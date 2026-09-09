@@ -14,11 +14,7 @@ import {
 
 import { AppButton } from '@/components/ui/AppButton';
 
-import {
-  colors,
-  radius,
-  spacing,
-} from '@/constants/theme';
+import { radius, spacing } from '@/constants/theme';
 
 export default function LoginScreen() {
   const router = useRouter();
@@ -47,17 +43,17 @@ export default function LoginScreen() {
         showsVerticalScrollIndicator={false}
       >
         {/* ==============================
-            DECORACIÓN DE FONDO VIBRANTE
+            DECORACIÓN DE FONDO (NEGRO Y ROJO)
             ============================== */}
 
         <View pointerEvents="none" style={styles.decorations}>
           {/* Esferas de luz principales */}
-          <View style={styles.orbInfoLarge} />
-          <View style={styles.orbAccentLarge} />
+          <View style={styles.orbRedLarge} />
+          <View style={styles.orbDarkRed} />
           
           {/* Cristales geométricos (Cuadrados rotados) */}
-          <View style={styles.crystalAccent} />
-          <View style={styles.crystalPrimary} />
+          <View style={styles.crystalRed} />
+          <View style={styles.crystalGrey} />
 
           {/* Anillos notorios */}
           <View style={styles.ringStrong1} />
@@ -129,7 +125,7 @@ export default function LoginScreen() {
                   autoCorrect={false}
                   keyboardType="email-address"
                   placeholder="usuario@correo.cl"
-                  placeholderTextColor={colors.textMuted}
+                  placeholderTextColor="#666666"
                   style={styles.input}
                   onFocus={() => setEmailFocused(true)}
                   onBlur={() => setEmailFocused(false)}
@@ -156,7 +152,7 @@ export default function LoginScreen() {
                   autoCapitalize="none"
                   autoCorrect={false}
                   placeholder="••••••••"
-                  placeholderTextColor={colors.textMuted}
+                  placeholderTextColor="#666666"
                   secureTextEntry={!passwordVisible}
                   style={styles.input}
                   onFocus={() => setPasswordFocused(true)}
@@ -215,10 +211,23 @@ export default function LoginScreen() {
   );
 }
 
+// Variables de color locales para el nuevo tema Black & Red
+const localTheme = {
+  background: '#070707', // Negro profundo
+  surface: '#121212', // Gris muy oscuro para la tarjeta
+  surfaceSoft: '#1A1A1A', // Fondo de los inputs
+  border: '#2A2A2A', // Bordes sutiles
+primary: '#740b0b', // Rojo vibrante
+  primaryDark: '#8A0009', // Rojo oscuro
+  text: '#FFFFFF', // Blanco puro
+  textSecondary: '#A0A0A0', // Gris claro
+  textMuted: '#666666', // Gris oscuro
+};
+
 const styles = StyleSheet.create({
   root: {
     flex: 1,
-    backgroundColor: colors.background,
+    backgroundColor: localTheme.background,
   },
 
   container: {
@@ -229,7 +238,7 @@ const styles = StyleSheet.create({
   },
 
   /* ===================================
-     DECORACIÓN VIBRANTE
+     DECORACIÓN VIBRANTE (Dark & Red)
      =================================== */
 
   decorations: {
@@ -241,62 +250,59 @@ const styles = StyleSheet.create({
     overflow: 'hidden',
   },
 
-  // Esferas de color intenso con opacidad media para no perderse
-  orbInfoLarge: {
+  orbRedLarge: {
     position: 'absolute',
     width: 280,
     height: 280,
     borderRadius: 140,
-    backgroundColor: colors.info, // Azul vibrante
+    backgroundColor: localTheme.primary,
     top: -100,
     right: -80,
-    opacity: 0.15,
+    opacity: 0.12, 
   },
 
-  orbAccentLarge: {
+  orbDarkRed: {
     position: 'absolute',
     width: 240,
     height: 240,
     borderRadius: 120,
-    backgroundColor: colors.accent, // Naranja fuerte
+    backgroundColor: localTheme.primaryDark,
     bottom: -80,
     left: -70,
-    opacity: 0.18,
+    opacity: 0.25,
   },
 
-  // Formas de cristal (Rombos)
-  crystalAccent: {
+  crystalRed: {
     position: 'absolute',
     width: 90,
     height: 90,
     borderRadius: 20,
-    backgroundColor: colors.warning,
+    backgroundColor: localTheme.primary,
     top: 180,
     left: -35,
-    opacity: 0.25,
+    opacity: 0.15,
     transform: [{ rotate: '45deg' }],
   },
 
-  crystalPrimary: {
+  crystalGrey: {
     position: 'absolute',
     width: 110,
     height: 110,
     borderRadius: 24,
-    backgroundColor: colors.primaryLight,
+    backgroundColor: '#333333',
     bottom: 150,
     right: -45,
     opacity: 0.2,
     transform: [{ rotate: '45deg' }],
   },
 
-  // Anillos notorios (bordes más gruesos y colores sólidos con transparencia)
   ringStrong1: {
     position: 'absolute',
     width: 130,
     height: 130,
     borderRadius: 65,
-    borderWidth: 6,
-    borderColor: colors.accent,
+    borderWidth: 4,
+    borderColor: localTheme.primary,
     bottom: 60,
     right: -30,
     opacity: 0.25,
@@ -307,28 +313,27 @@ const styles = StyleSheet.create({
     width: 80,
     height: 80,
     borderRadius: 40,
-    borderWidth: 4,
-    borderColor: colors.info,
+    borderWidth: 3,
+    borderColor: '#444444',
     top: 70,
     left: 20,
     opacity: 0.3,
   },
 
-  // Puntos/Destellos con sombra para que resalten
   glowDot1: {
     position: 'absolute',
     width: 16,
     height: 16,
     borderRadius: 8,
-    backgroundColor: colors.accent,
+    backgroundColor: localTheme.primary,
     top: 310,
     left: 50,
-    opacity: 0.7,
-    shadowColor: colors.accent,
+    opacity: 0.9,
+    shadowColor: localTheme.primary,
     shadowOffset: { width: 0, height: 0 },
-    shadowOpacity: 0.8,
-    shadowRadius: 10,
-    elevation: 3,
+    shadowOpacity: 1,
+    shadowRadius: 12,
+    elevation: 4,
   },
 
   glowDot2: {
@@ -336,15 +341,10 @@ const styles = StyleSheet.create({
     width: 12,
     height: 12,
     borderRadius: 6,
-    backgroundColor: colors.info,
+    backgroundColor: '#666666',
     bottom: 250,
     right: 50,
-    opacity: 0.8,
-    shadowColor: colors.info,
-    shadowOffset: { width: 0, height: 0 },
-    shadowOpacity: 0.8,
-    shadowRadius: 8,
-    elevation: 3,
+    opacity: 0.5,
   },
 
   glowDot3: {
@@ -352,10 +352,10 @@ const styles = StyleSheet.create({
     width: 14,
     height: 14,
     borderRadius: 7,
-    backgroundColor: colors.warning,
+    backgroundColor: localTheme.primary,
     top: 120,
     right: 70,
-    opacity: 0.6,
+    opacity: 0.8,
   },
 
   /* ===================================
@@ -373,7 +373,9 @@ const styles = StyleSheet.create({
     borderRadius: 28,
     alignItems: 'center',
     justifyContent: 'center',
-    backgroundColor: colors.primarySoft,
+    backgroundColor: localTheme.surface, 
+    borderWidth: 1,
+    borderColor: localTheme.border,
     marginBottom: spacing.md,
   },
 
@@ -381,19 +383,17 @@ const styles = StyleSheet.create({
     width: 64,
     height: 64,
     borderRadius: 21,
-    backgroundColor: colors.primary,
+    backgroundColor: localTheme.primary, // Logo en rojo
     alignItems: 'center',
     justifyContent: 'center',
-    borderWidth: 3,
-    borderColor: colors.surface,
-    shadowColor: colors.primary,
+    shadowColor: localTheme.primary,
     shadowOffset: {
       width: 0,
-      height: 5,
+      height: 4,
     },
-    shadowOpacity: 0.18,
-    shadowRadius: 9,
-    elevation: 4,
+    shadowOpacity: 0.4,
+    shadowRadius: 8,
+    elevation: 6,
   },
 
   logoText: {
@@ -404,14 +404,14 @@ const styles = StyleSheet.create({
   },
 
   brand: {
-    color: colors.primary,
+    color: localTheme.text,
     fontSize: 28,
     fontWeight: '900',
     letterSpacing: -0.8,
   },
 
   description: {
-    color: colors.textSecondary,
+    color: localTheme.textSecondary,
     fontSize: 12,
     lineHeight: 17,
     textAlign: 'center',
@@ -422,30 +422,30 @@ const styles = StyleSheet.create({
      =================================== */
 
   card: {
-    backgroundColor: colors.surface,
+    backgroundColor: localTheme.surface,
     borderRadius: radius.lg,
     borderWidth: 1,
-    borderColor: colors.border,
+    borderColor: localTheme.border,
     padding: spacing.xl,
 
-    shadowColor: colors.primary,
+    shadowColor: '#000000',
     shadowOffset: {
       width: 0,
-      height: 8,
+      height: 10,
     },
-    shadowOpacity: 0.08,
-    shadowRadius: 18,
-    elevation: 4,
+    shadowOpacity: 0.5,
+    shadowRadius: 20,
+    elevation: 8,
   },
 
   title: {
-    color: colors.text,
+    color: localTheme.text,
     fontSize: 22,
     fontWeight: '900',
   },
 
   subtitle: {
-    color: colors.textSecondary,
+    color: localTheme.textSecondary,
     marginTop: 5,
     fontSize: 12,
     lineHeight: 19,
@@ -461,7 +461,7 @@ const styles = StyleSheet.create({
   },
 
   label: {
-    color: colors.text,
+    color: localTheme.text,
     marginBottom: 7,
     fontSize: 11,
     fontWeight: '800',
@@ -472,24 +472,23 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
 
-    backgroundColor: colors.surfaceSoft,
+    backgroundColor: localTheme.surfaceSoft,
 
     borderWidth: 1,
-    borderColor: colors.border,
-
+    borderColor: localTheme.border,
     borderRadius: radius.md,
 
     paddingHorizontal: spacing.md,
   },
 
   inputFocused: {
-    backgroundColor: colors.surface,
-    borderColor: colors.accent,
+    backgroundColor: localTheme.surface,
+    borderColor: localTheme.primary, // Borde rojo al seleccionar
   },
 
   input: {
     flex: 1,
-    color: colors.text,
+    color: localTheme.text,
     fontSize: 14,
     paddingVertical: 0,
   },
@@ -500,7 +499,7 @@ const styles = StyleSheet.create({
   },
 
   showButtonText: {
-    color: colors.accent,
+    color: localTheme.primary,
     fontSize: 9,
     fontWeight: '900',
     letterSpacing: 0.3,
@@ -508,7 +507,7 @@ const styles = StyleSheet.create({
 
   loginButton: {
     marginTop: spacing.sm,
-    backgroundColor: colors.primary,
+    backgroundColor: localTheme.primary, // Botón de acción principal rojo
     borderRadius: radius.md,
   },
 
@@ -520,7 +519,7 @@ const styles = StyleSheet.create({
     marginTop: spacing.xl,
     paddingTop: spacing.lg,
     borderTopWidth: 1,
-    borderTopColor: colors.border,
+    borderTopColor: localTheme.border,
 
     flexDirection: 'row',
     alignItems: 'center',
@@ -531,12 +530,12 @@ const styles = StyleSheet.create({
     width: 7,
     height: 7,
     borderRadius: 4,
-    backgroundColor: colors.accent,
+    backgroundColor: localTheme.primary,
     marginRight: spacing.sm,
   },
 
   bottomText: {
-    color: colors.textMuted,
+    color: localTheme.textMuted,
     fontSize: 10,
     fontWeight: '600',
   },
@@ -551,7 +550,7 @@ const styles = StyleSheet.create({
   },
 
   footerText: {
-    color: colors.textMuted,
+    color: localTheme.textMuted,
     fontSize: 10,
   },
 });
