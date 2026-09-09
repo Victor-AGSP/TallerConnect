@@ -1,0 +1,106 @@
+@startuml
+title Sistema de Gestión TallerConnect\nDiagrama de Casos de Uso (Versión Completa y Optimizada)
+
+left to right direction
+
+' Configuraciones visuales para un diseño limpio
+skinparam packageStyle rectangle
+skinparam shadowing false
+skinparam actorStyle stickman
+skinparam nodesep 40
+skinparam ranksep 60
+
+' Estilo general de los casos de uso
+skinparam usecase {
+    BackgroundColor #F7F9FC
+    BorderColor #1F4E79
+    ArrowColor #1F4E79
+}
+
+actor "Cliente" as C
+actor "Mecánico" as M
+actor "Administrador" as A
+
+' Separación visual entre Cliente y Mecánico en el lado izquierdo
+C -[hidden]down-> M
+
+rectangle "Plataforma TallerConnect" {
+    
+    package "1. Acceso Transversal" {
+        usecase "Iniciar Sesión (JWT) y Perfil" as UC_Auth
+    }
+    
+    package "2. Experiencia del Cliente" {
+        usecase "Consultar historial y estado vehicular" as UC_Historial
+        usecase "Aprobar o Rechazar presupuesto" as UC_Aprobar
+        usecase "Servicios Futuros\n(Pagos, Reservas, Recordatorios)" as UC_Futuro
+    }
+    
+    package "3. Operación en Taller (Mecánico)" {
+        usecase "Actualizar estado de reparación" as UC_Estado
+        usecase "Registrar cambio en historial" as UC_Log
+        usecase "Registrar diagnóstico técnico" as UC_Diag
+        usecase "Adjuntar evidencia multimedia" as UC_Evidencia
+        usecase "Registrar repuestos utilizados" as UC_Repuestos
+        usecase "Asociar distribuidor y garantía" as UC_Distribuidor
+    }
+    
+    package "4. Administración y Recepción" {
+        usecase "Registrar cliente y vehículo" as UC_Registro
+        usecase "Crear Orden de Trabajo (OT)" as UC_CrearOT
+        usecase "Asignar mecánico a OT" as UC_Asignar
+        usecase "Generar presupuesto" as UC_Presupuesto
+        usecase "Consultar Dashboard (Estado de OTs)" as UC_Dash
+        
+        ' Caso de uso centralizado por herencia
+        usecase "Gestionar Administración\n(Datos Maestros)" as UC_GestCentral
+        usecase "Catálogo de distribuidores" as UC_GestDistribuidores
+        usecase "Inventario de repuestos" as UC_GestInventario
+        usecase "Usuarios y roles" as UC_GestUsuarios
+    }
+}
+
+' === LÓGICA DE NEGOCIO (INCLUDES Y EXTENDS) ===
+UC_Estado ..> UC_Log : <<include>>
+UC_Repuestos ..> UC_Distribuidor : <<include>>
+UC_Evidencia ..> UC_Diag : <<extend>>
+UC_Aprobar ..> UC_Evidencia : <<include>>
+UC_CrearOT ..> UC_Asignar : <<include>>
+
+' === ESPECIALIZACIÓN / HERENCIA (UML Puro) ===
+' Las gestiones específicas heredan del caso general
+UC_GestDistribuidores --|> UC_GestCentral
+UC_GestInventario --|> UC_GestCentral
+UC_GestUsuarios --|> UC_GestCentral
+
+' === RELACIONES CON ACTORES (Asociaciones sin flechas) ===
+
+' Lado Izquierdo (Cliente)
+C -- UC_Auth
+C -- UC_Historial
+C -- UC_Aprobar
+C -- UC_Futuro
+
+' Lado Izquierdo (Mecánico)
+M -- UC_Auth
+M -- UC_Estado
+M -- UC_Diag
+M -- UC_Repuestos
+
+' Lado Derecho (Administrador)
+' Al definir la conexión al revés, PlantUML posiciona al Admin a la derecha automáticamente
+UC_Auth -- A
+UC_Registro -- A
+UC_CrearOT -- A
+UC_Presupuesto -- A
+UC_Dash -- A
+UC_GestCentral -- A
+
+note right of UC_Log
+  Flujo de estados trazables:
+  Recibido -> Esperando Diagnóstico -> 
+  En Reparación -> Esperando Repuestos -> 
+  Listo -> Entregado
+end note
+
+@enduml

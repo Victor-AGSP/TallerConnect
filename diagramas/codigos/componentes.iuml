@@ -1,0 +1,108 @@
+@startuml TallerConnect
+title TallerConnect: Arquitectura de Microservicios y Cliente Móvil\nDiagrama de Componentes UML
+
+skinparam shadowing false
+skinparam componentStyle rectangle
+skinparam packageStyle rectangle
+skinparam ArrowColor #1F4E79
+skinparam interface {
+    BackgroundColor #FFFFFF
+    BorderColor #1F4E79
+}
+skinparam component {
+    BackgroundColor #F7F9FC
+    BorderColor #1F4E79
+}
+skinparam database {
+    BackgroundColor #EDF2F8
+    BorderColor #1F4E79
+}
+
+' Actores que interactúan con el sistema
+actor Cliente
+actor Mecánico
+actor Administrador
+
+' Capa 1: Presentación
+package "Capa de Presentación" {
+    component "Aplicación Web\nReact (Integra II)" as Web
+    component "Aplicación Móvil\n(Integra IV)" as Mobile
+}
+
+' Interfaz unificada expuesta por la API Gateway (Lollipop)
+interface "API Gateway\n(HTTPS / JSON)" as I_Gateway
+
+' Capa 2: Integración y ruteo
+package "Capa de Integración" {
+    component "API Gateway\n(Punto Único de Entrada)" as Gateway
+}
+
+' Capa 3: Microservicios (Estructura oficial de 4 servicios)
+package "Capa de Microservicios" {
+    component "MS Autenticación\ny Usuarios" as MS_Auth
+    component "MS Vehículos y\nÓrdenes de Trabajo" as MS_Vehicles
+    component "MS Presupuestos, Repuestos\ny Proveedores" as MS_Budgets
+    component "MS Evidencia\nMultimedia" as MS_Media
+}
+
+' Interfaces expuestas por cada microservicio (Lollipops)
+interface "Auth & Users API" as I_Auth
+interface "Vehicles & Orders API" as I_Vehicles
+interface "Budgets, Parts & Stock API" as I_Budgets
+interface "Media API" as I_Media
+
+' Capa 4: Persistencia Desacoplada (Bases de datos independientes)
+package "Capa de Persistencia" {
+    database "BD Usuarios\n(Credentials/Roles)" as DB_Auth
+    database "BD Vehículos\ny Órdenes" as DB_Vehicles
+    database "BD Presupuestos\ny Repuestos" as DB_Budgets
+    database "Almacenamiento\nMultimedia (S3/Local)" as DB_Media
+}
+
+' --- RELACIONES Y ENSAMBLADOS (Simbología Correcta) ---
+
+' Actores acceden a la presentación
+Cliente -down-> Web
+Cliente -down-> Mobile
+Mecánico -down-> Mobile
+Mecánico -down-> Web
+Administrador -down-> Web
+
+' La API Gateway expone su interfaz expuesta (Lollipop)
+Gateway -up- I_Gateway
+
+' Las aplicaciones de presentación se acoplan a la interfaz del Gateway (Sockets)
+Web ..( I_Gateway : consume
+Mobile ..( I_Gateway : consume
+
+' Cada Microservicio expone su interfaz correspondiente
+MS_Auth -up- I_Auth
+MS_Vehicles -up- I_Vehicles
+MS_Budgets -up- I_Budgets
+MS_Media -up- I_Media
+
+' El API Gateway se acopla a las interfaces de los microservicios tras bambalinas
+Gateway ..( I_Auth : rutea
+Gateway ..( I_Vehicles : rutea
+Gateway ..( I_Budgets : rutea
+Gateway ..( I_Media : rutea
+
+' Persistencia aislada para cada microservicio
+MS_Auth -down-> DB_Auth
+MS_Vehicles -down-> DB_Vehicles
+MS_Budgets -down-> DB_Budgets
+MS_Media -down-> DB_Media
+
+' Notas aclaratorias para el informe de sistematización
+note right of Mobile
+  Foco de desarrollo de Integración IV.
+  Se conecta de manera exclusiva consumiendo
+  los contratos de la API Gateway.
+end note
+
+note bottom of MS_Budgets
+  Centraliza la lógica de presupuestos,
+  repuestos, proveedores e inventario.
+end note
+
+@enduml

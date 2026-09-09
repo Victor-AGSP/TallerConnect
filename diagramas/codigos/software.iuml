@@ -1,0 +1,109 @@
+@startuml
+title Arquitectura de Software - TallerConnect
+
+top to bottom direction
+
+skinparam componentStyle rectangle
+skinparam shadowing false
+skinparam packageStyle rectangle
+skinparam linetype ortho
+
+actor Cliente
+actor "Mecánico" as Mecanico
+actor Administrador
+
+' =====================================================
+' INTEGRACIÓN IV - APLICACIÓN MÓVIL
+' =====================================================
+
+package "Taller de Integración IV" {
+
+    component "Aplicación Móvil\nTallerConnect\n\nReact Native + Expo\nTypeScript" as Mobile
+}
+
+Cliente --> Mobile
+Mecanico --> Mobile
+Administrador --> Mobile
+
+
+' =====================================================
+' INTEGRACIÓN II - WEB + BACKEND
+' =====================================================
+
+package "Taller de Integración II" {
+
+    component "Plataforma Web" as Web
+
+    component "API Gateway\n\nPunto único de entrada" as Gateway
+
+    package "Microservicios" {
+
+        component "MS 1\nAutenticación\ny Usuarios" as Auth
+
+        component "MS 2\nVehículos y\nÓrdenes de Trabajo" as Orders
+
+        component "MS 3\nPresupuestos,\nRepuestos y\nProveedores" as Budget
+
+        component "MS 4\nEvidencia\nMultimedia" as Evidence
+    }
+
+    database "Persistencia /\nBases de Datos" as DB
+}
+
+Administrador --> Web
+
+Mobile --> Gateway : HTTPS / REST / JSON
+Web --> Gateway : HTTPS / REST / JSON
+
+Gateway --> Auth
+Gateway --> Orders
+Gateway --> Budget
+Gateway --> Evidence
+
+Auth --> DB
+Orders --> DB
+Budget --> DB
+Evidence --> DB
+
+
+note right of Auth
+Login
+Usuarios
+Roles
+Autorización
+end note
+
+note right of Orders
+Vehículos
+Órdenes
+Estados
+Historial
+Mecánico responsable
+end note
+
+note right of Budget
+Presupuestos
+Repuestos
+Proveedores
+Inventario / Stock
+end note
+
+note right of Evidence
+Fotografías
+Videos
+Evidencias de órdenes
+end note
+
+
+note left of Mobile
+Responsabilidad principal
+de Integración IV:
+
+• Aplicación móvil
+• Interfaces por rol
+• Gestión de sesión
+• Consumo de API
+• Evidencia multimedia
+end note
+
+@enduml
