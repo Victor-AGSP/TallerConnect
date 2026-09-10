@@ -71,7 +71,11 @@ export function Input({
       />
 
       {supportingText ? (
-        <Text style={[styles.supportingText, error && styles.errorText]}>
+        <Text
+          accessibilityLiveRegion={error ? 'polite' : 'none'}
+          accessibilityRole={error ? 'alert' : undefined}
+          style={[styles.supportingText, error && styles.errorText]}
+        >
           {supportingText}
         </Text>
       ) : null}
