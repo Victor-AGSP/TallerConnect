@@ -3,7 +3,7 @@ import { Text } from 'react-native';
 
 import { Button, Card, ErrorMessage, Input, Loading } from '@/components/common';
 
-describe('componentes reutilizables iniciales', () => {
+describe('componentes comunes', () => {
   it('Button ejecuta la acción y expone su estado de accesibilidad', async () => {
     const onPress = jest.fn();
     const { getByTestId } = await render(
@@ -43,6 +43,22 @@ describe('componentes reutilizables iniciales', () => {
     expect(onPress).not.toHaveBeenCalled();
   });
 
+  it('Button admite etiqueta de accesibilidad personalizada', async () => {
+    const { getByTestId } = await render(
+      <Button
+        title="Eliminar"
+        variant="danger"
+        accessibilityLabel="Eliminar orden de trabajo"
+        onPress={jest.fn()}
+        testID="delete-button"
+      />,
+    );
+
+    expect(getByTestId('delete-button').props.accessibilityLabel).toBe(
+      'Eliminar orden de trabajo',
+    );
+  });
+
   it('Card renderiza su encabezado y contenido', async () => {
     const { getByText } = await render(
       <Card title="Detalle" subtitle="Información del vehículo">
@@ -68,6 +84,30 @@ describe('componentes reutilizables iniciales', () => {
     expect(getByText('El correo es obligatorio').props.accessibilityRole).toBe(
       'alert',
     );
+  });
+
+  it('Input muestra ayuda y notifica foco y desenfoque', async () => {
+    const onFocus = jest.fn();
+    const onBlur = jest.fn();
+    const { getByTestId, getByText } = await render(
+      <Input
+        label="Correo"
+        helperText="Usa el correo registrado"
+        onFocus={onFocus}
+        onBlur={onBlur}
+        testID="helper-input"
+      />,
+    );
+
+    const input = getByTestId('helper-input');
+
+    await fireEvent(input, 'focus');
+    await fireEvent(input, 'blur');
+
+    expect(input.props.accessibilityLabel).toBe('Correo');
+    expect(getByText('Usa el correo registrado')).toBeTruthy();
+    expect(onFocus).toHaveBeenCalledTimes(1);
+    expect(onBlur).toHaveBeenCalledTimes(1);
   });
 
   it('Loading expone un indicador ocupado y un mensaje', async () => {
@@ -97,5 +137,17 @@ describe('componentes reutilizables iniciales', () => {
     fireEvent.press(getByText('Reintentar'));
 
     expect(onRetry).toHaveBeenCalledTimes(1);
+  });
+
+  it('ErrorMessage permite personalizar el título y ocultar el reintento', async () => {
+    const { getByText, queryByText } = await render(
+      <ErrorMessage
+        title="Servicio no disponible"
+        message="Intenta nuevamente más tarde"
+      />,
+    );
+
+    expect(getByText('Servicio no disponible')).toBeTruthy();
+    expect(queryByText('Reintentar')).toBeNull();
   });
 });
