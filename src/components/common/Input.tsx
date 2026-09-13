@@ -21,6 +21,8 @@ export interface InputProps extends Omit<TextInputProps, 'style'> {
   error?: string;
   helperText?: string;
   containerStyle?: StyleProp<ViewStyle>;
+  labelStyle?: StyleProp<TextStyle>;
+  focusedStyle?: StyleProp<TextStyle>;
   style?: StyleProp<TextStyle>;
 }
 
@@ -29,6 +31,8 @@ export function Input({
   error,
   helperText,
   containerStyle,
+  labelStyle,
+  focusedStyle,
   style,
   onFocus,
   onBlur,
@@ -52,7 +56,7 @@ export function Input({
 
   return (
     <View style={containerStyle}>
-      {label ? <Text style={styles.label}>{label}</Text> : null}
+      {label ? <Text style={[styles.label, labelStyle]}>{label}</Text> : null}
 
       <TextInput
         {...textInputProps}
@@ -67,6 +71,7 @@ export function Input({
           error && styles.inputError,
           !editable && styles.inputDisabled,
           style,
+          focused && focusedStyle,
         ]}
       />
 

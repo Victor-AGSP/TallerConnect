@@ -8,11 +8,10 @@ import {
   ScrollView,
   StyleSheet,
   Text,
-  TextInput,
   View,
 } from 'react-native';
 
-import { AppButton } from '@/components/ui/AppButton';
+import { Button, Card, Input } from '@/components/common';
 
 import { radius, spacing } from '@/constants/theme';
 
@@ -23,9 +22,6 @@ export default function LoginScreen() {
   const [password, setPassword] = useState('');
 
   const [passwordVisible, setPasswordVisible] = useState(false);
-
-  const [emailFocused, setEmailFocused] = useState(false);
-  const [passwordFocused, setPasswordFocused] = useState(false);
 
   const handleLogin = () => {
     // Temporal mientras no esté conectado el backend.
@@ -95,7 +91,7 @@ export default function LoginScreen() {
             TARJETA DE LOGIN
             ============================== */}
 
-        <View style={styles.card}>
+        <Card style={styles.card}>
           <Text style={styles.title}>
             Bienvenido
           </Text>
@@ -107,77 +103,61 @@ export default function LoginScreen() {
           <View style={styles.form}>
             {/* CORREO */}
 
-            <View>
-              <Text style={styles.label}>
-                Correo electrónico
-              </Text>
-
-              <View
-                style={[
-                  styles.inputWrapper,
-                  emailFocused && styles.inputFocused,
-                ]}
-              >
-                <TextInput
-                  value={email}
-                  onChangeText={setEmail}
-                  autoCapitalize="none"
-                  autoCorrect={false}
-                  keyboardType="email-address"
-                  placeholder="usuario@correo.cl"
-                  placeholderTextColor="#666666"
-                  style={styles.input}
-                  onFocus={() => setEmailFocused(true)}
-                  onBlur={() => setEmailFocused(false)}
-                />
-              </View>
-            </View>
+            <Input
+              label="Correo electrónico"
+              value={email}
+              onChangeText={setEmail}
+              autoCapitalize="none"
+              autoCorrect={false}
+              keyboardType="email-address"
+              placeholder="usuario@correo.cl"
+              placeholderTextColor={localTheme.textMuted}
+              labelStyle={styles.label}
+              style={styles.input}
+              focusedStyle={styles.inputFocused}
+            />
 
             {/* CONTRASEÑA */}
 
-            <View>
-              <Text style={styles.label}>
-                Contraseña
-              </Text>
+            <View style={styles.passwordField}>
+              <Input
+                label="Contraseña"
+                value={password}
+                onChangeText={setPassword}
+                autoCapitalize="none"
+                autoCorrect={false}
+                placeholder="••••••••"
+                placeholderTextColor={localTheme.textMuted}
+                secureTextEntry={!passwordVisible}
+                labelStyle={styles.label}
+                style={styles.input}
+                focusedStyle={styles.inputFocused}
+              />
 
-              <View
-                style={[
-                  styles.inputWrapper,
-                  passwordFocused && styles.inputFocused,
-                ]}
+              <Pressable
+                accessibilityRole="button"
+                accessibilityLabel={
+                  passwordVisible
+                    ? 'Ocultar contraseña'
+                    : 'Mostrar contraseña'
+                }
+                onPress={() =>
+                  setPasswordVisible(
+                    (previous) => !previous
+                  )
+                }
+                hitSlop={10}
+                style={styles.showButton}
               >
-                <TextInput
-                  value={password}
-                  onChangeText={setPassword}
-                  autoCapitalize="none"
-                  autoCorrect={false}
-                  placeholder="••••••••"
-                  placeholderTextColor="#666666"
-                  secureTextEntry={!passwordVisible}
-                  style={styles.input}
-                  onFocus={() => setPasswordFocused(true)}
-                  onBlur={() => setPasswordFocused(false)}
-                />
-
-                <Pressable
-                  onPress={() =>
-                    setPasswordVisible(
-                      (previous) => !previous
-                    )
-                  }
-                  hitSlop={10}
-                  style={styles.showButton}
-                >
-                  <Text style={styles.showButtonText}>
-                    {passwordVisible ? 'OCULTAR' : 'VER'}
-                  </Text>
-                </Pressable>
-              </View>
+                <Text style={styles.showButtonText}>
+                  {passwordVisible ? 'OCULTAR' : 'VER'}
+                </Text>
+              </Pressable>
             </View>
 
             {/* BOTÓN */}
 
-            <AppButton
+            <Button
               title="Iniciar sesión"
               onPress={handleLogin}
               style={styles.loginButton}
@@ -195,7 +175,7 @@ export default function LoginScreen() {
               Acceso al sistema TallerConnect
             </Text>
           </View>
-        </View>
+        </Card>
 
         {/* ==============================
             FOOTER
@@ -467,20 +447,6 @@ const styles = StyleSheet.create({
     fontWeight: '800',
   },
 
-  inputWrapper: {
-    minHeight: 52,
-    flexDirection: 'row',
-    alignItems: 'center',
-
-    backgroundColor: localTheme.surfaceSoft,
-
-    borderWidth: 1,
-    borderColor: localTheme.border,
-    borderRadius: radius.md,
-
-    paddingHorizontal: spacing.md,
-  },
-
   inputFocused: {
     backgroundColor: localTheme.surface,
     borderColor: localTheme.primary, // Borde rojo al seleccionar
@@ -488,13 +454,24 @@ const styles = StyleSheet.create({
 
   input: {
     flex: 1,
+    minHeight: 52,
+    backgroundColor: localTheme.surfaceSoft,
+    borderColor: localTheme.border,
+    borderRadius: radius.md,
     color: localTheme.text,
     fontSize: 14,
+    paddingHorizontal: spacing.md,
     paddingVertical: 0,
   },
 
+  passwordField: {
+    position: 'relative',
+  },
+
   showButton: {
-    marginLeft: spacing.sm,
+    position: 'absolute',
+    top: 28,
+    right: spacing.md,
     paddingVertical: spacing.sm,
   },
 

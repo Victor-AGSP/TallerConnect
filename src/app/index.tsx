@@ -1,8 +1,13 @@
 import { Redirect } from 'expo-router';
 import { useAuthStore } from '@/stores/authStore';
+import { Loading } from '@/components/common';
 
 export default function IndexScreen() {
-  const { isAuthenticated, role } = useAuthStore();
+  const { isAuthenticated, isLoading, role } = useAuthStore();
+
+  if (isLoading) {
+    return <Loading />;
+  }
 
   if (!isAuthenticated) {
     return <Redirect href="/login" />;
