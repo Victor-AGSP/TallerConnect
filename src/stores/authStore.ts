@@ -2,7 +2,7 @@ import { create } from 'zustand';
 import { User } from '@/models/user.model';
 import { UserRole } from '@/constants/roles';
 
-interface AuthState {
+export interface AuthState {
   user: User | null;
   token: string | null;
   role: UserRole | null;
