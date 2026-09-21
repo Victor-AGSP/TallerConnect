@@ -1,6 +1,7 @@
 import { create } from 'zustand';
-import { User } from '@/models/user.model';
-import { UserRole } from '@/constants/roles';
+import type { LoginCredentials, User } from '@/models';
+import type { UserRole } from '@/constants/roles';
+import { authService } from '@/services/auth.service';
 
 export interface AuthState {
   user: User | null;
@@ -9,6 +10,7 @@ export interface AuthState {
   isAuthenticated: boolean;
   isLoading: boolean;
 
+  login: (credentials: LoginCredentials) => Promise<void>;
   setAuth: (user: User, token: string) => void;
   logout: () => void;
   setLoading: (loading: boolean) => void;
@@ -20,6 +22,25 @@ export const useAuthStore = create<AuthState>((set) => ({
   role: null,
   isAuthenticated: false,
   isLoading: false,
+
+  login: async (credentials) => {
+    set({ isLoading: true });
+
+    try {
+      const response = await authService.login(credentials);
+
+      set({
+        user: response.user,
+        token: response.token,
+        role: response.user.role,
+        isAuthenticated: true,
+        isLoading: false,
+      });
+    } catch (error) {
+      set({ isLoading: false });
+      throw error;
+    }
+  },
 
   setAuth: (user, token) =>
     set({

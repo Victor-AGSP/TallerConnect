@@ -1,5 +1,7 @@
 import { useState } from 'react';
 import { useRouter } from 'expo-router';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { Controller, useForm } from 'react-hook-form';
 
 import {
   KeyboardAvoidingView,
@@ -11,22 +13,40 @@ import {
   View,
 } from 'react-native';
 
-import { Button, Card, Input } from '@/components/common';
+import { Button, Card, ErrorMessage, Input } from '@/components/common';
 
 import { radius, spacing } from '@/constants/theme';
+import { loginSchema, type LoginFormData } from '@/schemas/auth.schema';
+import { useAuthStore } from '@/stores/authStore';
 
 export default function LoginScreen() {
   const router = useRouter();
-
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
-
+  const login = useAuthStore((state) => state.login);
+  const isLoading = useAuthStore((state) => state.isLoading);
   const [passwordVisible, setPasswordVisible] = useState(false);
+  const [loginError, setLoginError] = useState<string | null>(null);
 
-  const handleLogin = () => {
-    // Temporal mientras no esté conectado el backend.
-    router.replace('/cliente');
-  };
+  const {
+    control,
+    handleSubmit,
+    formState: { errors },
+  } = useForm<LoginFormData>({
+    resolver: zodResolver(loginSchema),
+    defaultValues: { email: '', password: '' },
+  });
+
+  const handleLogin = handleSubmit(async (credentials) => {
+    setLoginError(null);
+
+    try {
+      await login(credentials);
+      router.replace('/');
+    } catch {
+      setLoginError(
+        'No se pudo iniciar sesión. Verifica tus credenciales e inténtalo nuevamente.',
+      );
+    }
+  });
 
   return (
     <KeyboardAvoidingView
@@ -103,35 +123,53 @@ export default function LoginScreen() {
           <View style={styles.form}>
             {/* CORREO */}
 
-            <Input
-              label="Correo electrónico"
-              value={email}
-              onChangeText={setEmail}
-              autoCapitalize="none"
-              autoCorrect={false}
-              keyboardType="email-address"
-              placeholder="usuario@correo.cl"
-              placeholderTextColor={localTheme.textMuted}
-              labelStyle={styles.label}
-              style={styles.input}
-              focusedStyle={styles.inputFocused}
+            <Controller
+              control={control}
+              name="email"
+              render={({ field: { onBlur, onChange, value } }) => (
+                <Input
+                  label="Correo electrónico"
+                  value={value}
+                  onBlur={onBlur}
+                  onChangeText={onChange}
+                  autoCapitalize="none"
+                  autoCorrect={false}
+                  keyboardType="email-address"
+                  placeholder="usuario@correo.cl"
+                  placeholderTextColor={localTheme.textMuted}
+                  labelStyle={styles.label}
+                  style={styles.input}
+                  focusedStyle={styles.inputFocused}
+                  error={errors.email?.message}
+                  testID="login-email"
+                />
+              )}
             />
 
             {/* CONTRASEÑA */}
 
             <View style={styles.passwordField}>
-              <Input
-                label="Contraseña"
-                value={password}
-                onChangeText={setPassword}
-                autoCapitalize="none"
-                autoCorrect={false}
-                placeholder="••••••••"
-                placeholderTextColor={localTheme.textMuted}
-                secureTextEntry={!passwordVisible}
-                labelStyle={styles.label}
-                style={styles.input}
-                focusedStyle={styles.inputFocused}
+              <Controller
+                control={control}
+                name="password"
+                render={({ field: { onBlur, onChange, value } }) => (
+                  <Input
+                    label="Contraseña"
+                    value={value}
+                    onBlur={onBlur}
+                    onChangeText={onChange}
+                    autoCapitalize="none"
+                    autoCorrect={false}
+                    placeholder="••••••••"
+                    placeholderTextColor={localTheme.textMuted}
+                    secureTextEntry={!passwordVisible}
+                    labelStyle={styles.label}
+                    style={styles.input}
+                    focusedStyle={styles.inputFocused}
+                    error={errors.password?.message}
+                    testID="login-password"
+                  />
+                )}
               />
 
               <Pressable
@@ -157,10 +195,14 @@ export default function LoginScreen() {
 
             {/* BOTÓN */}
 
+            {loginError ? <ErrorMessage message={loginError} /> : null}
+
             <Button
               title="Iniciar sesión"
-              onPress={handleLogin}
+              onPress={() => void handleLogin()}
+              loading={isLoading}
               style={styles.loginButton}
+              testID="login-submit"
             />
           </View>
 
