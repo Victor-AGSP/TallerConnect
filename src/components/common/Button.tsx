@@ -37,6 +37,8 @@ export function Button({
   variant = 'primary',
   loading = false,
   disabled = false,
+  accessibilityLabel,
+  accessibilityState,
   style,
   textStyle,
   ...pressableProps
@@ -46,9 +48,13 @@ export function Button({
   return (
     <Pressable
       {...pressableProps}
-      accessibilityLabel={title}
+      accessibilityLabel={accessibilityLabel ?? title}
       accessibilityRole="button"
-      accessibilityState={{ disabled: isDisabled, busy: loading }}
+      accessibilityState={{
+        ...accessibilityState,
+        disabled: isDisabled,
+        busy: loading,
+      }}
       disabled={isDisabled}
       onPress={onPress}
       style={({ pressed }) => [

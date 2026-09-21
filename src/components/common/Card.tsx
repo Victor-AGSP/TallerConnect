@@ -33,7 +33,7 @@ export function Card({
 
       {subtitle ? <Text style={styles.subtitle}>{subtitle}</Text> : null}
 
-      {children ? (
+      {children !== undefined && children !== null ? (
         <View style={hasHeader ? styles.content : undefined}>{children}</View>
       ) : null}
     </View>

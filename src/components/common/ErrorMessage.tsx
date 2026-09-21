@@ -3,13 +3,15 @@ import {
   StyleSheet,
   Text,
   View,
+  ViewProps,
   ViewStyle,
 } from 'react-native';
 
 import { Button } from '@/components/common/Button';
 import { colors, radius, spacing } from '@/constants/theme';
 
-export interface ErrorMessageProps {
+export interface ErrorMessageProps
+  extends Omit<ViewProps, 'children' | 'style'> {
   message: string;
   title?: string;
   onRetry?: () => void;
@@ -23,10 +25,13 @@ export function ErrorMessage({
   onRetry,
   retryLabel = 'Reintentar',
   style,
+  ...viewProps
 }: ErrorMessageProps) {
   return (
     <View
+      {...viewProps}
       accessibilityRole="alert"
+      accessibilityLiveRegion="polite"
       style={[styles.container, style]}
     >
       <Text style={styles.title}>{title}</Text>

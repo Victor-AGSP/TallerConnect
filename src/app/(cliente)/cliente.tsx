@@ -9,13 +9,13 @@ import {
   View,
 } from 'react-native';
 
-import { AppButton } from '@/components/ui/AppButton';
 import { StatusPill } from '@/components/ui/StatusPill';
 
 import {
   radius,
   spacing,
 } from '@/constants/theme';
+import { Button, Card } from '@/components/common';
 
 export default function ClienteScreen() {
   const router = useRouter();
@@ -58,7 +58,7 @@ export default function ClienteScreen() {
         {/* ==============================
             TARJETA 1: VEHÍCULO EN SERVICIO
             ============================== */}
-        <View style={styles.card}>
+        <Card style={styles.card}>
           <Text style={styles.cardTitle}>Vehículo en servicio</Text>
           <Text style={styles.cardSubtitle}>
             Vehículo de demostración · Patente AB-CD-12
@@ -75,12 +75,12 @@ export default function ClienteScreen() {
               tone="success"
             />
           </View>
-        </View>
+        </Card>
 
         {/* ==============================
             TARJETA 2: SEGUIMIENTO
             ============================== */}
-        <View style={styles.card}>
+        <Card style={styles.card}>
           <Text style={styles.cardTitle}>Seguimiento de la orden</Text>
           
           <View style={[styles.timeline, { marginTop: spacing.md }]}>
@@ -107,7 +107,7 @@ export default function ClienteScreen() {
               detail="Pendiente"
             />
           </View>
-        </View>
+        </Card>
 
         {/* ==============================
             MÉTRICAS (GRID)
@@ -137,7 +137,7 @@ export default function ClienteScreen() {
         {/* ==============================
             TARJETA 3: PRESUPUESTO
             ============================== */}
-        <View style={styles.card}>
+        <Card style={styles.card}>
           <Text style={styles.cardTitle}>Presupuesto</Text>
           <Text style={styles.cardSubtitle}>
             Consulta la información proporcionada por el taller.
@@ -150,12 +150,12 @@ export default function ClienteScreen() {
               tone="success"
             />
           </View>
-        </View>
+        </Card>
 
         {/* ==============================
             TARJETA 4: EVIDENCIA MULTIMEDIA
             ============================== */}
-        <View style={styles.card}>
+        <Card style={styles.card}>
           <Text style={styles.cardTitle}>Evidencia multimedia</Text>
           <Text style={styles.cardSubtitle}>
             Fotografías y videos asociados a la revisión o reparación aparecerán aquí.
@@ -167,12 +167,12 @@ export default function ClienteScreen() {
               4 archivos disponibles
             </Text>
           </View>
-        </View>
+        </Card>
 
         {/* ==============================
             BOTÓN CERRAR SESIÓN
             ============================== */}
-        <AppButton
+        <Button
           title="Cerrar sesión"
           variant="outline"
           onPress={() => router.replace('/login')}
