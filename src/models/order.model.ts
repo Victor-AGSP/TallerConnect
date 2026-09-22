@@ -1,22 +1,6 @@
-/**
- * Estados posibles de una Orden de Trabajo (OT).
- * Flujo trazable: Recibido → Esperando Diagnóstico → En Reparación →
- * Esperando Repuestos → Listo para Entrega → Entregado.
- * `pausado_por_presupuesto_rechazado` es la rama alterna cuando
- * el cliente rechaza el presupuesto propuesto.
- */
+import type { WorkOrderStatus } from '@/constants/orderStatus'; 
 
-export type WorkOrderStatus =
-  | 'recibido'
-  | 'esperando_diagnostico'
-  | 'esperando_aprobacion_presupuesto'
-  | 'pausado_por_presupuesto_rechazado'
-  | 'esperando_repuestos'
-  | 'en_reparacion'
-  | 'control_calidad'
-  | 'listo_para_entrega'
-  | 'entregado'
-  | 'cancelado';
+export type { WorkOrderStatus };
 
 /**
  * Representa una Orden de Trabajo (OT), la entidad central
