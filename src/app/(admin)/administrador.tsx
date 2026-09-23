@@ -26,13 +26,17 @@ export default function AdministradorScreen() {
         contentContainerStyle={styles.container}
         showsVerticalScrollIndicator={false}
       >
-        {/* ==============================
-            DECORACIÓN DE FONDO (DARK & RED)
-            ============================== */}
-        <View pointerEvents="none" style={styles.decorations}>
+        {/* =====================================
+            DECORACIÓN
+            ===================================== */}
+
+        <View
+          pointerEvents="none"
+          style={styles.decorations}
+        >
           <View style={styles.orbRedLarge} />
           <View style={styles.orbDarkRed} />
-          
+
           <View style={styles.crystalRed} />
           <View style={styles.crystalGrey} />
 
@@ -44,20 +48,29 @@ export default function AdministradorScreen() {
           <View style={styles.glowDot3} />
         </View>
 
-        {/* ==============================
+        {/* =====================================
             ENCABEZADO
-            ============================== */}
+            ===================================== */}
+
         <View style={styles.header}>
-          <Text style={styles.eyebrow}>Administración</Text>
-          <Text style={styles.title}>Resumen operativo</Text>
+          <Text style={styles.eyebrow}>
+            Administración
+          </Text>
+
+          <Text style={styles.title}>
+            Panel del taller
+          </Text>
+
           <Text style={styles.subtitle}>
-            Información relevante para seguimiento del funcionamiento del taller.
+            Vista general de vehículos, órdenes y
+            actividad operativa del taller.
           </Text>
         </View>
 
-        {/* ==============================
-            MÉTRICAS (STATS)
-            ============================== */}
+        {/* =====================================
+            MÉTRICAS
+            ===================================== */}
+
         <View style={styles.stats}>
           <Stat
             value="12"
@@ -80,13 +93,17 @@ export default function AdministradorScreen() {
           />
         </View>
 
-        {/* ==============================
-            TARJETA 1: ESTADO DE LAS ÓRDENES
-            ============================== */}
+        {/* =====================================
+            ESTADO DE LAS ÓRDENES
+            ===================================== */}
+
         <View style={styles.card}>
-          <Text style={styles.cardTitle}>Estado de las órdenes</Text>
+          <Text style={styles.cardTitle}>
+            Estado de las órdenes
+          </Text>
+
           <Text style={styles.cardSubtitle}>
-            Resumen de operaciones disponibles desde la API.
+            Resumen operativo de demostración.
           </Text>
 
           <View style={styles.statusList}>
@@ -107,16 +124,26 @@ export default function AdministradorScreen() {
               value="2"
               tone="success"
             />
+
+            <StatusRow
+              label="Esperando aprobación"
+              value="3"
+              tone="danger"
+            />
           </View>
         </View>
 
-        {/* ==============================
-            TARJETA 2: VEHÍCULOS EN ATENCIÓN
-            ============================== */}
+        {/* =====================================
+            VEHÍCULOS EN ATENCIÓN
+            ===================================== */}
+
         <View style={styles.card}>
-          <Text style={styles.cardTitle}>Vehículos en atención</Text>
+          <Text style={styles.cardTitle}>
+            Vehículos en atención
+          </Text>
+
           <Text style={styles.cardSubtitle}>
-            Consulta rápida de las operaciones actuales.
+            Operaciones actuales del taller.
           </Text>
 
           <View style={styles.orders}>
@@ -137,39 +164,134 @@ export default function AdministradorScreen() {
               plate="IJ-KL-56"
               status="Espera presupuesto"
             />
-          </View>
-        </View>
 
-        {/* ==============================
-            TARJETA 3: MECÁNICOS
-            ============================== */}
-        <View style={styles.card}>
-          <Text style={styles.cardTitle}>Mecánicos</Text>
-          <Text style={styles.cardSubtitle}>
-            Información resumida relacionada con la operación.
-          </Text>
-
-          <View style={styles.employee}>
-            <View>
-              <Text style={styles.employeeName}>
-                Mecánico de demostración
-              </Text>
-
-              <Text style={styles.employeeDetail}>
-                3 órdenes asignadas
-              </Text>
-            </View>
-
-            <StatusPill
-              label="Activo"
-              tone="success"
+            <AdminOrder
+              code="OT-00127"
+              plate="XY-ZW-90"
+              status="Listo para entrega"
             />
           </View>
         </View>
 
-        {/* ==============================
-            BOTÓN CERRAR SESIÓN
-            ============================== */}
+        {/* =====================================
+            MECÁNICOS
+            ===================================== */}
+
+        <View style={styles.card}>
+          <Text style={styles.cardTitle}>
+            Mecánicos
+          </Text>
+
+          <Text style={styles.cardSubtitle}>
+            Resumen de la actividad del equipo.
+          </Text>
+
+          <Mechanic
+            name="Mecánico de demostración"
+            orders="3 órdenes asignadas"
+            status="Activo"
+          />
+
+          <Mechanic
+            name="Segundo mecánico"
+            orders="2 órdenes asignadas"
+            status="Activo"
+          />
+
+          <Mechanic
+            name="Tercer mecánico"
+            orders="Sin órdenes asignadas"
+            status="Disponible"
+          />
+        </View>
+
+        {/* =====================================
+            APROBACIONES
+            ===================================== */}
+
+        <View style={styles.card}>
+          <Text style={styles.cardTitle}>
+            Pendientes de aprobación
+          </Text>
+
+          <Text style={styles.cardSubtitle}>
+            Elementos que requieren revisión
+            administrativa.
+          </Text>
+
+          <Approval
+            order="OT-00126"
+            vehicle="IJ-KL-56"
+            amount="$185.000"
+          />
+
+          <Approval
+            order="OT-00129"
+            vehicle="MN-OP-78"
+            amount="$240.000"
+          />
+
+          <Approval
+            order="OT-00130"
+            vehicle="QR-ST-12"
+            amount="$95.000"
+          />
+        </View>
+
+        {/* =====================================
+            ACTIVIDAD
+            ===================================== */}
+
+        <View style={styles.card}>
+          <Text style={styles.cardTitle}>
+            Resumen del sistema
+          </Text>
+
+          <View style={styles.systemRow}>
+            <Text style={styles.systemLabel}>
+              Vehículos registrados
+            </Text>
+
+            <Text style={styles.systemValue}>
+              32
+            </Text>
+          </View>
+
+          <View style={styles.systemRow}>
+            <Text style={styles.systemLabel}>
+              Órdenes completadas
+            </Text>
+
+            <Text style={styles.systemValue}>
+              87
+            </Text>
+          </View>
+
+          <View style={styles.systemRow}>
+            <Text style={styles.systemLabel}>
+              Mecánicos registrados
+            </Text>
+
+            <Text style={styles.systemValue}>
+              6
+            </Text>
+          </View>
+
+          <View style={styles.systemRow}>
+            <Text style={styles.systemLabel}>
+              Clientes registrados
+            </Text>
+
+            <Text style={styles.systemValue}>
+              41
+            </Text>
+          </View>
+        </View>
+
+        {/* =====================================
+            CERRAR SESIÓN
+            ===================================== */}
+
         <AppButton
           title="Cerrar sesión"
           variant="outline"
@@ -181,9 +303,9 @@ export default function AdministradorScreen() {
   );
 }
 
-// ==========================================
-// COMPONENTES SECUNDARIOS
-// ==========================================
+/* ==========================================
+   COMPONENTES
+   ========================================== */
 
 function Stat({
   value,
@@ -194,8 +316,13 @@ function Stat({
 }) {
   return (
     <View style={styles.stat}>
-      <Text style={styles.statValue}>{value}</Text>
-      <Text style={styles.statLabel}>{label}</Text>
+      <Text style={styles.statValue}>
+        {value}
+      </Text>
+
+      <Text style={styles.statLabel}>
+        {label}
+      </Text>
     </View>
   );
 }
@@ -207,7 +334,11 @@ function StatusRow({
 }: {
   label: string;
   value: string;
-  tone: 'success' | 'warning' | 'info';
+  tone:
+    | 'success'
+    | 'warning'
+    | 'info'
+    | 'danger';
 }) {
   return (
     <View style={styles.statusRow}>
@@ -223,16 +354,6 @@ function StatusRow({
   );
 }
 
-// Función auxiliar para colores dinámicos (Idéntica a Mecánico)
-const getStatusColor = (status: string) => {
-  const normalizedStatus = status.toUpperCase();
-  if (normalizedStatus.includes('DIAGNÓSTICO')) return '#F5A623'; // Naranja
-  if (normalizedStatus.includes('ESPERA')) return '#5AC8FA'; // Azul claro
-  if (normalizedStatus.includes('REPARACIÓN')) return '#34C759'; // Verde
-  if (normalizedStatus.includes('ENTREGA')) return '#AF52DE'; // Morado
-  return '#A0A0A0'; // Gris por defecto
-};
-
 function AdminOrder({
   code,
   plate,
@@ -242,18 +363,39 @@ function AdminOrder({
   plate: string;
   status: string;
 }) {
-  const statusColor = getStatusColor(status);
+  const color =
+    getStatusColor(status);
 
   return (
-    <View style={styles.miniOrder}>
-      <View style={styles.miniOrderLeft}>
-        <Text style={styles.miniOrderNumber}>{code}</Text>
-        <Text style={styles.miniOrderVehicle}>{plate}</Text>
+    <View style={styles.orderRow}>
+      <View style={styles.orderLeft}>
+        <Text style={styles.orderCode}>
+          {code}
+        </Text>
+
+        <Text style={styles.orderPlate}>
+          {plate}
+        </Text>
       </View>
-      
-      <View style={styles.miniOrderRight}>
-        <View style={[styles.statusDot, { backgroundColor: statusColor }]} />
-        <Text style={[styles.miniOrderStatus, { color: statusColor }]}>
+
+      <View style={styles.orderStatus}>
+        <View
+          style={[
+            styles.statusDot,
+            {
+              backgroundColor: color,
+            },
+          ]}
+        />
+
+        <Text
+          style={[
+            styles.orderStatusText,
+            {
+              color,
+            },
+          ]}
+        >
           {status.toUpperCase()}
         </Text>
       </View>
@@ -261,38 +403,137 @@ function AdminOrder({
   );
 }
 
-// ==========================================
-// TEMA LOCAL (DARK & RED)
-// ==========================================
+function Mechanic({
+  name,
+  orders,
+  status,
+}: {
+  name: string;
+  orders: string;
+  status: string;
+}) {
+  return (
+    <View style={styles.mechanicRow}>
+      <View style={styles.mechanicInfo}>
+        <Text style={styles.mechanicName}>
+          {name}
+        </Text>
+
+        <Text style={styles.mechanicDetail}>
+          {orders}
+        </Text>
+      </View>
+
+      <StatusPill
+        label={status}
+        tone="success"
+      />
+    </View>
+  );
+}
+
+function Approval({
+  order,
+  vehicle,
+  amount,
+}: {
+  order: string;
+  vehicle: string;
+  amount: string;
+}) {
+  return (
+    <View style={styles.approvalRow}>
+      <View>
+        <Text style={styles.approvalOrder}>
+          {order}
+        </Text>
+
+        <Text style={styles.approvalVehicle}>
+          {vehicle}
+        </Text>
+      </View>
+
+      <View style={styles.approvalRight}>
+        <Text style={styles.approvalAmount}>
+          {amount}
+        </Text>
+
+        <Text style={styles.approvalPending}>
+          Pendiente
+        </Text>
+      </View>
+    </View>
+  );
+}
+
+function getStatusColor(
+  status: string
+) {
+  const normalized =
+    status.toUpperCase();
+
+  if (
+    normalized.includes('DIAGNÓSTICO')
+  ) {
+    return '#F5A623';
+  }
+
+  if (
+    normalized.includes('ESPERA')
+  ) {
+    return '#5AC8FA';
+  }
+
+  if (
+    normalized.includes('REPARACIÓN')
+  ) {
+    return '#34C759';
+  }
+
+  if (
+    normalized.includes('ENTREGA')
+  ) {
+    return '#AF52DE';
+  }
+
+  return '#A0A0A0';
+}
+
+/* ==========================================
+   TEMA
+   ========================================== */
+
 const localTheme = {
   background: '#070707',
   surface: '#121212',
   surfaceSoft: '#1A1A1A',
   border: '#2A2A2A',
-  primary: '#740b0b', 
+
+  primary: '#740b0b',
   primaryDark: '#4a0707',
+
   text: '#FFFFFF',
   textSecondary: '#A0A0A0',
   textMuted: '#666666',
 };
 
-// ==========================================
-// ESTILOS
-// ==========================================
+/* ==========================================
+   ESTILOS
+   ========================================== */
+
 const styles = StyleSheet.create({
   root: {
     flex: 1,
     backgroundColor: localTheme.background,
-    paddingTop: Platform.OS === 'android' ? 40 : 0,
+    paddingTop:
+      Platform.OS === 'android' ? 40 : 0,
   },
+
   container: {
     paddingHorizontal: spacing.lg,
     paddingBottom: spacing.xxl,
   },
 
-  /* ===================================
-     DECORACIÓN VIBRANTE
-     =================================== */
   decorations: {
     position: 'absolute',
     top: 0,
@@ -301,6 +542,7 @@ const styles = StyleSheet.create({
     left: 0,
     overflow: 'hidden',
   },
+
   orbRedLarge: {
     position: 'absolute',
     width: 300,
@@ -309,8 +551,9 @@ const styles = StyleSheet.create({
     backgroundColor: localTheme.primary,
     top: -50,
     right: -100,
-    opacity: 0.15, 
+    opacity: 0.15,
   },
+
   orbDarkRed: {
     position: 'absolute',
     width: 200,
@@ -321,6 +564,7 @@ const styles = StyleSheet.create({
     left: -80,
     opacity: 0.25,
   },
+
   crystalRed: {
     position: 'absolute',
     width: 80,
@@ -330,8 +574,13 @@ const styles = StyleSheet.create({
     top: 150,
     left: -20,
     opacity: 0.15,
-    transform: [{ rotate: '45deg' }],
+    transform: [
+      {
+        rotate: '45deg',
+      },
+    ],
   },
+
   crystalGrey: {
     position: 'absolute',
     width: 100,
@@ -341,8 +590,13 @@ const styles = StyleSheet.create({
     bottom: 200,
     right: -40,
     opacity: 0.2,
-    transform: [{ rotate: '45deg' }],
+    transform: [
+      {
+        rotate: '45deg',
+      },
+    ],
   },
+
   ringStrong1: {
     position: 'absolute',
     width: 120,
@@ -354,6 +608,7 @@ const styles = StyleSheet.create({
     right: -40,
     opacity: 0.25,
   },
+
   ringStrong2: {
     position: 'absolute',
     width: 60,
@@ -365,6 +620,7 @@ const styles = StyleSheet.create({
     left: 40,
     opacity: 0.3,
   },
+
   glowDot1: {
     position: 'absolute',
     width: 12,
@@ -375,11 +631,15 @@ const styles = StyleSheet.create({
     left: 60,
     opacity: 0.9,
     shadowColor: localTheme.primary,
-    shadowOffset: { width: 0, height: 0 },
+    shadowOffset: {
+      width: 0,
+      height: 0,
+    },
     shadowOpacity: 1,
     shadowRadius: 10,
     elevation: 4,
   },
+
   glowDot2: {
     position: 'absolute',
     width: 10,
@@ -390,6 +650,7 @@ const styles = StyleSheet.create({
     right: 70,
     opacity: 0.5,
   },
+
   glowDot3: {
     position: 'absolute',
     width: 14,
@@ -401,71 +662,41 @@ const styles = StyleSheet.create({
     opacity: 0.8,
   },
 
-  /* ===================================
-     ENCABEZADO
-     =================================== */
   header: {
     marginTop: spacing.xl,
     marginBottom: spacing.xl,
   },
+
   eyebrow: {
-    color: localTheme.primary,
+    color: '#C94A4A',
     fontSize: 13,
     fontWeight: '900',
     textTransform: 'uppercase',
     letterSpacing: 0.5,
     marginBottom: 4,
   },
+
   title: {
     color: localTheme.text,
-    fontSize: 28,
+    fontSize: 30,
     fontWeight: '900',
     letterSpacing: -0.5,
     marginBottom: 8,
   },
+
   subtitle: {
     color: localTheme.textSecondary,
     fontSize: 14,
     lineHeight: 20,
   },
 
-  /* ===================================
-     TARJETAS (Reemplazo de InfoCard)
-     =================================== */
-  card: {
-    backgroundColor: localTheme.surface,
-    borderRadius: radius.lg,
-    borderWidth: 1,
-    borderColor: localTheme.border,
-    padding: spacing.lg,
-    marginBottom: spacing.lg,
-    shadowColor: '#000000',
-    shadowOffset: { width: 0, height: 8 },
-    shadowOpacity: 0.4,
-    shadowRadius: 12,
-    elevation: 6,
-  },
-  cardTitle: {
-    color: localTheme.text,
-    fontSize: 18,
-    fontWeight: '900',
-    marginBottom: 4,
-  },
-  cardSubtitle: {
-    color: localTheme.textSecondary,
-    fontSize: 13,
-    marginBottom: spacing.lg,
-  },
-
-  /* ===================================
-     ESTILOS INTERNOS (Métricas)
-     =================================== */
   stats: {
     flexDirection: 'row',
     flexWrap: 'wrap',
     gap: spacing.sm,
     marginBottom: spacing.lg,
   },
+
   stat: {
     width: '48%',
     minHeight: 112,
@@ -476,11 +707,13 @@ const styles = StyleSheet.create({
     padding: spacing.lg,
     justifyContent: 'center',
   },
+
   statValue: {
     color: localTheme.text,
     fontSize: 28,
     fontWeight: '900',
   },
+
   statLabel: {
     color: localTheme.textSecondary,
     marginTop: 5,
@@ -488,32 +721,61 @@ const styles = StyleSheet.create({
     lineHeight: 17,
   },
 
-  /* ===================================
-     ESTILOS INTERNOS (StatusRow)
-     =================================== */
+  card: {
+    backgroundColor: localTheme.surface,
+    borderRadius: radius.lg,
+    borderWidth: 1,
+    borderColor: localTheme.border,
+    padding: spacing.lg,
+    marginBottom: spacing.lg,
+
+    shadowColor: '#000000',
+    shadowOffset: {
+      width: 0,
+      height: 8,
+    },
+    shadowOpacity: 0.4,
+    shadowRadius: 12,
+    elevation: 6,
+  },
+
+  cardTitle: {
+    color: localTheme.text,
+    fontSize: 18,
+    fontWeight: '900',
+    marginBottom: 4,
+  },
+
+  cardSubtitle: {
+    color: localTheme.textSecondary,
+    fontSize: 13,
+    marginBottom: spacing.lg,
+  },
+
   statusList: {
     gap: spacing.md,
   },
+
   statusRow: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
-    paddingBottom: spacing.sm,
+    paddingBottom: spacing.md,
     borderBottomWidth: 1,
     borderBottomColor: localTheme.border,
   },
+
   statusLabel: {
     color: localTheme.text,
     fontWeight: '700',
+    fontSize: 14,
   },
 
-  /* ===================================
-     ESTILOS INTERNOS (AdminOrder adaptado)
-     =================================== */
   orders: {
     gap: 0,
   },
-  miniOrder: {
+
+  orderRow: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
@@ -521,55 +783,127 @@ const styles = StyleSheet.create({
     borderBottomWidth: 1,
     borderBottomColor: localTheme.border,
   },
-  miniOrderLeft: {
+
+  orderLeft: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: spacing.sm, 
+    gap: spacing.sm,
+    flex: 1,
   },
-  miniOrderNumber: {
+
+  orderCode: {
     color: localTheme.text,
     fontSize: 15,
     fontWeight: '900',
   },
-  miniOrderVehicle: {
+
+  orderPlate: {
     color: localTheme.textSecondary,
     fontSize: 14,
     fontWeight: '600',
   },
-  miniOrderRight: {
+
+  orderStatus: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 6, 
+    gap: 6,
   },
+
   statusDot: {
     width: 8,
     height: 8,
     borderRadius: 4,
   },
-  miniOrderStatus: {
-    fontSize: 12,
+
+  orderStatusText: {
+    fontSize: 11,
     fontWeight: '900',
-    letterSpacing: 0.3,
+    letterSpacing: 0.2,
   },
 
-  /* ===================================
-     ESTILOS INTERNOS (Employee)
-     =================================== */
-  employee: {
+  mechanicRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    gap: spacing.md,
+    paddingVertical: spacing.md,
+    borderBottomWidth: 1,
+    borderBottomColor: localTheme.border,
+  },
+
+  mechanicInfo: {
+    flex: 1,
+  },
+
+  mechanicName: {
+    color: localTheme.text,
+    fontSize: 14,
+    fontWeight: '800',
+  },
+
+  mechanicDetail: {
+    color: localTheme.textSecondary,
+    fontSize: 12,
+    marginTop: 4,
+  },
+
+  approvalRow: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
     gap: spacing.md,
-    marginTop: spacing.xs,
+    paddingVertical: spacing.md,
+    borderBottomWidth: 1,
+    borderBottomColor: localTheme.border,
   },
-  employeeName: {
+
+  approvalOrder: {
     color: localTheme.text,
-    fontWeight: '800',
+    fontSize: 14,
+    fontWeight: '900',
   },
-  employeeDetail: {
+
+  approvalVehicle: {
     color: localTheme.textSecondary,
     fontSize: 12,
     marginTop: 4,
+  },
+
+  approvalRight: {
+    alignItems: 'flex-end',
+  },
+
+  approvalAmount: {
+    color: localTheme.text,
+    fontSize: 14,
+    fontWeight: '900',
+  },
+
+  approvalPending: {
+    color: '#F5A623',
+    fontSize: 11,
+    fontWeight: '800',
+    marginTop: 4,
+  },
+
+  systemRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    paddingVertical: spacing.md,
+    borderBottomWidth: 1,
+    borderBottomColor: localTheme.border,
+  },
+
+  systemLabel: {
+    color: localTheme.textSecondary,
+    fontSize: 13,
+  },
+
+  systemValue: {
+    color: localTheme.text,
+    fontSize: 18,
+    fontWeight: '900',
   },
 
   logoutButton: {
