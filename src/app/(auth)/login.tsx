@@ -23,6 +23,8 @@ import {
   LoginFormData,
 } from '@/schemas/auth.schema';
 
+import { getRouteByRole } from '@/constants/routes';
+
 import { login } from '@/services/auth.service';
 
 import { useAuthStore } from '@/stores/authStore';
@@ -99,24 +101,10 @@ export default function LoginScreen() {
       /**
        * Redirección según el rol.
        */
-      switch (response.user.role) {
-        case 'cliente':
-          router.replace('/cliente');
-          break;
-
-        case 'mecanico':
-          router.replace('/mecanico');
-          break;
-
-        case 'administrador':
-          router.replace('/administrador');
-          break;
-
-        default:
-          setGeneralError(
-            'El usuario no tiene un rol válido.'
-          );
-      }
+      const route = getRouteByRole(
+        response.user.role
+      );
+      router.replace(route);
     } catch (error) {
       console.error(
         'Error durante el inicio de sesión:',
