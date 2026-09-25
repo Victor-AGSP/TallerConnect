@@ -1,7 +1,8 @@
 import axios from 'axios';
+import { attachAuthTokenInterceptor } from './interceptors';
 
 /**
- * URL base oficial de la API Gateway (Integración 2).
+ * URL base oficial de la API Gateway 
  * Puede sobreescribirse mediante la variable de entorno EXPO_PUBLIC_API_URL.
  */
 export const API_BASE_URL =
@@ -24,3 +25,6 @@ export const apiClient = axios.create({
     Accept: 'application/json',
   },
 });
+
+// Registrar interceptor de autenticación para adjuntar token Bearer automáticamente
+attachAuthTokenInterceptor(apiClient);
