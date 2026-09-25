@@ -11,6 +11,8 @@ import {
 } from 'react-native';
 
 import { useRouter } from 'expo-router';
+import { Controller, useForm } from 'react-hook-form';
+import { zodResolver } from '@hookform/resolvers/zod';
 
 import { Button, Card, Input } from '@/components/common';
 
@@ -20,6 +22,8 @@ import {
   loginSchema,
   LoginFormData,
 } from '@/schemas/auth.schema';
+
+import { getRouteByRole } from '@/constants/routes';
 
 import { login } from '@/services/auth.service';
 
@@ -32,15 +36,6 @@ export default function LoginScreen() {
     (state) => state.setAuth
   );
 
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
-
-  const [emailError, setEmailError] =
-    useState<string | undefined>();
-
-  const [passwordError, setPasswordError] =
-    useState<string | undefined>();
-
   const [generalError, setGeneralError] =
     useState<string | undefined>();
 
@@ -51,68 +46,42 @@ export default function LoginScreen() {
     useState(false);
 
   /**
-   * Limpia los mensajes de error mientras el usuario
-   * vuelve a escribir.
+   * React Hook Form administra:
+   *
+   * - valores de los campos
+   * - errores
+   * - validación
+   * - estado del formulario
+   *
+   * Zod se encarga de validar mediante zodResolver.
    */
-  const handleEmailChange = (value: string) => {
-    setEmail(value);
-
-    if (emailError) {
-      setEmailError(undefined);
-    }
-
-    if (generalError) {
-      setGeneralError(undefined);
-    }
-  };
-
-  const handlePasswordChange = (value: string) => {
-    setPassword(value);
-
-    if (passwordError) {
-      setPasswordError(undefined);
-    }
-
-    if (generalError) {
-      setGeneralError(undefined);
-    }
-  };
+  const {
+    control,
+    handleSubmit,
+    clearErrors,
+    formState: { errors },
+  } = useForm<LoginFormData>({
+    resolver: zodResolver(loginSchema),
+    defaultValues: {
+      email: '',
+      password: '',
+    },
+    mode: 'onSubmit',
+  });
 
   /**
-   * Procesa el inicio de sesión.
+   * Procesa el inicio de sesión solamente cuando
+   * React Hook Form + Zod consideran válido el formulario.
    */
-  const handleLogin = async () => {
-    setEmailError(undefined);
-    setPasswordError(undefined);
+  const handleLogin = async (
+    credentials: LoginFormData
+  ) => {
     setGeneralError(undefined);
-
-    /**
-     * Validación mediante Zod.
-     */
-    const validation =
-      loginSchema.safeParse({
-        email,
-        password,
-      });
-
-    if (!validation.success) {
-      const errors =
-        validation.error.flatten().fieldErrors;
-
-      setEmailError(errors.email?.[0]);
-      setPasswordError(errors.password?.[0]);
-
-      return;
-    }
-
-    const credentials: LoginFormData =
-      validation.data;
-
     setIsLoading(true);
 
     try {
       /**
-       * La pantalla no sabe si estamos usando:
+       * La pantalla no necesita saber si estamos usando:
        *
        * - autenticación demo
        * - backend real
@@ -132,24 +101,10 @@ export default function LoginScreen() {
       /**
        * Redirección según el rol.
        */
-      switch (response.user.role) {
-        case 'cliente':
-          router.replace('/cliente');
-          break;
-
-        case 'mecanico':
-          router.replace('/mecanico');
-          break;
-
-        case 'administrador':
-          router.replace('/administrador');
-          break;
-
-        default:
-          setGeneralError(
-            'El usuario no tiene un rol válido.'
-          );
-      }
+      const route = getRouteByRole(
+        response.user.role
+      );
+      router.replace(route);
     } catch (error) {
       console.error(
         'Error durante el inicio de sesión:',
@@ -166,6 +121,14 @@ export default function LoginScreen() {
     } finally {
       setIsLoading(false);
     }
+  };
+
+  /**
+   * Se ejecuta cuando React Hook Form detecta
+   * errores de validación.
+   */
+  const handleValidationError = () => {
+    setGeneralError(undefined);
   };
 
   return (
@@ -250,53 +213,103 @@ export default function LoginScreen() {
           </Text>
 
           <View style={styles.form}>
-            {/* CORREO */}
+            {/* =====================================
+                CORREO
+                ===================================== */}
 
-            <Input
-              label="Correo electrónico"
-              value={email}
-              onChangeText={handleEmailChange}
-              autoCapitalize="none"
-              autoCorrect={false}
-              keyboardType="email-address"
-              placeholder="usuario@correo.cl"
-              placeholderTextColor={
-                localTheme.textMuted
-              }
-              labelStyle={styles.label}
-              style={styles.input}
-              focusedStyle={
-                styles.inputFocused
-              }
-              error={emailError}
-              editable={!isLoading}
+            <Controller
+              control={control}
+              name="email"
+              render={({
+                field: {
+                  onChange,
+                  onBlur,
+                  value,
+                },
+                fieldState: { error },
+              }) => (
+                <Input
+                  label="Correo electrónico"
+                  value={value}
+                  onChangeText={(text) => {
+                    onChange(text);
+
+                    if (generalError) {
+                      setGeneralError(undefined);
+                    }
+
+                    if (errors.email) {
+                      clearErrors('email');
+                    }
+                  }}
+                  onBlur={onBlur}
+                  autoCapitalize="none"
+                  autoCorrect={false}
+                  keyboardType="email-address"
+                  placeholder="usuario@correo.cl"
+                  placeholderTextColor={
+                    localTheme.textMuted
+                  }
+                  labelStyle={styles.label}
+                  style={styles.input}
+                  focusedStyle={
+                    styles.inputFocused
+                  }
+                  error={error?.message}
+                  editable={!isLoading}
+                />
+              )}
             />
 
-            {/* CONTRASEÑA */}
+            {/* =====================================
+                CONTRASEÑA
+                ===================================== */}
 
             <View style={styles.passwordField}>
-              <Input
-                label="Contraseña"
-                value={password}
-                onChangeText={
-                  handlePasswordChange
-                }
-                autoCapitalize="none"
-                autoCorrect={false}
-                placeholder="••••••••"
-                placeholderTextColor={
-                  localTheme.textMuted
-                }
-                secureTextEntry={
-                  !passwordVisible
-                }
-                labelStyle={styles.label}
-                style={styles.input}
-                focusedStyle={
-                  styles.inputFocused
-                }
-                error={passwordError}
-                editable={!isLoading}
+              <Controller
+                control={control}
+                name="password"
+                render={({
+                  field: {
+                    onChange,
+                    onBlur,
+                    value,
+                  },
+                  fieldState: { error },
+                }) => (
+                  <Input
+                    label="Contraseña"
+                    value={value}
+                    onChangeText={(text) => {
+                      onChange(text);
+
+                      if (generalError) {
+                        setGeneralError(undefined);
+                      }
+
+                      if (errors.password) {
+                        clearErrors('password');
+                      }
+                    }}
+                    onBlur={onBlur}
+                    autoCapitalize="none"
+                    autoCorrect={false}
+                    placeholder="••••••••"
+                    placeholderTextColor={
+                      localTheme.textMuted
+                    }
+                    secureTextEntry={
+                      !passwordVisible
+                    }
+                    labelStyle={styles.label}
+                    style={styles.input}
+                    focusedStyle={
+                      styles.inputFocused
+                    }
+                    error={error?.message}
+                    editable={!isLoading}
+                  />
+                )}
               />
 
               <Pressable
@@ -331,7 +344,9 @@ export default function LoginScreen() {
               </Pressable>
             </View>
 
-            {/* ERROR GENERAL */}
+            {/* =====================================
+                ERROR GENERAL
+                ===================================== */}
 
             {generalError ? (
               <View
@@ -354,7 +369,9 @@ export default function LoginScreen() {
               </View>
             ) : null}
 
-            {/* BOTÓN */}
+            {/* =====================================
+                BOTÓN
+                ===================================== */}
 
             <Button
               title={
@@ -362,7 +379,10 @@ export default function LoginScreen() {
                   ? 'Iniciando sesión...'
                   : 'Iniciar sesión'
               }
-              onPress={handleLogin}
+              onPress={handleSubmit(
+                handleLogin,
+                handleValidationError
+              )}
               loading={isLoading}
               disabled={isLoading}
               style={styles.loginButton}
@@ -704,6 +724,7 @@ const styles = StyleSheet.create({
     },
 
     shadowOpacity: 0.4,
+
     shadowRadius: 8,
 
     elevation: 6,
@@ -1022,3 +1043,4 @@ const styles = StyleSheet.create({
     fontSize: 10,
   },
 });
+

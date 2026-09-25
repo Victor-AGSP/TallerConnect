@@ -1,43 +1,67 @@
 import React, { useEffect } from 'react';
-import { ActivityIndicator, StyleSheet, View } from 'react-native';
+
+import {
+  ActivityIndicator,
+  StyleSheet,
+  View,
+} from 'react-native';
+
 import { Redirect } from 'expo-router';
-import { useAuthStore } from '@/stores/authStore';
+
 import { colors } from '@/constants/theme';
 
-export default function IndexScreen() {
-  const { isAuthenticated, role, isHydrated, restoreSession } = useAuthStore();
+import { getRouteByRole } from '@/constants/routes';
 
+import { useAuthStore } from '@/stores/authStore';
+
+export default function IndexScreen() {
+  const {
+    isAuthenticated,
+    role,
+    isHydrated,
+    restoreSession,
+  } = useAuthStore();
+
+  /**
+   * Recupera la sesión almacenada al iniciar
+   * la aplicación.
+   */
   useEffect(() => {
     if (!isHydrated) {
       restoreSession();
     }
   }, [isHydrated, restoreSession]);
 
-  // Mientras se recupera el estado de sesión desde SecureStore, mostrar indicador de carga
+  /**
+   * Mientras se recupera la sesión,
+   * mostramos un indicador de carga.
+   */
   if (!isHydrated) {
     return (
       <View style={styles.container}>
-        <ActivityIndicator size="large" color={colors.primary} />
+        <ActivityIndicator
+          size="large"
+          color={colors.primary}
+        />
       </View>
     );
   }
 
-  // Si no hay sesión válida recuperada, enviar al Login
-  if (!isAuthenticated) {
+  /**
+   * Si no existe una sesión válida,
+   * enviamos al usuario al Login.
+   */
+  if (!isAuthenticated || !role) {
     return <Redirect href="/login" />;
   }
 
-  // Redirección inteligente según el rol del usuario autenticado
-  switch (role) {
-    case 'administrador':
-      return <Redirect href="/administrador" />;
-    case 'mecanico':
-      return <Redirect href="/mecanico" />;
-    case 'cliente':
-      return <Redirect href="/cliente" />;
-    default:
-      return <Redirect href="/login" />;
-  }
+  /**
+   * Obtenemos la ruta correspondiente
+   * al rol autenticado.
+   */
+  const route = getRouteByRole(role);
+
+  return <Redirect href={route} />;
 }
 
 const styles = StyleSheet.create({
