@@ -1,8 +1,11 @@
 import axios from 'axios';
-import { attachAuthTokenInterceptor } from './interceptors';
+import {
+  attachAuthTokenInterceptor,
+  attachErrorInterceptor,
+} from './interceptors';
 
 /**
- * URL base oficial de la API Gateway 
+ * URL base oficial de la API Gateway (Integración 2).
  * Puede sobreescribirse mediante la variable de entorno EXPO_PUBLIC_API_URL.
  */
 export const API_BASE_URL =
@@ -26,5 +29,8 @@ export const apiClient = axios.create({
   },
 });
 
-// Registrar interceptor de autenticación para adjuntar token Bearer automáticamente
+// 1. Interceptor de peticiones: Adjuntar token Bearer automáticamente en rutas protegidas
 attachAuthTokenInterceptor(apiClient);
+
+// 2. Interceptor de respuestas: Manejo centralizado de errores ({ detail }), timeout y logout en 401/403
+attachErrorInterceptor(apiClient);
