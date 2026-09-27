@@ -11,6 +11,7 @@ import {
 
 import { AppButton } from '@/components/ui/AppButton';
 import { StatusPill } from '@/components/ui/StatusPill';
+import { useAuthStore } from '@/stores/authStore';
 
 import {
   radius,
@@ -19,6 +20,7 @@ import {
 
 export default function AdministradorScreen() {
   const router = useRouter();
+  const logout = useAuthStore((state) => state.logout);
 
   return (
     <SafeAreaView style={styles.root}>
@@ -295,7 +297,10 @@ export default function AdministradorScreen() {
         <AppButton
           title="Cerrar sesión"
           variant="outline"
-          onPress={() => router.replace('/login')}
+          onPress={async () => {
+            await logout();
+            router.replace('/login');
+          }}
           style={styles.logoutButton}
         />
       </ScrollView>
