@@ -54,7 +54,7 @@ describe('flujo de autenticación', () => {
 
     await fireEvent.press(screen.getByTestId('login-submit'));
 
-    expect(await screen.findByText('El correo no puede estar vacío')).toBeTruthy();
+    expect(await screen.findByText('El correo es obligatorio')).toBeTruthy();
     expect(
       screen.getByText('La contraseña debe tener al menos 6 caracteres'),
     ).toBeTruthy();
