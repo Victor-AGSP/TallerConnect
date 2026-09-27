@@ -1,18 +1,21 @@
 import { useRouter } from 'expo-router';
 
 import {
+  Platform,
+  SafeAreaView,
   ScrollView,
   StyleSheet,
   Text,
   View,
-  SafeAreaView,
-  Platform,
 } from 'react-native';
 
 import { AppButton } from '@/components/ui/AppButton';
 import { StatusPill } from '@/components/ui/StatusPill';
 
-import { radius, spacing } from '@/constants/theme';
+import {
+  radius,
+  spacing,
+} from '@/constants/theme';
 
 export default function MecanicoScreen() {
   const router = useRouter();
@@ -23,13 +26,17 @@ export default function MecanicoScreen() {
         contentContainerStyle={styles.container}
         showsVerticalScrollIndicator={false}
       >
-        {/* ==============================
-            DECORACIÓN DE FONDO (DARK & RED)
-            ============================== */}
-        <View pointerEvents="none" style={styles.decorations}>
+        {/* =====================================
+            DECORACIÓN
+            ===================================== */}
+
+        <View
+          pointerEvents="none"
+          style={styles.decorations}
+        >
           <View style={styles.orbRedLarge} />
           <View style={styles.orbDarkRed} />
-          
+
           <View style={styles.crystalRed} />
           <View style={styles.crystalGrey} />
 
@@ -41,88 +48,254 @@ export default function MecanicoScreen() {
           <View style={styles.glowDot3} />
         </View>
 
-        {/* ==============================
+        {/* =====================================
             ENCABEZADO
-            ============================== */}
+            ===================================== */}
+
         <View style={styles.header}>
-          <Text style={styles.eyebrow}>Área de trabajo</Text>
-          <Text style={styles.title}>Órdenes asignadas</Text>
+          <Text style={styles.eyebrow}>
+            Área de trabajo
+          </Text>
+
+          <Text style={styles.title}>
+            Mis órdenes
+          </Text>
+
           <Text style={styles.subtitle}>
-            Consulta vehículos y registra las acciones permitidas durante el servicio.
+            Revisa tus órdenes asignadas y registra
+            las acciones correspondientes al servicio.
           </Text>
         </View>
 
-        {/* ==============================
-            TARJETA 1: ORDEN ACTUAL
-            ============================== */}
+        {/* =====================================
+            RESUMEN
+            ===================================== */}
+
+        <View style={styles.stats}>
+          <Stat
+            value="5"
+            label="Órdenes asignadas"
+          />
+
+          <Stat
+            value="1"
+            label="En reparación"
+          />
+
+          <Stat
+            value="2"
+            label="En diagnóstico"
+          />
+
+          <Stat
+            value="2"
+            label="Pendientes"
+          />
+        </View>
+
+        {/* =====================================
+            ORDEN ACTUAL
+            ===================================== */}
+
         <View style={styles.card}>
           <View style={styles.orderHeader}>
-            <View style={styles.orderId}>
-              <Text style={styles.orderNumber}>OT-00124</Text>
-              <Text style={styles.vehicle}>Vehículo · AB-CD-12</Text>
+            <View style={styles.orderHeaderText}>
+              <Text style={styles.cardEyebrow}>
+                Orden actual
+              </Text>
+
+              <Text style={styles.orderNumber}>
+                OT-00124
+              </Text>
+
+              <Text style={styles.vehicle}>
+                Vehículo · AB-CD-12
+              </Text>
             </View>
 
-            <StatusPill label="En reparación" tone="warning" />
+            <StatusPill
+              label="En reparación"
+              tone="warning"
+            />
           </View>
 
           <View style={styles.separator} />
 
           <View style={styles.details}>
-            <Detail label="Trabajo" value="Mantención preventiva" />
-            <Detail label="Prioridad" value="Normal" />
-            <Detail label="Repuestos" value="3 asociados" />
-          </View>
-
-          <View style={styles.actions}>
-            <AppButton
-              title="Ver detalle de la orden"
-              onPress={() => {}}
-              style={styles.primaryButton}
+            <Detail
+              label="Trabajo"
+              value="Mantención preventiva"
             />
 
-            <AppButton
+            <Detail
+              label="Prioridad"
+              value="Normal"
+            />
+
+            <Detail
+              label="Repuestos"
+              value="3 asociados"
+            />
+
+            <Detail
+              label="Cliente"
+              value="Cliente de demostración"
+            />
+          </View>
+
+          <View style={styles.actionGrid}>
+            <ActionBox
+              code="01"
+              title="Actualizar estado"
+            />
+
+            <ActionBox
+              code="02"
+              title="Registrar información"
+            />
+
+            <ActionBox
+              code="03"
+              title="Revisar repuestos"
+            />
+
+            <ActionBox
+              code="04"
               title="Agregar evidencia"
-              variant="outline"
-              onPress={() => {}}
             />
           </View>
         </View>
 
-        {/* ==============================
-            TARJETA 2: ACCIONES RÁPIDAS
-            ============================== */}
+        {/* =====================================
+            PROGRESO
+            ===================================== */}
+
         <View style={styles.card}>
-          <Text style={styles.cardTitle}>Acciones rápidas</Text>
-          <Text style={styles.cardSubtitle}>
-            Las acciones disponibles dependerán de los permisos informados por el backend.
+          <Text style={styles.cardTitle}>
+            Progreso de la orden
           </Text>
 
-          <View style={styles.quickGrid}>
-            <QuickAction title="Actualizar estado" code="01" />
-            <QuickAction title="Registrar información" code="02" />
-            <QuickAction title="Revisar repuestos" code="03" />
-            <QuickAction title="Agregar evidencia" code="04" />
-          </View>
+          <Text style={styles.cardSubtitle}>
+            Seguimiento de las etapas del trabajo.
+          </Text>
+
+          <ProgressItem
+            title="Recepción"
+            detail="Completado"
+            completed
+          />
+
+          <ProgressItem
+            title="Diagnóstico"
+            detail="Completado"
+            completed
+          />
+
+          <ProgressItem
+            title="Reparación"
+            detail="En curso"
+            active
+          />
+
+          <ProgressItem
+            title="Control final"
+            detail="Pendiente"
+          />
+
+          <ProgressItem
+            title="Entrega"
+            detail="Pendiente"
+          />
         </View>
 
-        {/* ==============================
-            TARJETA 3: ÓRDENES PENDIENTES
-            ============================== */}
+        {/* =====================================
+            ÓRDENES PENDIENTES
+            ===================================== */}
+
         <View style={styles.card}>
-          <Text style={styles.cardTitle}>Órdenes pendientes</Text>
-          <Text style={styles.cardSubtitle}>4 órdenes adicionales asignadas.</Text>
+          <Text style={styles.cardTitle}>
+            Otras órdenes
+          </Text>
+
+          <Text style={styles.cardSubtitle}>
+            Órdenes actualmente asociadas al mecánico.
+          </Text>
 
           <View style={styles.list}>
-            <MiniOrder code="OT-00125" vehicle="EF-GH-34" status="Diagnóstico" />
-            <MiniOrder code="OT-00126" vehicle="IJ-KL-56" status="Espera" />
-            <MiniOrder code="OT-00127" vehicle="AB-CD-12" status="Reparación" />
-            <MiniOrder code="OT-00128" vehicle="XY-ZW-90" status="Finalizado" />
+            <MiniOrder
+              code="OT-00125"
+              vehicle="EF-GH-34"
+              status="Diagnóstico"
+            />
+
+            <MiniOrder
+              code="OT-00126"
+              vehicle="IJ-KL-56"
+              status="Espera"
+            />
+
+            <MiniOrder
+              code="OT-00127"
+              vehicle="AB-CD-12"
+              status="Reparación"
+            />
+
+            <MiniOrder
+              code="OT-00128"
+              vehicle="XY-ZW-90"
+              status="Finalizado"
+            />
           </View>
         </View>
 
-        {/* ==============================
-            BOTÓN CERRAR SESIÓN
-            ============================== */}
+        {/* =====================================
+            INFORMACIÓN DEL MECÁNICO
+            ===================================== */}
+
+        <View style={styles.card}>
+          <Text style={styles.cardTitle}>
+            Mi actividad
+          </Text>
+
+          <Text style={styles.cardSubtitle}>
+            Resumen de actividad de demostración.
+          </Text>
+
+          <View style={styles.activityRow}>
+            <Text style={styles.activityLabel}>
+              Órdenes completadas
+            </Text>
+
+            <Text style={styles.activityValue}>
+              12
+            </Text>
+          </View>
+
+          <View style={styles.activityRow}>
+            <Text style={styles.activityLabel}>
+              Evidencias registradas
+            </Text>
+
+            <Text style={styles.activityValue}>
+              24
+            </Text>
+          </View>
+
+          <View style={styles.activityRow}>
+            <Text style={styles.activityLabel}>
+              Repuestos utilizados
+            </Text>
+
+            <Text style={styles.activityValue}>
+              18
+            </Text>
+          </View>
+        </View>
+
+        {/* =====================================
+            CERRAR SESIÓN
+            ===================================== */}
+
         <AppButton
           title="Cerrar sesión"
           variant="outline"
@@ -134,55 +307,149 @@ export default function MecanicoScreen() {
   );
 }
 
-// Subcomponentes adaptados al Dark Theme
-function Detail({ label, value }: { label: string; value: string }) {
+/* ==========================================
+   COMPONENTES
+   ========================================== */
+
+function Stat({
+  value,
+  label,
+}: {
+  value: string;
+  label: string;
+}) {
   return (
-    <View>
-      <Text style={styles.detailLabel}>{label}</Text>
-      <Text style={styles.detailValue}>{value}</Text>
+    <View style={styles.stat}>
+      <Text style={styles.statValue}>
+        {value}
+      </Text>
+
+      <Text style={styles.statLabel}>
+        {label}
+      </Text>
     </View>
   );
 }
 
-function QuickAction({ title, code }: { title: string; code: string }) {
+function Detail({
+  label,
+  value,
+}: {
+  label: string;
+  value: string;
+}) {
   return (
-    <View style={styles.quick}>
-      <Text style={styles.quickCode}>{code}</Text>
-      <Text style={styles.quickTitle}>{title}</Text>
+    <View style={styles.detail}>
+      <Text style={styles.detailLabel}>
+        {label}
+      </Text>
+
+      <Text style={styles.detailValue}>
+        {value}
+      </Text>
     </View>
   );
 }
 
-// Función auxiliar para determinar el color del estado
-const getStatusColor = (status: string) => {
-  const normalizedStatus = status.toUpperCase();
-  switch (normalizedStatus) {
-    case 'DIAGNÓSTICO':
-      return '#F5A623'; // Naranja (Amber)
-    case 'ESPERA':
-      return '#5AC8FA'; // Azul claro (Sky Blue)
-    case 'REPARACIÓN':
-      return '#34C759'; // Verde (Emerald)
-    case 'FINALIZADO':
-      return '#AF52DE'; // Morado (Purple - Añadido según la imagen)
-    default:
-      return '#A0A0A0'; // Gris por defecto
-  }
-};
+function ActionBox({
+  code,
+  title,
+}: {
+  code: string;
+  title: string;
+}) {
+  return (
+    <View style={styles.actionBox}>
+      <Text style={styles.actionCode}>
+        {code}
+      </Text>
 
-function MiniOrder({ code, vehicle, status }: { code: string; vehicle: string; status: string }) {
-  const statusColor = getStatusColor(status);
-  
+      <Text style={styles.actionTitle}>
+        {title}
+      </Text>
+    </View>
+  );
+}
+
+function ProgressItem({
+  title,
+  detail,
+  completed = false,
+  active = false,
+}: {
+  title: string;
+  detail: string;
+  completed?: boolean;
+  active?: boolean;
+}) {
+  return (
+    <View style={styles.progressRow}>
+      <View
+        style={[
+          styles.progressDot,
+          completed &&
+            styles.progressCompleted,
+          active &&
+            styles.progressActive,
+        ]}
+      />
+
+      <View style={styles.progressText}>
+        <Text style={styles.progressTitle}>
+          {title}
+        </Text>
+
+        <Text style={styles.progressDetail}>
+          {detail}
+        </Text>
+      </View>
+    </View>
+  );
+}
+
+function MiniOrder({
+  code,
+  vehicle,
+  status,
+}: {
+  code: string;
+  vehicle: string;
+  status: string;
+}) {
+  const statusColor =
+    getStatusColor(status);
+
   return (
     <View style={styles.miniOrder}>
       <View style={styles.miniOrderLeft}>
-        <Text style={styles.miniOrderNumber}>{code}</Text>
-        <Text style={styles.miniOrderVehicle}>{vehicle}</Text>
+        <Text style={styles.miniOrderNumber}>
+          {code}
+        </Text>
+
+        <Text style={styles.miniOrderVehicle}>
+          {vehicle}
+        </Text>
       </View>
-      
+
       <View style={styles.miniOrderRight}>
-        <View style={[styles.statusDot, { backgroundColor: statusColor }]} />
-        <Text style={[styles.miniOrderStatus, { color: statusColor }]}>
+        <View
+          style={[
+            styles.statusDot,
+            {
+              backgroundColor:
+                statusColor,
+            },
+          ]}
+        />
+
+        <Text
+          style={[
+            styles.miniOrderStatus,
+            {
+              color: statusColor,
+            },
+          ]}
+        >
           {status.toUpperCase()}
         </Text>
       </View>
@@ -190,33 +457,65 @@ function MiniOrder({ code, vehicle, status }: { code: string; vehicle: string; s
   );
 }
 
-// Variables del Dark & Red Theme (#740b0b)
+function getStatusColor(
+  status: string
+) {
+  const normalized =
+    status.toUpperCase();
+
+  switch (normalized) {
+    case 'DIAGNÓSTICO':
+      return '#F5A623';
+
+    case 'ESPERA':
+      return '#5AC8FA';
+
+    case 'REPARACIÓN':
+      return '#34C759';
+
+    case 'FINALIZADO':
+      return '#AF52DE';
+
+    default:
+      return '#A0A0A0';
+  }
+}
+
+/* ==========================================
+   TEMA
+   ========================================== */
+
 const localTheme = {
   background: '#070707',
   surface: '#121212',
   surfaceSoft: '#1A1A1A',
   border: '#2A2A2A',
-  primary: '#740b0b', 
+
+  primary: '#740b0b',
   primaryDark: '#4a0707',
+
   text: '#FFFFFF',
   textSecondary: '#A0A0A0',
   textMuted: '#666666',
 };
 
+/* ==========================================
+   ESTILOS
+   ========================================== */
+
 const styles = StyleSheet.create({
   root: {
     flex: 1,
     backgroundColor: localTheme.background,
-    paddingTop: Platform.OS === 'android' ? 40 : 0,
+    paddingTop:
+      Platform.OS === 'android' ? 40 : 0,
   },
+
   container: {
     paddingHorizontal: spacing.lg,
     paddingBottom: spacing.xxl,
   },
 
-  /* ===================================
-     DECORACIÓN VIBRANTE (Dark & Red)
-     =================================== */
   decorations: {
     position: 'absolute',
     top: 0,
@@ -225,6 +524,7 @@ const styles = StyleSheet.create({
     left: 0,
     overflow: 'hidden',
   },
+
   orbRedLarge: {
     position: 'absolute',
     width: 300,
@@ -233,8 +533,9 @@ const styles = StyleSheet.create({
     backgroundColor: localTheme.primary,
     top: -50,
     right: -100,
-    opacity: 0.15, 
+    opacity: 0.15,
   },
+
   orbDarkRed: {
     position: 'absolute',
     width: 200,
@@ -245,6 +546,7 @@ const styles = StyleSheet.create({
     left: -80,
     opacity: 0.25,
   },
+
   crystalRed: {
     position: 'absolute',
     width: 80,
@@ -254,8 +556,13 @@ const styles = StyleSheet.create({
     top: 150,
     left: -20,
     opacity: 0.15,
-    transform: [{ rotate: '45deg' }],
+    transform: [
+      {
+        rotate: '45deg',
+      },
+    ],
   },
+
   crystalGrey: {
     position: 'absolute',
     width: 100,
@@ -265,8 +572,13 @@ const styles = StyleSheet.create({
     bottom: 200,
     right: -40,
     opacity: 0.2,
-    transform: [{ rotate: '45deg' }],
+    transform: [
+      {
+        rotate: '45deg',
+      },
+    ],
   },
+
   ringStrong1: {
     position: 'absolute',
     width: 120,
@@ -278,6 +590,7 @@ const styles = StyleSheet.create({
     right: -40,
     opacity: 0.25,
   },
+
   ringStrong2: {
     position: 'absolute',
     width: 60,
@@ -289,6 +602,7 @@ const styles = StyleSheet.create({
     left: 40,
     opacity: 0.3,
   },
+
   glowDot1: {
     position: 'absolute',
     width: 12,
@@ -299,11 +613,15 @@ const styles = StyleSheet.create({
     left: 60,
     opacity: 0.9,
     shadowColor: localTheme.primary,
-    shadowOffset: { width: 0, height: 0 },
+    shadowOffset: {
+      width: 0,
+      height: 0,
+    },
     shadowOpacity: 1,
     shadowRadius: 10,
     elevation: 4,
   },
+
   glowDot2: {
     position: 'absolute',
     width: 10,
@@ -314,6 +632,7 @@ const styles = StyleSheet.create({
     right: 70,
     opacity: 0.5,
   },
+
   glowDot3: {
     position: 'absolute',
     width: 14,
@@ -325,37 +644,65 @@ const styles = StyleSheet.create({
     opacity: 0.8,
   },
 
-  /* ===================================
-     ENCABEZADO
-     =================================== */
   header: {
     marginTop: spacing.xl,
     marginBottom: spacing.xl,
   },
+
   eyebrow: {
-    color: localTheme.primary,
+    color: '#C94A4A',
     fontSize: 13,
     fontWeight: '900',
     textTransform: 'uppercase',
     letterSpacing: 0.5,
     marginBottom: 4,
   },
+
   title: {
     color: localTheme.text,
-    fontSize: 28,
+    fontSize: 30,
     fontWeight: '900',
     letterSpacing: -0.5,
     marginBottom: 8,
   },
+
   subtitle: {
     color: localTheme.textSecondary,
     fontSize: 14,
     lineHeight: 20,
   },
 
-  /* ===================================
-     TARJETAS
-     =================================== */
+  stats: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    gap: spacing.sm,
+    marginBottom: spacing.lg,
+  },
+
+  stat: {
+    width: '48%',
+    minHeight: 105,
+    borderRadius: radius.lg,
+    backgroundColor: localTheme.surfaceSoft,
+    borderWidth: 1,
+    borderColor: localTheme.border,
+    padding: spacing.lg,
+    justifyContent: 'center',
+  },
+
+  statValue: {
+    color: localTheme.text,
+    fontSize: 28,
+    fontWeight: '900',
+  },
+
+  statLabel: {
+    color: localTheme.textSecondary,
+    marginTop: 5,
+    fontSize: 12,
+    lineHeight: 17,
+  },
+
   card: {
     backgroundColor: localTheme.surface,
     borderRadius: radius.lg,
@@ -365,85 +712,87 @@ const styles = StyleSheet.create({
     marginBottom: spacing.lg,
 
     shadowColor: '#000000',
-    shadowOffset: { width: 0, height: 8 },
+    shadowOffset: {
+      width: 0,
+      height: 8,
+    },
     shadowOpacity: 0.4,
     shadowRadius: 12,
     elevation: 6,
   },
-  cardTitle: {
-    color: localTheme.text,
-    fontSize: 18,
-    fontWeight: '900',
-    marginBottom: 4,
-  },
-  cardSubtitle: {
-    color: localTheme.textSecondary,
-    fontSize: 13,
-    marginBottom: spacing.lg,
-  },
 
-  /* ===================================
-     CONTENIDO ORDEN
-     =================================== */
   orderHeader: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'flex-start',
     gap: spacing.md,
   },
-  orderId: {
+
+  orderHeaderText: {
     flex: 1,
   },
+
+  cardEyebrow: {
+    color: '#C94A4A',
+    fontSize: 11,
+    fontWeight: '900',
+    textTransform: 'uppercase',
+    letterSpacing: 0.5,
+    marginBottom: 5,
+  },
+
   orderNumber: {
     color: localTheme.text,
-    fontSize: 20,
+    fontSize: 22,
     fontWeight: '900',
   },
+
   vehicle: {
     marginTop: 4,
     color: localTheme.textSecondary,
     fontSize: 13,
     fontWeight: '600',
   },
+
   separator: {
     height: 1,
     backgroundColor: localTheme.border,
     marginVertical: spacing.lg,
   },
+
   details: {
     gap: spacing.md,
   },
+
+  detail: {
+    paddingBottom: spacing.sm,
+    borderBottomWidth: 1,
+    borderBottomColor: localTheme.border,
+  },
+
   detailLabel: {
     color: localTheme.textMuted,
-    fontSize: 11,
+    fontSize: 10,
     textTransform: 'uppercase',
     fontWeight: '800',
     letterSpacing: 0.5,
   },
+
   detailValue: {
     color: localTheme.text,
     marginTop: 4,
     fontSize: 14,
     fontWeight: '700',
   },
-  actions: {
-    marginTop: spacing.xl,
-    gap: spacing.md,
-  },
-  primaryButton: {
-    backgroundColor: localTheme.primary,
-  },
 
-  /* ===================================
-     ACCIONES RÁPIDAS
-     =================================== */
-  quickGrid: {
+  actionGrid: {
     flexDirection: 'row',
     flexWrap: 'wrap',
     gap: spacing.sm,
-    justifyContent: 'space-between',
+    marginTop: spacing.xl,
   },
-  quick: {
+
+  actionBox: {
     width: '48%',
     minHeight: 90,
     borderRadius: radius.md,
@@ -453,24 +802,77 @@ const styles = StyleSheet.create({
     borderColor: localTheme.border,
     justifyContent: 'space-between',
   },
-  quickCode: {
-    color: localTheme.primary,
+
+  actionCode: {
+    color: '#C94A4A',
     fontSize: 14,
     fontWeight: '900',
   },
-  quickTitle: {
+
+  actionTitle: {
     color: localTheme.text,
     fontSize: 13,
     fontWeight: '800',
     lineHeight: 18,
   },
 
-  /* ===================================
-     LISTA DE ÓRDENES (Dinámica)
-     =================================== */
-  list: {
-    gap: 0, // El padding se maneja internamente en miniOrder
+  cardTitle: {
+    color: localTheme.text,
+    fontSize: 18,
+    fontWeight: '900',
+    marginBottom: 4,
   },
+
+  cardSubtitle: {
+    color: localTheme.textSecondary,
+    fontSize: 13,
+    marginBottom: spacing.lg,
+  },
+
+  progressRow: {
+    flexDirection: 'row',
+    gap: spacing.md,
+    paddingVertical: spacing.md,
+    borderBottomWidth: 1,
+    borderBottomColor: localTheme.border,
+  },
+
+  progressDot: {
+    width: 12,
+    height: 12,
+    marginTop: 4,
+    borderRadius: 6,
+    backgroundColor: localTheme.border,
+  },
+
+  progressCompleted: {
+    backgroundColor: '#34C759',
+  },
+
+  progressActive: {
+    backgroundColor: localTheme.primary,
+  },
+
+  progressText: {
+    flex: 1,
+  },
+
+  progressTitle: {
+    color: localTheme.text,
+    fontSize: 14,
+    fontWeight: '800',
+  },
+
+  progressDetail: {
+    color: localTheme.textSecondary,
+    fontSize: 12,
+    marginTop: 3,
+  },
+
+  list: {
+    gap: 0,
+  },
+
   miniOrder: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -479,40 +881,63 @@ const styles = StyleSheet.create({
     borderBottomWidth: 1,
     borderBottomColor: localTheme.border,
   },
+
   miniOrderLeft: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: spacing.sm, // Espacio entre el código y la patente
+    gap: spacing.sm,
   },
+
   miniOrderNumber: {
     color: localTheme.text,
     fontSize: 15,
     fontWeight: '900',
   },
+
   miniOrderVehicle: {
     color: localTheme.textSecondary,
     fontSize: 14,
     fontWeight: '600',
   },
+
   miniOrderRight: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 6, // Espacio entre el punto y el texto
+    gap: 6,
   },
+
   statusDot: {
     width: 8,
     height: 8,
     borderRadius: 4,
   },
+
   miniOrderStatus: {
-    fontSize: 12,
+    fontSize: 11,
     fontWeight: '900',
     letterSpacing: 0.3,
   },
 
-  /* ===================================
-     OTROS
-     =================================== */
+  activityRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    paddingVertical: spacing.md,
+    borderBottomWidth: 1,
+    borderBottomColor: localTheme.border,
+  },
+
+  activityLabel: {
+    color: localTheme.textSecondary,
+    fontSize: 13,
+  },
+
+  activityValue: {
+    color: localTheme.text,
+    fontSize: 18,
+    fontWeight: '900',
+  },
+
   logoutButton: {
     marginTop: spacing.sm,
     marginBottom: spacing.xl,

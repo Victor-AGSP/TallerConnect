@@ -9,13 +9,13 @@ import {
   View,
 } from 'react-native';
 
+import { Button, Card } from '@/components/common';
 import { StatusPill } from '@/components/ui/StatusPill';
 
 import {
   radius,
   spacing,
 } from '@/constants/theme';
-import { Button, Card } from '@/components/common';
 
 export default function ClienteScreen() {
   const router = useRouter();
@@ -26,13 +26,17 @@ export default function ClienteScreen() {
         contentContainerStyle={styles.container}
         showsVerticalScrollIndicator={false}
       >
-        {/* ==============================
-            DECORACIÓN DE FONDO (DARK & RED)
-            ============================== */}
-        <View pointerEvents="none" style={styles.decorations}>
+        {/* =====================================
+            DECORACIÓN DE FONDO
+            ===================================== */}
+
+        <View
+          pointerEvents="none"
+          style={styles.decorations}
+        >
           <View style={styles.orbRedLarge} />
           <View style={styles.orbDarkRed} />
-          
+
           <View style={styles.crystalRed} />
           <View style={styles.crystalGrey} />
 
@@ -44,30 +48,40 @@ export default function ClienteScreen() {
           <View style={styles.glowDot3} />
         </View>
 
-        {/* ==============================
+        {/* =====================================
             ENCABEZADO
-            ============================== */}
+            ===================================== */}
+
         <View style={styles.header}>
-          <Text style={styles.eyebrow}>Portal del cliente</Text>
-          <Text style={styles.title}>Hola, Cliente</Text>
+          <Text style={styles.eyebrow}>
+            Portal del cliente
+          </Text>
+
+          <Text style={styles.title}>
+            Mi taller
+          </Text>
+
           <Text style={styles.subtitle}>
-            Consulta el estado de tu vehículo y los antecedentes asociados al servicio.
+            Consulta el estado de tu vehículo,
+            órdenes de trabajo y la información
+            asociada al servicio.
           </Text>
         </View>
 
-        {/* ==============================
-            TARJETA 1: VEHÍCULO EN SERVICIO
-            ============================== */}
+        {/* =====================================
+            VEHÍCULO EN SERVICIO
+            ===================================== */}
+
         <Card style={styles.card}>
-          <Text style={styles.cardTitle}>Vehículo en servicio</Text>
-          <Text style={styles.cardSubtitle}>
-            Vehículo de demostración · Patente AB-CD-12
-          </Text>
-          
-          <View style={styles.row}>
-            <View>
-              <Text style={styles.smallLabel}>Estado actual</Text>
-              <Text style={styles.vehicle}>Servicio técnico</Text>
+          <View style={styles.cardHeader}>
+            <View style={styles.cardHeaderText}>
+              <Text style={styles.cardTitle}>
+                Vehículo en servicio
+              </Text>
+
+              <Text style={styles.cardSubtitle}>
+                Información de demostración
+              </Text>
             </View>
 
             <StatusPill
@@ -75,15 +89,44 @@ export default function ClienteScreen() {
               tone="success"
             />
           </View>
+
+          <View style={styles.vehicleBox}>
+            <View>
+              <Text style={styles.smallLabel}>
+                PATENTE
+              </Text>
+
+              <Text style={styles.vehiclePlate}>
+                AB-CD-12
+              </Text>
+            </View>
+
+            <View style={styles.vehicleInfo}>
+              <Text style={styles.smallLabel}>
+                SERVICIO
+              </Text>
+
+              <Text style={styles.vehicleService}>
+                Mantención preventiva
+              </Text>
+            </View>
+          </View>
         </Card>
 
-        {/* ==============================
-            TARJETA 2: SEGUIMIENTO
-            ============================== */}
+        {/* =====================================
+            SEGUIMIENTO
+            ===================================== */}
+
         <Card style={styles.card}>
-          <Text style={styles.cardTitle}>Seguimiento de la orden</Text>
-          
-          <View style={[styles.timeline, { marginTop: spacing.md }]}>
+          <Text style={styles.cardTitle}>
+            Seguimiento de la orden
+          </Text>
+
+          <Text style={styles.cardSubtitle}>
+            Estado actual del servicio.
+          </Text>
+
+          <View style={styles.timeline}>
             <TimelineItem
               title="Vehículo recibido"
               detail="Registro completado"
@@ -109,9 +152,10 @@ export default function ClienteScreen() {
           </View>
         </Card>
 
-        {/* ==============================
-            MÉTRICAS (GRID)
-            ============================== */}
+        {/* =====================================
+            RESUMEN
+            ===================================== */}
+
         <View style={styles.grid}>
           <Metric
             value="$125.000"
@@ -134,17 +178,30 @@ export default function ClienteScreen() {
           />
         </View>
 
-        {/* ==============================
-            TARJETA 3: PRESUPUESTO
-            ============================== */}
+        {/* =====================================
+            PRESUPUESTO
+            ===================================== */}
+
         <Card style={styles.card}>
-          <Text style={styles.cardTitle}>Presupuesto</Text>
-          <Text style={styles.cardSubtitle}>
-            Consulta la información proporcionada por el taller.
+          <Text style={styles.cardTitle}>
+            Presupuesto
           </Text>
-          
-          <View style={styles.row}>
-            <Text style={styles.amount}>$125.000</Text>
+
+          <Text style={styles.cardSubtitle}>
+            Información proporcionada por el taller.
+          </Text>
+
+          <View style={styles.budgetRow}>
+            <View>
+              <Text style={styles.smallLabel}>
+                TOTAL ESTIMADO
+              </Text>
+
+              <Text style={styles.amount}>
+                $125.000
+              </Text>
+            </View>
+
             <StatusPill
               label="Aprobado"
               tone="success"
@@ -152,26 +209,73 @@ export default function ClienteScreen() {
           </View>
         </Card>
 
-        {/* ==============================
-            TARJETA 4: EVIDENCIA MULTIMEDIA
-            ============================== */}
+        {/* =====================================
+            EVIDENCIA MULTIMEDIA
+            ===================================== */}
+
         <Card style={styles.card}>
-          <Text style={styles.cardTitle}>Evidencia multimedia</Text>
-          <Text style={styles.cardSubtitle}>
-            Fotografías y videos asociados a la revisión o reparación aparecerán aquí.
+          <Text style={styles.cardTitle}>
+            Evidencia multimedia
           </Text>
-          
+
+          <Text style={styles.cardSubtitle}>
+            Fotografías y videos asociados al
+            servicio aparecerán aquí.
+          </Text>
+
           <View style={styles.mediaPlaceholder}>
-            <Text style={styles.mediaIcon}>▧</Text>
-            <Text style={styles.mediaText}>
+            <View style={styles.mediaIconCircle}>
+              <Text style={styles.mediaIcon}>
+                ▧
+              </Text>
+            </View>
+
+            <Text style={styles.mediaTitle}>
               4 archivos disponibles
+            </Text>
+
+            <Text style={styles.mediaDescription}>
+              Evidencias asociadas a la orden.
             </Text>
           </View>
         </Card>
 
-        {/* ==============================
-            BOTÓN CERRAR SESIÓN
-            ============================== */}
+        {/* =====================================
+            INFORMACIÓN DE LA ORDEN
+            ===================================== */}
+
+        <Card style={styles.card}>
+          <Text style={styles.cardTitle}>
+            Orden de trabajo
+          </Text>
+
+          <View style={styles.orderInfo}>
+            <InfoRow
+              label="Número"
+              value="OT-00124"
+            />
+
+            <InfoRow
+              label="Estado"
+              value="En reparación"
+            />
+
+            <InfoRow
+              label="Prioridad"
+              value="Normal"
+            />
+
+            <InfoRow
+              label="Técnico"
+              value="Mecánico asignado"
+            />
+          </View>
+        </Card>
+
+        {/* =====================================
+            CERRAR SESIÓN
+            ===================================== */}
+
         <Button
           title="Cerrar sesión"
           variant="outline"
@@ -183,23 +287,21 @@ export default function ClienteScreen() {
   );
 }
 
-// ==========================================
-// COMPONENTES SECUNDARIOS
-// ==========================================
-
-interface TimelineItemProps {
-  title: string;
-  detail: string;
-  completed?: boolean;
-  active?: boolean;
-}
+/* ==========================================
+   COMPONENTES
+   ========================================== */
 
 function TimelineItem({
   title,
   detail,
-  completed,
-  active,
-}: TimelineItemProps) {
+  completed = false,
+  active = false,
+}: {
+  title: string;
+  detail: string;
+  completed?: boolean;
+  active?: boolean;
+}) {
   return (
     <View style={styles.timelineRow}>
       <View
@@ -223,56 +325,83 @@ function TimelineItem({
   );
 }
 
-interface MetricProps {
-  value: string;
-  label: string;
-}
-
 function Metric({
   value,
   label,
-}: MetricProps) {
+}: {
+  value: string;
+  label: string;
+}) {
   return (
     <View style={styles.metric}>
-      <Text style={styles.metricValue}>{value}</Text>
-      <Text style={styles.metricLabel}>{label}</Text>
+      <Text style={styles.metricValue}>
+        {value}
+      </Text>
+
+      <Text style={styles.metricLabel}>
+        {label}
+      </Text>
     </View>
   );
 }
 
-// ==========================================
-// TEMA LOCAL (DARK & RED)
-// ==========================================
+function InfoRow({
+  label,
+  value,
+}: {
+  label: string;
+  value: string;
+}) {
+  return (
+    <View style={styles.infoRow}>
+      <Text style={styles.infoLabel}>
+        {label}
+      </Text>
+
+      <Text style={styles.infoValue}>
+        {value}
+      </Text>
+    </View>
+  );
+}
+
+/* ==========================================
+   TEMA
+   ========================================== */
+
 const localTheme = {
   background: '#070707',
   surface: '#121212',
   surfaceSoft: '#1A1A1A',
   border: '#2A2A2A',
-  primary: '#740b0b', 
+
+  primary: '#740b0b',
   primaryDark: '#4a0707',
+
   text: '#FFFFFF',
   textSecondary: '#A0A0A0',
   textMuted: '#666666',
-  success: '#34C759', // Verde esmeralda para estados aprobados/completados
+
+  success: '#34C759',
 };
 
-// ==========================================
-// ESTILOS
-// ==========================================
+/* ==========================================
+   ESTILOS
+   ========================================== */
+
 const styles = StyleSheet.create({
   root: {
     flex: 1,
     backgroundColor: localTheme.background,
-    paddingTop: Platform.OS === 'android' ? 40 : 0,
+    paddingTop:
+      Platform.OS === 'android' ? 40 : 0,
   },
+
   container: {
     paddingHorizontal: spacing.lg,
     paddingBottom: spacing.xxl,
   },
 
-  /* ===================================
-     DECORACIÓN VIBRANTE
-     =================================== */
   decorations: {
     position: 'absolute',
     top: 0,
@@ -281,6 +410,7 @@ const styles = StyleSheet.create({
     left: 0,
     overflow: 'hidden',
   },
+
   orbRedLarge: {
     position: 'absolute',
     width: 300,
@@ -289,8 +419,9 @@ const styles = StyleSheet.create({
     backgroundColor: localTheme.primary,
     top: -50,
     right: -100,
-    opacity: 0.15, 
+    opacity: 0.15,
   },
+
   orbDarkRed: {
     position: 'absolute',
     width: 200,
@@ -301,6 +432,7 @@ const styles = StyleSheet.create({
     left: -80,
     opacity: 0.25,
   },
+
   crystalRed: {
     position: 'absolute',
     width: 80,
@@ -310,8 +442,13 @@ const styles = StyleSheet.create({
     top: 150,
     left: -20,
     opacity: 0.15,
-    transform: [{ rotate: '45deg' }],
+    transform: [
+      {
+        rotate: '45deg',
+      },
+    ],
   },
+
   crystalGrey: {
     position: 'absolute',
     width: 100,
@@ -321,8 +458,13 @@ const styles = StyleSheet.create({
     bottom: 200,
     right: -40,
     opacity: 0.2,
-    transform: [{ rotate: '45deg' }],
+    transform: [
+      {
+        rotate: '45deg',
+      },
+    ],
   },
+
   ringStrong1: {
     position: 'absolute',
     width: 120,
@@ -334,6 +476,7 @@ const styles = StyleSheet.create({
     right: -40,
     opacity: 0.25,
   },
+
   ringStrong2: {
     position: 'absolute',
     width: 60,
@@ -345,6 +488,7 @@ const styles = StyleSheet.create({
     left: 40,
     opacity: 0.3,
   },
+
   glowDot1: {
     position: 'absolute',
     width: 12,
@@ -355,11 +499,15 @@ const styles = StyleSheet.create({
     left: 60,
     opacity: 0.9,
     shadowColor: localTheme.primary,
-    shadowOffset: { width: 0, height: 0 },
+    shadowOffset: {
+      width: 0,
+      height: 0,
+    },
     shadowOpacity: 1,
     shadowRadius: 10,
     elevation: 4,
   },
+
   glowDot2: {
     position: 'absolute',
     width: 10,
@@ -370,6 +518,7 @@ const styles = StyleSheet.create({
     right: 70,
     opacity: 0.5,
   },
+
   glowDot3: {
     position: 'absolute',
     width: 14,
@@ -381,37 +530,34 @@ const styles = StyleSheet.create({
     opacity: 0.8,
   },
 
-  /* ===================================
-     ENCABEZADO
-     =================================== */
   header: {
     marginTop: spacing.xl,
     marginBottom: spacing.xl,
   },
+
   eyebrow: {
-    color: localTheme.primary,
+    color: '#C94A4A',
     fontSize: 13,
     fontWeight: '900',
     textTransform: 'uppercase',
     letterSpacing: 0.5,
     marginBottom: 4,
   },
+
   title: {
     color: localTheme.text,
-    fontSize: 28,
+    fontSize: 30,
     fontWeight: '900',
     letterSpacing: -0.5,
     marginBottom: 8,
   },
+
   subtitle: {
     color: localTheme.textSecondary,
     fontSize: 14,
     lineHeight: 20,
   },
 
-  /* ===================================
-     TARJETAS
-     =================================== */
   card: {
     backgroundColor: localTheme.surface,
     borderRadius: radius.lg,
@@ -421,47 +567,71 @@ const styles = StyleSheet.create({
     marginBottom: spacing.lg,
 
     shadowColor: '#000000',
-    shadowOffset: { width: 0, height: 8 },
+    shadowOffset: {
+      width: 0,
+      height: 8,
+    },
     shadowOpacity: 0.4,
     shadowRadius: 12,
     elevation: 6,
   },
+
+  cardHeader: {
+    flexDirection: 'row',
+    alignItems: 'flex-start',
+    justifyContent: 'space-between',
+    gap: spacing.md,
+  },
+
+  cardHeaderText: {
+    flex: 1,
+  },
+
   cardTitle: {
     color: localTheme.text,
     fontSize: 18,
     fontWeight: '900',
     marginBottom: 4,
   },
+
   cardSubtitle: {
     color: localTheme.textSecondary,
     fontSize: 13,
-    marginBottom: spacing.md,
+    marginBottom: spacing.lg,
   },
 
-  /* ===================================
-     ESTILOS INTERNOS DEL CLIENTE
-     =================================== */
-  row: {
+  vehicleBox: {
     flexDirection: 'row',
     justifyContent: 'space-between',
-    alignItems: 'center',
-    gap: spacing.md,
-    marginTop: spacing.sm,
+    gap: spacing.lg,
+    paddingTop: spacing.md,
+    borderTopWidth: 1,
+    borderTopColor: localTheme.border,
+  },
+
+  vehicleInfo: {
+    flex: 1,
   },
 
   smallLabel: {
     color: localTheme.textMuted,
-    fontSize: 11,
-    fontWeight: '700',
-    textTransform: 'uppercase',
+    fontSize: 10,
+    fontWeight: '800',
     letterSpacing: 0.5,
   },
 
-  vehicle: {
-    marginTop: 4,
+  vehiclePlate: {
+    marginTop: 5,
     color: localTheme.text,
+    fontSize: 22,
     fontWeight: '900',
-    fontSize: 16,
+  },
+
+  vehicleService: {
+    marginTop: 5,
+    color: localTheme.text,
+    fontSize: 14,
+    fontWeight: '700',
   },
 
   timeline: {
@@ -537,14 +707,22 @@ const styles = StyleSheet.create({
     fontWeight: '600',
   },
 
+  budgetRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    gap: spacing.md,
+  },
+
   amount: {
+    marginTop: 5,
     color: localTheme.text,
-    fontSize: 24,
+    fontSize: 25,
     fontWeight: '900',
   },
 
   mediaPlaceholder: {
-    minHeight: 90,
+    minHeight: 120,
     marginTop: spacing.sm,
     borderRadius: radius.md,
     backgroundColor: localTheme.surfaceSoft,
@@ -554,16 +732,56 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
 
-  mediaIcon: {
-    color: localTheme.primary,
-    fontSize: 28,
+  mediaIconCircle: {
+    width: 48,
+    height: 48,
+    borderRadius: 24,
+    backgroundColor: '#240606',
+    alignItems: 'center',
+    justifyContent: 'center',
   },
 
-  mediaText: {
-    marginTop: 5,
+  mediaIcon: {
+    color: '#C94A4A',
+    fontSize: 24,
+  },
+
+  mediaTitle: {
+    marginTop: spacing.sm,
+    color: localTheme.text,
+    fontSize: 14,
+    fontWeight: '800',
+  },
+
+  mediaDescription: {
+    marginTop: 3,
+    color: localTheme.textSecondary,
+    fontSize: 12,
+  },
+
+  orderInfo: {
+    marginTop: spacing.sm,
+    gap: 0,
+  },
+
+  infoRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    paddingVertical: spacing.md,
+    borderBottomWidth: 1,
+    borderBottomColor: localTheme.border,
+  },
+
+  infoLabel: {
     color: localTheme.textSecondary,
     fontSize: 13,
-    fontWeight: '600',
+  },
+
+  infoValue: {
+    color: localTheme.text,
+    fontSize: 13,
+    fontWeight: '800',
   },
 
   logoutButton: {
