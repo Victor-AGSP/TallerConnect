@@ -3,6 +3,7 @@ import { Text } from 'react-native';
 
 import { Button, Card, ErrorMessage, Input, Loading } from '@/components/common';
 import { AppScreen } from '@/components/layout/AppScreen';
+import { AppButton } from '@/components/ui/AppButton';
 import { InfoCard } from '@/components/ui/InfoCard';
 import { StatusPill } from '@/components/ui/StatusPill';
 
@@ -60,6 +61,17 @@ describe('componentes comunes', () => {
     expect(getByTestId('delete-button').props.accessibilityLabel).toBe(
       'Eliminar orden de trabajo',
     );
+  });
+
+  it('AppButton mantiene el alias compatible del Button común', async () => {
+    const onPress = jest.fn();
+    const { getByRole } = await renderWithProviders(
+      <AppButton title="Continuar" onPress={onPress} />,
+    );
+
+    fireEvent.press(getByRole('button', { name: 'Continuar' }));
+
+    expect(onPress).toHaveBeenCalledTimes(1);
   });
 
   it('Card renderiza su encabezado y contenido', async () => {
@@ -201,6 +213,22 @@ describe('componentes comunes', () => {
     expect(getByText('Patente ABCD12')).toBeTruthy();
     expect(getByText('En revisión')).toBeTruthy();
     expect(queryByText('Otro dato')).toBeNull();
+  });
+
+  it('InfoCard comparte las props de accesibilidad de Card', async () => {
+    const { getByTestId } = await renderWithProviders(
+      <InfoCard
+        title="Cantidad"
+        accessibilityLabel="Resumen de cantidades"
+        testID="info-card"
+      >
+        <Text>3 unidades</Text>
+      </InfoCard>,
+    );
+
+    expect(getByTestId('info-card').props.accessibilityLabel).toBe(
+      'Resumen de cantidades',
+    );
   });
 
   it.each(['success', 'warning', 'info', 'danger'] as const)(
