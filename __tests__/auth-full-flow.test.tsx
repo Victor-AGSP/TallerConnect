@@ -1,12 +1,14 @@
 import * as SecureStore from 'expo-secure-store';
 
 import {
+  cleanup,
   fireEvent,
   renderRouterWithProviders,
   resetStores,
   screen,
   waitFor,
 } from '../test-utils';
+import RootLayout from '@/app/_layout';
 import AdminLayout from '@/app/(admin)/_layout';
 import AdminScreen from '@/app/(admin)/administrador';
 import AuthLayout from '@/app/(auth)/_layout';
@@ -133,4 +135,30 @@ it.each(roleCases)('permite reintentar una limpieza fallida desde el logout de %
   await waitFor(() => expect(useAuthStore.getState().sessionIssue).toBeNull());
   expect(screen.queryByText(/no se pudieron borrar todos los datos/)).toBeNull();
   expect(deleteItem).toHaveBeenCalledTimes(6);
+});
+
+it.each(roleCases)('recupera %s al arrancar y no recupera la sesión después de Logout y reinicio', async (role, route) => {
+  resetStores();
+  const disk = new Map([[AUTH_SESSION_STORAGE_KEY, JSON.stringify(mockAuthResponses[role])]]);
+  getItem.mockReset().mockImplementation(async (key) => disk.get(key) ?? null);
+  setItem.mockReset().mockImplementation(async (key, value) => { disk.set(key, value); });
+  deleteItem.mockReset().mockImplementation(async (key) => { disk.delete(key); });
+  const appRoutes = { ...routes, _layout: RootLayout };
+  const router = renderRouterWithProviders(appRoutes, {
+    initialUrl: '/', initialAuthState: { isLoading: true, isHydrated: false },
+  });
+  await router;
+  await waitFor(() => expect(router.getPathname()).toBe(route));
+  expect(useAuthStore.getState().role).toBe(role);
+  await fireEvent.press(screen.getByText('Cerrar sesión'));
+  await waitFor(() => expect(router.getPathname()).toBe('/login'));
+  await waitFor(() => expect(disk.size).toBe(0));
+  await cleanup();
+  resetStores();
+  const restarted = renderRouterWithProviders(appRoutes, {
+    initialUrl: '/', initialAuthState: { isLoading: true, isHydrated: false },
+  });
+  await restarted;
+  await waitFor(() => expect(restarted.getPathname()).toBe('/login'));
+  expect(useAuthStore.getState()).toMatchObject({ isAuthenticated: false, token: null, role: null });
 });
