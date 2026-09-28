@@ -1,12 +1,16 @@
 import { Stack } from 'expo-router';
 
+import { RoleGuard } from '@/components/auth/RoleGuard';
+
 export default function ClienteLayout() {
   return (
-    <Stack
-      screenOptions={{
-        headerShown: false,
-        animation: 'slide_from_right',
-      }}
-    />
+    <RoleGuard role="cliente">
+      <Stack
+        screenOptions={{
+          headerShown: false,
+          animation: 'slide_from_right',
+        }}
+      />
+    </RoleGuard>
   );
 }

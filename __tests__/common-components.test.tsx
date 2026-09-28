@@ -1,12 +1,15 @@
-import { fireEvent, render } from '@testing-library/react-native';
+import { fireEvent, renderWithProviders } from '../test-utils';
 import { Text } from 'react-native';
 
 import { Button, Card, ErrorMessage, Input, Loading } from '@/components/common';
+import { AppScreen } from '@/components/layout/AppScreen';
+import { InfoCard } from '@/components/ui/InfoCard';
+import { StatusPill } from '@/components/ui/StatusPill';
 
 describe('componentes comunes', () => {
   it('Button ejecuta la acción y expone su estado de accesibilidad', async () => {
     const onPress = jest.fn();
-    const { getByTestId } = await render(
+    const { getByTestId } = await renderWithProviders(
       <Button title="Guardar" onPress={onPress} testID="save-button" />,
     );
 
@@ -22,7 +25,7 @@ describe('componentes comunes', () => {
 
   it('Button bloquea la interacción mientras carga', async () => {
     const onPress = jest.fn();
-    const { getByTestId } = await render(
+    const { getByTestId } = await renderWithProviders(
       <Button
         title="Guardar"
         loading
@@ -44,7 +47,7 @@ describe('componentes comunes', () => {
   });
 
   it('Button admite etiqueta de accesibilidad personalizada', async () => {
-    const { getByTestId } = await render(
+    const { getByTestId } = await renderWithProviders(
       <Button
         title="Eliminar"
         variant="danger"
@@ -60,7 +63,7 @@ describe('componentes comunes', () => {
   });
 
   it('Card renderiza su encabezado y contenido', async () => {
-    const { getByText } = await render(
+    const { getByText } = await renderWithProviders(
       <Card title="Detalle" subtitle="Información del vehículo">
         <Text>Contenido de la tarjeta</Text>
       </Card>,
@@ -72,7 +75,7 @@ describe('componentes comunes', () => {
   });
 
   it('Input muestra errores de validación y los anuncia', async () => {
-    const { getByTestId, getByText } = await render(
+    const { getByTestId, getByText } = await renderWithProviders(
       <Input
         label="Correo"
         error="El correo es obligatorio"
@@ -89,7 +92,7 @@ describe('componentes comunes', () => {
   it('Input muestra ayuda y notifica foco y desenfoque', async () => {
     const onFocus = jest.fn();
     const onBlur = jest.fn();
-    const { getByTestId, getByText } = await render(
+    const { getByTestId, getByText } = await renderWithProviders(
       <Input
         label="Correo"
         helperText="Usa el correo registrado"
@@ -111,7 +114,7 @@ describe('componentes comunes', () => {
   });
 
   it('Loading expone un indicador ocupado y un mensaje', async () => {
-    const { getByTestId, getByText } = await render(
+    const { getByTestId, getByText } = await renderWithProviders(
       <Loading message="Cargando órdenes" testID="orders-loading" />,
     );
 
@@ -124,7 +127,7 @@ describe('componentes comunes', () => {
 
   it('ErrorMessage permite reintentar la operación', async () => {
     const onRetry = jest.fn();
-    const { getByTestId, getByText } = await render(
+    const { getByTestId, getByText } = await renderWithProviders(
       <ErrorMessage
         message="No se pudo cargar la información"
         onRetry={onRetry}
@@ -140,7 +143,7 @@ describe('componentes comunes', () => {
   });
 
   it('ErrorMessage permite personalizar el título y ocultar el reintento', async () => {
-    const { getByText, queryByText } = await render(
+    const { getByText, queryByText } = await renderWithProviders(
       <ErrorMessage
         title="Servicio no disponible"
         message="Intenta nuevamente más tarde"
@@ -149,5 +152,82 @@ describe('componentes comunes', () => {
 
     expect(getByText('Servicio no disponible')).toBeTruthy();
     expect(queryByText('Reintentar')).toBeNull();
+  });
+
+  it('Button expone y respeta el estado deshabilitado explícito', async () => {
+    const onPress = jest.fn();
+    const { getByRole } = await renderWithProviders(
+      <Button title="Continuar" disabled onPress={onPress} />,
+    );
+
+    const button = getByRole('button', { name: 'Continuar' });
+
+    expect(button.props.accessibilityState).toEqual({
+      disabled: true,
+      busy: false,
+    });
+
+    fireEvent.press(button);
+
+    expect(onPress).not.toHaveBeenCalled();
+  });
+
+  it('Input conserva su etiqueta accesible cuando no es editable', async () => {
+    const { getByLabelText } = await renderWithProviders(
+      <Input label="Correo" editable={false} />,
+    );
+
+    expect(getByLabelText('Correo').props.editable).toBe(false);
+  });
+
+  it('Input anuncia el error como una región de actualización accesible', async () => {
+    const { getByRole } = await renderWithProviders(
+      <Input label="Correo" error="Correo inválido" />,
+    );
+
+    expect(
+      getByRole('alert', { name: 'Correo inválido' }).props,
+    ).toMatchObject({ accessibilityLiveRegion: 'polite' });
+  });
+
+  it('InfoCard muestra sus campos opcionales y contenido', async () => {
+    const { getByText, queryByText } = await renderWithProviders(
+      <InfoCard title="Vehículo" subtitle="Patente ABCD12">
+        <Text>En revisión</Text>
+      </InfoCard>,
+    );
+
+    expect(getByText('Vehículo')).toBeTruthy();
+    expect(getByText('Patente ABCD12')).toBeTruthy();
+    expect(getByText('En revisión')).toBeTruthy();
+    expect(queryByText('Otro dato')).toBeNull();
+  });
+
+  it.each(['success', 'warning', 'info', 'danger'] as const)(
+    'StatusPill mantiene su etiqueta accesible en tono %s',
+    async (tone) => {
+      const { getByText } = await renderWithProviders(
+        <StatusPill label="Orden en proceso" tone={tone} />,
+      );
+
+      expect(getByText('Orden en proceso')).toBeTruthy();
+    },
+  );
+
+  it('AppScreen deja título, descripción y contenido disponibles', async () => {
+    const { getByText } = await renderWithProviders(
+      <AppScreen
+        eyebrow="Panel"
+        title="Mis órdenes"
+        subtitle="Revisa el avance del taller"
+      >
+        <Text>Orden 42</Text>
+      </AppScreen>,
+    );
+
+    expect(getByText('Panel')).toBeTruthy();
+    expect(getByText('Mis órdenes')).toBeTruthy();
+    expect(getByText('Revisa el avance del taller')).toBeTruthy();
+    expect(getByText('Orden 42')).toBeTruthy();
   });
 });

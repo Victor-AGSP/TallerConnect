@@ -1,4 +1,4 @@
-import type { WorkOrderStatus } from '@/constants/orderStatus'; 
+import type { WorkOrderStatus } from '@/constants/orderStatus';
 
 export type { WorkOrderStatus };
 
