@@ -4,7 +4,7 @@ Aplicación móvil para la gestión de servicios técnicos vehiculares, desarrol
 
 ## Requisitos
 
-- Node.js `20.19.4` o superior dentro de las versiones compatibles con Expo (`20`, `22`, `24` o `25+`). La versión recomendada del proyecto es Node `24` (`.nvmrc`).
+- Node.js `22.13.0` o superior de la rama `22`, o `24.3.0` en adelante. RNTL 14 excluye Node 20 aunque Expo lo admita. La versión usada y comprobada en local/CI es Node `24` (`.nvmrc`).
 - npm, incluido con Node.js.
 
 Con nvm, instala y activa la versión del proyecto desde la raíz:
