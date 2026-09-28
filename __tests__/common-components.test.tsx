@@ -35,7 +35,7 @@ describe('componentes comunes', () => {
     expect(button.props.accessibilityRole).toBe('button');
     expect(button.props.accessibilityLabel).toBe('Guardar');
 
-    fireEvent.press(button);
+    await fireEvent.press(button);
 
     expect(onPress).toHaveBeenCalledTimes(1);
   });
@@ -58,7 +58,7 @@ describe('componentes comunes', () => {
       busy: true,
     });
 
-    fireEvent.press(button);
+    await fireEvent.press(button);
 
     expect(onPress).not.toHaveBeenCalled();
   });
@@ -85,7 +85,7 @@ describe('componentes comunes', () => {
       <AppButton title="Continuar" onPress={onPress} />,
     );
 
-    fireEvent.press(getByRole('button', { name: 'Continuar' }));
+    await fireEvent.press(getByRole('button', { name: 'Continuar' }));
 
     expect(onPress).toHaveBeenCalledTimes(1);
   });
@@ -165,7 +165,7 @@ describe('componentes comunes', () => {
 
     expect(getByTestId('error-message').props.accessibilityRole).toBe('alert');
 
-    fireEvent.press(getByText('Reintentar'));
+    await fireEvent.press(getByText('Reintentar'));
 
     expect(onRetry).toHaveBeenCalledTimes(1);
   });
@@ -195,7 +195,7 @@ describe('componentes comunes', () => {
       busy: false,
     });
 
-    fireEvent.press(button);
+    await fireEvent.press(button);
 
     expect(onPress).not.toHaveBeenCalled();
   });

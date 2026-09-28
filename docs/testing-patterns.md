@@ -10,13 +10,13 @@ Prueba lo que ve y hace el usuario: consulta por rol, etiqueta o texto accesible
 import { fireEvent, renderWithProviders } from '../test-utils';
 import { Button } from '@/components/common';
 
-it('permite iniciar una acción', () => {
+it('permite iniciar una acción', async () => {
   const onPress = jest.fn();
-  const { getByRole } = renderWithProviders(
+  const { getByRole } = await renderWithProviders(
     <Button title="Guardar" onPress={onPress} />,
   );
 
-  fireEvent.press(getByRole('button', { name: 'Guardar' }));
+  await fireEvent.press(getByRole('button', { name: 'Guardar' }));
 
   expect(onPress).toHaveBeenCalledTimes(1);
 });
@@ -26,26 +26,28 @@ Para componentes reutilizables, cubre estados observables como `disabled`, `load
 
 ## Expo Router
 
-`renderRouterWithProviders` usa `expo-router/testing-library`, que crea un árbol de rutas en memoria. Para una prueba enfocada, pasa un mapa de rutas pequeño; usa `initialUrl` para elegir la ruta de entrada y `screen.toHavePathname` para comprobar navegación. Así se prueba el comportamiento real de Router sin reemplazar `useRouter` por un mock.
+`renderRouterWithProviders` usa `expo-router/testing-library`, que crea un árbol de rutas en memoria. Para una prueba enfocada, pasa un mapa de rutas pequeño; usa `initialUrl` para elegir la ruta de entrada y `router.getPathname()` para comprobar navegación. Así se prueba el comportamiento real de Router sin reemplazar `useRouter` por un mock.
 
 ```tsx
 import { Link } from 'expo-router';
-import { Text, View } from 'react-native';
+import { Text } from 'react-native';
 import {
   fireEvent,
   renderRouterWithProviders,
   screen,
+  waitFor,
 } from '../test-utils';
 
-it('navega a la ruta solicitada', () => {
-  renderRouterWithProviders({
-    index: () => <Link href="/perfil">Abrir perfil</Link>,
+it('navega a la ruta solicitada', async () => {
+  const router = renderRouterWithProviders({
+    index: () => <Link href="./perfil">Abrir perfil</Link>,
     perfil: () => <Text>Perfil</Text>,
   });
 
-  fireEvent.press(screen.getByText('Abrir perfil'));
+  await router;
+  await fireEvent.press(screen.getByText('Abrir perfil'));
 
-  expect(screen).toHavePathname('/perfil');
+  await waitFor(() => expect(router.getPathname()).toBe('/perfil'));
 });
 ```
 
@@ -56,13 +58,19 @@ Usa los fixtures inline para flujos pequeños y rutas reales de `src/app` cuando
 El store de autenticación actual se crea con `create`, por lo que no requiere un provider React. Inicializa el estado por medio de `initialAuthState` y llama `resetStores()` entre pruebas. Para otro store, `resetStore(store)` usa `getInitialState()` y reemplaza el estado completo, incluidas sus acciones.
 
 ```tsx
+import { Text } from 'react-native';
 import { resetStores, renderWithProviders } from '../test-utils';
 import { useAuthStore } from '@/stores/authStore';
 
 beforeEach(() => resetStores());
 
-it('parte desde el estado de sesión definido para el caso', () => {
-  renderWithProviders(<Profile />, {
+function Profile() {
+  const role = useAuthStore((state) => state.role);
+  return <Text>{role}</Text>;
+}
+
+it('parte desde el estado de sesión definido para el caso', async () => {
+  await renderWithProviders(<Profile />, {
     initialAuthState: {
       isAuthenticated: true,
       role: 'mecanico',
@@ -86,6 +94,12 @@ jest.mock('expo-secure-store', () => ({
   deleteItemAsync: jest.fn(),
 }));
 ```
+
+## Compatibilidad comprobada
+
+Con RNTL 14, `render`, `renderRouter` y `fireEvent` son asíncronos: espera su finalización. Conserva primero el objeto de `renderRouterWithProviders` y luego haz `await router`; los helpers como `getPathname` pertenecen a ese objeto, no a `screen` ni al valor que resuelve la promesa. El helper upstream `testRouter` no se reexporta porque la versión instalada consulta esos helpers en `screen`.
+
+Los ejemplos de botón, navegación, provider personalizado y reinicio de Zustand se ejecutan en `__tests__/test-utils.test.tsx`.
 
 ## Referencias
 
