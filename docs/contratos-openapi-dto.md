@@ -137,3 +137,4 @@ Respuesta HTTP → DTO → validación Zod → mapper → modelo → store / pan
 
 - [Especificación OpenAPI 3.1](https://spec.openapis.org/oas/v3.1.0)
 - [Documentación de Swagger](https://swagger.io/docs/specification/)
+- [Checklist de integración móvil con la API Gateway](./checklist-integracion-api-gateway.md)
