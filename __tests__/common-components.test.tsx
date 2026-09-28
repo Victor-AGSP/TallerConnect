@@ -1,5 +1,6 @@
 import { fireEvent, renderWithProviders } from '../test-utils';
-import { Text } from 'react-native';
+import { StyleSheet, Text } from 'react-native';
+import { colors } from '@/constants/theme';
 
 import { Button, Card, ErrorMessage, Input, Loading } from '@/components/common';
 import { AppScreen } from '@/components/layout/AppScreen';
@@ -8,6 +9,21 @@ import { InfoCard } from '@/components/ui/InfoCard';
 import { StatusPill } from '@/components/ui/StatusPill';
 
 describe('componentes comunes', () => {
+  it.each([false, true])('Input mantiene visible el error con estilos personalizados y foco %s', async (focused) => {
+    const { getByLabelText } = await renderWithProviders(
+      <Input
+        label="Correo"
+        error="Correo inválido"
+        style={{ borderColor: '#222222' }}
+        focusedStyle={{ borderColor: '#333333' }}
+      />,
+    );
+    if (focused) await fireEvent(getByLabelText('Correo'), 'focus');
+    expect(
+      StyleSheet.flatten(getByLabelText('Correo').props.style).borderColor,
+    ).toBe(colors.danger);
+  });
+
   it('Button ejecuta la acción y expone su estado de accesibilidad', async () => {
     const onPress = jest.fn();
     const { getByTestId } = await renderWithProviders(
