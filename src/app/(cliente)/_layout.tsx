@@ -1,12 +1,15 @@
 import { Stack } from 'expo-router';
+import { ProtectedRoute } from '@/components/auth/ProtectedRoute';
 
 export default function ClienteLayout() {
   return (
-    <Stack
-      screenOptions={{
-        headerShown: false,
-        animation: 'slide_from_right',
-      }}
-    />
+    <ProtectedRoute allowedRole="cliente">
+      <Stack
+        screenOptions={{
+          headerShown: false,
+          animation: 'slide_from_right',
+        }}
+      />
+    </ProtectedRoute>
   );
 }
