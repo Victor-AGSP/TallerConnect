@@ -12,6 +12,7 @@ import { mockAuthResponses } from '@/mocks/auth.mock';
 import { authService } from '@/services/auth.service';
 import IndexScreen from '@/app/index';
 import { AUTH_SESSION_STORAGE_KEY, useAuthStore } from '@/stores/authStore';
+import { STORAGE_KEYS } from '@/utils/storage';
 
 jest.mock('expo-secure-store', () => ({
   getItemAsync: jest.fn(),
@@ -47,6 +48,48 @@ describe('persistencia y recuperación de sesión', () => {
 
   afterEach(() => {
     jest.useRealTimers();
+  });
+
+  it.each(['login', 'setAuth'] as const)('no autentica si %s no puede persistir la sesión', async (action) => {
+    const response = mockAuthResponses.cliente;
+    login.mockResolvedValueOnce(response);
+    setItem.mockRejectedValueOnce(new Error('SecureStore unavailable'));
+    const operation = action === 'login'
+      ? useAuthStore.getState().login({ email: response.user.email, password: 'clave-segura' })
+      : useAuthStore.getState().setAuth(response.user, response.token);
+
+    await expect(operation).rejects.toThrow();
+    expect(useAuthStore.getState()).toMatchObject({
+      user: null, token: null, role: null, isAuthenticated: false, isLoading: false,
+    });
+  });
+
+  it('migra la sesión antigua al formato actual antes de retirar sus claves', async () => {
+    const response = mockAuthResponses.cliente;
+    getItem.mockImplementation(async (key) => {
+      if (key === STORAGE_KEYS.AUTH_TOKEN) return response.token;
+      if (key === STORAGE_KEYS.USER_DATA) return JSON.stringify(response.user);
+      return null;
+    });
+
+    await useAuthStore.getState().hydrateSession();
+
+    expect(setItem).toHaveBeenCalledWith(AUTH_SESSION_STORAGE_KEY,
+      JSON.stringify({ user: response.user, token: response.token }));
+    expect(deleteItem).toHaveBeenCalledWith(STORAGE_KEYS.AUTH_TOKEN);
+    expect(deleteItem).toHaveBeenCalledWith(STORAGE_KEYS.USER_DATA);
+    expect(useAuthStore.getState().isAuthenticated).toBe(true);
+  });
+
+  it('un fallo de lectura termina la carga sin borrar los datos recuperables', async () => {
+    getItem.mockRejectedValueOnce(new Error('SecureStore locked'));
+    await useAuthStore.getState().hydrateSession();
+
+    expect(deleteItem).not.toHaveBeenCalled();
+    expect(useAuthStore.getState()).toMatchObject({
+      isAuthenticated: false, isLoading: false, isHydrated: true,
+      sessionIssue: { kind: 'restore' },
+    });
   });
 
   it('guarda en SecureStore la sesión devuelta por el login', async () => {
