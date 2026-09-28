@@ -111,6 +111,35 @@ describe('rutas protegidas por sesión y rol', () => {
     },
   );
 
+  it.each([
+    ['cliente', 'mecanico'],
+    ['mecanico', 'administrador'],
+    ['administrador', 'cliente'],
+  ] as const)(
+    'revalida la ruta abierta cuando la sesión cambia de %s a %s',
+    async (initialRole, updatedRole) => {
+      const initialDestination = routeByRole[initialRole];
+      const updatedDestination = routeByRole[updatedRole];
+      const router = renderRouterWithProviders(routes, {
+        initialUrl: initialDestination.path,
+        initialAuthState: sessionForRole(initialRole),
+      });
+      await router;
+
+      expect(screen.getByText(initialDestination.content)).toBeTruthy();
+
+      await act(async () => {
+        useAuthStore.setState(sessionForRole(updatedRole));
+      });
+
+      await waitFor(() =>
+        expect(router.getPathname()).toBe(updatedDestination.path),
+      );
+      expect(screen.getByText(updatedDestination.content)).toBeTruthy();
+      expect(screen.queryByText(initialDestination.content)).toBeNull();
+    },
+  );
+
   it('espera a que termine la recuperación de sesión antes de decidir la ruta', async () => {
     const router = renderRouterWithProviders(routes, {
       initialUrl: '/administrador',
