@@ -1,7 +1,17 @@
+import { z } from 'zod';
 import { ROLES, UserRole } from '@/constants/roles';
 import { LoginResponseDto, UserResponseDto } from '@/dto/auth.dto';
 import { AuthResponse } from '@/models/auth.model';
 import { User } from '@/models/user.model';
+
+// Validate before String(id) or dropping is_active: coercion can hide invalid data.
+const userResponseSchema = z.object({
+  id: z.number().int(),
+  email: z.string().email(),
+  full_name: z.string().trim().min(1),
+  roles: z.array(z.string()),
+  is_active: z.literal(true),
+});
 
 const VALID_ROLES: readonly string[] = Object.values(ROLES);
 
@@ -18,7 +28,8 @@ function isUserRole(value: unknown): value is UserRole {
  * Se usa el primer rol de `roles`, igual que la integración actual;
  * si falta o no es un rol de la app, se lanza un error.
  */
-export function mapUserResponse(dto: UserResponseDto): User {
+export function mapUserResponse(payload: UserResponseDto): User {
+  const dto = userResponseSchema.parse(payload);
   const role = dto.roles[0];
 
   if (!isUserRole(role)) {
