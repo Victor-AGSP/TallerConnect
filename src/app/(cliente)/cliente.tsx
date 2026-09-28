@@ -11,6 +11,7 @@ import {
 
 import { Button, Card } from '@/components/common';
 import { StatusPill } from '@/components/ui/StatusPill';
+import { useAuthStore } from '@/stores/authStore';
 
 import {
   radius,
@@ -19,7 +20,9 @@ import {
 
 export default function ClienteScreen() {
   const router = useRouter();
-
+  const logout = useAuthStore(
+    (state) => state.logout
+  );
   return (
     <SafeAreaView style={styles.root}>
       <ScrollView
@@ -279,7 +282,10 @@ export default function ClienteScreen() {
         <Button
           title="Cerrar sesión"
           variant="outline"
-          onPress={() => router.replace('/login')}
+          onPress={async () => {
+          await logout();
+          router.replace('/login');
+          }}
           style={styles.logoutButton}
         />
       </ScrollView>
