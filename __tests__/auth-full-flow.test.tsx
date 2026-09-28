@@ -112,3 +112,25 @@ describe('flujo completo de Login → rol → Logout', () => {
     },
   );
 });
+
+it.each(roleCases)('permite reintentar una limpieza fallida desde el logout de %s', async (role, route) => {
+  resetStores();
+  deleteItem.mockReset().mockResolvedValue(undefined);
+  deleteItem.mockRejectedValueOnce(new Error('fallo de almacenamiento'));
+  const response = mockAuthResponses[role];
+  const router = renderRouterWithProviders(routes, {
+    initialUrl: route,
+    initialAuthState: {
+      ...response, role, isAuthenticated: true, isHydrated: true, isLoading: false,
+    },
+  });
+  await router;
+  await fireEvent.press(screen.getByText('Cerrar sesión'));
+  await waitFor(() => expect(router.getPathname()).toBe('/login'));
+  expect(await screen.findByText(/no se pudieron borrar todos los datos/)).toBeTruthy();
+  expect(useAuthStore.getState().isAuthenticated).toBe(false);
+  await fireEvent.press(screen.getByRole('button', { name: 'Reintentar' }));
+  await waitFor(() => expect(useAuthStore.getState().sessionIssue).toBeNull());
+  expect(screen.queryByText(/no se pudieron borrar todos los datos/)).toBeNull();
+  expect(deleteItem).toHaveBeenCalledTimes(6);
+});
