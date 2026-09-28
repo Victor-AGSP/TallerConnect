@@ -21,9 +21,9 @@ En el repositorio no hay actualmente una especificación OpenAPI oficial ni un e
 
 ### Login
 
-- [x] La app envía correo y contraseña a `POST /auth/login` relativo a la URL base configurada.
+- [x] Con `EXPO_PUBLIC_USE_MOCK_AUTH=false`, la app envía correo y contraseña a `POST /auth/login` relativo a la URL base configurada. El modo predeterminado usa cuentas demo.
 - [x] La respuesta se transforma mediante DTO, mapper y esquema Zod antes de guardarse en Zustand.
-- [x] Hay pruebas unitarias del mapper/esquema y pruebas del flujo de login con respuestas simuladas.
+- [x] Hay pruebas del mapper/esquema, del flujo con AuthService simulado y del servicio real con el cliente HTTP simulado (`__tests__/auth-service.test.ts`). Estas últimas verifican ruta, cuerpo, mapeo de los tres roles y rechazo de datos inválidos/cuentas inactivas; no comprueban un servidor real.
 - [ ] Cotejar con OpenAPI que ruta, método, prefijo, nombres, tipos y campos obligatorios coincidan. El código hoy espera `access_token`, `token_type` y `user` con `id`, `email`, `full_name`, `roles` e `is_active`.
 - [ ] Confirmar si `roles` contiene uno o varios roles, el orden/prioridad aplicable y los valores exactos que devuelve el servicio.
 - [ ] Confirmar estados y cuerpos de respuesta para credenciales inválidas, cuenta inactiva, validación y errores de servidor.
@@ -82,9 +82,10 @@ En el repositorio no hay actualmente una especificación OpenAPI oficial ni un e
 - [ ] Prueba funcional en Android y iOS con dispositivos/emuladores y URL accesible desde el dispositivo.
 - [ ] Confirmar resultados del pipeline: `npm run test:ci`, `npm run typecheck` y `npm run export:android`.
 
-## Estado observado al crear esta lista
+## Estado observado en la auditoría del 27-09-2026
 
-- Autenticación: cliente y DTO de login implementados; la integración HTTP depende de `EXPO_PUBLIC_USE_MOCK_AUTH=false`. Las pruebas del flujo usan AuthService simulado.
+- Autenticación: cliente y DTO de login implementados; la integración HTTP depende de `EXPO_PUBLIC_USE_MOCK_AUTH=false`. Las pruebas del flujo usan AuthService simulado; las del servicio ejecutan AuthService y simulan únicamente el cliente HTTP.
+- Persistencia/logout: pruebas de lectura, escritura y eliminación fallidas, migración de claves, operaciones concurrentes y reinicio con layout raíz; almacenamiento nativo y web simulado.
 - Navegación/roles: rutas locales protegidas y cubiertas con pruebas automatizadas.
 - Resto de dominios: las pantallas muestran datos de demostración; todavía no hay servicios HTTP móviles para vehículos/órdenes, presupuestos/repuestos/proveedores ni evidencia.
 - Verificación contra Gateway: pendiente de contar con el contrato oficial y un entorno de pruebas accesible.
