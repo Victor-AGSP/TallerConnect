@@ -49,3 +49,5 @@ npm run export:android
 ```
 
 `npm test` ejecuta Jest secuencialmente para mantener estable el uso de recursos en local. `npm run test:ci` es el alias utilizado por GitHub Actions y llama al mismo comando. GitHub Actions ejecuta estas verificaciones para cambios en `Victor` y `Develop` y en pull requests hacia esas ramas.
+
+La regresión incluye automáticamente las suites `auth-*`, rutas protegidas, componentes comunes y utilidades de pruebas mediante `jest.regression.config.cjs`. `npm test` y `test:ci` ejecutan todas las suites, incluida la configuración del entorno.
