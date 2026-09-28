@@ -48,4 +48,4 @@ npm run typecheck
 npm run export:android
 ```
 
-GitHub Actions ejecuta estas mismas verificaciones para cambios en `Victor` y `Develop` y en pull requests hacia esas ramas.
+`npm test` ejecuta Jest secuencialmente para mantener estable el uso de recursos en local. `npm run test:ci` es el alias utilizado por GitHub Actions y llama al mismo comando. GitHub Actions ejecuta estas verificaciones para cambios en `Victor` y `Develop` y en pull requests hacia esas ramas.
