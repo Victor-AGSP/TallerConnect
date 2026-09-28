@@ -56,6 +56,7 @@
     "lint": "expo lint",
     "test": "jest",
     "test:ci": "jest --runInBand",
+    "test:regression": "jest --runInBand --runTestsByPath __tests__/auth-flow.test.tsx __tests__/auth-full-flow.test.tsx __tests__/auth-mapper.test.ts __tests__/auth-role.test.ts __tests__/auth-schema.test.ts __tests__/auth-session.test.tsx __tests__/protected-routes.test.tsx __tests__/common-components.test.tsx",
     "typecheck": "tsc --noEmit",
     "export:android": "expo export --platform android"
   },

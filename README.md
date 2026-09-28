@@ -42,6 +42,7 @@ Para consumir la API Gateway, define `EXPO_PUBLIC_USE_MOCK_AUTH=false` y `EXPO_P
 ## Verificaciones
 
 ```bash
+npm run test:regression
 npm test
 npm run typecheck
 npm run export:android
