@@ -1,9 +1,17 @@
 import { create } from 'zustand';
-import type { LoginCredentials, User } from '@/models';
-import type { UserRole } from '@/constants/roles';
-import { authService } from '@/services/auth.service';
-import { authResponseSchema } from '@/schemas/auth.schema';
-import { storage, STORAGE_KEYS } from '@/utils/storage';
+
+import { User } from '@/models/user.model';
+
+import { UserRole } from '@/constants/roles';
+
+import {
+  getCurrentUser,
+} from '@/services/auth.service';
+
+import {
+  storage,
+  STORAGE_KEYS,
+} from '@/utils/storage';
 
 export const AUTH_SESSION_STORAGE_KEY = 'tallerconnect.auth.session';
 
@@ -17,110 +25,235 @@ const emptySession = {
 
 export interface AuthState {
   user: User | null;
+
   token: string | null;
-  refreshToken: string | null;
   role: UserRole | null;
   isAuthenticated: boolean;
+
   isLoading: boolean;
+
   isHydrated: boolean;
 
-  login: (credentials: LoginCredentials) => Promise<void>;
-  setAuth: (user: User, token: string, refreshToken?: string) => Promise<void>;
+  setAuth: (
+    user: User,
+    token: string
+  ) => Promise<void>;
+
   logout: () => Promise<void>;
-  hydrateSession: () => Promise<void>;
+
   restoreSession: () => Promise<void>;
-  setLoading: (loading: boolean) => void;
+
+  setLoading: (
+    loading: boolean
+  ) => void;
 }
 
-type AuthSet = (partial: Partial<AuthState>) => void;
+export const useAuthStore =
+  create<AuthState>((set) => ({
+    user: null,
 
-async function hydrateStoredSession(set: AuthSet): Promise<void> {
-  set({ isLoading: true });
+    token: null,
 
-  let candidate: unknown = null;
-  const storedSession = await storage.get(AUTH_SESSION_STORAGE_KEY);
+    role: null,
 
-  if (storedSession) {
-    try {
-      candidate = JSON.parse(storedSession);
-    } catch {
-      candidate = null;
-    }
-  } else {
-    // Migrate sessions written by Develop's separate token/user storage.
-    const [token, user] = await Promise.all([
-      storage.get(STORAGE_KEYS.AUTH_TOKEN),
-      storage.getObject<User>(STORAGE_KEYS.USER_DATA),
-    ]);
-    if (token && user) candidate = { user, token };
-  }
+    isAuthenticated: false,
 
-  const parsedSession = authResponseSchema.safeParse(candidate);
-  if (!parsedSession.success) {
-    await storage.remove(AUTH_SESSION_STORAGE_KEY);
-    await storage.clearSession();
-    set({ ...emptySession, isLoading: false, isHydrated: true });
-    return;
-  }
-
-  const { user, token, refreshToken } = parsedSession.data;
-  set({
-    user,
-    token,
-    refreshToken: refreshToken ?? null,
-    role: user.role,
-    isAuthenticated: true,
     isLoading: false,
-    isHydrated: true,
-  });
-}
 
-export const useAuthStore = create<AuthState>((set) => ({
-  ...emptySession,
-  isLoading: true,
-  isHydrated: false,
+    isHydrated: false,
 
-  login: async (credentials) => {
-    set({ isLoading: true });
-    try {
-      const response = await authService.login(credentials);
-      await storage.set(AUTH_SESSION_STORAGE_KEY, JSON.stringify(response));
+    /**
+     * ========================================================
+     * GUARDAR SESIÓN
+     * ========================================================
+     */
+    setAuth: async (
+      user: User,
+      token: string
+    ) => {
       set({
-        user: response.user,
-        token: response.token,
-        refreshToken: response.refreshToken ?? null,
-        role: response.user.role,
-        isAuthenticated: true,
-        isLoading: false,
-        isHydrated: true,
+        isLoading: true,
       });
-    } catch (error) {
-      set({ isLoading: false });
-      throw error;
-    }
-  },
 
-  setAuth: async (user, token, refreshToken) => {
-    const response = { user, token, refreshToken };
-    set({
-      user,
-      token,
-      refreshToken: refreshToken ?? null,
-      role: user.role,
-      isAuthenticated: true,
-      isLoading: false,
-      isHydrated: true,
-    });
-    await storage.set(AUTH_SESSION_STORAGE_KEY, JSON.stringify(response));
-  },
+      try {
+        await storage.set(
+          STORAGE_KEYS.AUTH_TOKEN,
+          token
+        );
 
-  logout: async () => {
-    set({ ...emptySession, isLoading: false, isHydrated: true });
-    await storage.remove(AUTH_SESSION_STORAGE_KEY);
-    await storage.clearSession();
-  },
+        await storage.setObject(
+          STORAGE_KEYS.USER_DATA,
+          user
+        );
 
-  hydrateSession: async () => hydrateStoredSession(set),
-  restoreSession: async () => hydrateStoredSession(set),
-  setLoading: (loading) => set({ isLoading: loading }),
-}));
+        set({
+          user,
+
+          token,
+
+          role: user.role,
+
+          isAuthenticated: true,
+
+          isLoading: false,
+
+          isHydrated: true,
+        });
+      } catch (error) {
+        console.error(
+          'Error al guardar la sesión:',
+          error
+        );
+
+        set({
+          isLoading: false,
+        });
+
+        throw error;
+      }
+    },
+
+    /**
+     * ========================================================
+     * CERRAR SESIÓN
+     * ========================================================
+     *
+     * El backend no documenta un endpoint de logout.
+     *
+     * El JWT es stateless, por lo que el logout del cliente
+     * consiste en eliminar la sesión local.
+     */
+    logout: async () => {
+      set({
+        isLoading: true,
+      });
+
+      try {
+        await storage.clearSession();
+      } finally {
+        set({
+          user: null,
+
+          token: null,
+
+          role: null,
+
+          isAuthenticated: false,
+
+          isLoading: false,
+
+          isHydrated: true,
+        });
+      }
+    },
+
+    /**
+     * ========================================================
+     * RESTAURAR SESIÓN
+     * ========================================================
+     *
+     * 1. Busca JWT almacenado.
+     * 2. Si no existe, no hay sesión.
+     * 3. Si existe, consulta /auth/me.
+     * 4. El backend valida realmente el JWT.
+     * 5. Si es válido, actualizamos el usuario.
+     * 6. Si es inválido, eliminamos la sesión.
+     */
+    restoreSession: async () => {
+      set({
+        isLoading: true,
+      });
+
+      try {
+        const token =
+          await storage.get(
+            STORAGE_KEYS.AUTH_TOKEN
+          );
+
+        if (!token) {
+          set({
+            user: null,
+
+            token: null,
+
+            role: null,
+
+            isAuthenticated: false,
+
+            isLoading: false,
+
+            isHydrated: true,
+          });
+
+          return;
+        }
+
+        /**
+         * Validación real contra el backend.
+         */
+        const user =
+          await getCurrentUser();
+
+        /**
+         * Actualizamos los datos del usuario
+         * almacenados localmente.
+         */
+        await storage.setObject(
+          STORAGE_KEYS.USER_DATA,
+          user
+        );
+
+        set({
+          user,
+
+          token,
+
+          role: user.role,
+
+          isAuthenticated: true,
+
+          isLoading: false,
+
+          isHydrated: true,
+        });
+      } catch (error) {
+        console.error(
+          'La sesión almacenada no es válida:',
+          error
+        );
+
+        /**
+         * El JWT ya no es válido.
+         * Eliminamos toda la sesión.
+         */
+        await storage.clearSession();
+
+        set({
+          user: null,
+
+          token: null,
+
+          role: null,
+
+          isAuthenticated: false,
+
+          isLoading: false,
+
+          isHydrated: true,
+        });
+      }
+    },
+
+    /**
+     * ========================================================
+     * ESTADO DE CARGA
+     * ========================================================
+     */
+    setLoading: (
+      loading: boolean
+    ) => {
+      set({
+        isLoading: loading,
+      });
+    },
+  }));
