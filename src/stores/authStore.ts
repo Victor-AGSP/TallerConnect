@@ -5,6 +5,7 @@ import type { UserRole } from '@/constants/roles';
 
 import {
   authService,
+  getCurrentUser,
 } from '@/services/auth.service';
 
 import {
@@ -335,12 +336,65 @@ export const useAuthStore =
      * RESTORE SESSION
      * ========================================================
      *
-     * Alias compatible con el código anterior.
+     * Valida el token almacenado con el backend mediante getCurrentUser().
      */
     restoreSession: async () => {
-      await hydrateStoredSession(
-        set
-      );
+      set({
+        isLoading: true,
+      });
+
+      try {
+        const token =
+          await storage.get(
+            STORAGE_KEYS.AUTH_TOKEN
+          );
+
+        if (!token) {
+          set({
+            user: null,
+            token: null,
+            role: null,
+            isAuthenticated: false,
+            isLoading: false,
+            isHydrated: true,
+          });
+
+          return;
+        }
+
+        const user =
+          await getCurrentUser();
+
+        await storage.setObject(
+          STORAGE_KEYS.USER_DATA,
+          user
+        );
+
+        set({
+          user,
+          token,
+          role: user.role,
+          isAuthenticated: true,
+          isLoading: false,
+          isHydrated: true,
+        });
+      } catch (error) {
+        console.error(
+          'La sesión almacenada no es válida:',
+          error
+        );
+
+        await storage.clearSession();
+
+        set({
+          user: null,
+          token: null,
+          role: null,
+          isAuthenticated: false,
+          isLoading: false,
+          isHydrated: true,
+        });
+      }
     },
 
     /**

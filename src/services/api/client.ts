@@ -1,88 +1,36 @@
 import axios from 'axios';
-
 import {
-  storage,
-  STORAGE_KEYS,
-} from '@/utils/storage';
+  attachAuthTokenInterceptor,
+  attachErrorInterceptor,
+} from './interceptors';
 
 /**
- * URL base de la API.
- *
- * Se puede sobrescribir mediante:
- *
- * EXPO_PUBLIC_API_URL
+ * URL base de la API Gateway (Integración 2).
+ * Puede sobreescribirse mediante la variable de entorno EXPO_PUBLIC_API_URL.
  */
-const API_BASE_URL =
-  process.env.EXPO_PUBLIC_API_URL ??
-  'https://tallerconect.vercel.app/api';
-
-export const apiClient =
-  axios.create({
-    baseURL: API_BASE_URL,
-
-    timeout: 15000,
-
-    headers: {
-      'Content-Type':
-        'application/json',
-
-      Accept:
-        'application/json',
-    },
-  });
+export const API_BASE_URL =
+  process.env.EXPO_PUBLIC_API_URL ?? 'https://tallerconect.vercel.app/api';
 
 /**
- * ============================================================
- * REQUEST INTERCEPTOR
- * ============================================================
- *
- * Agrega automáticamente:
- *
- * Authorization: Bearer <token>
+ * Timeout estándar de 15 segundos para solicitudes HTTP hacia la API Gateway.
  */
-apiClient.interceptors.request.use(
-  async (config) => {
-    const token =
-      await storage.get(
-        STORAGE_KEYS.AUTH_TOKEN
-      );
+export const DEFAULT_TIMEOUT_MS = 15000;
 
-    if (token) {
-      config.headers.Authorization =
-        `Bearer ${token}`;
-    }
-
-    return config;
+/**
+ * Cliente HTTP centralizado basado en Axios para todas las solicitudes
+ * hacia la API Gateway del sistema TallerConnect.
+ */
+export const apiClient = axios.create({
+  baseURL: API_BASE_URL,
+  timeout: DEFAULT_TIMEOUT_MS,
+  headers: {
+    'Content-Type': 'application/json',
+    Accept: 'application/json',
   },
+});
 
-  (error) => {
-    return Promise.reject(
-      error
-    );
-  }
-);
+// 1. Interceptor de peticiones: Adjuntar token Bearer automáticamente en rutas protegidas
+attachAuthTokenInterceptor(apiClient);
 
-/**
- * ============================================================
- * RESPONSE INTERCEPTOR
- * ============================================================
- *
- * Si el backend responde 401,
- * limpiamos la sesión.
- */
-apiClient.interceptors.response.use(
-  (response) => response,
-
-  async (error) => {
-    if (
-      error.response?.status ===
-      401
-    ) {
-      await storage.clearSession();
-    }
-
-    return Promise.reject(
-      error
-    );
-  }
-);
+// 2. Interceptor de respuestas: Manejo centralizado de errores ({ detail }), timeout y logout en 401/403
+attachErrorInterceptor(apiClient);
