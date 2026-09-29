@@ -1,6 +1,6 @@
 # Convenciones de representación de datos
 
-Este documento define cómo la app representa los identificadores, las fechas, los valores nulos y las listas que recibe de la API. Las convenciones se aplican en la tarea "Corregir modelos/DTO según diferencias encontradas"; este documento no modifica código.
+Este documento define cómo la app representa los identificadores, las fechas, los valores nulos y las listas que recibe de la API. Las convenciones se aplican en la tarea "Corregir modelos/DTO según diferencias encontradas".
 
 ## Principio general
 

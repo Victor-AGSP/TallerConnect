@@ -10,10 +10,11 @@ export type { WorkOrderStatus };
 export interface WorkOrder {
   id: string;
   vehicleId: string;
+  intakeId: string;
   status: WorkOrderStatus;
-  assignedMechanicId?: string;
+  assignedMechanicId: string | null;
   clientId: string;
-  description?: string;
-  createdAt?: string;
-  updatedAt?: string;
+  createdById: string;
+  createdAt: string;
+  updatedAt: string;
 }

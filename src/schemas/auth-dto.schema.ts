@@ -20,6 +20,6 @@ export const userResponseDtoSchema: z.ZodType<UserResponseDto> = z.object({
  */
 export const loginResponseDtoSchema: z.ZodType<LoginResponseDto> = z.object({
   access_token: z.string().min(1),
-  token_type: z.string(),
+  token_type: z.string().optional(),
   user: userResponseDtoSchema,
 });

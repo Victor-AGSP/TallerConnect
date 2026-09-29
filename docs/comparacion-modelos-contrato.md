@@ -39,7 +39,7 @@ Este documento compara, campo por campo, los modelos de la app (`src/models/`) c
 |---|---|---|---|
 | `user: User` | `user: UsuarioRespuesta` | Mapper | Mismo mapper de `User` |
 | `token: string` | `access_token: string` | Mapper | Renombrar |
-| `refreshToken?: string` | (no existe) | Corregir modelo | La API no tiene refresh token. Lo usan el store, los mocks y las pruebas de sesión |
+| `refreshToken?: string` | (no existe) | Corregir modelo | La API no entrega este campo, por lo que corresponde eliminarlo del modelo. La eliminación queda pendiente porque actualmente `authStore`, mocks y pruebas de sesión lo utilizan; requiere coordinación antes de realizar el cambio. |
 | (no existe) | `token_type?: string` (opcional, por defecto `bearer`) | Intencional | La app no lo necesita |
 
 ### `AuthSession`

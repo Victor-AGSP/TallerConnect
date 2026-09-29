@@ -7,7 +7,6 @@ export const mockUsers: User[] = [
     email: 'jmonsalvez@tallerconnect.cl',
     role: 'cliente',
     phone: '+56912345678',
-    createdAt: '2026-01-15T10:00:00.000Z',
   },
   {
     id: 'usr-002',
@@ -15,7 +14,6 @@ export const mockUsers: User[] = [
     email: 'vsepulveda@tallerconnect.cl',
     role: 'mecanico',
     phone: '+56987654321',
-    createdAt: '2026-02-01T09:30:00.000Z',
   },
   {
     id: 'usr-003',
@@ -23,7 +21,6 @@ export const mockUsers: User[] = [
     email: 'jllanca@tallerconnect.cl',
     role: 'administrador',
     phone: '+56911223344',
-    createdAt: '2025-12-01T08:00:00.000Z',
   },
 ];
 
