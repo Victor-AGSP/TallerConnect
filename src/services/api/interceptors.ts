@@ -1,6 +1,5 @@
 import axios, { AxiosError, AxiosInstance, InternalAxiosRequestConfig } from 'axios';
 import { storage, STORAGE_KEYS } from '@/utils/storage';
-import { useAuthStore } from '@/stores/authStore';
 import { useConnectivityStore } from '@/stores/connectivityStore';
 import {
   ApiErrorResponse,
@@ -161,6 +160,10 @@ export function attachErrorInterceptor(client: AxiosInstance): void {
             `[Axios Error Interceptor] HTTP ${normalized.status} en ruta protegida (${requestUrl}). Coordinando cierre de sesión...`
           );
           try {
+            // Carga diferida en tiempo de ejecución para romper ciclo de dependencias:
+            // authStore -> auth.service -> client -> interceptors -> authStore
+            // eslint-disable-next-line @typescript-eslint/no-var-requires
+            const { useAuthStore } = require('@/stores/authStore');
             await useAuthStore.getState().logout();
           } catch (logoutError) {
             console.error('Error al coordinar logout tras 401/403:', logoutError);

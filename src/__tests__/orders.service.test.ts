@@ -39,7 +39,7 @@ describe('ordersService (Capa de Servicios de Órdenes)', () => {
 
       const result = await ordersService.getOrders();
 
-      expect(mockedApiClient.get).toHaveBeenCalledWith('/orders');
+      expect(mockedApiClient.get).toHaveBeenCalledWith('/ordenes');
       expect(result).toHaveLength(1);
       expect(result[0]).toEqual({
         id: '101',
@@ -84,7 +84,7 @@ describe('ordersService (Capa de Servicios de Órdenes)', () => {
 
       const result = await ordersService.getOrderById('101');
 
-      expect(mockedApiClient.get).toHaveBeenCalledWith('/orders/101');
+      expect(mockedApiClient.get).toHaveBeenCalledWith('/ordenes/101');
       expect(result.id).toBe('101');
       expect(result.status).toBe('esperando_diagnostico');
     });
@@ -113,7 +113,10 @@ describe('ordersService (Capa de Servicios de Órdenes)', () => {
 
       const result = await ordersService.createOrder(newOrderPayload);
 
-      expect(mockedApiClient.post).toHaveBeenCalledWith('/orders', newOrderPayload);
+      expect(mockedApiClient.post).toHaveBeenCalledWith('/ordenes', expect.objectContaining({
+        vehicle_id: '5',
+        client_id: '12',
+      }));
       expect(result.id).toBe('102');
       expect(result.status).toBe('recibido');
       expect(result.vehicleId).toBe('5');
@@ -135,7 +138,7 @@ describe('ordersService (Capa de Servicios de Órdenes)', () => {
 
       const result = await ordersService.updateOrderStatus('101', 'listo_para_entrega');
 
-      expect(mockedApiClient.patch).toHaveBeenCalledWith('/orders/101/status', {
+      expect(mockedApiClient.patch).toHaveBeenCalledWith('/ordenes/101/status', {
         status: 'listo_para_entrega',
       });
       expect(result.status).toBe('listo_para_entrega');

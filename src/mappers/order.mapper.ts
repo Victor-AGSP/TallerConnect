@@ -5,6 +5,21 @@ import { ORDER_STATUS } from '@/constants/orderStatus';
 const VALID_STATUSES: readonly string[] = Object.values(ORDER_STATUS);
 
 /**
+ * Mapeo de códigos numéricos de estado (FastAPI/MS2) a estados de la aplicación.
+ */
+export const CODE_TO_STATUS: Record<number, WorkOrderStatus> = {
+  1: ORDER_STATUS.RECIBIDO,
+  2: ORDER_STATUS.ESPERANDO_DIAGNOSTICO,
+  3: ORDER_STATUS.EN_REPARACION,
+  4: ORDER_STATUS.ESPERANDO_REPUESTOS,
+  5: ORDER_STATUS.CONTROL_CALIDAD,
+  6: ORDER_STATUS.LISTO_PARA_ENTREGA,
+  7: ORDER_STATUS.ENTREGADO,
+  8: ORDER_STATUS.ESPERANDO_APROBACION_PRESUPUESTO,
+  9: ORDER_STATUS.CANCELADO,
+};
+
+/**
  * Valida si un texto corresponde a un WorkOrderStatus de la aplicación.
  */
 export function isValidOrderStatus(status: unknown): status is WorkOrderStatus {
@@ -12,27 +27,40 @@ export function isValidOrderStatus(status: unknown): status is WorkOrderStatus {
 }
 
 /**
- * Mapea una orden devuelta por la API Gateway (snake_case) al modelo WorkOrder de la app (camelCase).
+ * Mapea una orden devuelta por la API Gateway (tanto ordenes en español como inglés) al modelo WorkOrder.
  */
 export function mapOrderResponse(dto: OrderResponseDto): WorkOrder {
-  const status: WorkOrderStatus = isValidOrderStatus(dto.status)
-    ? dto.status
-    : ORDER_STATUS.ESPERANDO_DIAGNOSTICO;
+  let status: WorkOrderStatus = ORDER_STATUS.ESPERANDO_DIAGNOSTICO;
+
+  if (isValidOrderStatus(dto.status)) {
+    status = dto.status;
+  } else if (dto.estado_codigo != null && CODE_TO_STATUS[dto.estado_codigo]) {
+    status = CODE_TO_STATUS[dto.estado_codigo];
+  }
+
+  const id = String(dto.orden_id ?? dto.id ?? '');
+  const vehicleId = String(dto.vehiculo_id ?? dto.vehicle_id ?? '');
+  const intakeId = String(dto.ingreso_id ?? dto.intake_id ?? `ing-${id}`);
+  const clientId = String(dto.cliente_id ?? dto.client_id ?? dto.creado_por_id ?? dto.created_by_id ?? '1');
+  const createdById = String(dto.creado_por_id ?? dto.created_by_id ?? clientId);
+
+  const rawMechanic = dto.mecanico_actual_id !== undefined ? dto.mecanico_actual_id : dto.assigned_mechanic_id;
+  const assignedMechanicId = rawMechanic != null ? String(rawMechanic) : null;
 
   const defaultIso = '1970-01-01T00:00:00.000Z';
+  const createdAt = dto.creado_en || dto.created_at || defaultIso;
+  const updatedAt = dto.actualizado_en || dto.updated_at || createdAt;
 
   return {
-    id: String(dto.id),
-    vehicleId: String(dto.vehicle_id),
-    intakeId: dto.intake_id ? String(dto.intake_id) : `ing-${dto.id}`,
-    clientId: String(dto.client_id),
-    createdById: dto.created_by_id ? String(dto.created_by_id) : String(dto.client_id),
+    id,
+    vehicleId,
+    intakeId,
+    clientId,
+    createdById,
     status,
-    assignedMechanicId: dto.assigned_mechanic_id != null
-      ? String(dto.assigned_mechanic_id)
-      : null,
-    createdAt: dto.created_at ?? defaultIso,
-    updatedAt: dto.updated_at ?? defaultIso,
+    assignedMechanicId,
+    createdAt,
+    updatedAt,
   };
 }
 

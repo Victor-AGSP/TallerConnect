@@ -17,7 +17,7 @@ let localMockOrders = [...mockWorkOrders];
 export class OrdersService {
   /**
    * Obtiene la lista completa de órdenes de trabajo.
-   * Utiliza GET (operación segura con reintento automático ante fallas de red).
+   * Ruta Gateway: GET /api/ordenes
    */
   async getOrders(): Promise<WorkOrder[]> {
     if (USE_MOCKS) {
@@ -26,7 +26,7 @@ export class OrdersService {
     }
 
     try {
-      const response = await apiClient.get<OrderResponseDto[]>('/orders');
+      const response = await apiClient.get<OrderResponseDto[]>('/ordenes');
       return mapOrdersResponseList(response.data);
     } catch (error: unknown) {
       const normalized = normalizeApiError(error);
@@ -36,6 +36,7 @@ export class OrdersService {
 
   /**
    * Obtiene el detalle de una orden de trabajo por su ID.
+   * Ruta Gateway: GET /api/ordenes/{id}
    */
   async getOrderById(id: string): Promise<WorkOrder> {
     if (USE_MOCKS) {
@@ -48,7 +49,7 @@ export class OrdersService {
     }
 
     try {
-      const response = await apiClient.get<OrderResponseDto>(`/orders/${id}`);
+      const response = await apiClient.get<OrderResponseDto>(`/ordenes/${id}`);
       return mapOrderResponse(response.data);
     } catch (error: unknown) {
       const normalized = normalizeApiError(error);
@@ -58,16 +59,19 @@ export class OrdersService {
 
   /**
    * Crea una nueva orden de trabajo.
-   * Utiliza POST (operación no segura, protegida contra reintentos automáticos duplicados).
+   * Ruta Gateway: POST /api/ordenes
    */
   async createOrder(data: CreateOrderRequestDto): Promise<WorkOrder> {
+    const vehicleId = String(data.vehiculo_id ?? data.vehicle_id ?? '');
+    const clientId = String(data.cliente_id ?? data.client_id ?? '');
+
     if (USE_MOCKS) {
       await new Promise((resolve) => setTimeout(resolve, 400));
       const newMockOrder: WorkOrder = {
         id: `ot-00${localMockOrders.length + 124}`,
-        vehicleId: String(data.vehicle_id),
+        vehicleId,
         intakeId: `ing-00${localMockOrders.length + 124}`,
-        clientId: String(data.client_id),
+        clientId,
         createdById: 'usr-003',
         status: 'esperando_diagnostico',
         assignedMechanicId: null,
@@ -79,7 +83,15 @@ export class OrdersService {
     }
 
     try {
-      const response = await apiClient.post<OrderResponseDto>('/orders', data);
+      const payload = {
+        vehiculo_id: vehicleId,
+        vehicle_id: vehicleId,
+        cliente_id: clientId,
+        client_id: clientId,
+        description: data.description,
+      };
+
+      const response = await apiClient.post<OrderResponseDto>('/ordenes', payload);
       return mapOrderResponse(response.data);
     } catch (error: unknown) {
       const normalized = normalizeApiError(error);
@@ -88,7 +100,7 @@ export class OrdersService {
   }
 
   /**
-   * Actualiza el estado de una orden de trabajo (PATCH).
+   * Actualiza el estado de una orden de trabajo (PATCH /api/ordenes/{id}/status).
    */
   async updateOrderStatus(id: string, status: WorkOrderStatus): Promise<WorkOrder> {
     if (USE_MOCKS) {
@@ -107,7 +119,7 @@ export class OrdersService {
 
     try {
       const payload: UpdateOrderStatusRequestDto = { status };
-      const response = await apiClient.patch<OrderResponseDto>(`/orders/${id}/status`, payload);
+      const response = await apiClient.patch<OrderResponseDto>(`/ordenes/${id}/status`, payload);
       return mapOrderResponse(response.data);
     } catch (error: unknown) {
       const normalized = normalizeApiError(error);

@@ -17,7 +17,7 @@ describe('vehiclesService (Capa de Servicios de Vehículos)', () => {
   });
 
   describe('getVehicles', () => {
-    it('obtiene y mapea la lista de vehículos desde la API Gateway', async () => {
+    it('obtiene y mapea la lista de vehículos desde la API Gateway (/vehiculos)', async () => {
       const rawApiVehicles: VehicleResponseDto[] = [
         {
           id: 1,
@@ -35,7 +35,7 @@ describe('vehiclesService (Capa de Servicios de Vehículos)', () => {
 
       const result = await vehiclesService.getVehicles();
 
-      expect(mockedApiClient.get).toHaveBeenCalledWith('/vehicles');
+      expect(mockedApiClient.get).toHaveBeenCalledWith('/vehiculos');
       expect(result).toHaveLength(1);
       expect(result[0]).toEqual({
         id: '1',
@@ -63,6 +63,57 @@ describe('vehiclesService (Capa de Servicios de Vehículos)', () => {
     });
   });
 
+  describe('getMyVehicles', () => {
+    it('obtiene los vehículos del cliente autenticado (/vehiculos/mios)', async () => {
+      const rawVehicles: VehicleResponseDto[] = [
+        {
+          vehiculo_id: 1,
+          patente: 'ABCD12',
+          marca: 'Toyota',
+          modelo: 'Corolla',
+          anio: 2019,
+          kilometraje: 65000,
+        },
+      ];
+
+      mockedApiClient.get.mockResolvedValueOnce({
+        data: rawVehicles,
+      } as never);
+
+      const result = await vehiclesService.getMyVehicles();
+
+      expect(mockedApiClient.get).toHaveBeenCalledWith('/vehiculos/mios');
+      expect(result).toHaveLength(1);
+      expect(result[0].plate).toBe('ABCD12');
+      expect(result[0].mileage).toBe(65000);
+    });
+  });
+
+  describe('getAssignedVehicles', () => {
+    it('obtiene los vehículos asignados al mecánico (/vehiculos/asignados)', async () => {
+      const rawVehicles: VehicleResponseDto[] = [
+        {
+          vehiculo_id: 2,
+          patente: 'KJTR45',
+          marca: 'Hyundai',
+          modelo: 'Accent',
+          anio: 2017,
+          kilometraje: 98000,
+        },
+      ];
+
+      mockedApiClient.get.mockResolvedValueOnce({
+        data: rawVehicles,
+      } as never);
+
+      const result = await vehiclesService.getAssignedVehicles();
+
+      expect(mockedApiClient.get).toHaveBeenCalledWith('/vehiculos/asignados');
+      expect(result).toHaveLength(1);
+      expect(result[0].plate).toBe('KJTR45');
+    });
+  });
+
   describe('getVehicleById', () => {
     it('obtiene un vehículo específico por su identificador', async () => {
       const rawVehicle: VehicleResponseDto = {
@@ -79,7 +130,7 @@ describe('vehiclesService (Capa de Servicios de Vehículos)', () => {
 
       const result = await vehiclesService.getVehicleById('2');
 
-      expect(mockedApiClient.get).toHaveBeenCalledWith('/vehicles/2');
+      expect(mockedApiClient.get).toHaveBeenCalledWith('/vehiculos/2');
       expect(result.id).toBe('2');
       expect(result.plate).toBe('EFGH34');
       expect(result.brand).toBe('Nissan');
@@ -111,7 +162,10 @@ describe('vehiclesService (Capa de Servicios de Vehículos)', () => {
 
       const result = await vehiclesService.createVehicle(payload);
 
-      expect(mockedApiClient.post).toHaveBeenCalledWith('/vehicles', payload);
+      expect(mockedApiClient.post).toHaveBeenCalledWith('/vehiculos', expect.objectContaining({
+        patent: 'JKLM56',
+        brand: 'Hyundai',
+      }));
       expect(result.id).toBe('10');
       expect(result.plate).toBe('JKLM56');
       expect(result.brand).toBe('Hyundai');
