@@ -5,16 +5,16 @@ import {
 } from './interceptors';
 
 /**
- * URL base oficial de la API Gateway (Integración 2).
+ * URL base de la API Gateway (Integración 2).
  * Puede sobreescribirse mediante la variable de entorno EXPO_PUBLIC_API_URL.
  */
 export const API_BASE_URL =
-  process.env.EXPO_PUBLIC_API_URL ?? 'http://localhost:8000/api';
+  process.env.EXPO_PUBLIC_API_URL ?? 'https://tallerconect.vercel.app/api';
 
 /**
- * Timeout estándar de 10 segundos para solicitudes HTTP hacia la API Gateway.
+ * Timeout estándar de 15 segundos para solicitudes HTTP hacia la API Gateway.
  */
-export const DEFAULT_TIMEOUT_MS = 10000;
+export const DEFAULT_TIMEOUT_MS = 15000;
 
 /**
  * Cliente HTTP centralizado basado en Axios para todas las solicitudes

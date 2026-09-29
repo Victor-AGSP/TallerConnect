@@ -11,17 +11,9 @@ const isWeb = Platform.OS === 'web';
 export const storage = {
   async get(key: string): Promise<string | null> {
     try {
-      if (isWeb) {
-        return localStorage.getItem(key);
-      }
-
-      return await SecureStore.getItemAsync(key);
+      return isWeb ? localStorage.getItem(key) : await SecureStore.getItemAsync(key);
     } catch (error) {
-      console.error(
-        `Error al leer la clave "${key}" de almacenamiento:`,
-        error
-      );
-
+      console.error(`Error al leer la clave "${key}" de almacenamiento:`, error);
       return null;
     }
   },
@@ -30,15 +22,11 @@ export const storage = {
     try {
       if (isWeb) {
         localStorage.setItem(key, value);
-        return;
+      } else {
+        await SecureStore.setItemAsync(key, value);
       }
-
-      await SecureStore.setItemAsync(key, value);
     } catch (error) {
-      console.error(
-        `Error al guardar la clave "${key}" en almacenamiento:`,
-        error
-      );
+      console.error(`Error al guardar la clave "${key}" en almacenamiento:`, error);
     }
   },
 
@@ -46,15 +34,11 @@ export const storage = {
     try {
       if (isWeb) {
         localStorage.removeItem(key);
-        return;
+      } else {
+        await SecureStore.deleteItemAsync(key);
       }
-
-      await SecureStore.deleteItemAsync(key);
     } catch (error) {
-      console.error(
-        `Error al eliminar la clave "${key}" de almacenamiento:`,
-        error
-      );
+      console.error(`Error al eliminar la clave "${key}" de almacenamiento:`, error);
     }
   },
 
@@ -65,18 +49,9 @@ export const storage = {
   async getObject<T>(key: string): Promise<T | null> {
     try {
       const json = await this.get(key);
-
-      if (!json) {
-        return null;
-      }
-
-      return JSON.parse(json) as T;
+      return json ? (JSON.parse(json) as T) : null;
     } catch (error) {
-      console.error(
-        `Error al deserializar objeto desde "${key}":`,
-        error
-      );
-
+      console.error(`Error al deserializar el objeto "${key}":`, error);
       return null;
     }
   },
