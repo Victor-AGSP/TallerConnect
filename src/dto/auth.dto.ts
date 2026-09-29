@@ -18,7 +18,8 @@ export interface RegisterRequestDto {
 }
 
 /**
- * Usuario devuelto por GET /api/auth/me y en el campo `user` del login.
+ * Usuario devuelto por GET /api/auth/me, en el campo `user` del login
+ * y como respuesta 201 de POST /api/auth/register.
  * Refleja el esquema `UsuarioRespuesta` de MS1.
  * `roles` se recibe como texto libre; la conversión al rol de la app la hace el mapper.
  */
@@ -32,10 +33,10 @@ export interface UserResponseDto {
 
 /**
  * Respuesta de POST /api/auth/login.
- * Refleja el esquema `TokenRespuesta` de MS1.
+ * Refleja el esquema `TokenRespuesta` de MS1. `token_type` es opcional y por defecto es `bearer`.
  */
 export interface LoginResponseDto {
   access_token: string;
-  token_type: string;
+  token_type?: string;
   user: UserResponseDto;
 }
