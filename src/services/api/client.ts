@@ -1,20 +1,19 @@
 import axios from 'axios';
+import { ENV } from '@/config/env';
 import {
   attachAuthTokenInterceptor,
   attachErrorInterceptor,
 } from './interceptors';
 
 /**
- * URL base de la API Gateway (Integración 2).
- * Puede sobreescribirse mediante la variable de entorno EXPO_PUBLIC_API_URL.
+ * URL base oficial de la API Gateway resuelta según el entorno (Dev / Integración).
  */
-export const API_BASE_URL =
-  process.env.EXPO_PUBLIC_API_URL ?? 'https://tallerconect.vercel.app/api';
+export const API_BASE_URL = ENV.API_URL;
 
 /**
  * Timeout estándar de 15 segundos para solicitudes HTTP hacia la API Gateway.
  */
-export const DEFAULT_TIMEOUT_MS = 15000;
+export const DEFAULT_TIMEOUT_MS = ENV.TIMEOUT_MS;
 
 /**
  * Cliente HTTP centralizado basado en Axios para todas las solicitudes
