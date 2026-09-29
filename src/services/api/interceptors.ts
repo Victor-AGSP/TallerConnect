@@ -1,6 +1,7 @@
 import axios, { AxiosError, AxiosInstance, InternalAxiosRequestConfig } from 'axios';
 import { storage, STORAGE_KEYS } from '@/utils/storage';
 import { useAuthStore } from '@/stores/authStore';
+import { useConnectivityStore } from '@/stores/connectivityStore';
 import {
   ApiErrorResponse,
   ApiRequestConfig,
@@ -122,9 +123,28 @@ export function attachAuthTokenInterceptor(client: AxiosInstance): void {
  */
 export function attachErrorInterceptor(client: AxiosInstance): void {
   client.interceptors.response.use(
-    (response) => response,
+    (response) => {
+      // Si la conexión fue exitosa y existía una alerta de red activa, la limpiamos
+      try {
+        if (useConnectivityStore.getState().hasNetworkIssue) {
+          useConnectivityStore.getState().clearNetworkIssue();
+        }
+      } catch {
+        // Ignorar si el store no está inicializado en entornos aislados
+      }
+      return response;
+    },
     async (error: AxiosError<ApiErrorResponse>) => {
       const normalized = normalizeApiError(error);
+
+      // Tratamiento de Timeout y pérdida de conectividad: notificar al store global
+      if (normalized.isNetworkError || normalized.isTimeout) {
+        try {
+          useConnectivityStore.getState().setNetworkIssue(normalized.message);
+        } catch {
+          // Ignorar en entornos aislados
+        }
+      }
 
       // Tratamiento de HTTP 401 / 403: Coordinación de cierre de sesión automático
       if (
