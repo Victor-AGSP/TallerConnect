@@ -122,9 +122,13 @@ describe('Pruebas Integradas: Servicios, Sesión y Navegación', () => {
       {
         id: 'ot-101',
         vehicleId: 'veh-1',
+        intakeId: 'ing-1',
         clientId: 'usr-1',
+        createdById: 'usr-3',
         status: 'en_reparacion',
-        description: 'Reparación de embrague',
+        assignedMechanicId: mechanicAuth.user.id,
+        createdAt: '2026-03-01T09:00:00.000Z',
+        updatedAt: '2026-03-05T14:00:00.000Z',
       },
     ]);
 
@@ -149,7 +153,8 @@ describe('Pruebas Integradas: Servicios, Sesión y Navegación', () => {
     const orders = await ordersService.getOrders();
 
     expect(orders).toHaveLength(1);
-    expect(orders[0].description).toBe('Reparación de embrague');
+    expect(orders[0].id).toBe('ot-101');
+    expect(orders[0].status).toBe('en_reparacion');
     expect(useAuthStore.getState().isAuthenticated).toBe(true);
     expect(router.getPathname()).toBe('/mecanico');
   });
@@ -203,6 +208,7 @@ describe('Pruebas Integradas: Servicios, Sesión y Navegación', () => {
         brand: 'Toyota',
         model: 'Corolla',
         year: 2020,
+        mileage: 45000,
         ownerId: clientAuth.user.id,
       },
     ]);

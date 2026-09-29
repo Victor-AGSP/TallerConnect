@@ -66,10 +66,13 @@ export class OrdersService {
       const newMockOrder: WorkOrder = {
         id: `ot-00${localMockOrders.length + 124}`,
         vehicleId: String(data.vehicle_id),
+        intakeId: `ing-00${localMockOrders.length + 124}`,
         clientId: String(data.client_id),
+        createdById: 'usr-003',
         status: 'esperando_diagnostico',
-        description: data.description,
+        assignedMechanicId: null,
         createdAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString(),
       };
       localMockOrders.unshift(newMockOrder);
       return newMockOrder;

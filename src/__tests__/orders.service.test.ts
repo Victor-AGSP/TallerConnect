@@ -23,11 +23,13 @@ describe('ordersService (Capa de Servicios de Órdenes)', () => {
         {
           id: 101,
           vehicle_id: 5,
+          intake_id: 201,
           client_id: 12,
+          created_by_id: 99,
           assigned_mechanic_id: 3,
           status: 'en_reparacion',
-          description: 'Alineación y balanceo',
           created_at: '2026-03-20T10:00:00Z',
+          updated_at: '2026-03-20T11:00:00Z',
         },
       ];
 
@@ -42,12 +44,13 @@ describe('ordersService (Capa de Servicios de Órdenes)', () => {
       expect(result[0]).toEqual({
         id: '101',
         vehicleId: '5',
+        intakeId: '201',
         clientId: '12',
+        createdById: '99',
         assignedMechanicId: '3',
         status: 'en_reparacion',
-        description: 'Alineación y balanceo',
         createdAt: '2026-03-20T10:00:00Z',
-        updatedAt: undefined,
+        updatedAt: '2026-03-20T11:00:00Z',
       });
     });
 

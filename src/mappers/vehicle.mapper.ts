@@ -10,9 +10,10 @@ export function mapVehicleResponse(dto: VehicleResponseDto): Vehicle {
   return {
     id: String(dto.id),
     plate,
-    brand: dto.brand ?? undefined,
-    model: dto.model ?? undefined,
-    year: dto.year ? Number(dto.year) : undefined,
+    brand: dto.brand ?? '',
+    model: dto.model ?? '',
+    year: dto.year != null ? Number(dto.year) : null,
+    mileage: dto.mileage != null ? Number(dto.mileage) : null,
     ownerId: dto.owner_id
       ? String(dto.owner_id)
       : dto.ownerId

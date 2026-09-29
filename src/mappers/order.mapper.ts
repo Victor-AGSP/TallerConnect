@@ -19,17 +19,20 @@ export function mapOrderResponse(dto: OrderResponseDto): WorkOrder {
     ? dto.status
     : ORDER_STATUS.ESPERANDO_DIAGNOSTICO;
 
+  const defaultIso = '1970-01-01T00:00:00.000Z';
+
   return {
     id: String(dto.id),
     vehicleId: String(dto.vehicle_id),
+    intakeId: dto.intake_id ? String(dto.intake_id) : `ing-${dto.id}`,
     clientId: String(dto.client_id),
+    createdById: dto.created_by_id ? String(dto.created_by_id) : String(dto.client_id),
     status,
-    assignedMechanicId: dto.assigned_mechanic_id
+    assignedMechanicId: dto.assigned_mechanic_id != null
       ? String(dto.assigned_mechanic_id)
-      : undefined,
-    description: dto.description ?? undefined,
-    createdAt: dto.created_at ?? undefined,
-    updatedAt: dto.updated_at ?? undefined,
+      : null,
+    createdAt: dto.created_at ?? defaultIso,
+    updatedAt: dto.updated_at ?? defaultIso,
   };
 }
 

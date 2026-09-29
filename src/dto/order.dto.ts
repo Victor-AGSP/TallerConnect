@@ -11,6 +11,8 @@ export interface OrderResponseDto {
   assigned_mechanic_id?: number | string | null;
   status: string;
   description?: string | null;
+  intake_id?: number | string;
+  created_by_id?: number | string;
   created_at?: string;
   updated_at?: string;
 }

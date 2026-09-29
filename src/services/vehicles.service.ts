@@ -67,9 +67,10 @@ export class VehiclesService {
       const newMockVehicle: Vehicle = {
         id: `veh-00${localMockVehicles.length + 1}`,
         plate: data.plate.toUpperCase().trim(),
-        brand: data.brand,
-        model: data.model,
-        year: data.year,
+        brand: data.brand ?? '',
+        model: data.model ?? '',
+        year: data.year ?? null,
+        mileage: data.mileage ?? null,
         ownerId: data.owner_id ? String(data.owner_id) : undefined,
       };
       localMockVehicles.unshift(newMockVehicle);

@@ -43,6 +43,7 @@ describe('vehiclesService (Capa de Servicios de Vehículos)', () => {
         brand: 'Toyota',
         model: 'Corolla',
         year: 2020,
+        mileage: null,
         ownerId: '15',
       });
     });

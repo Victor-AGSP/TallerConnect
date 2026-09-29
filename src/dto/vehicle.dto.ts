@@ -8,7 +8,8 @@ export interface VehicleResponseDto {
   plate?: string;
   brand?: string;
   model?: string;
-  year?: number;
+  year?: number | null;
+  mileage?: number | null;
   owner_id?: number | string;
   ownerId?: string;
 }
@@ -20,6 +21,7 @@ export interface CreateVehicleRequestDto {
   plate: string;
   brand?: string;
   model?: string;
-  year?: number;
+  year?: number | null;
+  mileage?: number | null;
   owner_id?: number | string;
 }
