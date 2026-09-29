@@ -13,6 +13,20 @@ import {
   apiClient,
 } from '@/services/api/client';
 
+import type {
+  LoginResponseDto,
+  UserResponseDto,
+} from '@/dto/auth.dto';
+
+import {
+  mapLoginResponse,
+  mapUserResponse,
+} from '@/mappers/auth.mapper';
+
+import {
+  normalizeApiError,
+} from '@/services/api/interceptors';
+
 /**
  * ============================================================
  * CONFIGURACIÓN
@@ -81,144 +95,7 @@ const DEMO_USERS: Array<{
   },
 ];
 
-/**
- * ============================================================
- * TIPOS DEL BACKEND
- * ============================================================
- */
 
-interface BackendUser {
-  id: number;
-
-  email: string;
-
-  full_name: string;
-
-  roles: string[];
-
-  is_active: boolean;
-}
-
-interface BackendLoginResponse {
-  access_token: string;
-
-  token_type?: string;
-}
-
-/**
- * ============================================================
- * MANEJO DE ERRORES
- * ============================================================
- */
-
-function getErrorMessage(
-  error: unknown,
-  fallback: string
-): string {
-  if (!axios.isAxiosError(error)) {
-    if (error instanceof Error) {
-      return error.message;
-    }
-
-    return fallback;
-  }
-
-  const status =
-    error.response?.status;
-
-  const detail =
-    error.response?.data?.detail;
-
-  if (
-    typeof detail === 'string'
-  ) {
-    return detail;
-  }
-
-  if (Array.isArray(detail)) {
-    const firstMessage =
-      detail[0]?.msg;
-
-    if (
-      typeof firstMessage === 'string'
-    ) {
-      return firstMessage;
-    }
-  }
-
-  if (status === 400) {
-    return 'La solicitud no es válida.';
-  }
-
-  if (status === 401) {
-    return 'Correo o contraseña incorrectos.';
-  }
-
-  if (status === 403) {
-    return 'No tienes permisos para realizar esta acción.';
-  }
-
-  if (status === 404) {
-    return 'El servicio solicitado no está disponible.';
-  }
-
-  if (
-    status &&
-    status >= 500
-  ) {
-    return 'El servidor presentó un problema. Inténtalo nuevamente.';
-  }
-
-  if (
-    error.code ===
-    'ECONNABORTED'
-  ) {
-    return 'La solicitud tardó demasiado. Verifica tu conexión.';
-  }
-
-  if (!error.response) {
-    return 'No fue posible conectarse con el servidor.';
-  }
-
-  return fallback;
-}
-
-/**
- * ============================================================
- * MAPEAR USUARIO DEL BACKEND
- * ============================================================
- */
-
-function mapBackendUser(
-  backendUser: BackendUser
-): User {
-  const role =
-    backendUser.roles?.[0];
-
-  if (
-    role !== 'cliente' &&
-    role !== 'mecanico' &&
-    role !== 'administrador'
-  ) {
-    throw new Error(
-      'El usuario no tiene un rol válido para TallerConnect.'
-    );
-  }
-
-  return {
-    id: String(
-      backendUser.id
-    ),
-
-    name:
-      backendUser.full_name,
-
-    email:
-      backendUser.email,
-
-    role,
-  };
-}
 
 /**
  * ============================================================
@@ -278,13 +155,8 @@ async function apiLogin(
   credentials: LoginCredentials
 ): Promise<AuthResponse> {
   try {
-    /**
-     * --------------------------------------------------------
-     * 1. LOGIN
-     * --------------------------------------------------------
-     */
     const loginResponse =
-      await apiClient.post<BackendLoginResponse>(
+      await apiClient.post<LoginResponseDto>(
         '/auth/login',
         {
           email:
@@ -307,13 +179,12 @@ async function apiLogin(
       );
     }
 
-    /**
-     * --------------------------------------------------------
-     * 2. OBTENER USUARIO
-     * --------------------------------------------------------
-     */
+    if (loginResponse.data.user) {
+      return mapLoginResponse(loginResponse.data);
+    }
+
     const meResponse =
-      await apiClient.get<BackendUser>(
+      await apiClient.get<UserResponseDto>(
         '/auth/me',
         {
           headers: {
@@ -324,21 +195,31 @@ async function apiLogin(
       );
 
     const user =
-      mapBackendUser(
+      mapUserResponse(
         meResponse.data
       );
 
     return {
       user,
-
       token,
     };
-  } catch (error) {
+  } catch (error: unknown) {
+    if (
+      error instanceof Error &&
+      error.message === 'El servidor no entregó un token de acceso.'
+    ) {
+      throw error;
+    }
+
+    const normalized = normalizeApiError(error);
+    const message =
+      normalized.status === 401 &&
+      (!axios.isAxiosError(error) || !error.response?.data?.detail)
+        ? 'Correo o contraseña incorrectos.'
+        : normalized.message;
+
     throw new Error(
-      getErrorMessage(
-        error,
-        'No se pudo iniciar sesión.'
-      )
+      message || 'No se pudo iniciar sesión.'
     );
   }
 }
@@ -352,19 +233,17 @@ async function apiLogin(
 export async function getCurrentUser(): Promise<User> {
   try {
     const response =
-      await apiClient.get<BackendUser>(
+      await apiClient.get<UserResponseDto>(
         '/auth/me'
       );
 
-    return mapBackendUser(
+    return mapUserResponse(
       response.data
     );
-  } catch (error) {
+  } catch (error: unknown) {
+    const normalized = normalizeApiError(error);
     throw new Error(
-      getErrorMessage(
-        error,
-        'No se pudo validar la sesión.'
-      )
+      normalized.message || 'No se pudo validar la sesión.'
     );
   }
 }
