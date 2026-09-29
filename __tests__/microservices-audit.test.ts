@@ -1,5 +1,8 @@
-import fs from 'fs';
-import path from 'path';
+declare const require: (id: string) => any;
+declare const __dirname: string;
+
+const fs = require('fs');
+const path = require('path');
 import { ENV } from '@/config/env';
 import { apiClient } from '@/services/api/client';
 

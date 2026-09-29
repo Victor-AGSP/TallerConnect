@@ -4,6 +4,7 @@ import {
   attachAuthTokenInterceptor,
   attachErrorInterceptor,
 } from './interceptors';
+import { attachRetryInterceptor } from './retry';
 
 /**
  * URL base oficial de la API Gateway resuelta según el entorno (Dev / Integración).
@@ -31,5 +32,8 @@ export const apiClient = axios.create({
 // 1. Interceptor de peticiones: Adjuntar token Bearer automáticamente en rutas protegidas
 attachAuthTokenInterceptor(apiClient);
 
-// 2. Interceptor de respuestas: Manejo centralizado de errores ({ detail }), timeout y logout en 401/403
+// 2. Interceptor de respuestas: Política de reintento con backoff exponencial para operaciones seguras (GET, HEAD, OPTIONS)
+attachRetryInterceptor(apiClient);
+
+// 3. Interceptor de respuestas: Manejo centralizado de errores ({ detail }), timeout y logout en 401/403
 attachErrorInterceptor(apiClient);

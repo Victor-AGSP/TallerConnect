@@ -36,11 +36,35 @@ export const HTTP_STATUS = {
 export type HttpStatusCode = (typeof HTTP_STATUS)[keyof typeof HTTP_STATUS];
 
 /**
+ * Configuración para políticas de reintento en solicitudes hacia la API Gateway.
+ */
+export interface RetryConfig {
+  /**
+   * Número máximo de reintentos permitidos para operaciones seguras (por defecto 2).
+   */
+  maxRetries?: number;
+  /**
+   * Retraso base en milisegundos para el primer reintento (por defecto 1000 ms).
+   */
+  retryDelayMs?: number;
+  /**
+   * Si es true, desactiva el reintento automático para esta petición específica.
+   */
+  disableRetry?: boolean;
+}
+
+/**
  * Configuración base tipada para solicitudes hacia la API Gateway.
- * Permite flags personalizados, como `skipAuth` para omitir el token Bearer en endpoints públicos (ej. login).
+ * Permite flags personalizados, como `skipAuth` para omitir el token Bearer en endpoints públicos (ej. login)
+ * y `retryConfig` para controlar la política de reintentos en operaciones seguras.
  */
 export interface ApiRequestConfig extends AxiosRequestConfig {
   skipAuth?: boolean;
+  retryConfig?: RetryConfig;
+  /**
+   * Contador interno de reintentos ya ejecutados en la petición.
+   */
+  __retryCount?: number;
 }
 
 /**
