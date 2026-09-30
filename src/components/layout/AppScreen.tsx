@@ -1,12 +1,15 @@
 import { ReactNode } from 'react';
 
 import {
+  KeyboardAvoidingView,
+  Platform,
   ScrollView,
-  StatusBar,
   StyleSheet,
   Text,
   View,
 } from 'react-native';
+
+import { SafeAreaView } from 'react-native-safe-area-context';
 
 import {
   colors,
@@ -27,41 +30,68 @@ export function AppScreen({
   children,
 }: AppScreenProps) {
   return (
-    <View style={styles.root}>
-      <ScrollView
-        contentContainerStyle={styles.content}
-        showsVerticalScrollIndicator={false}
+    <SafeAreaView style={styles.safeArea}>
+      <KeyboardAvoidingView
+        style={styles.root}
+        behavior={
+          Platform.OS === 'ios'
+            ? 'padding'
+            : 'height'
+        }
       >
-        <View style={styles.header}>
-          {eyebrow ? (
-            <Text style={styles.eyebrow}>{eyebrow}</Text>
-          ) : null}
+        <ScrollView
+          contentContainerStyle={styles.content}
+          showsVerticalScrollIndicator={false}
+          keyboardShouldPersistTaps="handled"
+          keyboardDismissMode={
+            Platform.OS === 'ios'
+              ? 'interactive'
+              : 'on-drag'
+          }
+        >
+          <View style={styles.header}>
+            {eyebrow ? (
+              <Text style={styles.eyebrow}>
+                {eyebrow}
+              </Text>
+            ) : null}
 
-          <Text style={styles.title}>{title}</Text>
+            <Text style={styles.title}>
+              {title}
+            </Text>
 
-          {subtitle ? (
-            <Text style={styles.subtitle}>{subtitle}</Text>
-          ) : null}
-        </View>
+            {subtitle ? (
+              <Text style={styles.subtitle}>
+                {subtitle}
+              </Text>
+            ) : null}
+          </View>
 
-        <View style={styles.body}>
-          {children}
-        </View>
-      </ScrollView>
-    </View>
+          <View style={styles.body}>
+            {children}
+          </View>
+        </ScrollView>
+      </KeyboardAvoidingView>
+    </SafeAreaView>
   );
 }
 
 const styles = StyleSheet.create({
+  safeArea: {
+    flex: 1,
+    backgroundColor: colors.background,
+  },
+
   root: {
     flex: 1,
     backgroundColor: colors.background,
   },
 
   content: {
-    paddingTop: (StatusBar.currentHeight ?? 20) + spacing.lg,
+    flexGrow: 1,
     paddingHorizontal: spacing.lg,
-    paddingBottom: 50,
+    paddingTop: spacing.lg,
+    paddingBottom: spacing.xxl,
   },
 
   header: {
@@ -74,7 +104,7 @@ const styles = StyleSheet.create({
     fontWeight: '900',
     letterSpacing: 1.2,
     textTransform: 'uppercase',
-    marginBottom: 6,
+    marginBottom: spacing.xs,
   },
 
   title: {

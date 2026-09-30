@@ -8,13 +8,16 @@ import {
   screen,
   waitFor,
 } from '../test-utils';
+
 import { mockAuthResponses } from '@/mocks/auth.mock';
 import { authService } from '@/services/auth.service';
 import IndexScreen from '@/app/index';
 import LoginScreen from '@/app/(auth)/login';
 
 jest.mock('@/services/auth.service', () => ({
-  authService: { login: jest.fn() },
+  authService: {
+    login: jest.fn(),
+  },
 }));
 
 const routes = {
@@ -32,6 +35,7 @@ async function enterCredentials() {
     screen.getByTestId('login-email'),
     'cliente@tallerconnect.cl',
   );
+
   await fireEvent.changeText(
     screen.getByTestId('login-password'),
     'clave-segura',
@@ -49,30 +53,48 @@ describe('flujo de autenticación', () => {
   });
 
   it('valida, muestra errores y completa el login con redirección por rol', async () => {
-    const router = renderRouterWithProviders(routes, { initialUrl: '/login' });
+    const router = renderRouterWithProviders(routes, {
+      initialUrl: '/login',
+    });
+
     await router;
 
-    await fireEvent.press(screen.getByTestId('login-submit'));
+    await fireEvent.press(
+      screen.getByTestId('login-submit'),
+    );
 
-    expect(await screen.findByText('El correo es obligatorio')).toBeTruthy();
     expect(
-      screen.getByText('La contraseña debe tener al menos 6 caracteres'),
+      await screen.findByText('El correo es obligatorio'),
     ).toBeTruthy();
+
+    expect(
+      screen.getByText(
+        'La contraseña debe tener al menos 6 caracteres',
+      ),
+    ).toBeTruthy();
+
     expect(login).not.toHaveBeenCalled();
     expect(router.getPathname()).toBe('/login');
 
-    login.mockRejectedValueOnce(new Error('Credenciales inválidas'));
+    login.mockRejectedValueOnce(
+      new Error('Credenciales inválidas'),
+    );
+
     await enterCredentials();
-    await fireEvent.press(screen.getByTestId('login-submit'));
+
+    await fireEvent.press(
+      screen.getByTestId('login-submit'),
+    );
 
     expect(
-      await screen.findByText(
-        'No se pudo iniciar sesión. Verifica tus credenciales e inténtalo nuevamente.',
-      ),
+      await screen.findByText('Credenciales inválidas'),
     ).toBeTruthy();
+
     expect(router.getPathname()).toBe('/login');
 
-    let resolveLogin!: (response: typeof mockAuthResponses.cliente) => void;
+    let resolveLogin!:
+      (response: typeof mockAuthResponses.cliente) => void;
+
     login.mockImplementationOnce(
       () =>
         new Promise((resolve) => {
@@ -80,14 +102,19 @@ describe('flujo de autenticación', () => {
         }),
     );
 
-    await fireEvent.press(screen.getByTestId('login-submit'));
+    await fireEvent.press(
+      screen.getByTestId('login-submit'),
+    );
 
     await waitFor(() => {
-      expect(screen.getByTestId('login-submit').props.accessibilityState).toEqual({
+      expect(
+        screen.getByTestId('login-submit').props.accessibilityState,
+      ).toEqual({
         disabled: true,
         busy: true,
       });
     });
+
     expect(login).toHaveBeenLastCalledWith({
       email: 'cliente@tallerconnect.cl',
       password: 'clave-segura',
@@ -97,7 +124,12 @@ describe('flujo de autenticación', () => {
       resolveLogin(mockAuthResponses.cliente);
     });
 
-    await waitFor(() => expect(router.getPathname()).toBe('/cliente'));
-    expect(screen.getByText('Inicio cliente')).toBeTruthy();
+    await waitFor(() => {
+      expect(router.getPathname()).toBe('/cliente');
+    });
+
+    expect(
+      screen.getByText('Inicio cliente'),
+    ).toBeTruthy();
   });
 });

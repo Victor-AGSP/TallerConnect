@@ -14,6 +14,7 @@ import { StatusPill } from '@/components/ui/StatusPill';
 import { useAuthStore } from '@/stores/authStore';
 
 import {
+  colors,
   radius,
   spacing,
 } from '@/constants/theme';
@@ -28,28 +29,17 @@ export default function ClienteScreen() {
       <ScrollView
         contentContainerStyle={styles.container}
         showsVerticalScrollIndicator={false}
+        keyboardShouldPersistTaps="handled"
+        keyboardDismissMode={
+          Platform.OS === 'ios'
+            ? 'interactive'
+            : 'on-drag'
+        }
       >
         {/* =====================================
             DECORACIÓN DE FONDO
             ===================================== */}
 
-        <View
-          pointerEvents="none"
-          style={styles.decorations}
-        >
-          <View style={styles.orbRedLarge} />
-          <View style={styles.orbDarkRed} />
-
-          <View style={styles.crystalRed} />
-          <View style={styles.crystalGrey} />
-
-          <View style={styles.ringStrong1} />
-          <View style={styles.ringStrong2} />
-
-          <View style={styles.glowDot1} />
-          <View style={styles.glowDot2} />
-          <View style={styles.glowDot3} />
-        </View>
 
         {/* =====================================
             ENCABEZADO
@@ -376,19 +366,23 @@ function InfoRow({
    ========================================== */
 
 const localTheme = {
-  background: '#070707',
-  surface: '#121212',
-  surfaceSoft: '#1A1A1A',
-  border: '#2A2A2A',
+  background: colors.background,
+  surface: colors.surface,
+  surfaceSoft: colors.surfaceSoft,
+  border: colors.border,
 
-  primary: '#740b0b',
-  primaryDark: '#4a0707',
+  primary: colors.primary,
+  primaryDark: colors.primary,
 
-  text: '#FFFFFF',
-  textSecondary: '#A0A0A0',
-  textMuted: '#666666',
+  text: colors.text,
+  textSecondary: colors.textSecondary,
+  textMuted: colors.textSecondary,
 
-  success: '#34C759',
+  accent: colors.accent,
+  info: colors.info,
+  success: colors.success,
+  warning: colors.warning,
+  danger: colors.danger,
 };
 
 /* ==========================================
@@ -399,8 +393,6 @@ const styles = StyleSheet.create({
   root: {
     flex: 1,
     backgroundColor: localTheme.background,
-    paddingTop:
-      Platform.OS === 'android' ? 40 : 0,
   },
 
   container: {
@@ -460,7 +452,7 @@ const styles = StyleSheet.create({
     width: 100,
     height: 100,
     borderRadius: 20,
-    backgroundColor: '#333333',
+    backgroundColor: colors.surfaceSoft,
     bottom: 200,
     right: -40,
     opacity: 0.2,
@@ -542,7 +534,7 @@ const styles = StyleSheet.create({
   },
 
   eyebrow: {
-    color: '#C94A4A',
+    color: colors.accent,
     fontSize: 13,
     fontWeight: '900',
     textTransform: 'uppercase',
@@ -568,11 +560,11 @@ const styles = StyleSheet.create({
     backgroundColor: localTheme.surface,
     borderRadius: radius.lg,
     borderWidth: 1,
-    borderColor: localTheme.border,
+    borderColor: colors.border,
     padding: spacing.lg,
     marginBottom: spacing.lg,
 
-    shadowColor: '#000000',
+    shadowColor: colors.primary,
     shadowOffset: {
       width: 0,
       height: 8,
@@ -695,7 +687,7 @@ const styles = StyleSheet.create({
     backgroundColor: localTheme.surfaceSoft,
     borderRadius: radius.md,
     borderWidth: 1,
-    borderColor: localTheme.border,
+    borderColor: colors.border,
     padding: spacing.lg,
     justifyContent: 'center',
   },
@@ -733,7 +725,7 @@ const styles = StyleSheet.create({
     borderRadius: radius.md,
     backgroundColor: localTheme.surfaceSoft,
     borderWidth: 1,
-    borderColor: localTheme.border,
+    borderColor: colors.border,
     alignItems: 'center',
     justifyContent: 'center',
   },
@@ -742,13 +734,13 @@ const styles = StyleSheet.create({
     width: 48,
     height: 48,
     borderRadius: 24,
-    backgroundColor: '#240606',
+    backgroundColor: colors.surfaceSoft,
     alignItems: 'center',
     justifyContent: 'center',
   },
 
   mediaIcon: {
-    color: '#C94A4A',
+    color: colors.accent,
     fontSize: 24,
   },
 
@@ -793,6 +785,6 @@ const styles = StyleSheet.create({
   logoutButton: {
     marginTop: spacing.sm,
     marginBottom: spacing.xl,
-    borderColor: localTheme.border,
+    borderColor: colors.border,
   },
 });

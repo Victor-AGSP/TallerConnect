@@ -12,23 +12,52 @@ import {
   Text,
   View,
 } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { Button, Card, ErrorMessage, Input } from '@/components/common';
 
-import { radius, spacing } from '@/constants/theme';
-import { loginSchema, type LoginFormData } from '@/schemas/auth.schema';
+import {
+  colors,
+  radius,
+  spacing,
+} from '@/constants/theme';
+
+import {
+  loginSchema,
+  type LoginFormData,
+} from '@/schemas/auth.schema';
+
 import { useAuthStore } from '@/stores/authStore';
 import { StorageError } from '@/utils/storage';
 
 export default function LoginScreen() {
   const router = useRouter();
-  const login = useAuthStore((state) => state.login);
-  const isLoading = useAuthStore((state) => state.isLoading);
-  const sessionIssue = useAuthStore((state) => state.sessionIssue);
-  const hydrateSession = useAuthStore((state) => state.hydrateSession);
-  const logout = useAuthStore((state) => state.logout);
-  const [passwordVisible, setPasswordVisible] = useState(false);
-  const [loginError, setLoginError] = useState<string | null>(null);
+
+  const login = useAuthStore(
+    (state) => state.login
+  );
+
+  const isLoading = useAuthStore(
+    (state) => state.isLoading
+  );
+
+  const sessionIssue = useAuthStore(
+    (state) => state.sessionIssue
+  );
+
+  const hydrateSession = useAuthStore(
+    (state) => state.hydrateSession
+  );
+
+  const logout = useAuthStore(
+    (state) => state.logout
+  );
+
+  const [passwordVisible, setPasswordVisible] =
+    useState(false);
+
+  const [loginError, setLoginError] =
+    useState<string | null>(null);
 
   const {
     control,
@@ -36,231 +65,259 @@ export default function LoginScreen() {
     formState: { errors },
   } = useForm<LoginFormData>({
     resolver: zodResolver(loginSchema),
-    defaultValues: { email: '', password: '' },
+    defaultValues: {
+      email: '',
+      password: '',
+    },
   });
 
-  const handleLogin = handleSubmit(async (credentials) => {
-    setLoginError(null);
+  const handleLogin = handleSubmit(
+    async (credentials) => {
+      setLoginError(null);
 
-    try {
-      await login(credentials);
-      router.replace('/');
-    } catch (error) {
-      setLoginError(
-        error instanceof StorageError ? error.message
-          : 'No se pudo iniciar sesión. Verifica tus credenciales e inténtalo nuevamente.',
-      );
+      try {
+        await login(credentials);
+
+        router.replace('/');
+      } catch (error) {
+        setLoginError(
+          error instanceof StorageError
+            ? error.message
+            : error instanceof Error
+              ? error.message
+              : 'No se pudo iniciar sesión. Verifica tus credenciales e inténtalo nuevamente.'
+        );
+      }
     }
-  });
+  );
 
   return (
-    <KeyboardAvoidingView
-      style={styles.root}
-      behavior={Platform.OS === 'ios' ? 'padding' : undefined}
-    >
-      <ScrollView
-        contentContainerStyle={styles.container}
-        keyboardShouldPersistTaps="handled"
-        showsVerticalScrollIndicator={false}
+    <SafeAreaView style={styles.safeArea}>
+      <KeyboardAvoidingView
+        style={styles.root}
+        behavior={
+          Platform.OS === 'ios'
+            ? 'padding'
+            : 'height'
+        }
       >
-        {/* ==============================
-            DECORACIÓN DE FONDO (NEGRO Y ROJO)
-            ============================== */}
-
-        <View pointerEvents="none" style={styles.decorations}>
-          {/* Esferas de luz principales */}
-          <View style={styles.orbRedLarge} />
-          <View style={styles.orbDarkRed} />
-          
-          {/* Cristales geométricos (Cuadrados rotados) */}
-          <View style={styles.crystalRed} />
-          <View style={styles.crystalGrey} />
-
-          {/* Anillos notorios */}
-          <View style={styles.ringStrong1} />
-          <View style={styles.ringStrong2} />
-
-          {/* Destellos / Puntos brillantes */}
-          <View style={styles.glowDot1} />
-          <View style={styles.glowDot2} />
-          <View style={styles.glowDot3} />
-        </View>
-
-        {/* ==============================
-            ENCABEZADO
-            ============================== */}
-
-        <View style={styles.header}>
-          <View style={styles.logoWrapper}>
-            <View style={styles.logo}>
-              <Text style={styles.logoText}>
-                TC
-              </Text>
+        <ScrollView
+          contentContainerStyle={styles.container}
+          keyboardShouldPersistTaps="handled"
+          keyboardDismissMode={
+            Platform.OS === 'ios'
+              ? 'interactive'
+              : 'on-drag'
+          }
+          showsVerticalScrollIndicator={false}
+        >
+          <View style={styles.header}>
+            <View
+              accessible
+              accessibilityRole="image"
+              accessibilityLabel="Logo de TallerConnect"
+              style={styles.logoWrapper}
+            >
+              <View style={styles.logo}>
+                <Text style={styles.logoText}>
+                  TC
+                </Text>
+              </View>
             </View>
+
+            <Text style={styles.brand}>
+              TallerConnect
+            </Text>
+
+            <Text style={styles.description}>
+              Gestión del servicio técnico vehicular
+            </Text>
+
+            <Text style={styles.description}>
+              desde tu teléfono.
+            </Text>
           </View>
 
-          <Text style={styles.brand}>
-            TallerConnect
-          </Text>
+          <Card style={styles.card}>
+            <Text style={styles.title}>
+              Bienvenido
+            </Text>
 
-          <Text style={styles.description}>
-            Gestión del servicio técnico vehicular
-          </Text>
+            <Text style={styles.subtitle}>
+              Ingresa tus credenciales para acceder
+              al sistema.
+            </Text>
 
-          <Text style={styles.description}>
-            desde tu teléfono.
-          </Text>
-        </View>
-
-        {/* ==============================
-            TARJETA DE LOGIN
-            ============================== */}
-
-        <Card style={styles.card}>
-          <Text style={styles.title}>
-            Bienvenido
-          </Text>
-
-          <Text style={styles.subtitle}>
-            Ingresa tus credenciales para acceder al sistema.
-          </Text>
-
-          <View style={styles.form}>
-            {/* CORREO */}
-
-            <Controller
-              control={control}
-              name="email"
-              render={({ field: { onBlur, onChange, value } }) => (
-                <Input
-                  label="Correo electrónico"
-                  value={value}
-                  onBlur={onBlur}
-                  onChangeText={onChange}
-                  autoCapitalize="none"
-                  autoCorrect={false}
-                  keyboardType="email-address"
-                  placeholder="usuario@correo.cl"
-                  placeholderTextColor={localTheme.textMuted}
-                  labelStyle={styles.label}
-                  style={styles.input}
-                  focusedStyle={styles.inputFocused}
-                  error={errors.email?.message}
-                  testID="login-email"
-                />
-              )}
-            />
-
-            {/* CONTRASEÑA */}
-
-            <View style={styles.passwordField}>
+            <View style={styles.form}>
               <Controller
                 control={control}
-                name="password"
-                render={({ field: { onBlur, onChange, value } }) => (
+                name="email"
+                render={({
+                  field: {
+                    onBlur,
+                    onChange,
+                    value,
+                  },
+                }) => (
                   <Input
-                    label="Contraseña"
+                    label="Correo electrónico"
                     value={value}
                     onBlur={onBlur}
                     onChangeText={onChange}
                     autoCapitalize="none"
                     autoCorrect={false}
-                    placeholder="••••••••"
-                    placeholderTextColor={localTheme.textMuted}
-                    secureTextEntry={!passwordVisible}
+                    keyboardType="email-address"
+                    textContentType="emailAddress"
+                    autoComplete="email"
+                    returnKeyType="next"
+                    placeholder="usuario@correo.cl"
+                    placeholderTextColor={
+                      colors.textSecondary
+                    }
                     labelStyle={styles.label}
                     style={styles.input}
-                    focusedStyle={styles.inputFocused}
-                    error={errors.password?.message}
-                    testID="login-password"
+                    focusedStyle={
+                      styles.inputFocused
+                    }
+                    error={errors.email?.message}
+                    testID="login-email"
                   />
                 )}
               />
 
-              <Pressable
-                accessibilityRole="button"
-                accessibilityLabel={
-                  passwordVisible
-                    ? 'Ocultar contraseña'
-                    : 'Mostrar contraseña'
-                }
+              <View style={styles.passwordField}>
+                <Controller
+                  control={control}
+                  name="password"
+                  render={({
+                    field: {
+                      onBlur,
+                      onChange,
+                      value,
+                    },
+                  }) => (
+                    <Input
+                      label="Contraseña"
+                      value={value}
+                      onBlur={onBlur}
+                      onChangeText={onChange}
+                      autoCapitalize="none"
+                      autoCorrect={false}
+                      secureTextEntry={
+                        !passwordVisible
+                      }
+                      textContentType="password"
+                      autoComplete="password"
+                      returnKeyType="done"
+                      placeholder="••••••••"
+                      placeholderTextColor={
+                        colors.textSecondary
+                      }
+                      labelStyle={styles.label}
+                      style={[
+                        styles.input,
+                        styles.passwordInput,
+                      ]}
+                      focusedStyle={
+                        styles.inputFocused
+                      }
+                      error={
+                        errors.password?.message
+                      }
+                      testID="login-password"
+                      onSubmitEditing={() =>
+                        void handleLogin()
+                      }
+                    />
+                  )}
+                />
+
+                <Pressable
+  testID="login-password-toggle"
+  accessibilityRole="button"
+  accessibilityLabel={
+    passwordVisible
+      ? 'Ocultar contraseña'
+      : 'Mostrar contraseña'
+  }
+  onPress={() =>
+    setPasswordVisible(
+      (previous) => !previous
+    )
+  }
+  hitSlop={10}
+  style={styles.showButton}
+>
+  <Text style={styles.showButtonText}>
+    {passwordVisible ? 'OCULTAR' : 'VER'}
+  </Text>
+</Pressable>
+              </View>
+
+              {loginError ? (
+                <ErrorMessage
+                  message={loginError}
+                />
+              ) : null}
+
+              {sessionIssue ? (
+                <ErrorMessage
+                  message={sessionIssue.message}
+                  onRetry={() =>
+                    void (
+                      sessionIssue.kind === 'restore'
+                        ? hydrateSession()
+                        : logout()
+                    )
+                  }
+                />
+              ) : null}
+
+              <Button
+                title="Iniciar sesión"
                 onPress={() =>
-                  setPasswordVisible(
-                    (previous) => !previous
-                  )
+                  void handleLogin()
                 }
-                hitSlop={10}
-                style={styles.showButton}
-              >
-                <Text style={styles.showButtonText}>
-                  {passwordVisible ? 'OCULTAR' : 'VER'}
-                </Text>
-              </Pressable>
+                loading={isLoading}
+                accessibilityLabel="Iniciar sesión"
+                style={styles.loginButton}
+                testID="login-submit"
+              />
             </View>
 
-            {/* BOTÓN */}
-
-            {loginError ? <ErrorMessage message={loginError} /> : null}
-            {sessionIssue ? (
-              <ErrorMessage
-                message={sessionIssue.message}
-                onRetry={() => void (sessionIssue.kind === 'restore' ? hydrateSession() : logout())}
+            <View style={styles.bottomInfo}>
+              <View
+                accessible={false}
+                style={styles.statusDot}
               />
-            ) : null}
 
-            <Button
-              title="Iniciar sesión"
-              onPress={() => void handleLogin()}
-              loading={isLoading}
-              style={styles.loginButton}
-              testID="login-submit"
-            />
-          </View>
+              <Text style={styles.bottomText}>
+                Acceso seguro al sistema
+                TallerConnect
+              </Text>
+            </View>
+          </Card>
 
-          {/* ==============================
-              INFORMACIÓN INFERIOR
-              ============================== */}
-
-          <View style={styles.bottomInfo}>
-            <View style={styles.statusDot} />
-
-            <Text style={styles.bottomText}>
-              Acceso al sistema TallerConnect
+          <View style={styles.footer}>
+            <Text style={styles.footerText}>
+              TallerConnect · Aplicación móvil
             </Text>
           </View>
-        </Card>
-
-        {/* ==============================
-            FOOTER
-            ============================== */}
-
-        <View style={styles.footer}>
-          <Text style={styles.footerText}>
-            TallerConnect · Aplicación móvil
-          </Text>
-        </View>
-      </ScrollView>
-    </KeyboardAvoidingView>
+        </ScrollView>
+      </KeyboardAvoidingView>
+    </SafeAreaView>
   );
 }
 
-// Variables de color locales para el nuevo tema Black & Red
-const localTheme = {
-  background: '#070707', // Negro profundo
-  surface: '#121212', // Gris muy oscuro para la tarjeta
-  surfaceSoft: '#1A1A1A', // Fondo de los inputs
-  border: '#2A2A2A', // Bordes sutiles
-primary: '#740b0b', // Rojo vibrante
-  primaryDark: '#8A0009', // Rojo oscuro
-  text: '#FFFFFF', // Blanco puro
-  textSecondary: '#A0A0A0', // Gris claro
-  textMuted: '#666666', // Gris oscuro
-};
-
 const styles = StyleSheet.create({
+  safeArea: {
+    flex: 1,
+    backgroundColor: colors.background,
+  },
+
   root: {
     flex: 1,
-    backgroundColor: localTheme.background,
+    backgroundColor: colors.background,
   },
 
   container: {
@@ -270,131 +327,6 @@ const styles = StyleSheet.create({
     paddingVertical: spacing.xl,
   },
 
-  /* ===================================
-     DECORACIÓN VIBRANTE (Dark & Red)
-     =================================== */
-
-  decorations: {
-    position: 'absolute',
-    top: 0,
-    right: 0,
-    bottom: 0,
-    left: 0,
-    overflow: 'hidden',
-  },
-
-  orbRedLarge: {
-    position: 'absolute',
-    width: 280,
-    height: 280,
-    borderRadius: 140,
-    backgroundColor: localTheme.primary,
-    top: -100,
-    right: -80,
-    opacity: 0.12, 
-  },
-
-  orbDarkRed: {
-    position: 'absolute',
-    width: 240,
-    height: 240,
-    borderRadius: 120,
-    backgroundColor: localTheme.primaryDark,
-    bottom: -80,
-    left: -70,
-    opacity: 0.25,
-  },
-
-  crystalRed: {
-    position: 'absolute',
-    width: 90,
-    height: 90,
-    borderRadius: 20,
-    backgroundColor: localTheme.primary,
-    top: 180,
-    left: -35,
-    opacity: 0.15,
-    transform: [{ rotate: '45deg' }],
-  },
-
-  crystalGrey: {
-    position: 'absolute',
-    width: 110,
-    height: 110,
-    borderRadius: 24,
-    backgroundColor: '#333333',
-    bottom: 150,
-    right: -45,
-    opacity: 0.2,
-    transform: [{ rotate: '45deg' }],
-  },
-
-  ringStrong1: {
-    position: 'absolute',
-    width: 130,
-    height: 130,
-    borderRadius: 65,
-    borderWidth: 4,
-    borderColor: localTheme.primary,
-    bottom: 60,
-    right: -30,
-    opacity: 0.25,
-  },
-
-  ringStrong2: {
-    position: 'absolute',
-    width: 80,
-    height: 80,
-    borderRadius: 40,
-    borderWidth: 3,
-    borderColor: '#444444',
-    top: 70,
-    left: 20,
-    opacity: 0.3,
-  },
-
-  glowDot1: {
-    position: 'absolute',
-    width: 16,
-    height: 16,
-    borderRadius: 8,
-    backgroundColor: localTheme.primary,
-    top: 310,
-    left: 50,
-    opacity: 0.9,
-    shadowColor: localTheme.primary,
-    shadowOffset: { width: 0, height: 0 },
-    shadowOpacity: 1,
-    shadowRadius: 12,
-    elevation: 4,
-  },
-
-  glowDot2: {
-    position: 'absolute',
-    width: 12,
-    height: 12,
-    borderRadius: 6,
-    backgroundColor: '#666666',
-    bottom: 250,
-    right: 50,
-    opacity: 0.5,
-  },
-
-  glowDot3: {
-    position: 'absolute',
-    width: 14,
-    height: 14,
-    borderRadius: 7,
-    backgroundColor: localTheme.primary,
-    top: 120,
-    right: 70,
-    opacity: 0.8,
-  },
-
-  /* ===================================
-     HEADER
-     =================================== */
-
   header: {
     alignItems: 'center',
     marginBottom: spacing.xl,
@@ -403,90 +335,74 @@ const styles = StyleSheet.create({
   logoWrapper: {
     width: 82,
     height: 82,
-    borderRadius: 28,
+    borderRadius: radius.lg,
     alignItems: 'center',
     justifyContent: 'center',
-    backgroundColor: localTheme.surface, 
+    backgroundColor: colors.surface,
     borderWidth: 1,
-    borderColor: localTheme.border,
+    borderColor: colors.border,
     marginBottom: spacing.md,
   },
 
   logo: {
     width: 64,
     height: 64,
-    borderRadius: 21,
-    backgroundColor: localTheme.primary, // Logo en rojo
+    borderRadius: radius.md,
+    backgroundColor: colors.primary,
     alignItems: 'center',
     justifyContent: 'center',
-    shadowColor: localTheme.primary,
-    shadowOffset: {
-      width: 0,
-      height: 4,
-    },
-    shadowOpacity: 0.4,
-    shadowRadius: 8,
-    elevation: 6,
   },
 
   logoText: {
-    color: '#FFFFFF',
+    color: colors.surface,
     fontSize: 22,
     fontWeight: '900',
     letterSpacing: -0.5,
   },
 
   brand: {
-    color: localTheme.text,
+    color: colors.primary,
     fontSize: 28,
     fontWeight: '900',
     letterSpacing: -0.8,
   },
 
   description: {
-    color: localTheme.textSecondary,
+    color: colors.textSecondary,
     fontSize: 12,
     lineHeight: 17,
     textAlign: 'center',
   },
 
-  /* ===================================
-     CARD
-     =================================== */
-
   card: {
-    backgroundColor: localTheme.surface,
+    backgroundColor: colors.surface,
     borderRadius: radius.lg,
     borderWidth: 1,
-    borderColor: localTheme.border,
+    borderColor: colors.border,
     padding: spacing.xl,
 
-    shadowColor: '#000000',
+    shadowColor: colors.primary,
     shadowOffset: {
       width: 0,
-      height: 10,
+      height: 5,
     },
-    shadowOpacity: 0.5,
-    shadowRadius: 20,
-    elevation: 8,
+    shadowOpacity: 0.08,
+    shadowRadius: 12,
+    elevation: 4,
   },
 
   title: {
-    color: localTheme.text,
+    color: colors.text,
     fontSize: 22,
     fontWeight: '900',
   },
 
   subtitle: {
-    color: localTheme.textSecondary,
-    marginTop: 5,
-    fontSize: 12,
+    color: colors.textSecondary,
+    marginTop: spacing.xs,
+    fontSize: 13,
     lineHeight: 19,
   },
-
-  /* ===================================
-     FORMULARIO
-     =================================== */
 
   form: {
     marginTop: spacing.xl,
@@ -494,27 +410,27 @@ const styles = StyleSheet.create({
   },
 
   label: {
-    color: localTheme.text,
-    marginBottom: 7,
-    fontSize: 11,
-    fontWeight: '800',
-  },
-
-  inputFocused: {
-    backgroundColor: localTheme.surface,
-    borderColor: localTheme.primary, // Borde rojo al seleccionar
+    color: colors.text,
+    fontSize: 14,
+    fontWeight: '700',
+    marginBottom: spacing.sm,
   },
 
   input: {
-    flex: 1,
     minHeight: 52,
-    backgroundColor: localTheme.surfaceSoft,
-    borderColor: localTheme.border,
+    backgroundColor: colors.surfaceSoft,
+    borderColor: colors.border,
     borderRadius: radius.md,
-    color: localTheme.text,
-    fontSize: 14,
-    paddingHorizontal: spacing.md,
-    paddingVertical: 0,
+    color: colors.text,
+    fontSize: 16,
+  },
+
+  passwordInput: {
+    paddingRight: 78,
+  },
+
+  inputFocused: {
+    borderColor: colors.accent,
   },
 
   passwordField: {
@@ -523,33 +439,30 @@ const styles = StyleSheet.create({
 
   showButton: {
     position: 'absolute',
-    top: 28,
+    top: 34,
     right: spacing.md,
     paddingVertical: spacing.sm,
+    paddingHorizontal: spacing.xs,
   },
 
   showButtonText: {
-    color: localTheme.primary,
-    fontSize: 9,
+    color: colors.accent,
+    fontSize: 11,
     fontWeight: '900',
     letterSpacing: 0.3,
   },
 
   loginButton: {
     marginTop: spacing.sm,
-    backgroundColor: localTheme.primary, // Botón de acción principal rojo
+    backgroundColor: colors.primary,
     borderRadius: radius.md,
   },
-
-  /* ===================================
-     INFORMACIÓN
-     =================================== */
 
   bottomInfo: {
     marginTop: spacing.xl,
     paddingTop: spacing.lg,
     borderTopWidth: 1,
-    borderTopColor: localTheme.border,
+    borderTopColor: colors.border,
 
     flexDirection: 'row',
     alignItems: 'center',
@@ -557,22 +470,18 @@ const styles = StyleSheet.create({
   },
 
   statusDot: {
-    width: 7,
-    height: 7,
+    width: 8,
+    height: 8,
     borderRadius: 4,
-    backgroundColor: localTheme.primary,
+    backgroundColor: colors.success,
     marginRight: spacing.sm,
   },
 
   bottomText: {
-    color: localTheme.textMuted,
-    fontSize: 10,
+    color: colors.textSecondary,
+    fontSize: 11,
     fontWeight: '600',
   },
-
-  /* ===================================
-     FOOTER
-     =================================== */
 
   footer: {
     marginTop: spacing.lg,
@@ -580,7 +489,7 @@ const styles = StyleSheet.create({
   },
 
   footerText: {
-    color: localTheme.textMuted,
+    color: colors.textSecondary,
     fontSize: 10,
   },
 });
