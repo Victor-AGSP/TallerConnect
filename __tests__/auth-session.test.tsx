@@ -64,7 +64,7 @@ describe('persistencia y recuperación de sesión', () => {
     });
   });
 
-  it('migra la sesión antigua al formato actual antes de retirar sus claves', async () => {
+  it('migra la sesión antigua y conserva las claves que usa Gateway', async () => {
     const response = mockAuthResponses.cliente;
     getItem.mockImplementation(async (key) => {
       if (key === STORAGE_KEYS.AUTH_TOKEN) return response.token;
@@ -76,8 +76,9 @@ describe('persistencia y recuperación de sesión', () => {
 
     expect(setItem).toHaveBeenCalledWith(AUTH_SESSION_STORAGE_KEY,
       JSON.stringify({ user: response.user, token: response.token }));
-    expect(deleteItem).toHaveBeenCalledWith(STORAGE_KEYS.AUTH_TOKEN);
-    expect(deleteItem).toHaveBeenCalledWith(STORAGE_KEYS.USER_DATA);
+    expect(setItem).toHaveBeenCalledWith(STORAGE_KEYS.AUTH_TOKEN, response.token);
+    expect(setItem).toHaveBeenCalledWith(STORAGE_KEYS.USER_DATA, JSON.stringify(response.user));
+    expect(deleteItem).not.toHaveBeenCalled();
     expect(useAuthStore.getState().isAuthenticated).toBe(true);
   });
 
@@ -107,6 +108,8 @@ describe('persistencia y recuperación de sesión', () => {
       AUTH_SESSION_STORAGE_KEY,
       JSON.stringify(response),
     );
+    expect(setItem).toHaveBeenCalledWith(STORAGE_KEYS.AUTH_TOKEN, response.token);
+    expect(setItem).toHaveBeenCalledWith(STORAGE_KEYS.USER_DATA, JSON.stringify(response.user));
     expect(useAuthStore.getState()).toMatchObject({
       user: response.user,
       token: response.token,

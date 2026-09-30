@@ -20,8 +20,9 @@ import {
 
 export default function AdministradorScreen() {
   const router = useRouter();
-  const logout = useAuthStore((state) => state.logout);
-
+  const logout = useAuthStore(
+  (state) => state.logout
+);
   return (
     <SafeAreaView style={styles.root}>
       <ScrollView
@@ -298,8 +299,8 @@ export default function AdministradorScreen() {
           title="Cerrar sesión"
           variant="outline"
           onPress={async () => {
-            await logout();
-            router.replace('/login');
+          await logout();
+          router.replace('/login');
           }}
           style={styles.logoutButton}
         />

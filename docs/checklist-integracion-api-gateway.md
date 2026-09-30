@@ -10,7 +10,7 @@ En el repositorio no hay actualmente una especificación OpenAPI oficial ni un e
 
 - [ ] Recibir la URL de OpenAPI/Swagger y registrar su versión o commit.
 - [ ] Recibir las URLs base para desarrollo, pruebas y producción; confirmar HTTPS fuera del entorno local.
-- [x] La app permite configurar `EXPO_PUBLIC_API_URL`; el valor por defecto del cliente actual es `http://localhost:8000/api`.
+- [x] La app permite configurar `EXPO_PUBLIC_API_URL`; en desarrollo usa `http://localhost:8000/api` (Android Emulator: `http://10.0.2.2:8000/api`) y en integración/producción usa la URL definida en `src/config/env.ts`.
 - [ ] Confirmar si `/api` forma parte de la URL base o del prefijo de cada ruta para evitar duplicarlo.
 - [ ] Confirmar autenticación requerida por operación, formato del encabezado, expiración y renovación del token.
 - [ ] Confirmar la forma común de errores, códigos HTTP y mensajes que puede mostrar la app.
@@ -21,7 +21,7 @@ En el repositorio no hay actualmente una especificación OpenAPI oficial ni un e
 
 ### Login
 
-- [x] Con `EXPO_PUBLIC_USE_MOCK_AUTH=false`, la app envía correo y contraseña a `POST /auth/login` relativo a la URL base configurada. El modo predeterminado usa cuentas demo.
+- [x] Por defecto, la app envía correo y contraseña a `POST /auth/login` relativo a la URL base configurada. `EXPO_PUBLIC_USE_MOCK_AUTH=true` habilita cuentas demo.
 - [x] La respuesta se transforma mediante DTO, mapper y esquema Zod antes de guardarse en Zustand.
 - [x] Hay pruebas del mapper/esquema, del flujo con AuthService simulado y del servicio real con el cliente HTTP simulado (`__tests__/auth-service.test.ts`). Estas últimas verifican ruta, cuerpo, mapeo de los tres roles y rechazo de datos inválidos/cuentas inactivas; no comprueban un servidor real.
 - [ ] Cotejar con OpenAPI que ruta, método, prefijo, nombres, tipos y campos obligatorios coincidan. El código hoy espera `access_token`, `token_type` y `user` con `id`, `email`, `full_name`, `roles` e `is_active`.
@@ -34,7 +34,8 @@ En el repositorio no hay actualmente una especificación OpenAPI oficial ni un e
 - [x] La sesión móvil se persiste en SecureStore en iOS/Android; el almacenamiento web usa `localStorage`.
 - [x] La navegación protege las rutas locales de cliente, mecánico y administrador según sesión y rol.
 - [ ] Confirmar el mecanismo de envío del token en solicitudes autenticadas y comprobarlo en el contrato.
-- [ ] Confirmar si existen operaciones oficiales para consultar usuario/sesión, renovar token, cerrar sesión o revocar tokens. El DTO menciona `GET /auth/me`, pero no existe una llamada móvil implementada.
+- [x] El cliente adjunta el token Bearer desde la sesión guardada; `GET /auth/me` está implementado para completar el login cuando la respuesta no incluye usuario y para validar `restoreSession()`.
+- [ ] Confirmar en el contrato oficial si `GET /auth/me`, renovar token, cerrar sesión o revocar tokens tienen exactamente estos comportamientos.
 - [ ] Confirmar políticas de autorización en la Gateway y comportamiento esperado para `401` y `403`; la protección de rutas móviles no reemplaza la autorización del servidor.
 - [ ] Confirmar qué campos del perfil devuelve cada rol y cuáles pueden ser nulos o actualizarse.
 
@@ -65,9 +66,9 @@ En el repositorio no hay actualmente una especificación OpenAPI oficial ni un e
 
 ## Cambios requeridos en la app por contrato
 
-- [x] El cliente HTTP centraliza la URL base, `Content-Type`, `Accept` y timeout de 10 segundos.
-- [ ] Añadir interceptores o configuración equivalente para autorización solo después de confirmar el formato del token.
-- [ ] Normalizar los errores de Gateway sin ocultar errores de validación ni filtrar datos sensibles en logs.
+- [x] El cliente HTTP centraliza la URL base, `Content-Type`, `Accept` y timeout de 15 segundos.
+- [x] El interceptor adjunta Bearer a solicitudes protegidas, respeta un token explícito y omite el login público.
+- [x] Se normalizan errores HTTP, timeout y conectividad; falta validar los mensajes contra el contrato oficial.
 - [ ] Crear DTO, schema de entrada/salida y mapper por dominio; validar datos externos antes de actualizar Zustand o las pantallas.
 - [ ] Mantener las respuestas simuladas detrás de configuración de desarrollo y evitar que se confundan con datos reales en pruebas de integración.
 - [ ] No guardar tokens, contraseñas ni datos personales en logs, reportes de errores o archivos de configuración versionados.

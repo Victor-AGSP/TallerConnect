@@ -10,10 +10,3 @@ export interface AuthResponse {
   token: string;
   refreshToken?: string;
 }
-
-export interface AuthSession {
-  user: User | null;
-  token: string | null;
-  refreshToken?: string | null;
-  isAuthenticated: boolean;
-}

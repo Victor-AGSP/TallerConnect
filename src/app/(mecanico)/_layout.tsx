@@ -1,15 +1,15 @@
 import { Stack } from 'expo-router';
-import { ProtectedRoute } from '@/components/auth/ProtectedRoute';
+import { RoleGuard } from '@/components/auth/RoleGuard';
 
 export default function MecanicoLayout() {
   return (
-    <ProtectedRoute allowedRole="mecanico">
+    <RoleGuard role="mecanico">
       <Stack
         screenOptions={{
           headerShown: false,
           animation: 'slide_from_right',
         }}
       />
-    </ProtectedRoute>
+    </RoleGuard>
   );
 }

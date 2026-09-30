@@ -23,7 +23,6 @@ export const userSchema = z.object({
     ROLES.ADMINISTRADOR,
   ]),
   phone: z.string().optional(),
-  createdAt: z.string().optional(),
 });
 
 export const authResponseSchema = z.object({

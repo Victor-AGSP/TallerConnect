@@ -6,8 +6,9 @@
 export interface Vehicle {
   id: string;
   plate: string;
-  brand?: string;
-  model?: string;
-  year?: number;
+  brand: string;
+  model: string;
+  year: number | null;
+  mileage: number | null;
   ownerId?: string;
 }

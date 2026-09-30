@@ -1,15 +1,15 @@
 import { Stack } from 'expo-router';
-import { ProtectedRoute } from '@/components/auth/ProtectedRoute';
+import { RoleGuard } from '@/components/auth/RoleGuard';
 
 export default function AdminLayout() {
   return (
-    <ProtectedRoute allowedRole="administrador">
+    <RoleGuard role="administrador">
       <Stack
         screenOptions={{
           headerShown: false,
           animation: 'slide_from_right',
         }}
       />
-    </ProtectedRoute>
+    </RoleGuard>
   );
 }

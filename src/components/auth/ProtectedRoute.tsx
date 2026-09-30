@@ -1,32 +1,11 @@
 import type { PropsWithChildren } from 'react';
-import { Redirect } from 'expo-router';
-
-import { Loading } from '@/components/common';
 import type { UserRole } from '@/constants/roles';
-import { useAuthStore } from '@/stores/authStore';
-import { getAuthRouteForRole } from '@/utils/auth-routing';
+import { RoleGuard } from './RoleGuard';
 
-type ProtectedRouteProps = PropsWithChildren<{
-  allowedRole: UserRole;
-}>;
-
+// Keep the older component API while both route trees share the current guard.
 export function ProtectedRoute({
   allowedRole,
   children,
-}: ProtectedRouteProps) {
-  const { isAuthenticated, isLoading, role } = useAuthStore();
-
-  if (isLoading) {
-    return <Loading />;
-  }
-
-  if (!isAuthenticated || !role) {
-    return <Redirect href="/login" />;
-  }
-
-  if (role !== allowedRole) {
-    return <Redirect href={getAuthRouteForRole(role)} />;
-  }
-
-  return children;
+}: PropsWithChildren<{ allowedRole: UserRole }>) {
+  return <RoleGuard role={allowedRole}>{children}</RoleGuard>;
 }

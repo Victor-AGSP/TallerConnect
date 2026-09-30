@@ -29,7 +29,7 @@ npm run web
 npm run android
 ```
 
-La autenticación de demostración está habilitada de forma predeterminada. Usa una de estas cuentas con contraseña `123456`:
+La app usa la API Gateway de forma predeterminada. Para activar la autenticación de demostración, define `EXPO_PUBLIC_USE_MOCK_AUTH=true` y usa una de estas cuentas con contraseña `123456`:
 
 | Rol | Correo |
 | --- | --- |
@@ -37,7 +37,7 @@ La autenticación de demostración está habilitada de forma predeterminada. Usa
 | Mecánico | `mecanico@demo.local` |
 | Administrador | `admin@demo.local` |
 
-Para consumir la API Gateway, define `EXPO_PUBLIC_USE_MOCK_AUTH=false` y `EXPO_PUBLIC_API_URL` en un archivo `.env` local. Para un dispositivo físico, usa una dirección IP accesible desde el teléfono en lugar de `localhost`.
+Para consumir la API Gateway, configura `EXPO_PUBLIC_API_URL` o `EXPO_PUBLIC_APP_ENV` en un archivo `.env` local. Para un dispositivo físico en desarrollo, usa una dirección IP accesible desde el teléfono en lugar de `localhost`.
 
 ## Verificaciones
 

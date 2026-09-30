@@ -1,7 +1,7 @@
 import { create } from 'zustand';
 import type { AuthResponse, LoginCredentials, User } from '@/models';
 import type { UserRole } from '@/constants/roles';
-import { authService } from '@/services/auth.service';
+import { authService, getCurrentUser } from '@/services/auth.service';
 import { authResponseSchema } from '@/schemas/auth.schema';
 import { storage, STORAGE_KEYS, StorageError } from '@/utils/storage';
 
@@ -55,69 +55,122 @@ export const useAuthStore = create<AuthState>((set) => {
   let revision = 0;
   let storageQueue: Promise<void> = Promise.resolve();
 
-  // Serialize writes/deletes so a previous logout cannot erase a newer login.
+  // Serialize session mutations so an old logout cannot erase a newer login.
   function mutateStorage(action: () => Promise<void>) {
     const result = storageQueue.then(action);
     storageQueue = result.catch(() => undefined);
     return result;
   }
 
+  async function persistSession(response: AuthResponse) {
+    // Gateway's request interceptor still reads the legacy token key.
+    await storage.set(AUTH_SESSION_STORAGE_KEY, JSON.stringify(response));
+    await storage.set(STORAGE_KEYS.AUTH_TOKEN, response.token);
+    await storage.setObject(STORAGE_KEYS.USER_DATA, response.user);
+  }
+
   async function authenticate(load: () => Promise<AuthResponse>) {
     const operation = ++revision;
     set({ ...emptySession, isLoading: true, sessionIssue: null });
     try {
-      const validated = authResponseSchema.parse(await load());
+      const response = authResponseSchema.parse(await load());
       await mutateStorage(async () => {
         if (operation !== revision) throw new Error('La operación de sesión fue reemplazada.');
-        await storage.set(AUTH_SESSION_STORAGE_KEY, JSON.stringify(validated));
+        try {
+          await persistSession(response);
+        } catch (error) {
+          // Remove any partial write before reporting the failed login.
+          await clearPersistedSession();
+          throw error;
+        }
       });
       if (operation !== revision) throw new Error('La operación de sesión fue reemplazada.');
-      set(authenticatedState(validated));
+      set(authenticatedState(response));
     } catch (error) {
       if (operation === revision) set({ ...emptySession, isLoading: false });
       throw error;
     }
   }
 
-  async function hydrateStoredSession() {
+  async function readStoredSession(): Promise<AuthResponse | null> {
+    const storedSession = await storage.get(AUTH_SESSION_STORAGE_KEY);
+    if (storedSession) {
+      let candidate: unknown;
+      try { candidate = JSON.parse(storedSession); } catch { return null; }
+      const parsed = authResponseSchema.safeParse(candidate);
+      return parsed.success ? parsed.data : null;
+    }
+    const [token, user] = await Promise.all([
+      storage.get(STORAGE_KEYS.AUTH_TOKEN),
+      storage.getObject<User>(STORAGE_KEYS.USER_DATA),
+    ]);
+    if (!token || !user) return null;
+    const parsed = authResponseSchema.safeParse({ user, token });
+    return parsed.success ? parsed.data : null;
+  }
+
+  async function hydrateStoredSession(validateWithBackend: boolean) {
     const operation = ++revision;
     set({ isLoading: true, sessionIssue: null });
     try {
       await storageQueue;
       if (operation !== revision) return;
-      let candidate: unknown = null;
-      const storedSession = await storage.get(AUTH_SESSION_STORAGE_KEY);
-      if (storedSession) {
-        try { candidate = JSON.parse(storedSession); } catch { candidate = null; }
-      } else {
-        const [token, user] = await Promise.all([
-          storage.get(STORAGE_KEYS.AUTH_TOKEN),
-          storage.getObject<User>(STORAGE_KEYS.USER_DATA),
-        ]);
-        if (token && user) candidate = { user, token };
-      }
+      let response = await readStoredSession();
       if (operation !== revision) return;
-      const parsed = authResponseSchema.safeParse(candidate);
-      if (!parsed.success) {
+      let validatedByBackend = false;
+      if (!response && validateWithBackend) {
+        // Older installations may have saved only a token. The backend
+        // supplies the user needed to build the current session format.
+        const token = await storage.get(STORAGE_KEYS.AUTH_TOKEN);
+        if (token) {
+          try {
+            const user = await getCurrentUser();
+            if (operation !== revision) return;
+            response = authResponseSchema.parse({ user, token });
+            validatedByBackend = true;
+          } catch {
+            if (operation !== revision) return;
+            await mutateStorage(clearPersistedSession);
+            set({ ...emptySession, isLoading: false, isHydrated: true });
+            return;
+          }
+        }
+      }
+      if (!response) {
         await mutateStorage(async () => {
           if (operation === revision) await clearPersistedSession();
         });
         if (operation === revision) set({ ...emptySession, isLoading: false, isHydrated: true });
         return;
       }
-      if (!storedSession) {
-        await mutateStorage(async () => {
+      // Migrate legacy sessions and keep both keys synchronized for Gateway.
+      await mutateStorage(async () => {
+        if (operation === revision) await persistSession(response!);
+      });
+      if (operation !== revision) return;
+      if (validateWithBackend && !validatedByBackend) {
+        try {
+          const user = await getCurrentUser();
           if (operation !== revision) return;
-          // Persist validated data before retiring legacy keys.
-          await storage.set(AUTH_SESSION_STORAGE_KEY, JSON.stringify(parsed.data));
-          await storage.clearSession();
-        });
+          response = authResponseSchema.parse({ ...response, user });
+          await mutateStorage(async () => {
+            if (operation === revision) await persistSession(response!);
+          });
+        } catch {
+          if (operation !== revision) return;
+          await mutateStorage(clearPersistedSession);
+          set({ ...emptySession, isLoading: false, isHydrated: true });
+          return;
+        }
       }
-      if (operation === revision) set(authenticatedState(parsed.data));
+      if (operation === revision) set(authenticatedState(response));
     } catch {
       if (operation === revision) set({
         ...emptySession, isLoading: false, isHydrated: true,
-        sessionIssue: { kind: 'restore', message: 'No se pudo recuperar la sesión del dispositivo. Reintenta para volver a leerla.' },
+        sessionIssue: {
+          kind: 'restore',
+          message: 'No se pudo recuperar la sesión del dispositivo. Reintenta para volver a leerla.',
+        },
       });
     }
   }
@@ -133,7 +186,6 @@ export const useAuthStore = create<AuthState>((set) => {
       const operation = ++revision;
       set({ ...emptySession, isLoading: false, isHydrated: true, sessionIssue: null });
       try {
-        // Always finish this deletion, even when a new login has already started.
         await mutateStorage(clearPersistedSession);
       } catch {
         if (operation === revision) set({ sessionIssue: {
@@ -142,8 +194,8 @@ export const useAuthStore = create<AuthState>((set) => {
         } });
       }
     },
-    hydrateSession: hydrateStoredSession,
-    restoreSession: hydrateStoredSession,
+    hydrateSession: () => hydrateStoredSession(false),
+    restoreSession: () => hydrateStoredSession(true),
     setLoading: (loading) => set({ isLoading: loading }),
   };
 });

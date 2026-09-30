@@ -7,6 +7,7 @@ export const mockVehicles: Vehicle[] = [
     brand: 'Toyota',
     model: 'Corolla',
     year: 2019,
+    mileage: 85120,
     ownerId: 'usr-001',
   },
   {
@@ -15,6 +16,7 @@ export const mockVehicles: Vehicle[] = [
     brand: 'Chevrolet',
     model: 'Sail',
     year: 2021,
+    mileage: null,
     ownerId: 'usr-001',
   },
 ];
