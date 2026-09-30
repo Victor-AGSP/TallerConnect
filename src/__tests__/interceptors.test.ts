@@ -127,6 +127,37 @@ describe('Interceptors y Manejo Centralizado de Errores', () => {
   });
 
   describe('attachAuthTokenInterceptor', () => {
+    it('no envía un token viejo en el login público', async () => {
+      mockedStorage.get.mockResolvedValueOnce('token-anterior');
+      const client = axios.create();
+      attachAuthTokenInterceptor(client);
+      const requestInterceptor = (client.interceptors.request as unknown as {
+        handlers: Array<{ fulfilled: (config: unknown) => Promise<unknown> }>;
+      }).handlers[0].fulfilled;
+      const config = {
+        url: '/auth/login',
+        headers: new axios.AxiosHeaders(),
+      } as InternalAxiosRequestConfig;
+      const result = await requestInterceptor(config) as InternalAxiosRequestConfig;
+      expect(mockedStorage.get).not.toHaveBeenCalled();
+      expect(result.headers.Authorization).toBeUndefined();
+    });
+
+    it('respeta un token explícito durante la consulta de usuario', async () => {
+      mockedStorage.get.mockResolvedValueOnce('token-anterior');
+      const client = axios.create();
+      attachAuthTokenInterceptor(client);
+      const requestInterceptor = (client.interceptors.request as unknown as {
+        handlers: Array<{ fulfilled: (config: unknown) => Promise<unknown> }>;
+      }).handlers[0].fulfilled;
+      const config = {
+        url: '/auth/me',
+        headers: new axios.AxiosHeaders({ Authorization: 'Bearer token-nuevo' }),
+      } as InternalAxiosRequestConfig;
+      const result = await requestInterceptor(config) as InternalAxiosRequestConfig;
+      expect(result.headers.Authorization).toBe('Bearer token-nuevo');
+    });
+
     it('adjunta el encabezado Authorization Bearer si existe token en el almacenamiento', async () => {
       mockedStorage.get.mockResolvedValueOnce('mi-jwt-token-seguro');
 

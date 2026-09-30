@@ -1,5 +1,4 @@
 import { Stack } from 'expo-router';
-
 import { RoleGuard } from '@/components/auth/RoleGuard';
 
 export default function MecanicoLayout() {

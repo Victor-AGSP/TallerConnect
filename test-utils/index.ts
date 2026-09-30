@@ -4,7 +4,6 @@ export {
   fireEvent,
   renderHook,
   screen,
-  testRouter,
   waitFor,
   waitForElementToBeRemoved,
   within,

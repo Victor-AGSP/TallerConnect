@@ -67,11 +67,11 @@ export function Input({
         placeholderTextColor={placeholderTextColor}
         style={[
           styles.input,
+          style,
           focused && styles.inputFocused,
+          focused && focusedStyle,
           error && styles.inputError,
           !editable && styles.inputDisabled,
-          style,
-          focused && focusedStyle,
         ]}
       />
 

@@ -41,15 +41,13 @@ export function RoleGuard({
   const {
     user,
     isAuthenticated,
-    isHydrated,
+    isLoading,
   } = useAuthStore();
 
-  if (!isHydrated) {
+  if (isLoading) {
     return (
       <View style={styles.container}>
-        <Loading
-          message="Verificando sesión..."
-        />
+        <Loading />
       </View>
     );
   }

@@ -16,7 +16,7 @@ Para dos equipos separados, el archivo OpenAPI cumple el papel del "manual" de l
 
 ## Ejemplo: contrato del login
 
-Así se describiría en OpenAPI el endpoint de login. Los nombres de campos corresponden a lo que hoy asume `apiLogin` en `src/services/auth.service.ts` (`access_token`, `full_name`, `roles`); es un ejemplo ilustrativo, no el contrato oficial del backend.
+Así se describiría en OpenAPI el endpoint de login. Los nombres de campos corresponden a lo que consumen `AuthService.login` y `mapLoginResponse` (`access_token`, `full_name`, `roles`); es un ejemplo ilustrativo, no el contrato oficial del backend.
 
 ```yaml
 paths:
@@ -43,13 +43,15 @@ paths:
             application/json:
               schema:
                 type: object
-                required: [access_token, user]
+                required: [access_token, token_type, user]
                 properties:
                   access_token:
                     type: string
+                  token_type:
+                    type: string
                   user:
                     type: object
-                    required: [id, full_name, email, roles]
+                    required: [id, full_name, email, roles, is_active]
                     properties:
                       id:
                         type: integer
@@ -57,6 +59,8 @@ paths:
                         type: string
                       email:
                         type: string
+                      is_active:
+                        type: boolean
                       roles:
                         type: array
                         items:
@@ -79,61 +83,34 @@ El login del proyecto muestra por qué hace falta. El backend y el modelo `User`
 |---|---|---|
 | `id: number` | `id: string` | `String(id)` |
 | `full_name` | `name` | Renombrar |
-| `roles: string[]` | `role: UserRole` | Tomar un rol válido |
+| `roles: string[]` | `role: UserRole` | Validar el primer rol; rechazar si no es compatible |
 | `access_token` | `token` (en `AuthResponse`) | Renombrar |
 
-Con DTO y mapper separados, quedaría así:
+La separación ya existe en el código:
 
-```ts
-// DTO: forma de los datos recibidos por el backend
-export interface LoginResponseDto {
-  access_token: string;
-  user: {
-    id: number;
-    full_name: string;
-    email: string;
-    roles: string[];
-  };
-}
+- `src/dto/auth.dto.ts`: `LoginRequestDto`, `LoginResponseDto` y `UserResponseDto`.
+- `src/mappers/auth.mapper.ts`: `mapUserResponse` valida id numérico entero, nombre, correo, lista de roles y `is_active: true` antes de transformar. El primer rol debe ser compatible; no se implementa selección multirrol.
+- `src/services/auth.service.ts`: `AuthService.login` envía la solicitud, llama al mapper y valida el modelo resultante con `authResponseSchema` antes de entregarlo al store.
 
-// Mapper: convierte el DTO al modelo que usa la app
-export function mapLoginResponse(dto: LoginResponseDto): AuthResponse {
-  const role = dto.user.roles[0];
-
-  if (role !== 'cliente' && role !== 'mecanico' && role !== 'administrador') {
-    throw new Error('El usuario no tiene un rol válido para TallerConnect.');
-  }
-
-  return {
-    token: dto.access_token,
-    user: {
-      id: String(dto.user.id),
-      name: dto.user.full_name,
-      email: dto.user.email,
-      role,
-    },
-  };
-}
-```
-
-Hoy esa conversión ocurre dentro de `apiLogin`. Separarla en un DTO y un mapper permite reutilizarla, probarla por separado y ajustarla en un solo lugar si el backend cambia.
+`token_type` está declarado en el DTO pero no se conserva ni se valida en tiempo de ejecución; tampoco se ha implementado el encabezado de autorización de peticiones posteriores. Estas decisiones siguen pendientes del contrato Gateway.
 
 ## Aplicación en TallerConnect
 
-El recorrido de una respuesta del backend sería:
+El recorrido actual de una respuesta del backend es:
 
 ```
-Respuesta HTTP → DTO → validación Zod → mapper → modelo → store / pantallas
+Respuesta HTTP → mapper (valida usuario DTO) → validación del modelo → store → pantallas
 ```
 
-- **DTO:** nueva carpeta `src/dto/`, un archivo por dominio (por ejemplo, `auth.dto.ts`).
-- **Mappers:** nueva carpeta `src/mappers/` (por ejemplo, `auth.mapper.ts`).
+- **DTO:** carpeta `src/dto/`, un archivo por dominio (por ejemplo, `auth.dto.ts`).
+- **Mappers:** carpeta `src/mappers/` (por ejemplo, `auth.mapper.ts`).
 - **Modelos:** se mantienen en `src/models/`; el resto de la app sigue usándolos sin cambios.
-- **Schemas Zod:** conviene validar el DTO, que es el dato externo no confiable, antes de pasarlo al mapper. Los schemas actuales de `src/schemas/` validan la forma del modelo.
-- **Mocks:** los de `src/mocks/` tienen forma de modelo y siguen sirviendo para la UI. Para probar los mappers se necesitan payloads simulados con forma de DTO.
+- **Schemas Zod:** el mapper valida los campos del usuario externo antes de convertirlos; `src/schemas/auth.schema.ts` valida la forma del modelo y las credenciales. Falta cotejar estas reglas con el OpenAPI oficial.
+- **Mocks:** los de `src/mocks/` tienen forma de modelo y siguen sirviendo para la UI. Los payloads de `src/mocks/payloads/auth.payload.ts` permiten probar el mapper y el servicio HTTP con forma de DTO.
 - **Servicios**: realizan las solicitudes HTTP y reciben las respuestas del backend. Los datos recibidos se validan y transforman antes de incorporarse al modelo interno.
 
 ## Referencias
 
 - [Especificación OpenAPI 3.1](https://spec.openapis.org/oas/v3.1.0)
 - [Documentación de Swagger](https://swagger.io/docs/specification/)
+- [Checklist de integración móvil con la API Gateway](./checklist-integracion-api-gateway.md)

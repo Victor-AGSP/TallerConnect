@@ -10,8 +10,8 @@ describe('identificación del rol autenticado', () => {
     ['administrador', '/administrador'],
     ['mecanico', '/mecanico'],
     ['cliente', '/cliente'],
-  ] as const)('dirige al rol %s a su inicio', (role, route) => {
-    useAuthStore.getState().setAuth(mockUserByRole[role], 'token');
+  ] as const)('dirige al rol %s a su inicio', async (role, route) => {
+    await useAuthStore.getState().setAuth(mockUserByRole[role], 'token');
 
     const authenticatedRole = useAuthStore.getState().role;
 

@@ -204,6 +204,11 @@ async function apiLogin(
       token,
     };
   } catch (error: unknown) {
+    // Preserve application and storage errors; only Axios failures need
+    // Gateway normalization before presenting a message to the user.
+    if (!axios.isAxiosError(error) && error instanceof Error) {
+      throw error;
+    }
     if (
       error instanceof Error &&
       error.message === 'El servidor no entregó un token de acceso.'

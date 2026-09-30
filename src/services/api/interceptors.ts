@@ -10,7 +10,7 @@ import {
 
 /**
  * Normaliza cualquier error devuelto por Axios, la API Gateway o la red,
- * extrayendo el mensaje legible 
+ * extrayendo el mensaje legible
  */
 export function normalizeApiError(error: unknown): NormalizedApiError {
   if (axios.isAxiosError(error)) {
@@ -90,14 +90,14 @@ export function attachAuthTokenInterceptor(client: AxiosInstance): void {
   client.interceptors.request.use(
     async (config: InternalAxiosRequestConfig & ApiRequestConfig) => {
       // Si la petición especifica explícitamente skipAuth (ej. /auth/login), omitir cabecera
-      if (config.skipAuth) {
+      if (config.skipAuth || /\/auth\/login(?:[?#]|$)/.test(config.url ?? '')) {
         return config;
       }
 
       try {
         const token = await storage.get(STORAGE_KEYS.AUTH_TOKEN);
 
-        if (token) {
+        if (token && !config.headers?.get?.('Authorization') && !config.headers?.Authorization) {
           if (config.headers?.set) {
             config.headers.set('Authorization', `Bearer ${token}`);
           } else if (config.headers) {
@@ -153,7 +153,7 @@ export function attachErrorInterceptor(client: AxiosInstance): void {
         const requestUrl = error.config?.url ?? '';
         // Si el 401 ocurrió en el login mismo, no hacemos logout (son solo credenciales incorrectas)
         const isLoginRequest =
-          requestUrl.includes('/auth/login') || (error.config as ApiRequestConfig)?.skipAuth;
+          /\/auth\/login(?:[?#]|$)/.test(requestUrl) || (error.config as ApiRequestConfig)?.skipAuth;
 
         if (!isLoginRequest) {
           console.warn(

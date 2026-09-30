@@ -2,6 +2,9 @@
   "name": "tallerconnect",
   "main": "expo-router/entry",
   "version": "1.0.0",
+  "engines": {
+    "node": "^22.13.0 || >=24.3.0"
+  },
   "dependencies": {
     "@expo/ui": "~57.0.15",
     "@hookform/resolvers": "^5.9.1",
@@ -51,7 +54,11 @@
     "ios": "expo start --ios",
     "web": "expo start --web",
     "lint": "expo lint",
-    "test": "jest"
+    "test": "jest --runInBand",
+    "test:ci": "npm test",
+    "test:regression": "jest --runInBand --config jest.regression.config.cjs",
+    "typecheck": "tsc --noEmit",
+    "export:android": "expo export --platform android"
   },
   "jest": {
     "preset": "jest-expo"

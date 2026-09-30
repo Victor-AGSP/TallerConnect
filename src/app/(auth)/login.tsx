@@ -18,11 +18,15 @@ import { Button, Card, ErrorMessage, Input } from '@/components/common';
 import { radius, spacing } from '@/constants/theme';
 import { loginSchema, type LoginFormData } from '@/schemas/auth.schema';
 import { useAuthStore } from '@/stores/authStore';
+import { StorageError } from '@/utils/storage';
 
 export default function LoginScreen() {
   const router = useRouter();
   const login = useAuthStore((state) => state.login);
   const isLoading = useAuthStore((state) => state.isLoading);
+  const sessionIssue = useAuthStore((state) => state.sessionIssue);
+  const hydrateSession = useAuthStore((state) => state.hydrateSession);
+  const logout = useAuthStore((state) => state.logout);
   const [passwordVisible, setPasswordVisible] = useState(false);
   const [loginError, setLoginError] = useState<string | null>(null);
 
@@ -41,9 +45,10 @@ export default function LoginScreen() {
     try {
       await login(credentials);
       router.replace('/');
-    } catch {
+    } catch (error) {
       setLoginError(
-        'No se pudo iniciar sesión. Verifica tus credenciales e inténtalo nuevamente.',
+        error instanceof StorageError ? error.message
+          : 'No se pudo iniciar sesión. Verifica tus credenciales e inténtalo nuevamente.',
       );
     }
   });
@@ -196,6 +201,12 @@ export default function LoginScreen() {
             {/* BOTÓN */}
 
             {loginError ? <ErrorMessage message={loginError} /> : null}
+            {sessionIssue ? (
+              <ErrorMessage
+                message={sessionIssue.message}
+                onRetry={() => void (sessionIssue.kind === 'restore' ? hydrateSession() : logout())}
+              />
+            ) : null}
 
             <Button
               title="Iniciar sesión"

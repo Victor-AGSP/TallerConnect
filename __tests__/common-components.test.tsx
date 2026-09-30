@@ -1,12 +1,29 @@
 import { fireEvent, renderWithProviders } from '../test-utils';
-import { Text } from 'react-native';
+import { StyleSheet, Text } from 'react-native';
+import { colors } from '@/constants/theme';
 
 import { Button, Card, ErrorMessage, Input, Loading } from '@/components/common';
 import { AppScreen } from '@/components/layout/AppScreen';
+import { AppButton } from '@/components/ui/AppButton';
 import { InfoCard } from '@/components/ui/InfoCard';
 import { StatusPill } from '@/components/ui/StatusPill';
 
 describe('componentes comunes', () => {
+  it.each([false, true])('Input mantiene visible el error con estilos personalizados y foco %s', async (focused) => {
+    const { getByLabelText } = await renderWithProviders(
+      <Input
+        label="Correo"
+        error="Correo inválido"
+        style={{ borderColor: '#222222' }}
+        focusedStyle={{ borderColor: '#333333' }}
+      />,
+    );
+    if (focused) await fireEvent(getByLabelText('Correo'), 'focus');
+    expect(
+      StyleSheet.flatten(getByLabelText('Correo').props.style).borderColor,
+    ).toBe(colors.danger);
+  });
+
   it('Button ejecuta la acción y expone su estado de accesibilidad', async () => {
     const onPress = jest.fn();
     const { getByTestId } = await renderWithProviders(
@@ -18,7 +35,7 @@ describe('componentes comunes', () => {
     expect(button.props.accessibilityRole).toBe('button');
     expect(button.props.accessibilityLabel).toBe('Guardar');
 
-    fireEvent.press(button);
+    await fireEvent.press(button);
 
     expect(onPress).toHaveBeenCalledTimes(1);
   });
@@ -41,7 +58,7 @@ describe('componentes comunes', () => {
       busy: true,
     });
 
-    fireEvent.press(button);
+    await fireEvent.press(button);
 
     expect(onPress).not.toHaveBeenCalled();
   });
@@ -60,6 +77,17 @@ describe('componentes comunes', () => {
     expect(getByTestId('delete-button').props.accessibilityLabel).toBe(
       'Eliminar orden de trabajo',
     );
+  });
+
+  it('AppButton mantiene el alias compatible del Button común', async () => {
+    const onPress = jest.fn();
+    const { getByRole } = await renderWithProviders(
+      <AppButton title="Continuar" onPress={onPress} />,
+    );
+
+    await fireEvent.press(getByRole('button', { name: 'Continuar' }));
+
+    expect(onPress).toHaveBeenCalledTimes(1);
   });
 
   it('Card renderiza su encabezado y contenido', async () => {
@@ -137,7 +165,7 @@ describe('componentes comunes', () => {
 
     expect(getByTestId('error-message').props.accessibilityRole).toBe('alert');
 
-    fireEvent.press(getByText('Reintentar'));
+    await fireEvent.press(getByText('Reintentar'));
 
     expect(onRetry).toHaveBeenCalledTimes(1);
   });
@@ -167,7 +195,7 @@ describe('componentes comunes', () => {
       busy: false,
     });
 
-    fireEvent.press(button);
+    await fireEvent.press(button);
 
     expect(onPress).not.toHaveBeenCalled();
   });
@@ -201,6 +229,22 @@ describe('componentes comunes', () => {
     expect(getByText('Patente ABCD12')).toBeTruthy();
     expect(getByText('En revisión')).toBeTruthy();
     expect(queryByText('Otro dato')).toBeNull();
+  });
+
+  it('InfoCard comparte las props de accesibilidad de Card', async () => {
+    const { getByTestId } = await renderWithProviders(
+      <InfoCard
+        title="Cantidad"
+        accessibilityLabel="Resumen de cantidades"
+        testID="info-card"
+      >
+        <Text>3 unidades</Text>
+      </InfoCard>,
+    );
+
+    expect(getByTestId('info-card').props.accessibilityLabel).toBe(
+      'Resumen de cantidades',
+    );
   });
 
   it.each(['success', 'warning', 'info', 'danger'] as const)(

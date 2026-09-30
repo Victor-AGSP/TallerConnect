@@ -2,14 +2,14 @@ import { useRouter } from 'expo-router';
 
 import {
   Platform,
-  SafeAreaView,
   ScrollView,
   StyleSheet,
   Text,
   View,
 } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 
-import { AppButton } from '@/components/ui/AppButton';
+import { Button } from '@/components/common';
 import { StatusPill } from '@/components/ui/StatusPill';
 import { useAuthStore } from '@/stores/authStore';
 
@@ -295,7 +295,7 @@ export default function AdministradorScreen() {
             CERRAR SESIÓN
             ===================================== */}
 
-        <AppButton
+        <Button
           title="Cerrar sesión"
           variant="outline"
           onPress={async () => {

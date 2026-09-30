@@ -17,4 +17,4 @@ export { Loading } from './Loading';
 export type { LoadingProps } from './Loading';
 
 export { ConnectivityBanner } from './ConnectivityBanner';
-export type { ConnectivityBannerProps } from './ConnectivityBanner';
+export type { ConnectivityBannerProps } from './ConnectivityBanner';

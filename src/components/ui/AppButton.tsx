@@ -1,7 +1,6 @@
 /**
- * Compatibility entry point for the button used by the existing screens.
- * The implementation lives in `components/common` so new screens can use
- * the same reusable component directly.
+ * Legacy import path kept for compatibility with existing consumers.
+ * New screens should import the shared component from `components/common`.
  */
 export {
   Button as AppButton,

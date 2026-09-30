@@ -1,0 +1,40 @@
+name: CI
+
+on:
+  push:
+    branches:
+      - Victor
+      - Develop
+  pull_request:
+    branches:
+      - Victor
+      - Develop
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Obtener el repositorio
+        uses: actions/checkout@v7
+
+      - name: Configurar Node.js
+        uses: actions/setup-node@v7
+        with:
+          node-version-file: .nvmrc
+          cache: npm
+
+      - name: Instalar dependencias
+        run: npm ci
+
+      - name: Ejecutar pruebas
+        run: npm run test:ci
+
+      - name: Verificar tipos
+        run: npm run typecheck
+
+      - name: Generar bundle Android
+        run: npm run export:android

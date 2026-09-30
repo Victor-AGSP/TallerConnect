@@ -38,6 +38,8 @@ const mockedGetCurrentUser =
 describe('authStore', () => {
   beforeEach(() => {
     jest.clearAllMocks();
+    mockedStorage.get.mockReset();
+    mockedGetCurrentUser.mockReset();
 
     useAuthStore.setState({
       user: null,
@@ -136,8 +138,8 @@ describe('authStore', () => {
       role: 'cliente' as const,
     };
 
-    mockedStorage.get.mockResolvedValueOnce(
-      'jwt-token'
+    mockedStorage.get.mockImplementation(async (key) =>
+      key === STORAGE_KEYS.AUTH_TOKEN ? 'jwt-token' : null
     );
 
     mockedGetCurrentUser.mockResolvedValueOnce(
@@ -193,8 +195,8 @@ describe('authStore', () => {
   });
 
   it('debe eliminar la sesión si el token almacenado ya no es válido', async () => {
-    mockedStorage.get.mockResolvedValueOnce(
-      'token-expirado'
+    mockedStorage.get.mockImplementation(async (key) =>
+      key === STORAGE_KEYS.AUTH_TOKEN ? 'token-expirado' : null
     );
 
     mockedGetCurrentUser.mockRejectedValueOnce(
