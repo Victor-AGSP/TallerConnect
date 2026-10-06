@@ -283,7 +283,11 @@ export default function AdministradorScreen() {
         {/* =====================================
             CERRAR SESIÓN
             ===================================== */}
-
+        <Button
+          title="Ver mis vehículos"
+          onPress={() => router.push('/(admin)/vehiculos')}
+          style={styles.logoutButton}
+        />
         <Button
           title="Cerrar sesión"
           variant="outline"

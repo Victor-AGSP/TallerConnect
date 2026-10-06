@@ -46,7 +46,7 @@ export class VehiclesService {
     }
 
     try {
-      const response = await apiClient.get<VehicleResponseDto[]>('/vehiculos/mios');
+      const response = await apiClient.get<VehicleResponseDto[]>('/vehiculos');
       return mapVehiclesResponseList(response.data);
     } catch (error: unknown) {
       const normalized = normalizeApiError(error);

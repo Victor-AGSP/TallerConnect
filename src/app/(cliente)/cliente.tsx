@@ -268,7 +268,11 @@ export default function ClienteScreen() {
         {/* =====================================
             CERRAR SESIÓN
             ===================================== */}
-
+        <Button
+          title="Ver mis vehículos"
+          onPress={() => router.push('/(cliente)/vehiculos')}
+          style={styles.logoutButton}
+        />
         <Button
           title="Cerrar sesión"
           variant="outline"
