@@ -64,7 +64,7 @@ describe('vehiclesService (Capa de Servicios de Vehículos)', () => {
   });
 
   describe('getMyVehicles', () => {
-    it('obtiene los vehículos del cliente autenticado (/vehiculos/mios)', async () => {
+    it('obtiene los vehículos del cliente autenticado (/vehiculos)', async () => {
       const rawVehicles: VehicleResponseDto[] = [
         {
           vehiculo_id: 1,
@@ -82,7 +82,7 @@ describe('vehiclesService (Capa de Servicios de Vehículos)', () => {
 
       const result = await vehiclesService.getMyVehicles();
 
-      expect(mockedApiClient.get).toHaveBeenCalledWith('/vehiculos/mios');
+      expect(mockedApiClient.get).toHaveBeenCalledWith('/vehiculos');
       expect(result).toHaveLength(1);
       expect(result[0].plate).toBe('ABCD12');
       expect(result[0].mileage).toBe(65000);

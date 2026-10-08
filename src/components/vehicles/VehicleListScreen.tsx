@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useState } from 'react';
+import { useRouter } from 'expo-router';
 
 import {
   ScrollView,
@@ -8,6 +9,7 @@ import {
 } from 'react-native';
 
 import {
+  Button,
   EmptyState,
   ErrorMessage,
   Loading,
@@ -65,6 +67,7 @@ function getRoleSubtitle(role: UserRole): string {
 export function VehicleListScreen({
   role,
 }: VehicleListScreenProps) {
+  const router = useRouter();
   const [vehicles, setVehicles] = useState<Vehicle[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [errorMessage, setErrorMessage] = useState<string | null>(
@@ -129,10 +132,31 @@ export function VehicleListScreen({
           testID="vehicles-list"
         >
           {vehicles.map((vehicle) => (
-            <VehicleCard
-              key={vehicle.id}
-              vehicle={vehicle}
-            />
+        <VehicleCard
+          key={vehicle.id}
+          vehicle={vehicle}
+          onPress={() => {
+            switch (role) {
+              case 'cliente':
+                router.push(
+                  `/(cliente)/vehiculos/${vehicle.id}` as never,
+                );
+                break;
+
+              case 'mecanico':
+                router.push(
+                  `/(mecanico)/vehiculos/${vehicle.id}` as never,
+                );
+                break;
+
+              case 'administrador':
+                router.push(
+                  `/(admin)/vehiculos/${vehicle.id}` as never,
+                );
+                break;
+            }
+          }}
+        />
           ))}
         </ScrollView>
       )}
@@ -142,10 +166,12 @@ export function VehicleListScreen({
 
 interface VehicleCardProps {
   vehicle: Vehicle;
+  onPress: () => void;
 }
 
 function VehicleCard({
   vehicle,
+  onPress,
 }: VehicleCardProps) {
   return (
     <Card style={styles.card}>
@@ -174,7 +200,11 @@ function VehicleCard({
           label="Marca"
           value={vehicle.brand || 'Sin información'}
         />
-
+      <Button
+        title="Ver detalle"
+        onPress={onPress}
+        testID={`vehicle-detail-${vehicle.id}`}
+      />
         <InfoItem
           label="Modelo"
           value={vehicle.model || 'Sin información'}
