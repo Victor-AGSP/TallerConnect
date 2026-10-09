@@ -1,13 +1,12 @@
 import { useCallback, useEffect, useState } from 'react';
-
+import { useRouter } from 'expo-router';
 import {
+  RefreshControl,
   ScrollView,
   StyleSheet,
   Text,
   View,
 } from 'react-native';
-
-import { useRouter } from 'expo-router';
 
 import {
   Button,
@@ -17,50 +16,26 @@ import {
 } from '@/components/common';
 
 import { AppScreen } from '@/components/layout/AppScreen';
-
-import {
-  colors,
-  radius,
-  spacing,
-} from '@/constants/theme';
-
-import type { UserRole } from '@/constants/roles';
+import { colors, radius, spacing } from '@/constants/theme';
 
 import type { WorkOrder } from '@/models/order.model';
-
 import type { Vehicle } from '@/models/vehicle.model';
 
 import { ordersService } from '@/services/orders.service';
-
 import { vehiclesService } from '@/services/vehicles.service';
 
 interface OrderDetailScreenProps {
-  role: UserRole;
   orderId: string;
 }
 
-function getRoleSubtitle(role: UserRole): string {
-  switch (role) {
-    case 'cliente':
-      return 'Información de una orden asociada a tu cuenta.';
-
-    case 'mecanico':
-      return 'Información de una orden visible para tu rol.';
-
-    case 'administrador':
-      return 'Información operativa de la orden.';
-
-    default:
-      return 'Información de la orden.';
-  }
-}
-
-function getStatusLabel(status: WorkOrder['status']): string {
+function getStatusLabel(
+  status: WorkOrder['status'],
+): string {
   const labels: Record<WorkOrder['status'], string> = {
     recibido: 'Recibido',
     esperando_diagnostico: 'Esperando diagnóstico',
     esperando_aprobacion_presupuesto:
-      'Esperando aprobación de presupuesto',
+      'Esperando aprobación',
     pausado_por_presupuesto_rechazado:
       'Presupuesto rechazado',
     esperando_repuestos: 'Esperando repuestos',
@@ -71,7 +46,7 @@ function getStatusLabel(status: WorkOrder['status']): string {
     cancelado: 'Cancelado',
   };
 
-  return labels[status] ?? status;
+  return labels[status];
 }
 
 function formatDate(value: string): string {
@@ -81,34 +56,33 @@ function formatDate(value: string): string {
     return 'Sin información';
   }
 
-  return date.toLocaleString('es-CL', {
-    dateStyle: 'medium',
-    timeStyle: 'short',
+  return date.toLocaleDateString('es-CL', {
+    day: '2-digit',
+    month: '2-digit',
+    year: 'numeric',
   });
 }
 
 export function OrderDetailScreen({
-  role,
   orderId,
 }: OrderDetailScreenProps) {
   const router = useRouter();
 
-  const [order, setOrder] =
-    useState<WorkOrder | null>(null);
+  const [order, setOrder] = useState<WorkOrder | null>(
+    null,
+  );
 
   const [vehicle, setVehicle] =
     useState<Vehicle | null>(null);
 
-  const [isLoading, setIsLoading] =
-    useState(true);
-
+  const [isLoading, setIsLoading] = useState(true);
   const [isRefreshing, setIsRefreshing] =
     useState(false);
 
   const [errorMessage, setErrorMessage] =
     useState<string | null>(null);
 
-  const loadData = useCallback(
+  const loadDetail = useCallback(
     async (refresh = false) => {
       if (refresh) {
         setIsRefreshing(true);
@@ -124,21 +98,17 @@ export function OrderDetailScreen({
 
         setOrder(orderResult);
 
-        try {
-          const vehicleResult =
-            await vehiclesService.getVehicleById(
-              orderResult.vehicleId,
-            );
+        const vehicleResult =
+          await vehiclesService.getVehicleById(
+            orderResult.vehicleId,
+          );
 
-          setVehicle(vehicleResult);
-        } catch {
-          setVehicle(null);
-        }
+        setVehicle(vehicleResult);
       } catch (error: unknown) {
         const message =
           error instanceof Error
             ? error.message
-            : 'No fue posible cargar la orden.';
+            : 'No fue posible cargar la orden de trabajo.';
 
         setErrorMessage(message);
       } finally {
@@ -150,14 +120,14 @@ export function OrderDetailScreen({
   );
 
   useEffect(() => {
-    void loadData();
-  }, [loadData]);
+    void loadDetail();
+  }, [loadDetail]);
 
   if (isLoading) {
     return (
       <AppScreen
-        eyebrow="Órdenes"
-        title="Detalle de orden"
+        eyebrow="Orden de trabajo"
+        title="Detalle"
         subtitle="Cargando información..."
       >
         <Loading
@@ -171,18 +141,18 @@ export function OrderDetailScreen({
   if (errorMessage || !order) {
     return (
       <AppScreen
-        eyebrow="Órdenes"
-        title="Detalle de orden"
-        subtitle={getRoleSubtitle(role)}
+        eyebrow="Orden de trabajo"
+        title="Detalle"
+        subtitle="No fue posible mostrar la información solicitada."
       >
         <ErrorMessage
           title="No se pudo cargar la orden"
           message={
             errorMessage ??
-            'La orden solicitada no está disponible.'
+            'La orden solicitada no existe o no está disponible para tu cuenta.'
           }
           onRetry={() => {
-            void loadData();
+            void loadDetail();
           }}
           retryLabel="Reintentar"
           testID="order-detail-error"
@@ -191,10 +161,7 @@ export function OrderDetailScreen({
         <Button
           title="Volver"
           variant="outline"
-          onPress={() => {
-            router.back();
-          }}
-          testID="order-detail-back"
+          onPress={() => router.back()}
         />
       </AppScreen>
     );
@@ -202,45 +169,87 @@ export function OrderDetailScreen({
 
   return (
     <AppScreen
-      eyebrow="Órdenes"
+      eyebrow="Orden de trabajo"
       title={`Orden #${order.id}`}
-      subtitle={getRoleSubtitle(role)}
+      subtitle={getStatusLabel(order.status)}
     >
       <ScrollView
         showsVerticalScrollIndicator={false}
+        refreshControl={
+          <RefreshControl
+            refreshing={isRefreshing}
+            onRefresh={() => {
+              void loadDetail(true);
+            }}
+          />
+        }
         contentContainerStyle={styles.content}
         testID="order-detail"
       >
         <Card style={styles.statusCard}>
-          <Text style={styles.sectionLabel}>
+          <Text style={styles.statusLabel}>
             ESTADO ACTUAL
           </Text>
 
-          <Text style={styles.status}>
+          <Text style={styles.statusValue}>
             {getStatusLabel(order.status)}
           </Text>
-
-          <View style={styles.statusIndicator} />
         </Card>
 
-        <Card style={styles.card}>
-          <Text style={styles.sectionTitle}>
-            Información de la orden
-          </Text>
+        <Card
+          title="Vehículo"
+          subtitle="Vehículo asociado a esta orden"
+        >
+          {vehicle ? (
+            <View style={styles.vehicleInfo}>
+              <InfoRow
+                label="Patente"
+                value={vehicle.plate}
+              />
 
+              <InfoRow
+                label="Marca"
+                value={
+                  vehicle.brand || 'Sin información'
+                }
+              />
+
+              <InfoRow
+                label="Modelo"
+                value={
+                  vehicle.model || 'Sin información'
+                }
+              />
+
+              <InfoRow
+                label="Año"
+                value={
+                  vehicle.year !== null
+                    ? String(vehicle.year)
+                    : 'Sin información'
+                }
+              />
+            </View>
+          ) : (
+            <Text style={styles.mutedText}>
+              No fue posible obtener el vehículo asociado.
+            </Text>
+          )}
+        </Card>
+
+        <Card
+          title="Información de la orden"
+          subtitle="Datos registrados en el sistema"
+        >
           <View style={styles.infoList}>
             <InfoRow
-              label="Identificador"
+              label="ID de orden"
               value={`#${order.id}`}
             />
 
             <InfoRow
-              label="Vehículo"
-              value={
-                vehicle
-                  ? `${vehicle.plate} · ${vehicle.brand} ${vehicle.model}`
-                  : `ID ${order.vehicleId}`
-              }
+              label="ID de ingreso"
+              value={order.intakeId}
             />
 
             <InfoRow
@@ -252,17 +261,17 @@ export function OrderDetailScreen({
               label="Mecánico asignado"
               value={
                 order.assignedMechanicId ??
-                'Sin asignar'
+                'Sin mecánico asignado'
               }
             />
 
             <InfoRow
-              label="Ingreso"
-              value={order.intakeId}
+              label="Creada por"
+              value={order.createdById}
             />
 
             <InfoRow
-              label="Creada"
+              label="Fecha de creación"
               value={formatDate(order.createdAt)}
             />
 
@@ -274,26 +283,9 @@ export function OrderDetailScreen({
         </Card>
 
         <Button
-          title={
-            isRefreshing
-              ? 'Actualizando...'
-              : 'Actualizar datos'
-          }
-          loading={isRefreshing}
-          variant="outline"
-          onPress={() => {
-            void loadData(true);
-          }}
-          testID="order-detail-refresh"
-        />
-
-        <Button
           title="Volver"
           variant="outline"
-          onPress={() => {
-            router.back();
-          }}
-          testID="order-detail-back-bottom"
+          onPress={() => router.back()}
         />
       </ScrollView>
     </AppScreen>
@@ -330,39 +322,25 @@ const styles = StyleSheet.create({
 
   statusCard: {
     borderRadius: radius.lg,
+    backgroundColor: colors.primarySoft,
   },
 
-  sectionLabel: {
+  statusLabel: {
     color: colors.textMuted,
     fontSize: 11,
     fontWeight: '900',
-    letterSpacing: 1,
+    letterSpacing: 0.8,
   },
 
-  status: {
-    marginTop: spacing.sm,
+  statusValue: {
+    marginTop: spacing.xs,
     color: colors.primary,
-    fontSize: 24,
+    fontSize: 22,
     fontWeight: '900',
   },
 
-  statusIndicator: {
-    width: 48,
-    height: 4,
-    marginTop: spacing.md,
-    borderRadius: radius.pill,
-    backgroundColor: colors.accent,
-  },
-
-  card: {
-    borderRadius: radius.lg,
-  },
-
-  sectionTitle: {
-    color: colors.primary,
-    fontSize: 20,
-    fontWeight: '900',
-    marginBottom: spacing.md,
+  vehicleInfo: {
+    gap: spacing.md,
   },
 
   infoList: {
@@ -370,15 +348,15 @@ const styles = StyleSheet.create({
   },
 
   infoRow: {
-    paddingBottom: spacing.md,
     borderBottomWidth: 1,
     borderBottomColor: colors.border,
+    paddingBottom: spacing.sm,
   },
 
   infoLabel: {
     color: colors.textMuted,
     fontSize: 11,
-    fontWeight: '800',
+    fontWeight: '700',
     textTransform: 'uppercase',
     letterSpacing: 0.4,
   },
@@ -388,5 +366,11 @@ const styles = StyleSheet.create({
     color: colors.text,
     fontSize: 15,
     fontWeight: '700',
+  },
+
+  mutedText: {
+    color: colors.textSecondary,
+    fontSize: 14,
+    lineHeight: 20,
   },
 });

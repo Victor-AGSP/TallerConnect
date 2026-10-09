@@ -1,12 +1,6 @@
+
 import { useCallback, useEffect, useState } from 'react';
-
-import {
-  ScrollView,
-  StyleSheet,
-  Text,
-  View,
-} from 'react-native';
-
+import { ScrollView, StyleSheet, Text, View } from 'react-native';
 import { useRouter } from 'expo-router';
 
 import {
@@ -16,19 +10,12 @@ import {
   ErrorMessage,
   Loading,
 } from '@/components/common';
-
 import { AppScreen } from '@/components/layout/AppScreen';
-
 import { colors, radius, spacing } from '@/constants/theme';
-
 import type { UserRole } from '@/constants/roles';
-
 import type { Vehicle } from '@/models/vehicle.model';
-
 import type { WorkOrder } from '@/models/order.model';
-
 import { vehiclesService } from '@/services/vehicles.service';
-
 import { ordersService } from '@/services/orders.service';
 
 interface VehicleDetailScreenProps {
@@ -36,27 +23,14 @@ interface VehicleDetailScreenProps {
   vehicleId: string;
 }
 
-function getVehicleDetailPath(
-  role: UserRole,
-  vehicleId: string,
-) {
-  return `/(cliente)/vehiculos/${vehicleId}`;
-}
-
-function getOrderDetailPath(
-  role: UserRole,
-  orderId: string,
-) {
+function getOrderDetailPath(role: UserRole, orderId: string) {
   switch (role) {
     case 'cliente':
       return `/(cliente)/ordenes/${orderId}`;
-
     case 'mecanico':
       return `/(mecanico)/ordenes/${orderId}`;
-
     case 'administrador':
       return `/(admin)/ordenes/${orderId}`;
-
     default:
       return `/(cliente)/ordenes/${orderId}`;
   }
@@ -66,13 +40,9 @@ function getRoleTitle(role: UserRole): string {
   switch (role) {
     case 'cliente':
       return 'Detalle de mi vehículo';
-
     case 'mecanico':
-      return 'Detalle del vehículo';
-
     case 'administrador':
       return 'Detalle del vehículo';
-
     default:
       return 'Detalle del vehículo';
   }
@@ -82,13 +52,10 @@ function getRoleSubtitle(role: UserRole): string {
   switch (role) {
     case 'cliente':
       return 'Información del vehículo asociado a tu cuenta.';
-
     case 'mecanico':
       return 'Información del vehículo relacionado con tus órdenes.';
-
     case 'administrador':
       return 'Información completa del vehículo registrado.';
-
     default:
       return 'Información del vehículo.';
   }
@@ -112,10 +79,8 @@ function getStatusLabel(status: WorkOrder['status']): string {
   const labels: Record<WorkOrder['status'], string> = {
     recibido: 'Recibido',
     esperando_diagnostico: 'Esperando diagnóstico',
-    esperando_aprobacion_presupuesto:
-      'Esperando aprobación de presupuesto',
-    pausado_por_presupuesto_rechazado:
-      'Presupuesto rechazado',
+    esperando_aprobacion_presupuesto: 'Esperando aprobación de presupuesto',
+    pausado_por_presupuesto_rechazado: 'Presupuesto rechazado',
     esperando_repuestos: 'Esperando repuestos',
     en_reparacion: 'En reparación',
     control_calidad: 'Control de calidad',
@@ -135,11 +100,8 @@ export function VehicleDetailScreen({
 
   const [vehicle, setVehicle] = useState<Vehicle | null>(null);
   const [orders, setOrders] = useState<WorkOrder[]>([]);
-
   const [isLoading, setIsLoading] = useState(true);
-  const [errorMessage, setErrorMessage] =
-    useState<string | null>(null);
-
+  const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [isRefreshing, setIsRefreshing] = useState(false);
 
   const loadData = useCallback(
@@ -153,19 +115,29 @@ export function VehicleDetailScreen({
       setErrorMessage(null);
 
       try {
-        const [vehicleResult, ordersResult] =
-          await Promise.all([
-            vehiclesService.getVehicleById(vehicleId),
-            ordersService.getOrders(),
-          ]);
+        // Primero cargamos el vehículo de forma independiente.
+        const vehicleResult =
+          await vehiclesService.getVehicleById(vehicleId);
 
         setVehicle(vehicleResult);
 
-        const vehicleOrders = ordersResult.filter(
-          (order) => order.vehicleId === vehicleResult.id,
-        );
+        // Si falla la consulta de órdenes, conservamos el vehículo.
+        try {
+          const ordersResult = await ordersService.getOrders();
 
-        setOrders(vehicleOrders);
+          const vehicleOrders = ordersResult.filter(
+            (order) =>
+              String(order.vehicleId) === String(vehicleResult.id),
+          );
+
+          setOrders(vehicleOrders);
+        } catch (ordersError: unknown) {
+          console.error(
+            '[VehicleDetail] No se pudieron cargar las órdenes:',
+            ordersError,
+          );
+          setOrders([]);
+        }
       } catch (error: unknown) {
         const message =
           error instanceof Error
@@ -223,9 +195,7 @@ export function VehicleDetailScreen({
         <Button
           title="Volver a vehículos"
           variant="outline"
-          onPress={() => {
-            router.back();
-          }}
+          onPress={() => router.back()}
           testID="vehicle-detail-back"
         />
       </AppScreen>
@@ -246,19 +216,12 @@ export function VehicleDetailScreen({
         <Card style={styles.vehicleCard}>
           <View style={styles.header}>
             <View style={styles.identity}>
-              <Text style={styles.label}>
-                PATENTE
-              </Text>
-
-              <Text style={styles.plate}>
-                {vehicle.plate}
-              </Text>
+              <Text style={styles.label}>PATENTE</Text>
+              <Text style={styles.plate}>{vehicle.plate}</Text>
             </View>
 
             <View style={styles.badge}>
-              <Text style={styles.badgeText}>
-                VEHÍCULO
-              </Text>
+              <Text style={styles.badgeText}>VEHÍCULO</Text>
             </View>
           </View>
 
@@ -288,26 +251,17 @@ export function VehicleDetailScreen({
               label="Kilometraje"
               value={
                 vehicle.mileage !== null
-                  ? `${vehicle.mileage.toLocaleString(
-                      'es-CL',
-                    )} km`
+                  ? `${vehicle.mileage.toLocaleString('es-CL')} km`
                   : 'Sin información'
               }
             />
 
-            <InfoItem
-              label="Identificador"
-              value={vehicle.id}
-            />
+            <InfoItem label="Identificador" value={vehicle.id} />
           </View>
         </Card>
 
         <Button
-          title={
-            isRefreshing
-              ? 'Actualizando...'
-              : 'Actualizar datos'
-          }
+          title={isRefreshing ? 'Actualizando...' : 'Actualizar datos'}
           loading={isRefreshing}
           variant="outline"
           onPress={() => {
@@ -317,13 +271,11 @@ export function VehicleDetailScreen({
         />
 
         <View style={styles.sectionHeader}>
-          <Text style={styles.sectionTitle}>
-            Órdenes de trabajo
-          </Text>
+          <Text style={styles.sectionTitle}>Órdenes de trabajo</Text>
 
           <Text style={styles.sectionSubtitle}>
             {orders.length === 0
-              ? 'No hay órdenes asociadas.'
+              ? 'No hay órdenes asociadas o no se pudieron cargar.'
               : `${orders.length} ${
                   orders.length === 1
                     ? 'orden asociada'
@@ -340,19 +292,11 @@ export function VehicleDetailScreen({
           />
         ) : (
           orders.map((order) => (
-            <Card
-              key={order.id}
-              style={styles.orderCard}
-            >
+            <Card key={order.id} style={styles.orderCard}>
               <View style={styles.orderHeader}>
                 <View style={styles.orderIdentity}>
-                  <Text style={styles.orderLabel}>
-                    ORDEN DE TRABAJO
-                  </Text>
-
-                  <Text style={styles.orderId}>
-                    #{order.id}
-                  </Text>
+                  <Text style={styles.orderLabel}>ORDEN DE TRABAJO</Text>
+                  <Text style={styles.orderId}>#{order.id}</Text>
                 </View>
 
                 <View style={styles.statusBadge}>
@@ -378,10 +322,7 @@ export function VehicleDetailScreen({
                 title="Ver detalle de la orden"
                 onPress={() => {
                   router.push(
-                    getOrderDetailPath(
-                      role,
-                      order.id,
-                    ) as never,
+                    getOrderDetailPath(role, String(order.id)) as never,
                   );
                 }}
                 testID={`vehicle-order-${order.id}`}
@@ -393,9 +334,7 @@ export function VehicleDetailScreen({
         <Button
           title="Volver a vehículos"
           variant="outline"
-          onPress={() => {
-            router.back();
-          }}
+          onPress={() => router.back()}
           testID="vehicle-detail-back-bottom"
         />
       </ScrollView>
@@ -408,19 +347,11 @@ interface InfoItemProps {
   value: string;
 }
 
-function InfoItem({
-  label,
-  value,
-}: InfoItemProps) {
+function InfoItem({ label, value }: InfoItemProps) {
   return (
     <View style={styles.infoItem}>
-      <Text style={styles.infoLabel}>
-        {label}
-      </Text>
-
-      <Text style={styles.infoValue}>
-        {value}
-      </Text>
+      <Text style={styles.infoLabel}>{label}</Text>
+      <Text style={styles.infoValue}>{value}</Text>
     </View>
   );
 }
@@ -430,66 +361,55 @@ const styles = StyleSheet.create({
     gap: spacing.md,
     paddingBottom: spacing.xxl,
   },
-
   vehicleCard: {
     borderRadius: radius.lg,
   },
-
   header: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
     gap: spacing.md,
   },
-
   identity: {
     flex: 1,
   },
-
   label: {
     color: colors.textMuted,
     fontSize: 11,
     fontWeight: '900',
     letterSpacing: 1,
   },
-
   plate: {
     marginTop: spacing.xs,
     color: colors.primary,
     fontSize: 28,
     fontWeight: '900',
   },
-
   badge: {
     borderRadius: radius.pill,
     paddingHorizontal: spacing.sm,
     paddingVertical: spacing.xs,
     backgroundColor: colors.primarySoft,
   },
-
   badgeText: {
     color: colors.primary,
     fontSize: 10,
     fontWeight: '900',
   },
-
   divider: {
     height: 1,
     marginVertical: spacing.md,
     backgroundColor: colors.border,
   },
-
   infoGrid: {
     flexDirection: 'row',
     flexWrap: 'wrap',
     rowGap: spacing.lg,
   },
-
   infoItem: {
     width: '50%',
     paddingRight: spacing.sm,
   },
-
   infoLabel: {
     color: colors.textMuted,
     fontSize: 11,
@@ -497,59 +417,49 @@ const styles = StyleSheet.create({
     textTransform: 'uppercase',
     letterSpacing: 0.4,
   },
-
   infoValue: {
     marginTop: spacing.xs,
     color: colors.text,
     fontSize: 14,
     fontWeight: '700',
   },
-
   sectionHeader: {
     marginTop: spacing.sm,
   },
-
   sectionTitle: {
     color: colors.primary,
     fontSize: 21,
     fontWeight: '900',
   },
-
   sectionSubtitle: {
     marginTop: spacing.xs,
     color: colors.textSecondary,
     fontSize: 14,
   },
-
   orderCard: {
     borderRadius: radius.lg,
   },
-
   orderHeader: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'flex-start',
     gap: spacing.md,
   },
-
   orderIdentity: {
     flex: 1,
   },
-
   orderLabel: {
     color: colors.textMuted,
     fontSize: 10,
     fontWeight: '900',
     letterSpacing: 0.8,
   },
-
   orderId: {
     marginTop: spacing.xs,
     color: colors.primary,
     fontSize: 22,
     fontWeight: '900',
   },
-
   statusBadge: {
     maxWidth: 150,
     borderRadius: radius.pill,
@@ -557,14 +467,12 @@ const styles = StyleSheet.create({
     paddingVertical: spacing.xs,
     backgroundColor: colors.infoSoft,
   },
-
   statusText: {
     color: colors.info,
     fontSize: 11,
     fontWeight: '800',
     textAlign: 'center',
   },
-
   orderInfo: {
     flexDirection: 'row',
     flexWrap: 'wrap',

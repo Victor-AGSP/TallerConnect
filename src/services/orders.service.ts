@@ -27,9 +27,11 @@ export class OrdersService {
 
     try {
       const response = await apiClient.get<OrderResponseDto[]>('/ordenes');
+      console.log('[OrdersService] Respuesta:', response.status, response.data);
       return mapOrdersResponseList(response.data);
     } catch (error: unknown) {
       const normalized = normalizeApiError(error);
+      console.log('[OrdersService] Error original:', error);
       throw new Error(normalized.message || 'No fue posible cargar las órdenes de trabajo.');
     }
   }

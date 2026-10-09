@@ -1,0 +1,13 @@
+import { useLocalSearchParams } from 'expo-router';
+
+import { VehicleDetailScreen } from '@/components/vehicles/VehicleDetailScreen';
+
+export default function AdministradorVehicleDetailScreen() {
+const { id } = useLocalSearchParams<{ id: string }>();
+
+return ( <VehicleDetailScreen
+   role="administrador"
+   vehicleId={id}
+ />
+);
+}
