@@ -41,8 +41,7 @@ export function mapOrderResponse(dto: OrderResponseDto): WorkOrder {
   const id = String(dto.orden_id ?? dto.id ?? '');
   const vehicleId = String(dto.vehiculo_id ?? dto.vehicle_id ?? '');
   const intakeId = String(dto.ingreso_id ?? dto.intake_id ?? `ing-${id}`);
-  const clientId = String(dto.cliente_id ?? dto.client_id ?? dto.creado_por_id ?? dto.created_by_id ?? '1');
-  const createdById = String(dto.creado_por_id ?? dto.created_by_id ?? clientId);
+  const createdById = String(dto.creado_por_id ?? dto.created_by_id ?? '');
 
   const rawMechanic = dto.mecanico_actual_id !== undefined ? dto.mecanico_actual_id : dto.assigned_mechanic_id;
   const assignedMechanicId = rawMechanic != null ? String(rawMechanic) : null;
@@ -55,7 +54,6 @@ export function mapOrderResponse(dto: OrderResponseDto): WorkOrder {
     id,
     vehicleId,
     intakeId,
-    clientId,
     createdById,
     status,
     assignedMechanicId,

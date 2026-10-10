@@ -123,7 +123,6 @@ describe('Pruebas Integradas: Servicios, Sesión y Navegación', () => {
         id: 'ot-101',
         vehicleId: 'veh-1',
         intakeId: 'ing-1',
-        clientId: 'usr-1',
         createdById: 'usr-3',
         status: 'en_reparacion',
         assignedMechanicId: mechanicAuth.user.id,

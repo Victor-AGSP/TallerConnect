@@ -45,7 +45,6 @@ describe('ordersService (Capa de Servicios de Órdenes)', () => {
         id: '101',
         vehicleId: '5',
         intakeId: '201',
-        clientId: '12',
         createdById: '99',
         assignedMechanicId: '3',
         status: 'en_reparacion',

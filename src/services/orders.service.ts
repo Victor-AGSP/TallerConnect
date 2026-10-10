@@ -71,7 +71,6 @@ export class OrdersService {
         id: `ot-00${localMockOrders.length + 124}`,
         vehicleId,
         intakeId: `ing-00${localMockOrders.length + 124}`,
-        clientId,
         createdById: 'usr-003',
         status: 'esperando_diagnostico',
         assignedMechanicId: null,
