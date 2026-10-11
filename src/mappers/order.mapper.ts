@@ -1,23 +1,8 @@
 import { WorkOrder, WorkOrderStatus } from '@/models/order.model';
 import { OrderResponseDto } from '@/dto/order.dto';
-import { ORDER_STATUS } from '@/constants/orderStatus';
+import { ORDER_STATUS, ORDER_STATUS_BY_CODE } from '@/constants/orderStatus';
 
 const VALID_STATUSES: readonly string[] = Object.values(ORDER_STATUS);
-
-/**
- * Mapeo de códigos numéricos de estado (FastAPI/MS2) a estados de la aplicación.
- */
-export const CODE_TO_STATUS: Record<number, WorkOrderStatus> = {
-  1: ORDER_STATUS.RECIBIDO,
-  2: ORDER_STATUS.ESPERANDO_DIAGNOSTICO,
-  3: ORDER_STATUS.EN_REPARACION,
-  4: ORDER_STATUS.ESPERANDO_REPUESTOS,
-  5: ORDER_STATUS.CONTROL_CALIDAD,
-  6: ORDER_STATUS.LISTO_PARA_ENTREGA,
-  7: ORDER_STATUS.ENTREGADO,
-  8: ORDER_STATUS.ESPERANDO_APROBACION_PRESUPUESTO,
-  9: ORDER_STATUS.CANCELADO,
-};
 
 /**
  * Valida si un texto corresponde a un WorkOrderStatus de la aplicación.
@@ -34,8 +19,8 @@ export function mapOrderResponse(dto: OrderResponseDto): WorkOrder {
 
   if (isValidOrderStatus(dto.status)) {
     status = dto.status;
-  } else if (dto.estado_codigo != null && CODE_TO_STATUS[dto.estado_codigo]) {
-    status = CODE_TO_STATUS[dto.estado_codigo];
+  } else if (dto.estado_codigo != null && ORDER_STATUS_BY_CODE[dto.estado_codigo]) {
+    status = ORDER_STATUS_BY_CODE[dto.estado_codigo];
   }
 
   const id = String(dto.orden_id ?? dto.id ?? '');
