@@ -51,7 +51,10 @@ export default function MecanicoScreen() {
             Área de trabajo
           </Text>
 
-          <Text style={styles.title}>
+          <Text
+            accessibilityRole="header"
+            style={styles.title}
+          >
             Mis órdenes
           </Text>
 
@@ -98,7 +101,10 @@ export default function MecanicoScreen() {
                 Orden actual
               </Text>
 
-              <Text style={styles.orderNumber}>
+              <Text
+                accessibilityRole="header"
+                style={styles.orderNumber}
+              >
                 OT-00124
               </Text>
 
@@ -110,6 +116,7 @@ export default function MecanicoScreen() {
             <StatusPill
               label="En reparación"
               tone="warning"
+              accessibilityLabel="Estado de la orden: En reparación"
             />
           </View>
 
@@ -165,7 +172,10 @@ export default function MecanicoScreen() {
             ===================================== */}
 
         <View style={styles.card}>
-          <Text style={styles.cardTitle}>
+          <Text
+            accessibilityRole="header"
+            style={styles.cardTitle}
+          >
             Progreso de la orden
           </Text>
 
@@ -207,7 +217,10 @@ export default function MecanicoScreen() {
             ===================================== */}
 
         <View style={styles.card}>
-          <Text style={styles.cardTitle}>
+          <Text
+            accessibilityRole="header"
+            style={styles.cardTitle}
+          >
             Otras órdenes
           </Text>
 
@@ -247,7 +260,10 @@ export default function MecanicoScreen() {
             ===================================== */}
 
         <View style={styles.card}>
-          <Text style={styles.cardTitle}>
+          <Text
+            accessibilityRole="header"
+            style={styles.cardTitle}
+          >
             Mi actividad
           </Text>
 
@@ -255,7 +271,11 @@ export default function MecanicoScreen() {
             Resumen de actividad de demostración.
           </Text>
 
-          <View style={styles.activityRow}>
+          <View
+            accessible
+            accessibilityLabel="Órdenes completadas: 12"
+            style={styles.activityRow}
+          >
             <Text style={styles.activityLabel}>
               Órdenes completadas
             </Text>
@@ -265,7 +285,11 @@ export default function MecanicoScreen() {
             </Text>
           </View>
 
-          <View style={styles.activityRow}>
+          <View
+            accessible
+            accessibilityLabel="Evidencias registradas: 24"
+            style={styles.activityRow}
+          >
             <Text style={styles.activityLabel}>
               Evidencias registradas
             </Text>
@@ -275,7 +299,11 @@ export default function MecanicoScreen() {
             </Text>
           </View>
 
-          <View style={styles.activityRow}>
+          <View
+            accessible
+            accessibilityLabel="Repuestos utilizados: 18"
+            style={styles.activityRow}
+          >
             <Text style={styles.activityLabel}>
               Repuestos utilizados
             </Text>
@@ -316,7 +344,11 @@ function Stat({
   label: string;
 }) {
   return (
-    <View style={styles.stat}>
+    <View
+      accessible
+      accessibilityLabel={`${label}: ${value}`}
+      style={styles.stat}
+    >
       <Text style={styles.statValue}>
         {value}
       </Text>
@@ -336,7 +368,11 @@ function Detail({
   value: string;
 }) {
   return (
-    <View style={styles.detail}>
+    <View
+      accessible
+      accessibilityLabel={`${label}: ${value}`}
+      style={styles.detail}
+    >
       <Text style={styles.detailLabel}>
         {label}
       </Text>
@@ -355,8 +391,15 @@ function ActionBox({
   code: string;
   title: string;
 }) {
+  // Estas tarjetas aún no tienen acción asociada: se anuncian como texto
+  // agrupado para no exponerlas como controles inexistentes.
   return (
-    <View style={styles.actionBox}>
+    <View
+      accessible
+      accessibilityRole="text"
+      accessibilityLabel={`Acción ${code}: ${title}`}
+      style={styles.actionBox}
+    >
       <Text style={styles.actionCode}>
         {code}
       </Text>
@@ -379,8 +422,20 @@ function ProgressItem({
   completed?: boolean;
   active?: boolean;
 }) {
+  // El punto de color es la única señal visual del estado: se expone
+  // también como texto para lectores de pantalla.
+  const state = completed
+    ? 'Completado'
+    : active
+      ? 'En curso'
+      : 'Pendiente';
+
   return (
-    <View style={styles.progressRow}>
+    <View
+      accessible
+      accessibilityLabel={`Etapa: ${title}. ${detail}. Estado: ${state}`}
+      style={styles.progressRow}
+    >
       <View
         style={[
           styles.progressDot,
@@ -417,7 +472,11 @@ function MiniOrder({
     getStatusColor(status);
 
   return (
-    <View style={styles.miniOrder}>
+    <View
+      accessible
+      accessibilityLabel={`Orden ${code}. Vehículo ${vehicle}. Estado: ${status}`}
+      style={styles.miniOrder}
+    >
       <View style={styles.miniOrderLeft}>
         <Text style={styles.miniOrderNumber}>
           {code}

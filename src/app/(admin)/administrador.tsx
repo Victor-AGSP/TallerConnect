@@ -49,7 +49,10 @@ export default function AdministradorScreen() {
             Administración
           </Text>
 
-          <Text style={styles.title}>
+          <Text
+            accessibilityRole="header"
+            style={styles.title}
+          >
             Panel del taller
           </Text>
 
@@ -90,7 +93,10 @@ export default function AdministradorScreen() {
             ===================================== */}
 
         <View style={styles.card}>
-          <Text style={styles.cardTitle}>
+          <Text
+            accessibilityRole="header"
+            style={styles.cardTitle}
+          >
             Estado de las órdenes
           </Text>
 
@@ -130,7 +136,10 @@ export default function AdministradorScreen() {
             ===================================== */}
 
         <View style={styles.card}>
-          <Text style={styles.cardTitle}>
+          <Text
+            accessibilityRole="header"
+            style={styles.cardTitle}
+          >
             Vehículos en atención
           </Text>
 
@@ -170,7 +179,10 @@ export default function AdministradorScreen() {
             ===================================== */}
 
         <View style={styles.card}>
-          <Text style={styles.cardTitle}>
+          <Text
+            accessibilityRole="header"
+            style={styles.cardTitle}
+          >
             Mecánicos
           </Text>
 
@@ -202,7 +214,10 @@ export default function AdministradorScreen() {
             ===================================== */}
 
         <View style={styles.card}>
-          <Text style={styles.cardTitle}>
+          <Text
+            accessibilityRole="header"
+            style={styles.cardTitle}
+          >
             Pendientes de aprobación
           </Text>
 
@@ -235,11 +250,18 @@ export default function AdministradorScreen() {
             ===================================== */}
 
         <View style={styles.card}>
-          <Text style={styles.cardTitle}>
+          <Text
+            accessibilityRole="header"
+            style={styles.cardTitle}
+          >
             Resumen del sistema
           </Text>
 
-          <View style={styles.systemRow}>
+          <View
+            accessible
+            accessibilityLabel="Vehículos registrados: 32"
+            style={styles.systemRow}
+          >
             <Text style={styles.systemLabel}>
               Vehículos registrados
             </Text>
@@ -249,7 +271,11 @@ export default function AdministradorScreen() {
             </Text>
           </View>
 
-          <View style={styles.systemRow}>
+          <View
+            accessible
+            accessibilityLabel="Órdenes completadas: 87"
+            style={styles.systemRow}
+          >
             <Text style={styles.systemLabel}>
               Órdenes completadas
             </Text>
@@ -259,7 +285,11 @@ export default function AdministradorScreen() {
             </Text>
           </View>
 
-          <View style={styles.systemRow}>
+          <View
+            accessible
+            accessibilityLabel="Mecánicos registrados: 6"
+            style={styles.systemRow}
+          >
             <Text style={styles.systemLabel}>
               Mecánicos registrados
             </Text>
@@ -269,7 +299,11 @@ export default function AdministradorScreen() {
             </Text>
           </View>
 
-          <View style={styles.systemRow}>
+          <View
+            accessible
+            accessibilityLabel="Clientes registrados: 41"
+            style={styles.systemRow}
+          >
             <Text style={styles.systemLabel}>
               Clientes registrados
             </Text>
@@ -310,7 +344,11 @@ function Stat({
   label: string;
 }) {
   return (
-    <View style={styles.stat}>
+    <View
+      accessible
+      accessibilityLabel={`${label}: ${value}`}
+      style={styles.stat}
+    >
       <Text style={styles.statValue}>
         {value}
       </Text>
@@ -336,7 +374,11 @@ function StatusRow({
     | 'danger';
 }) {
   return (
-    <View style={styles.statusRow}>
+    <View
+      accessible
+      accessibilityLabel={`${label}: ${value}`}
+      style={styles.statusRow}
+    >
       <Text style={styles.statusLabel}>
         {label}
       </Text>
@@ -362,7 +404,11 @@ function AdminOrder({
     getStatusColor(status);
 
   return (
-    <View style={styles.orderRow}>
+    <View
+      accessible
+      accessibilityLabel={`Orden ${code}. Patente ${plate}. Estado: ${status}`}
+      style={styles.orderRow}
+    >
       <View style={styles.orderLeft}>
         <Text style={styles.orderCode}>
           {code}
@@ -408,7 +454,11 @@ function Mechanic({
   status: string;
 }) {
   return (
-    <View style={styles.mechanicRow}>
+    <View
+      accessible
+      accessibilityLabel={`${name}. ${orders}. Estado: ${status}`}
+      style={styles.mechanicRow}
+    >
       <View style={styles.mechanicInfo}>
         <Text style={styles.mechanicName}>
           {name}
@@ -437,7 +487,11 @@ function Approval({
   amount: string;
 }) {
   return (
-    <View style={styles.approvalRow}>
+    <View
+      accessible
+      accessibilityLabel={`Orden ${order}. Vehículo ${vehicle}. Monto ${amount}. Pendiente de aprobación`}
+      style={styles.approvalRow}
+    >
       <View>
         <Text style={styles.approvalOrder}>
           {order}

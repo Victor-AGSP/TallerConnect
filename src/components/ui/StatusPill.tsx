@@ -1,10 +1,10 @@
-import { StyleSheet, Text, View } from 'react-native';
+import { StyleSheet, Text, View, type ViewProps } from 'react-native';
 
 import { colors, radius } from '@/constants/theme';
 
 type Tone = 'success' | 'warning' | 'info' | 'danger';
 
-interface StatusPillProps {
+interface StatusPillProps extends Omit<ViewProps, 'children' | 'style'> {
   label: string;
   tone?: Tone;
 }
@@ -26,9 +26,15 @@ const foregrounds = {
 export function StatusPill({
   label,
   tone = 'info',
+  accessibilityLabel,
+  ...viewProps
 }: StatusPillProps) {
   return (
     <View
+      {...viewProps}
+      accessible
+      accessibilityRole="text"
+      accessibilityLabel={accessibilityLabel ?? label}
       style={[
         styles.container,
         { backgroundColor: backgrounds[tone] },

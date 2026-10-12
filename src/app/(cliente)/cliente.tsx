@@ -50,7 +50,10 @@ export default function ClienteScreen() {
             Portal del cliente
           </Text>
 
-          <Text style={styles.title}>
+          <Text
+            accessibilityRole="header"
+            style={styles.title}
+          >
             Mi taller
           </Text>
 
@@ -68,7 +71,10 @@ export default function ClienteScreen() {
         <Card style={styles.card}>
           <View style={styles.cardHeader}>
             <View style={styles.cardHeaderText}>
-              <Text style={styles.cardTitle}>
+              <Text
+                accessibilityRole="header"
+                style={styles.cardTitle}
+              >
                 Vehículo en servicio
               </Text>
 
@@ -80,11 +86,15 @@ export default function ClienteScreen() {
             <StatusPill
               label="En reparación"
               tone="success"
+              accessibilityLabel="Estado del vehículo: En reparación"
             />
           </View>
 
           <View style={styles.vehicleBox}>
-            <View>
+            <View
+              accessible
+              accessibilityLabel="Patente: AB-CD-12"
+            >
               <Text style={styles.smallLabel}>
                 PATENTE
               </Text>
@@ -94,7 +104,11 @@ export default function ClienteScreen() {
               </Text>
             </View>
 
-            <View style={styles.vehicleInfo}>
+            <View
+              accessible
+              accessibilityLabel="Servicio: Mantención preventiva"
+              style={styles.vehicleInfo}
+            >
               <Text style={styles.smallLabel}>
                 SERVICIO
               </Text>
@@ -111,7 +125,10 @@ export default function ClienteScreen() {
             ===================================== */}
 
         <Card style={styles.card}>
-          <Text style={styles.cardTitle}>
+          <Text
+            accessibilityRole="header"
+            style={styles.cardTitle}
+          >
             Seguimiento de la orden
           </Text>
 
@@ -176,7 +193,10 @@ export default function ClienteScreen() {
             ===================================== */}
 
         <Card style={styles.card}>
-          <Text style={styles.cardTitle}>
+          <Text
+            accessibilityRole="header"
+            style={styles.cardTitle}
+          >
             Presupuesto
           </Text>
 
@@ -185,7 +205,10 @@ export default function ClienteScreen() {
           </Text>
 
           <View style={styles.budgetRow}>
-            <View>
+            <View
+              accessible
+              accessibilityLabel="Total estimado: $125.000"
+            >
               <Text style={styles.smallLabel}>
                 TOTAL ESTIMADO
               </Text>
@@ -198,6 +221,7 @@ export default function ClienteScreen() {
             <StatusPill
               label="Aprobado"
               tone="success"
+              accessibilityLabel="Estado del presupuesto: Aprobado"
             />
           </View>
         </Card>
@@ -207,7 +231,10 @@ export default function ClienteScreen() {
             ===================================== */}
 
         <Card style={styles.card}>
-          <Text style={styles.cardTitle}>
+          <Text
+            accessibilityRole="header"
+            style={styles.cardTitle}
+          >
             Evidencia multimedia
           </Text>
 
@@ -217,7 +244,13 @@ export default function ClienteScreen() {
           </Text>
 
           <View style={styles.mediaPlaceholder}>
-            <View style={styles.mediaIconCircle}>
+            <View
+              testID="cliente-media-icon"
+              accessible={false}
+              accessibilityElementsHidden
+              importantForAccessibility="no-hide-descendants"
+              style={styles.mediaIconCircle}
+            >
               <Text style={styles.mediaIcon}>
                 ▧
               </Text>
@@ -238,7 +271,10 @@ export default function ClienteScreen() {
             ===================================== */}
 
         <Card style={styles.card}>
-          <Text style={styles.cardTitle}>
+          <Text
+            accessibilityRole="header"
+            style={styles.cardTitle}
+          >
             Orden de trabajo
           </Text>
 
@@ -298,8 +334,20 @@ function TimelineItem({
   completed?: boolean;
   active?: boolean;
 }) {
+  // El punto de color es la única señal visual del estado: se expone
+  // también como texto para lectores de pantalla.
+  const state = completed
+    ? 'Completado'
+    : active
+      ? 'En curso'
+      : 'Pendiente';
+
   return (
-    <View style={styles.timelineRow}>
+    <View
+      accessible
+      accessibilityLabel={`Etapa: ${title}. ${detail}. Estado: ${state}`}
+      style={styles.timelineRow}
+    >
       <View
         style={[
           styles.timelineDot,
@@ -329,7 +377,11 @@ function Metric({
   label: string;
 }) {
   return (
-    <View style={styles.metric}>
+    <View
+      accessible
+      accessibilityLabel={`${label}: ${value}`}
+      style={styles.metric}
+    >
       <Text style={styles.metricValue}>
         {value}
       </Text>
@@ -349,7 +401,11 @@ function InfoRow({
   value: string;
 }) {
   return (
-    <View style={styles.infoRow}>
+    <View
+      accessible
+      accessibilityLabel={`${label}: ${value}`}
+      style={styles.infoRow}
+    >
       <Text style={styles.infoLabel}>
         {label}
       </Text>
