@@ -2,11 +2,11 @@ import { StyleSheet, Text, View, type ViewProps } from 'react-native';
 
 import { colors, radius } from '@/constants/theme';
 
-type Tone = 'success' | 'warning' | 'info' | 'danger';
+export type StatusTone = 'success' | 'warning' | 'info' | 'danger';
 
 interface StatusPillProps extends Omit<ViewProps, 'children' | 'style'> {
   label: string;
-  tone?: Tone;
+  tone?: StatusTone;
 }
 
 const backgrounds = {
