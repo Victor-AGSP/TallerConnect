@@ -319,6 +319,12 @@ export default function AdministradorScreen() {
             ===================================== */}
 
         <Button
+          title="Ver vehículos registrados"
+          onPress={() => router.push('./vehiculos')}
+          style={styles.navButton}
+        />
+
+        <Button
           title="Cerrar sesión"
           variant="outline"
           onPress={async () => {
@@ -957,6 +963,10 @@ const styles = StyleSheet.create({
     color: localTheme.text,
     fontSize: 18,
     fontWeight: '900',
+  },
+
+  navButton: {
+    marginTop: spacing.sm,
   },
 
   logoutButton: {

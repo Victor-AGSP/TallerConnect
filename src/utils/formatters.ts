@@ -7,6 +7,16 @@ export function formatPlate(plate: string): string {
   return cleaned;
 }
 
+export function formatMileage(mileage?: number | null): string {
+  if (mileage == null) return 'Sin kilometraje';
+  return `${mileage.toLocaleString('es-CL')} km`;
+}
+
+export function formatVehicleYear(year?: number | null): string {
+  if (year == null) return 'Sin año';
+  return String(year);
+}
+
 export function formatDate(dateString?: string): string {
   if (!dateString) return 'Sin fecha';
   try {

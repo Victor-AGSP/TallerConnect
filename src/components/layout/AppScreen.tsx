@@ -56,7 +56,10 @@ export function AppScreen({
               </Text>
             ) : null}
 
-            <Text style={styles.title}>
+            <Text
+              accessibilityRole="header"
+              style={styles.title}
+            >
               {title}
             </Text>
 

@@ -319,6 +319,12 @@ export default function MecanicoScreen() {
             ===================================== */}
 
         <Button
+          title="Ver vehículos asignados"
+          onPress={() => router.push('./vehiculos-asignados')}
+          style={styles.navButton}
+        />
+
+        <Button
           title="Cerrar sesión"
           variant="outline"
           onPress={async () => {
@@ -995,6 +1001,10 @@ const styles = StyleSheet.create({
     color: localTheme.text,
     fontSize: 18,
     fontWeight: '900',
+  },
+
+  navButton: {
+    marginTop: spacing.sm,
   },
 
   logoutButton: {

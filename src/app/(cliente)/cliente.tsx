@@ -306,6 +306,12 @@ export default function ClienteScreen() {
             ===================================== */}
 
         <Button
+          title="Ver mis vehículos"
+          onPress={() => router.push('./mis-vehiculos')}
+          style={styles.navButton}
+        />
+
+        <Button
           title="Cerrar sesión"
           variant="outline"
           onPress={async () => {
@@ -836,6 +842,10 @@ const styles = StyleSheet.create({
     color: localTheme.text,
     fontSize: 13,
     fontWeight: '800',
+  },
+
+  navButton: {
+    marginTop: spacing.sm,
   },
 
   logoutButton: {
