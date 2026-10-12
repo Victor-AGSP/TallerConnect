@@ -255,7 +255,7 @@ describe('vistas de órdenes con OrdersService real', () => {
         cliente_id: 12,
         creado_por_id: 99,
         mecanico_actual_id: 2,
-        estado_codigo: 3,
+        estado_codigo: 4,
         creado_en: '2026-03-01T09:00:00Z',
         actualizado_en: '2026-03-05T14:00:00Z',
       },
@@ -270,9 +270,11 @@ describe('vistas de órdenes con OrdersService real', () => {
       expect(screen.getByTestId('order-detail-124')).toBeTruthy(),
     );
 
-    // estado_codigo 3 corresponde a `en_reparacion` en el mapper.
+    // estado_codigo 4 es Esperando repuestos en el contrato y en el mapper.
+    // Los códigos que aún difieren se registran en
+    // docs/integracion-cruzada-ordenes.md (C1).
     expect(
-      screen.getByLabelText('Estado de la orden: En reparación'),
+      screen.getByLabelText('Estado de la orden: Esperando repuestos'),
     ).toBeTruthy();
 
     expect(screen.getByLabelText('Vehículo: 7')).toBeTruthy();
