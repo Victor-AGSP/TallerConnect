@@ -61,6 +61,15 @@ Comprobado con OrdersService real y el cliente HTTP simulado:
 
 Corrección necesaria: validar la respuesta en el mapper o el servicio (por ejemplo, exigir `orden_id`) y lanzar un error con mensaje propio. Las pruebas correspondientes quedan como `it.todo` en `__tests__/order-view-states.test.tsx`.
 
+## Hallazgos de las pruebas funcionales
+
+`__tests__/order-functional.test.tsx` recorre login → panel → detalle → actualización → regreso → cierre de sesión con pantallas, sesión, servicio e interceptores reales (Jest; sin emulador ni dispositivo). Observaciones:
+
+- Ninguna vista enlaza al detalle de una orden: solo se llega por ruta (`/ordenes/{id}`, `/mis-ordenes/{id}`, `/ordenes-asignadas/{id}`). Falta un listado de órdenes o un acceso desde los paneles.
+- Las secciones de órdenes, presupuesto y repuestos de los paneles muestran datos fijos de demostración.
+- Las acciones del panel del mecánico ("Actualizar estado", "Revisar repuestos", etc.) no tienen comportamiento asociado.
+- Ante un tiempo de espera agotado, el cliente HTTP reintenta dos veces (1 s y 2 s) antes de que la vista muestre el error y ofrezca el reintento manual.
+
 ## Endpoints del contrato sin uso en la app
 
 | Endpoint | Observación |
