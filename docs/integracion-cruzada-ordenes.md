@@ -52,6 +52,15 @@ El endpoint ya existe (I5 y E3 lo daban como inexistente). La corrección depend
 
 `OrdenRespuesta` sigue sin cliente. El mapper toma `clientId` de `creado_por_id`, de modo que con la API real la fila "Cliente" del detalle muestra el usuario creador (administrador).
 
+### C4. Respuestas vacías del detalle
+
+Comprobado con OrdersService real y el cliente HTTP simulado:
+
+- Una respuesta 200 con cuerpo `null` llega a `mapOrderResponse`, que falla al leer `dto.status`; `getOrderById` propaga el mensaje técnico y la vista muestra "Cannot read properties of null (reading 'status')".
+- Una respuesta 200 con `{}` se convierte en una orden con `id` vacío y valores por defecto, y la vista la representa como "Orden " sin identificador.
+
+Corrección necesaria: validar la respuesta en el mapper o el servicio (por ejemplo, exigir `orden_id`) y lanzar un error con mensaje propio. Las pruebas correspondientes quedan como `it.todo` en `__tests__/order-view-states.test.tsx`.
+
 ## Endpoints del contrato sin uso en la app
 
 | Endpoint | Observación |

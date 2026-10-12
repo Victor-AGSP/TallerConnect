@@ -88,7 +88,8 @@ export function OrderDetailView({
           title="Orden no encontrada"
           message="No se indicó qué orden de trabajo se quiere consultar."
         />
-      ) : isLoading ? (
+      ) : isLoading || (isRefreshing && !order) ? (
+        // Un reintento tras un error no tiene datos previos que mostrar.
         <Loading testID="order-detail-loading" message="Cargando orden..." />
       ) : errorMessage ? (
         <ErrorMessage
