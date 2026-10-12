@@ -1,14 +1,14 @@
-import { useCallback, useEffect, useRef, useState } from 'react';
-
 import { StyleSheet, Text, View } from 'react-native';
 
 import {
+  Button,
   Card,
   EmptyState,
   ErrorMessage,
   Loading,
 } from '@/components/common';
 import { AppScreen } from '@/components/layout/AppScreen';
+import { useDataQuery } from '@/hooks/useDataQuery';
 import { colors, spacing } from '@/constants/theme';
 import type { Vehicle } from '@/models/vehicle.model';
 import {
@@ -46,48 +46,10 @@ export function VehicleListView({
   emptyMessage,
   loadVehicles,
 }: VehicleListViewProps) {
-  const [vehicles, setVehicles] = useState<Vehicle[]>([]);
-  const [errorMessage, setErrorMessage] = useState<string | null>(null);
-  const [isLoading, setIsLoading] = useState(true);
+  const { data, errorMessage, isLoading, isRefreshing, refresh } =
+    useDataQuery(loadVehicles, FALLBACK_ERROR);
 
-  const isMountedRef = useRef(true);
-
-  useEffect(
-    () => () => {
-      isMountedRef.current = false;
-    },
-    [],
-  );
-
-  const runQuery = useCallback(async () => {
-    setIsLoading(true);
-    setErrorMessage(null);
-
-    try {
-      const result = await loadVehicles();
-
-      if (!isMountedRef.current) return;
-
-      setVehicles(result);
-    } catch (error: unknown) {
-      if (!isMountedRef.current) return;
-
-      setVehicles([]);
-      setErrorMessage(
-        error instanceof Error && error.message
-          ? error.message
-          : FALLBACK_ERROR,
-      );
-    } finally {
-      if (isMountedRef.current) {
-        setIsLoading(false);
-      }
-    }
-  }, [loadVehicles]);
-
-  useEffect(() => {
-    void runQuery();
-  }, [runQuery]);
+  const vehicles = data ?? [];
 
   return (
     <AppScreen eyebrow={eyebrow} title={title} subtitle={subtitle}>
@@ -100,17 +62,31 @@ export function VehicleListView({
         <ErrorMessage
           testID="vehicle-list-error"
           message={errorMessage}
+          onRetry={refresh}
         />
       ) : vehicles.length === 0 ? (
         <EmptyState
           testID="vehicle-list-empty"
           title="Sin vehículos"
           message={emptyMessage}
+          actionLabel="Actualizar"
+          onAction={refresh}
         />
       ) : (
-        vehicles.map((vehicle) => (
-          <VehicleCard key={vehicle.id} vehicle={vehicle} />
-        ))
+        <>
+          <Button
+            testID="vehicle-list-refresh"
+            title="Actualizar"
+            variant="outline"
+            loading={isRefreshing}
+            onPress={refresh}
+            style={styles.refreshButton}
+          />
+
+          {vehicles.map((vehicle) => (
+            <VehicleCard key={vehicle.id} vehicle={vehicle} />
+          ))}
+        </>
       )}
     </AppScreen>
   );
@@ -148,6 +124,12 @@ function VehicleCard({ vehicle }: { vehicle: Vehicle }) {
 }
 
 const styles = StyleSheet.create({
+  refreshButton: {
+    alignSelf: 'flex-end',
+    minHeight: 40,
+    paddingHorizontal: spacing.md,
+  },
+
   plate: {
     color: colors.text,
     fontSize: 20,

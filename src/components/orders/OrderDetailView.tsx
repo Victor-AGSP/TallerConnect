@@ -1,10 +1,17 @@
-import { useCallback, useEffect, useRef, useState } from 'react';
+import { useMemo } from 'react';
 
 import { StyleSheet, Text, View } from 'react-native';
 
-import { Card, EmptyState, ErrorMessage, Loading } from '@/components/common';
+import {
+  Button,
+  Card,
+  EmptyState,
+  ErrorMessage,
+  Loading,
+} from '@/components/common';
 import { AppScreen } from '@/components/layout/AppScreen';
 import { StatusPill, type StatusTone } from '@/components/ui/StatusPill';
+import { useDataQuery } from '@/hooks/useDataQuery';
 import {
   ORDER_STATUS,
   getOrderStatusLabel,
@@ -55,50 +62,19 @@ export function OrderDetailView({
   orderId,
   loadOrder,
 }: OrderDetailViewProps) {
-  const [order, setOrder] = useState<WorkOrder | null>(null);
-  const [errorMessage, setErrorMessage] = useState<string | null>(null);
-  const [isLoading, setIsLoading] = useState(Boolean(orderId));
-
-  const isMountedRef = useRef(true);
-
-  useEffect(
-    () => () => {
-      isMountedRef.current = false;
-    },
-    [],
+  // Sin identificador en la ruta no hay nada que consultar.
+  const query = useMemo(
+    () => (orderId ? () => loadOrder(orderId) : null),
+    [loadOrder, orderId],
   );
 
-  const runQuery = useCallback(async () => {
-    if (!orderId) return;
-
-    setIsLoading(true);
-    setErrorMessage(null);
-
-    try {
-      const result = await loadOrder(orderId);
-
-      if (!isMountedRef.current) return;
-
-      setOrder(result);
-    } catch (error: unknown) {
-      if (!isMountedRef.current) return;
-
-      setOrder(null);
-      setErrorMessage(
-        error instanceof Error && error.message
-          ? error.message
-          : FALLBACK_ERROR,
-      );
-    } finally {
-      if (isMountedRef.current) {
-        setIsLoading(false);
-      }
-    }
-  }, [loadOrder, orderId]);
-
-  useEffect(() => {
-    void runQuery();
-  }, [runQuery]);
+  const {
+    data: order,
+    errorMessage,
+    isLoading,
+    isRefreshing,
+    refresh,
+  } = useDataQuery(query, FALLBACK_ERROR);
 
   return (
     <AppScreen
@@ -115,9 +91,24 @@ export function OrderDetailView({
       ) : isLoading ? (
         <Loading testID="order-detail-loading" message="Cargando orden..." />
       ) : errorMessage ? (
-        <ErrorMessage testID="order-detail-error" message={errorMessage} />
+        <ErrorMessage
+          testID="order-detail-error"
+          message={errorMessage}
+          onRetry={refresh}
+        />
       ) : order ? (
-        <OrderDetailCard order={order} />
+        <>
+          <Button
+            testID="order-detail-refresh"
+            title="Actualizar"
+            variant="outline"
+            loading={isRefreshing}
+            onPress={refresh}
+            style={styles.refreshButton}
+          />
+
+          <OrderDetailCard order={order} />
+        </>
       ) : null}
     </AppScreen>
   );
@@ -177,6 +168,12 @@ function DetailRow({ label, value }: { label: string; value: string }) {
 }
 
 const styles = StyleSheet.create({
+  refreshButton: {
+    alignSelf: 'flex-end',
+    minHeight: 40,
+    paddingHorizontal: spacing.md,
+  },
+
   header: {
     flexDirection: 'row',
     alignItems: 'center',
