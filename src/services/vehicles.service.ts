@@ -10,6 +10,7 @@ import {
   mapVehiclesResponseList,
 } from '@/mappers/vehicle.mapper';
 import { mockVehicles } from '@/mocks/vehicles.mock';
+import { mockUserByRole } from '@/mocks/users.mock';
 
 const USE_MOCKS = process.env.EXPO_PUBLIC_USE_MOCK_AUTH === 'true';
 
@@ -113,7 +114,7 @@ export class VehiclesService {
         model: data.model || data.modelo || '',
         year: (data.year !== undefined ? data.year : data.anio) ?? null,
         mileage: (data.mileage !== undefined ? data.mileage : data.kilometraje) ?? null,
-        ownerId: data.owner_id ? String(data.owner_id) : undefined,
+        ownerId: mockUserByRole.cliente.id,
       };
       localMockVehicles.unshift(newMockVehicle);
       return newMockVehicle;

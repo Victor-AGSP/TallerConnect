@@ -1,27 +1,14 @@
 /**
- * Representa la respuesta de un vehículo devuelto por la API Gateway.
- * Tolera formatos en español (producción Vercel: vehiculo_id, patente, marca, anio),
- * formato del contrato de integración (patent, brand, model, mileage) y nombres tradicionales.
+ * Vehículo devuelto por la API Gateway (`VehiculoRespuesta` del contrato MS2).
  */
 export interface VehicleResponseDto {
-  id?: number | string;
-  vehiculo_id?: number | string;
-  patent?: string;
-  patente?: string;
-  license_plate?: string;
-  plate?: string;
-  brand?: string;
-  marca?: string;
-  model?: string;
-  modelo?: string;
-  year?: number | null;
-  anio?: number | null;
-  mileage?: number | null;
-  kilometraje?: number | null;
-  clientId?: string;
-  client_id?: number | string;
-  owner_id?: number | string;
-  ownerId?: string;
+  vehiculo_id: number;
+  cliente_id: number;
+  patente: string;
+  marca: string;
+  modelo: string;
+  anio: number | null;
+  kilometraje: number | null;
 }
 
 /**
