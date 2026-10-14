@@ -325,6 +325,18 @@ export default function AdministradorScreen() {
         />
 
         <Button
+          title="Ver repuestos"
+          onPress={() => router.push('./repuestos')}
+          style={styles.navButton}
+        />
+
+        <Button
+          title="Ver proveedores"
+          onPress={() => router.push('./proveedores')}
+          style={styles.navButton}
+        />
+
+        <Button
           title="Cerrar sesión"
           variant="outline"
           onPress={async () => {
