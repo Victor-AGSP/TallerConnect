@@ -32,6 +32,12 @@ export interface OrderDetailViewProps {
    * renderizados porque dispara la carga.
    */
   loadOrder: (id: string) => Promise<WorkOrder>;
+
+  /**
+   * Abre el presupuesto de la orden (MS3). Se omite en los roles que no
+   * pueden consultarlo.
+   */
+  onOpenBudget?: () => void;
 }
 
 const FALLBACK_ERROR = 'No fue posible cargar la orden de trabajo.';
@@ -61,6 +67,7 @@ export function OrderDetailView({
   eyebrow,
   orderId,
   loadOrder,
+  onOpenBudget,
 }: OrderDetailViewProps) {
   // Sin identificador en la ruta no hay nada que consultar.
   const query = useMemo(
@@ -109,6 +116,14 @@ export function OrderDetailView({
           />
 
           <OrderDetailCard order={order} />
+
+          {onOpenBudget ? (
+            <Button
+              testID="order-detail-open-budget"
+              title="Ver presupuesto"
+              onPress={onOpenBudget}
+            />
+          ) : null}
         </>
       ) : null}
     </AppScreen>

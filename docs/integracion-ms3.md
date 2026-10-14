@@ -34,3 +34,41 @@ El contrato pagina con `desde` y `limite` (valor por defecto 50, máximo 200). L
 ### Roles
 
 Los GET de repuestos y proveedores declaran `403 Rol no permitido`, pero el contrato no indica qué roles se admiten. Como el interceptor de la app cierra la sesión ante cualquier 403, las vistas se publican solo para el Administrador (`RoleGuard`). Hay que pedir al responsable del MS3 que confirme si el Mecánico puede consultar repuestos, antes de exponerlos en su panel.
+
+## Presupuesto ↔ orden de trabajo
+
+| Capa | Elemento |
+|---|---|
+| DTO | `src/dto/budget.dto.ts`: `PresupuestoResumen`, `PresupuestoDetalle`, `VersionDetalle`, `ItemSalida`, `DecisionSalida`, `DecisionEntrada`, `ResultadoOperacion`, `RepuestoFaltante`, `DecisionAplicacionPendiente` |
+| Modelo | `src/models/budget.model.ts`: `Budget`, `BudgetVersion`, `BudgetItem`, `BudgetDecision`, `BudgetDecisionResult` |
+| Mapper | `src/mappers/budget.mapper.ts`: ordena las versiones por número y rechaza estados o decisiones desconocidos en lugar de interpretarlos |
+| Servicio | `BudgetsService` (ver tabla siguiente) |
+| Vista | `OrderBudgetView`: total, estado, ítems (cantidad × precio, subtotal, repuesto y proveedor), versión vigente, decisión registrada; carga, vacío, error con reintento y actualización manual |
+| Rutas | `(cliente)/mis-ordenes/[id]/presupuesto` y `(admin)/ordenes/[id]/presupuesto`, abiertas con el botón "Ver presupuesto" del detalle de la orden |
+
+| Operación | Endpoint (vía Gateway) | Rol |
+|---|---|---|
+| Presupuesto de una orden | `GET /presupuestos?orden_id={id}` y luego `GET /presupuestos/{presupuesto_id}` | Cliente (solo versiones enviadas) y Administrador |
+| Aprobar / rechazar | `POST /presupuestos/{presupuesto_id}/versiones/{numero}/decision` | Solo Cliente |
+| Reintentar la aplicación | `POST /presupuestos/decisiones/{decision_id}/aplicacion` | Solo Cliente |
+
+### Origen del `decision_id`
+
+El MS3 crea la decisión con `POST …/decision` y, en la primera decisión, pide al MS2 que la aplique en la orden. El identificador llega en `ResultadoOperacion.decision_id`, en `VersionDetalle.decision.decision_id` y, si la aplicación falla, en el cuerpo del 503 (`DecisionAplicacionPendiente`). En ese caso la app reintenta con `…/decisiones/{decision_id}/aplicacion` sin volver a decidir.
+
+La app no llama directamente a `POST /ms2/ordenes/{orden_id}/decisiones-presupuesto`. Ese endpoint lo usa el MS3 para aplicar la decisión, y llamarlo desde la app duplicaría la ruta de aplicación.
+
+### Reglas del contrato que aplica la interfaz
+
+- Solo se puede decidir la versión más reciente visible con estado `enviada` y sin decisión. El MS3 responde 409 si la versión ya se decidió o fue reemplazada, y la app muestra ese mensaje.
+- Todo rechazo exige motivo, que la app valida antes de enviar.
+- Rechazar sin una aprobación previa (`version_vigente = null`) cancela el servicio. La app lo advierte, pide confirmarlo y envía `confirmar_cancelacion: true`. Rechazar una modificación posterior conserva la aprobación vigente y no cancela.
+- Ambas decisiones requieren una confirmación explícita.
+- `efecto_en_orden` y `repuestos_faltantes` se muestran tras decidir. El MS2 confirma el estado resultante de la orden, que se ve en el detalle al actualizarlo.
+- Un POST nunca se reintenta automáticamente (`attachRetryInterceptor` solo reintenta métodos seguros), así que una decisión no se envía dos veces.
+
+### Roles y limitaciones
+
+- El Mecánico no ve el presupuesto: `GET /presupuestos` declara `403 Rol no permitido` sin indicar qué roles admite, y un 403 cierra la sesión.
+- El estado de la orden en el detalle sigue usando `CODE_TO_STATUS` (C1 de `docs/integracion-cruzada-ordenes.md`, a cargo de otro integrante). En `Victor`, el código 3 se muestra como "En reparación" y el 5 como "Control de calidad". El flujo del presupuesto no depende de ese catálogo: usa el estado de la versión y `efecto_en_orden` del MS3.
+- Validación: contrato OpenAPI y pruebas con el cliente HTTP simulado (`budget-service.test.ts`) o con el adaptador de red simulado (`budget-flow-integration.test.tsx`). No se enviaron decisiones ni se crearon presupuestos en el MS3 desplegado.
