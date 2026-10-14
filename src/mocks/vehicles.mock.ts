@@ -1,5 +1,10 @@
 import { Vehicle } from '@/models';
 
+/**
+ * Vehículos del cliente simulado (`usr-001`).
+ * Incluyen un vehículo con todos sus datos, uno sin kilometraje y uno sin año,
+ * porque la API puede entregar `anio` y `kilometraje` como `null`.
+ */
 export const mockVehicles: Vehicle[] = [
   {
     id: 'veh-001',
@@ -17,6 +22,15 @@ export const mockVehicles: Vehicle[] = [
     model: 'Sail',
     year: 2021,
     mileage: null,
+    ownerId: 'usr-001',
+  },
+  {
+    id: 'veh-003',
+    plate: 'JKLM56',
+    brand: 'Suzuki',
+    model: 'Swift',
+    year: null,
+    mileage: 42300,
     ownerId: 'usr-001',
   },
 ];
