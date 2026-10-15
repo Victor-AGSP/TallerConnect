@@ -74,12 +74,26 @@ Corrección necesaria: validar la respuesta en el mapper o el servicio (por ejem
 
 ## Hallazgos de las pruebas funcionales
 
-`__tests__/order-functional.test.tsx` recorre login → panel → detalle → actualización → regreso → cierre de sesión con pantallas, sesión, servicio e interceptores reales (Jest; sin emulador ni dispositivo). Observaciones:
+`__tests__/order-functional.test.tsx` usa pantallas, sesión, servicios e interceptores reales (Jest; sin emulador ni dispositivo) y recorre dos casos de uso:
 
-- Ninguna vista enlaza al detalle de una orden: solo se llega por ruta (`/ordenes/{id}`, `/mis-ordenes/{id}`, `/ordenes-asignadas/{id}`). Falta un listado de órdenes o un acceso desde los paneles.
-- Las secciones de órdenes, presupuesto y repuestos de los paneles muestran datos fijos de demostración.
-- Las acciones del panel del mecánico ("Actualizar estado", "Revisar repuestos", etc.) no tienen comportamiento asociado.
-- Ante un tiempo de espera agotado, el cliente HTTP reintenta dos veces (1 s y 2 s) antes de que la vista muestre el error y ofrezca el reintento manual.
+- **Consultar una orden** (tres roles): login → panel → detalle → actualización → regreso → cierre de sesión.
+- **Decidir el presupuesto** (cliente, desde el 14-10-2026): login → detalle de la orden → "Ver presupuesto" → aprobar o rechazar. Las respuestas de MS2 y MS3 se simulan en el adaptador de Axios según sus contratos; no se envían decisiones a producción. Se verifica:
+  - la confirmación previa a toda decisión, y que "Volver" no envía nada;
+  - el motivo obligatorio al rechazar y la advertencia de cancelación en el primer rechazo (`confirmar_cancelacion: true`);
+  - el efecto en la orden, los repuestos faltantes y la recarga del presupuesto; al volver a la orden y actualizar, se ve el estado aplicado (código 4);
+  - el token de la sesión en la decisión, y que la app no llama a `decisiones-presupuesto` del MS2;
+  - un error 503 sin decisión registrada: no hay reintento automático del POST y el cliente puede volver a intentarlo;
+  - una aplicación pendiente (503 con `decision_id`): se reintenta `…/aplicacion` sin repetir la decisión;
+  - una decisión registrada no vuelve a ofrecerse, ni siquiera tras recargar;
+  - un tiempo de espera agotado al cargar el presupuesto: dos reintentos automáticos y luego el reintento manual.
+
+Observaciones:
+
+- Ninguna vista enlaza al detalle de una orden: solo se llega por ruta (`/ordenes/{id}`, `/mis-ordenes/{id}`, `/ordenes-asignadas/{id}`). Falta un listado de órdenes o un acceso desde los paneles. **Pendiente**: puede corresponder a otro integrante, por eso no se implementó.
+- Las secciones de órdenes, presupuesto y repuestos de los paneles muestran datos fijos de demostración, y las acciones del panel del mecánico ("Actualizar estado", "Revisar repuestos", etc.) no tienen comportamiento asociado. **Pendiente**: tampoco se modificaron, por la misma razón.
+- Ante un tiempo de espera agotado, el cliente HTTP reintenta dos veces las consultas GET (1 s y 2 s) antes de que la vista muestre el error y ofrezca el reintento manual. Los POST de decisión no se reintentan.
+- **Pendiente (`it.todo`)**: la doble pulsación de "Confirmar" con la decisión aún en curso. El botón queda deshabilitado mientras se envía, pero no se puede automatizar, porque el manejador devuelve la promesa del envío y el `fireEvent` de las pruebas la convierte en un `act()` asíncrono que no admite una segunda pulsación solapada. Se cubre que la decisión se envía una sola vez en los demás escenarios.
+- La política de cerrar la sesión ante cualquier 403 (`attachErrorInterceptor`) no se modificó: requiere acuerdo del equipo (`it.todo` en `order-role-access.test.tsx`).
 
 ## Endpoints del contrato sin uso en la app
 
