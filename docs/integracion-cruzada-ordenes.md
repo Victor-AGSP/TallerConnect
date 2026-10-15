@@ -1,6 +1,6 @@
 # Integración cruzada: órdenes, presupuestos, repuestos y proveedores
 
-Revisión de los contratos entre capas (contrato de la API → DTO → mapper → modelo → servicio → vista) del módulo de órdenes, contrastada el 12-10-2026 con el contrato publicado por la API Gateway (`/ms2/openapi.json`). Complementa `docs/discrepancias-integracion.md` y `docs/matriz-endpoint-dto-modelo.md` con los cambios que el contrato incorporó desde entonces.
+Revisión de los contratos entre capas (contrato de la API → DTO → mapper → modelo → servicio → vista) del módulo de órdenes, contrastada el 12-10-2026 con el contrato publicado por la API Gateway (`/ms2/openapi.json`) y actualizada el 14-10-2026 tras la publicación del MS3 (`/ms3/openapi.json`). Complementa `docs/discrepancias-integracion.md` y `docs/matriz-endpoint-dto-modelo.md` con los cambios que el contrato incorporó desde entonces. La integración con el MS3 está documentada en `docs/integracion-ms3.md`.
 
 ## Cadena verificada en la app
 
@@ -17,6 +17,17 @@ Pruebas: `__tests__/order-contract-compatibility.test.tsx` ejercita la cadena co
 ## Incompatibilidades detectadas (pendientes del responsable del código)
 
 Estas diferencias están en `src/mappers/order.mapper.ts` y `src/services/orders.service.ts`. No se modificaron en esta tarea porque corresponden a otro integrante.
+
+Estado al 14-10-2026 (contrato MS2 vuelto a consultar):
+
+| | Rama `Victor` | Rama `Develop` |
+|---|---|---|
+| C1 | Pendiente | Corregida (`ORDER_STATUS_BY_CODE`: 3, 5 y 8 alineados con el contrato) |
+| C2 | Pendiente | Pendiente (`PATCH /ordenes/{id}/status`) |
+| C3 | Pendiente (el contrato sigue sin cliente en `OrdenRespuesta`) | No verificado |
+| C4 | Pendiente | No verificado |
+
+Ninguna bloquea la integración con el MS3: el presupuesto y los repuestos se representan con los datos del MS3 (estado de la versión y `efecto_en_orden`), no con `estado_codigo`.
 
 ### C1. Catálogo de estados (`CODE_TO_STATUS`)
 
@@ -75,13 +86,22 @@ Corrección necesaria: validar la respuesta en el mapper o el servicio (por ejem
 | Endpoint | Observación |
 |---|---|
 | `GET /ordenes/{orden_id}/historial` | Historial de estados (`HistorialEstadoRespuesta`). |
-| `POST /ordenes/{orden_id}/decisiones-presupuesto` | Solo rol Cliente. Recibe `{ decision_id }` y el MS2 verifica la decisión en el MS3 (503 si no puede). |
+| `POST /ordenes/{orden_id}/decisiones-presupuesto` | Solo rol Cliente. Recibe `{ decision_id }` y el MS2 verifica la decisión en el MS3 (503 si no puede). No se usa por diseño: el MS3 lo invoca al registrar la decisión, y la app reintenta la aplicación con `POST /presupuestos/decisiones/{decision_id}/aplicacion` (ver `docs/integracion-ms3.md`). |
 
 ## Presupuestos, repuestos y proveedores (MS3)
 
-- No existen modelos, DTO, mappers ni servicios en la app, en ninguna rama del repositorio.
-- `/ms3/openapi.json` respondió 500 (`FUNCTION_INVOCATION_FAILED`) el 12-10-2026; no hay contrato publicado.
-- Las secciones "Presupuesto" y "Repuestos" de los paneles de cliente y mecánico muestran datos de demostración.
-- Sin MS3 no hay forma de obtener un `decision_id` real, por lo que `decisiones-presupuesto` no puede integrarse aún.
+El 12-10-2026 `/ms3/openapi.json` respondía 500 y bloqueaba esta parte. Al 14-10-2026 el MS3 está operativo (contrato 0.1.0, `/ms3/health` y `/ms3/health/db` responden 200) y la app lo consume a través de la API Gateway:
 
-Bloquea: integración de repuestos/proveedores, integración presupuesto ↔ orden y la relación presupuesto ↔ repuestos en la regresión del flujo.
+| Integración | Estado | Detalle |
+|---|---|---|
+| Repuestos y proveedores ↔ interfaces | Integrado | `PartsService`, vistas `(admin)/repuestos` y `(admin)/proveedores` |
+| Presupuesto ↔ orden de trabajo | Integrado | `BudgetsService`, vista `…/[id]/presupuesto` desde el detalle de la orden |
+| Decisión del cliente (`decision_id`) | Integrado | El MS3 genera el `decision_id` al aprobar o rechazar; la app no llama al endpoint del MS2 |
+| Presupuesto ↔ repuestos | Representado | Ítems con `repuesto_id`, repuesto y proveedor; `repuestos_faltantes` tras aprobar |
+
+Pendientes que no corresponden a esta integración:
+
+- Rol Mecánico: el contrato del MS3 no indica qué roles pueden leer repuestos y presupuestos, y la app cierra la sesión ante cualquier 403 (`attachErrorInterceptor`). Las vistas se exponen solo a los roles con permiso seguro hasta que el responsable del MS3 lo confirme. Cambiar la política del interceptor ante 403 requiere acuerdo del equipo.
+- Las tarjetas de presupuesto y repuestos de los paneles (`cliente.tsx`, `mecanico.tsx`, `administrador.tsx`) siguen con datos de demostración, y no hay un listado de órdenes que enlace al detalle. Pueden corresponder a funcionalidades de otros integrantes; no se modificaron.
+
+Detalle de endpoints, roles, reglas y validaciones: `docs/integracion-ms3.md`.
