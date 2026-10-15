@@ -12,5 +12,8 @@ module.exports = {
     '**/__tests__/manual-refresh-retry.test.tsx',
     '**/__tests__/use-data-query.test.ts',
     '**/__tests__/services-response-scenarios.test.ts',
+    // Integración con MS3: presupuestos, repuestos y proveedores.
+    '**/__tests__/budget-*.test.ts?(x)',
+    '**/__tests__/parts-*.test.ts?(x)',
   ],
 };

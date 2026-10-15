@@ -1,4 +1,9 @@
 import { StyleSheet } from 'react-native';
+import {
+  AxiosError,
+  type AxiosAdapter,
+  type InternalAxiosRequestConfig,
+} from 'axios';
 
 import {
   cleanup,
@@ -9,7 +14,9 @@ import {
   waitFor,
 } from '../test-utils';
 import OrdenScreen from '@/app/(admin)/ordenes/[id]';
+import OrdenPresupuestoScreen from '@/app/(admin)/ordenes/[id]/presupuesto';
 import MiOrdenScreen from '@/app/(cliente)/mis-ordenes/[id]';
+import MiOrdenPresupuestoScreen from '@/app/(cliente)/mis-ordenes/[id]/presupuesto';
 import OrdenAsignadaScreen from '@/app/(mecanico)/ordenes-asignadas/[id]';
 import {
   ORDER_STATUS,
@@ -18,7 +25,11 @@ import {
 } from '@/constants/orderStatus';
 import { colors } from '@/constants/theme';
 import type { WorkOrder } from '@/models/order.model';
+import { apiClient } from '@/services/api/client';
+import { budgetsService } from '@/services/budgets.service';
 import { ordersService } from '@/services/orders.service';
+import { partsService } from '@/services/parts.service';
+import { STORAGE_KEYS, storage } from '@/utils/storage';
 
 /**
  * Regresión del flujo orden → presupuesto → repuestos en la app.
@@ -28,9 +39,12 @@ import { ordersService } from '@/services/orders.service';
  * detalle de los tres roles, incluida la transición 3 → 4 / 5 que el
  * contrato de MS2 documenta para la aprobación del presupuesto.
  *
- * La relación con presupuestos y repuestos depende de MS3, que no tiene
- * contrato ni servicio en la app; esas comprobaciones quedan pendientes
- * (`it.todo`). Ver docs/integracion-cruzada-ordenes.md.
+ * La relación orden ↔ presupuesto ↔ repuestos se verifica con BudgetsService
+ * y PartsService reales sobre el cliente HTTP real; solo se sustituye el
+ * adaptador de red con respuestas del contrato del MS3 (docs/integracion-ms3.md).
+ *
+ * Siguen pendientes (`it.todo`) las comprobaciones que dependen de C1 y C2
+ * del mapper y servicio de órdenes (docs/integracion-cruzada-ordenes.md).
  */
 
 jest.mock('@/services/orders.service', () => ({
@@ -45,6 +59,8 @@ const routes = {
   '(cliente)/mis-ordenes/[id]': MiOrdenScreen,
   '(mecanico)/ordenes-asignadas/[id]': OrdenAsignadaScreen,
   '(admin)/ordenes/[id]': OrdenScreen,
+  '(cliente)/mis-ordenes/[id]/presupuesto': MiOrdenPresupuestoScreen,
+  '(admin)/ordenes/[id]/presupuesto': OrdenPresupuestoScreen,
 };
 
 function orderWith(status: WorkOrderStatus): WorkOrder {
@@ -205,10 +221,299 @@ describe('flujo orden → presupuesto → repuestos: propagación de cambios', (
   });
 });
 
+/* ------------------------------------------------------------------ */
+/* Orden ↔ presupuesto ↔ repuestos (MS3)                               */
+/* ------------------------------------------------------------------ */
+
+const MS3_ORDER: WorkOrder = {
+  ...orderWith(ORDER_STATUS.ESPERANDO_APROBACION_PRESUPUESTO),
+  id: '31',
+};
+
+const PART_ITEM = {
+  item_id: 11,
+  tipo: 'repuesto',
+  descripcion: 'Pastillas de freno delanteras',
+  cantidad: '2',
+  precio_unitario: '32500.00',
+  subtotal: '65000.00',
+  repuesto_id: 8,
+  repuesto_nombre: 'Pastillas de freno',
+  proveedor_nombre: 'Frenos Chile',
+};
+
+const LABOR_ITEM = {
+  item_id: 12,
+  tipo: 'mano_de_obra',
+  descripcion: 'Cambio de pastillas',
+  cantidad: '1',
+  precio_unitario: '60000.00',
+  subtotal: '60000.00',
+  repuesto_id: null,
+};
+
+const SENT_VERSION = {
+  numero: 1,
+  estado: 'enviada',
+  es_modificacion: false,
+  creado_por_id: 99,
+  creado_en: '2026-10-09T10:00:00-03:00',
+  enviado_en: '2026-10-09T12:00:00-03:00',
+  bloqueada_en: '2026-10-09T12:00:00-03:00',
+  total: '125000.00',
+  items: [PART_ITEM, LABOR_ITEM],
+  decision: null,
+};
+
+const BUDGET_SUMMARY = {
+  presupuesto_id: 5,
+  orden_id: 31,
+  creado_en: '2026-10-09T10:00:00-03:00',
+  cantidad_versiones: 1,
+  ultima_version: 1,
+  estado_ultima_version: 'enviada',
+  total_ultima_version: '125000.00',
+  version_vigente: null,
+};
+
+const SENT_BUDGET = { ...BUDGET_SUMMARY, versiones: [SENT_VERSION] };
+
+const APPROVED_BUDGET = {
+  ...BUDGET_SUMMARY,
+  estado_ultima_version: 'aprobada',
+  version_vigente: 1,
+  versiones: [
+    {
+      ...SENT_VERSION,
+      estado: 'aprobada',
+      decision: {
+        decision_id: 77,
+        decision: 'aprobado',
+        cliente_usuario_id: 4,
+        fecha_hora: '2026-10-10T15:00:00-03:00',
+        motivo: null,
+      },
+    },
+  ],
+};
+
+/** Inventario del MS3 con el repuesto presupuestado sin stock. */
+const INVENTORY = {
+  total: 1,
+  desde: 0,
+  limite: 50,
+  umbral_general: 5,
+  repuestos: [
+    {
+      repuesto_id: 8,
+      nombre: 'Pastillas de freno',
+      proveedor_id: 3,
+      proveedor_nombre: 'Frenos Chile',
+      stock: 0,
+      umbral_particular: null,
+      umbral_efectivo: 5,
+      bajo_umbral: true,
+    },
+  ],
+};
+
+const adapter = jest.fn<ReturnType<AxiosAdapter>, Parameters<AxiosAdapter>>();
+const originalAdapter = apiClient.defaults.adapter;
+
+function respond(config: InternalAxiosRequestConfig, status: number, data: unknown) {
+  const response = { data, status, statusText: String(status), headers: {}, config };
+
+  if (status >= 400) {
+    return Promise.reject(
+      new AxiosError(
+        `Request failed with status code ${status}`,
+        AxiosError.ERR_BAD_REQUEST,
+        config,
+        null,
+        response,
+      ),
+    );
+  }
+
+  return Promise.resolve(response);
+}
+
+/** MS3 simulado: presupuesto de la orden 31, decisión e inventario. */
+function ms3(decisionResult: unknown) {
+  let decided = false;
+
+  adapter.mockImplementation((config) => {
+    const key = `${config.method} ${config.url}`;
+
+    if (key === 'get /presupuestos') {
+      return respond(config, 200, {
+        total: 1,
+        desde: 0,
+        limite: 50,
+        presupuestos: config.params?.orden_id === 31 ? [BUDGET_SUMMARY] : [],
+      });
+    }
+    if (key === 'get /presupuestos/5') {
+      return respond(config, 200, decided ? APPROVED_BUDGET : SENT_BUDGET);
+    }
+    if (key === 'post /presupuestos/5/versiones/1/decision') {
+      decided = true;
+      return respond(config, 201, decisionResult);
+    }
+    if (key === 'get /repuestos') return respond(config, 200, INVENTORY);
+
+    return respond(config, 404, { detail: `No simulado: ${key}` });
+  });
+}
+
+function requestsTo(method: string, url: string) {
+  return adapter.mock.calls.filter(
+    ([config]) => config.method === method && config.url === url,
+  );
+}
+
+describe('flujo orden → presupuesto → repuestos: integración con MS3', () => {
+  beforeEach(() => {
+    adapter.mockReset();
+    apiClient.defaults.adapter = adapter;
+    jest
+      .spyOn(storage, 'get')
+      .mockImplementation(async (key) =>
+        key === STORAGE_KEYS.AUTH_TOKEN ? 'token-de-prueba' : null,
+      );
+  });
+
+  afterEach(() => {
+    apiClient.defaults.adapter = originalAdapter;
+    jest.restoreAllMocks();
+  });
+
+  it.each([
+    ['cliente', '/mis-ordenes/31', '/mis-ordenes/31/presupuesto'],
+    ['administración', '/ordenes/31', '/ordenes/31/presupuesto'],
+  ] as const)(
+    'asocia la orden con su presupuesto (vista de %s)',
+    async (_role, orderPath, budgetPath) => {
+      ms3(null);
+      mockedService.getOrderById.mockResolvedValueOnce(MS3_ORDER);
+
+      const view = renderRouterWithProviders(routes, { initialUrl: orderPath });
+      await view;
+
+      await waitFor(() =>
+        expect(screen.getByTestId('order-detail-31')).toBeTruthy(),
+      );
+      // El detalle de la orden no consulta al MS3 hasta abrir el presupuesto.
+      expect(adapter).not.toHaveBeenCalled();
+
+      await fireEvent.press(screen.getByTestId('order-detail-open-budget'));
+
+      await waitFor(() =>
+        expect(screen.getByTestId('order-budget-5')).toBeTruthy(),
+      );
+      expect(view.getPathname()).toBe(budgetPath);
+
+      // El presupuesto se busca por la orden de la ruta y se consulta su detalle.
+      const [[search]] = requestsTo('get', '/presupuestos');
+      expect(search.params).toEqual({ orden_id: 31 });
+      expect(requestsTo('get', '/presupuestos/5')).toHaveLength(1);
+      expect(screen.getByLabelText('Total del presupuesto: $125.000')).toBeTruthy();
+    },
+  );
+
+  it('no asocia presupuestos de otra orden', async () => {
+    ms3(null);
+
+    await expect(budgetsService.getBudgetForOrder('32')).resolves.toBeNull();
+    expect(requestsTo('get', '/presupuestos/5')).toHaveLength(0);
+  });
+
+  it('asocia el presupuesto aprobado con los repuestos requeridos', async () => {
+    ms3({
+      presupuesto: APPROVED_BUDGET,
+      efecto_en_orden: 'esperando_repuestos',
+      repuestos_faltantes: [
+        { repuesto_id: 8, nombre: 'Pastillas de freno', requerido: '2', disponible: 0 },
+      ],
+      decision_id: 77,
+      aplicacion_en_orden: { decision_id: 77, orden_id: 31, estado_aplicado: 4, historial_id: 300 },
+    });
+
+    await renderRouterWithProviders(routes, {
+      initialUrl: '/mis-ordenes/31/presupuesto',
+    });
+
+    await waitFor(() =>
+      expect(screen.getByTestId('order-budget-decision-form')).toBeTruthy(),
+    );
+
+    // El ítem presupuestado identifica el repuesto y su proveedor.
+    expect(
+      screen.getByLabelText(
+        'Repuesto: Pastillas de freno delanteras. 2 × $32.500. Pastillas de freno · Frenos Chile. Subtotal: $65.000',
+      ),
+    ).toBeTruthy();
+
+    await fireEvent.press(screen.getByTestId('order-budget-approve'));
+    await fireEvent.press(screen.getByTestId('order-budget-confirm'));
+
+    await waitFor(() =>
+      expect(screen.getByTestId('order-budget-missing-parts')).toBeTruthy(),
+    );
+    expect(
+      screen.getByText('Presupuesto aprobado. La orden queda esperando repuestos.'),
+    ).toBeTruthy();
+    expect(screen.getByText('Pastillas de freno: se requieren 2, hay 0')).toBeTruthy();
+    await waitFor(() =>
+      expect(screen.getByLabelText('Estado del presupuesto: Aprobado')).toBeTruthy(),
+    );
+    expect(requestsTo('post', '/presupuestos/5/versiones/1/decision')).toHaveLength(1);
+
+    // El repuesto faltante y el del ítem son el mismo registro del inventario.
+    const budget = await budgetsService.getBudgetForOrder('31');
+    const inventory = await partsService.getSpareParts();
+    const approved = budget?.versions.find((v) => v.number === budget.currentVersion);
+    const requiredPartIds = approved?.items
+      .filter((item) => item.type === 'repuesto')
+      .map((item) => item.partId);
+
+    expect(requiredPartIds).toEqual(['8']);
+    expect(inventory.items.find((part) => part.id === '8')).toMatchObject({
+      stock: 0,
+      belowThreshold: true,
+      supplierName: 'Frenos Chile',
+    });
+  });
+
+  it('aprobar con stock suficiente pasa la orden a reparación sin faltantes', async () => {
+    ms3({
+      presupuesto: APPROVED_BUDGET,
+      efecto_en_orden: 'en_reparacion',
+      repuestos_faltantes: [],
+      decision_id: 77,
+      aplicacion_en_orden: { decision_id: 77, orden_id: 31, estado_aplicado: 5, historial_id: 300 },
+    });
+
+    await renderRouterWithProviders(routes, {
+      initialUrl: '/mis-ordenes/31/presupuesto',
+    });
+
+    await waitFor(() =>
+      expect(screen.getByTestId('order-budget-approve')).toBeTruthy(),
+    );
+    await fireEvent.press(screen.getByTestId('order-budget-approve'));
+    await fireEvent.press(screen.getByTestId('order-budget-confirm'));
+
+    await waitFor(() =>
+      expect(
+        screen.getByText('Presupuesto aprobado. La orden pasa a reparación.'),
+      ).toBeTruthy(),
+    );
+    expect(screen.queryByTestId('order-budget-missing-parts')).toBeNull();
+  });
+});
+
 describe('flujo orden → presupuesto → repuestos: dependencias pendientes', () => {
-  // MS3 sin contrato ni servicio en la app.
-  it.todo('asocia la orden con su presupuesto');
-  it.todo('asocia el presupuesto aprobado con los repuestos requeridos');
   // Mapper y servicio de órdenes (C1 y C2 en docs/integracion-cruzada-ordenes.md).
   it.todo('propaga los códigos 3 → 4 / 5 del contrato hasta la vista');
   it.todo('registra el cambio de estado mediante PATCH /ordenes/{id}/estado');
