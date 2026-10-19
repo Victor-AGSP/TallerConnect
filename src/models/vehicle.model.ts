@@ -10,5 +10,5 @@ export interface Vehicle {
   model: string;
   year: number | null;
   mileage: number | null;
-  ownerId?: string;
+  ownerId: string;
 }

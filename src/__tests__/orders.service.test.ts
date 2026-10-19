@@ -21,15 +21,14 @@ describe('ordersService (Capa de Servicios de Órdenes)', () => {
     it('obtiene y mapea la lista de órdenes desde la API Gateway (snake_case a camelCase)', async () => {
       const rawApiOrders: OrderResponseDto[] = [
         {
-          id: 101,
-          vehicle_id: 5,
-          intake_id: 201,
-          client_id: 12,
-          created_by_id: 99,
-          assigned_mechanic_id: 3,
-          status: 'en_reparacion',
-          created_at: '2026-03-20T10:00:00Z',
-          updated_at: '2026-03-20T11:00:00Z',
+          orden_id: 101,
+          vehiculo_id: 5,
+          ingreso_id: 201,
+          estado_codigo: 5,
+          mecanico_actual_id: 3,
+          creado_por_id: 99,
+          creado_en: '2026-03-20T10:00:00Z',
+          actualizado_en: '2026-03-20T11:00:00Z',
         },
       ];
 
@@ -45,7 +44,6 @@ describe('ordersService (Capa de Servicios de Órdenes)', () => {
         id: '101',
         vehicleId: '5',
         intakeId: '201',
-        clientId: '12',
         createdById: '99',
         assignedMechanicId: '3',
         status: 'en_reparacion',
@@ -72,10 +70,14 @@ describe('ordersService (Capa de Servicios de Órdenes)', () => {
   describe('getOrderById', () => {
     it('obtiene una orden por su identificador', async () => {
       const rawOrder: OrderResponseDto = {
-        id: 101,
-        vehicle_id: 5,
-        client_id: 12,
-        status: 'esperando_diagnostico',
+        orden_id: 101,
+        vehiculo_id: 5,
+        ingreso_id: 201,
+        estado_codigo: 2,
+        mecanico_actual_id: null,
+        creado_por_id: 99,
+        creado_en: '2026-03-20T10:00:00Z',
+        actualizado_en: '2026-03-20T10:00:00Z',
       };
 
       mockedApiClient.get.mockResolvedValueOnce({
@@ -99,12 +101,14 @@ describe('ordersService (Capa de Servicios de Órdenes)', () => {
       };
 
       const rawResponse: OrderResponseDto = {
-        id: 102,
-        vehicle_id: 5,
-        client_id: 12,
-        status: 'recibido',
-        description: 'Cambio de pastillas de freno',
-        created_at: '2026-03-29T12:00:00Z',
+        orden_id: 102,
+        vehiculo_id: 5,
+        ingreso_id: 202,
+        estado_codigo: 1,
+        mecanico_actual_id: null,
+        creado_por_id: 99,
+        creado_en: '2026-03-29T12:00:00Z',
+        actualizado_en: '2026-03-29T12:00:00Z',
       };
 
       mockedApiClient.post.mockResolvedValueOnce({
@@ -126,10 +130,14 @@ describe('ordersService (Capa de Servicios de Órdenes)', () => {
   describe('updateOrderStatus', () => {
     it('actualiza el estado de una orden mediante PATCH', async () => {
       const rawUpdated: OrderResponseDto = {
-        id: 101,
-        vehicle_id: 5,
-        client_id: 12,
-        status: 'listo_para_entrega',
+        orden_id: 101,
+        vehiculo_id: 5,
+        ingreso_id: 201,
+        estado_codigo: 6,
+        mecanico_actual_id: 3,
+        creado_por_id: 99,
+        creado_en: '2026-03-20T10:00:00Z',
+        actualizado_en: '2026-03-21T09:00:00Z',
       };
 
       mockedApiClient.patch.mockResolvedValueOnce({
