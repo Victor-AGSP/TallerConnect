@@ -36,11 +36,8 @@ function getStatusLabel(
     esperando_diagnostico: 'Esperando diagnóstico',
     esperando_aprobacion_presupuesto:
       'Esperando aprobación',
-    pausado_por_presupuesto_rechazado:
-      'Presupuesto rechazado',
     esperando_repuestos: 'Esperando repuestos',
     en_reparacion: 'En reparación',
-    control_calidad: 'Control de calidad',
     listo_para_entrega: 'Listo para entrega',
     entregado: 'Entregado',
     cancelado: 'Cancelado',
@@ -253,8 +250,8 @@ export function OrderDetailScreen({
             />
 
             <InfoRow
-              label="Cliente"
-              value={order.clientId}
+              label="ID del cliente"
+              value={vehicle?.ownerId ?? 'Sin información'}
             />
 
             <InfoRow
