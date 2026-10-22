@@ -200,7 +200,15 @@ export default function ClienteScreen() {
               tone="success"
             />
           </View>
+
         </Card>
+
+
+        <Button
+          title="Ver detalle del presupuesto"
+          onPress={() => router.push('/presupuesto' as never)}
+          style={styles.logoutButton}
+        />
 
         {/* =====================================
             EVIDENCIA MULTIMEDIA
