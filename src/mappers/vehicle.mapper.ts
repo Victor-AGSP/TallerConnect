@@ -18,15 +18,18 @@ export function mapVehicleResponse(dto: VehicleResponseDto): Vehicle {
   const rawMileage = dto.mileage !== undefined ? dto.mileage : dto.kilometraje;
   const mileage = rawMileage != null ? Number(rawMileage) : null;
 
-  const ownerId = dto.clientId
-    ? String(dto.clientId)
-    : dto.client_id != null
-    ? String(dto.client_id)
-    : dto.owner_id != null
-    ? String(dto.owner_id)
-    : dto.ownerId
-    ? String(dto.ownerId)
-    : undefined;
+  const ownerId =
+    dto.cliente_id != null
+      ? String(dto.cliente_id)
+      : dto.clientId
+      ? String(dto.clientId)
+      : dto.client_id != null
+      ? String(dto.client_id)
+      : dto.owner_id != null
+      ? String(dto.owner_id)
+      : dto.ownerId
+      ? String(dto.ownerId)
+      : undefined;
 
   return {
     id,

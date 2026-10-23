@@ -5,18 +5,36 @@ import { ORDER_STATUS } from '@/constants/orderStatus';
 const VALID_STATUSES: readonly string[] = Object.values(ORDER_STATUS);
 
 /**
- * Mapeo de códigos numéricos de estado (FastAPI/MS2) a estados de la aplicación.
+ * Mapeo oficial de códigos numéricos de estado (OrdenRespuesta.estado_codigo en MS2) a estados de la aplicación:
+ * 1 = Recibido; 2 = Esperando diagnóstico; 3 = Esperando aprobación de presupuesto;
+ * 4 = Esperando repuestos; 5 = En reparación; 6 = Listo; 7 = Entregado; 8 = Cancelado.
  */
 export const CODE_TO_STATUS: Record<number, WorkOrderStatus> = {
   1: ORDER_STATUS.RECIBIDO,
   2: ORDER_STATUS.ESPERANDO_DIAGNOSTICO,
-  3: ORDER_STATUS.EN_REPARACION,
+  3: ORDER_STATUS.ESPERANDO_APROBACION_PRESUPUESTO,
   4: ORDER_STATUS.ESPERANDO_REPUESTOS,
-  5: ORDER_STATUS.CONTROL_CALIDAD,
+  5: ORDER_STATUS.EN_REPARACION,
   6: ORDER_STATUS.LISTO_PARA_ENTREGA,
   7: ORDER_STATUS.ENTREGADO,
-  8: ORDER_STATUS.ESPERANDO_APROBACION_PRESUPUESTO,
+  8: ORDER_STATUS.CANCELADO,
   9: ORDER_STATUS.CANCELADO,
+};
+
+/**
+ * Mapeo inverso de WorkOrderStatus al código numérico esperado por MS2 (estado_destino).
+ */
+export const STATUS_TO_CODE: Record<WorkOrderStatus, number> = {
+  [ORDER_STATUS.RECIBIDO]: 1,
+  [ORDER_STATUS.ESPERANDO_DIAGNOSTICO]: 2,
+  [ORDER_STATUS.ESPERANDO_APROBACION_PRESUPUESTO]: 3,
+  [ORDER_STATUS.PAUSADO_POR_PRESUPUESTO_RECHAZADO]: 3,
+  [ORDER_STATUS.ESPERANDO_REPUESTOS]: 4,
+  [ORDER_STATUS.EN_REPARACION]: 5,
+  [ORDER_STATUS.CONTROL_CALIDAD]: 5,
+  [ORDER_STATUS.LISTO_PARA_ENTREGA]: 6,
+  [ORDER_STATUS.ENTREGADO]: 7,
+  [ORDER_STATUS.CANCELADO]: 8,
 };
 
 /**
