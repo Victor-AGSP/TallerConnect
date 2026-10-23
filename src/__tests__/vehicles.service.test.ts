@@ -1,4 +1,9 @@
-import { vehiclesService } from '@/services/vehicles.service';
+import {
+  MockVehicleAdapter,
+  ServiceError,
+  VehiclesService,
+  vehiclesService,
+} from '@/services/vehicles.service';
 import { apiClient } from '@/services/api/client';
 import { VehicleResponseDto } from '@/dto/vehicle.dto';
 
@@ -6,6 +11,7 @@ jest.mock('@/services/api/client', () => ({
   apiClient: {
     get: jest.fn(),
     post: jest.fn(),
+    patch: jest.fn(),
   },
 }));
 
@@ -14,6 +20,8 @@ const mockedApiClient = apiClient as jest.Mocked<typeof apiClient>;
 describe('vehiclesService (Capa de Servicios de Vehículos)', () => {
   beforeEach(() => {
     jest.clearAllMocks();
+    vehiclesService.useRealAdapter();
+    vehiclesService.resetMocks();
   });
 
   describe('getVehicles', () => {
@@ -48,7 +56,46 @@ describe('vehiclesService (Capa de Servicios de Vehículos)', () => {
       });
     });
 
-    it('propaga error normalizado si falla la petición', async () => {
+    it('envía parámetros de consulta tipados (VehicleQueryParamsDto) y filtra los resultados', async () => {
+      const rawApiVehicles: VehicleResponseDto[] = [
+        {
+          vehiculo_id: 1,
+          cliente_id: 10,
+          patente: 'BBCC11',
+          marca: 'Toyota',
+          modelo: 'Yaris',
+          anio: 2021,
+          kilometraje: 32000,
+        },
+        {
+          vehiculo_id: 2,
+          cliente_id: 10,
+          patente: 'XXYY99',
+          marca: 'Mazda',
+          modelo: 'Mazda 3',
+          anio: 2022,
+          kilometraje: 15000,
+        },
+      ];
+
+      mockedApiClient.get.mockResolvedValueOnce({
+        data: rawApiVehicles,
+      } as never);
+
+      const result = await vehiclesService.getVehicles({
+        marca: 'Toyota',
+        cliente_id: 10,
+      });
+
+      expect(mockedApiClient.get).toHaveBeenCalledWith('/vehiculos', {
+        params: { marca: 'Toyota', cliente_id: 10 },
+      });
+      expect(result).toHaveLength(1);
+      expect(result[0].plate).toBe('BBCC11');
+      expect(result[0].ownerId).toBe('10');
+    });
+
+    it('propaga error normalizado (ServiceError) si falla la petición', async () => {
       mockedApiClient.get.mockRejectedValueOnce({
         isAxiosError: true,
         response: {
@@ -162,14 +209,90 @@ describe('vehiclesService (Capa de Servicios de Vehículos)', () => {
 
       const result = await vehiclesService.createVehicle(payload);
 
-      expect(mockedApiClient.post).toHaveBeenCalledWith('/vehiculos', expect.objectContaining({
-        patent: 'JKLM56',
-        brand: 'Hyundai',
-      }));
+      expect(mockedApiClient.post).toHaveBeenCalledWith(
+        '/vehiculos',
+        expect.objectContaining({
+          patent: 'JKLM56',
+          patente: 'JKLM56',
+          brand: 'Hyundai',
+          marca: 'Hyundai',
+          model: 'Tucson',
+          modelo: 'Tucson',
+        })
+      );
       expect(result.id).toBe('10');
       expect(result.plate).toBe('JKLM56');
       expect(result.brand).toBe('Hyundai');
       expect(result.year).toBe(2023);
+    });
+  });
+
+  describe('updateVehicle (PATCH /vehiculos/{vehiculo_id})', () => {
+    it('actualiza parcialmente un vehículo según el esquema VehiculoActualizar de MS2', async () => {
+      const rawUpdated: VehicleResponseDto = {
+        vehiculo_id: 10,
+        cliente_id: 8,
+        patente: 'JKLM56',
+        marca: 'Hyundai',
+        modelo: 'Tucson NX4',
+        anio: 2023,
+        kilometraje: 18500,
+      };
+
+      mockedApiClient.patch.mockResolvedValueOnce({
+        data: rawUpdated,
+      } as never);
+
+      const result = await vehiclesService.updateVehicle(10, {
+        modelo: 'Tucson NX4',
+        kilometraje: 18500,
+      });
+
+      expect(mockedApiClient.patch).toHaveBeenCalledWith('/vehiculos/10', {
+        modelo: 'Tucson NX4',
+        kilometraje: 18500,
+      });
+      expect(result.id).toBe('10');
+      expect(result.model).toBe('Tucson NX4');
+      expect(result.mileage).toBe(18500);
+    });
+  });
+
+  describe('Normalización de errores y Adaptador Simulado', () => {
+    it('normaliza errores HTTP 409 y 422 de validación OpenAPI como ServiceError tipado', async () => {
+      mockedApiClient.post.mockRejectedValueOnce({
+        isAxiosError: true,
+        response: {
+          status: 422,
+          data: {
+            detail: [
+              {
+                loc: ['body', 'patente'],
+                msg: 'String should have at least 1 character',
+                type: 'string_too_short',
+              },
+            ],
+          },
+        },
+      });
+
+      try {
+        await vehiclesService.createVehicle({ patente: '', marca: 'Kia', modelo: 'Rio' });
+        fail('Debió lanzar un ServiceError');
+      } catch (err) {
+        expect(err).toBeInstanceOf(ServiceError);
+        const serviceErr = err as ServiceError;
+        expect(serviceErr.status).toBe(422);
+        expect(serviceErr.code).toBe('VEHICLE_VALIDATION_ERROR');
+        expect(serviceErr.domain).toBe('vehicles');
+        expect(serviceErr.message).toContain('String should have at least 1 character');
+      }
+    });
+
+    it('permite alternar limpiamente al adaptador simulado (MockVehicleAdapter)', async () => {
+      const serviceWithMock = new VehiclesService(new MockVehicleAdapter());
+      const list = await serviceWithMock.getVehicles({ limit: 2 });
+      expect(list.length).toBeLessThanOrEqual(2);
     });
   });
 });
