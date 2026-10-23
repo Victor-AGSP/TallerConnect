@@ -28,12 +28,13 @@ describe('vehiclesService (Capa de Servicios de Vehículos)', () => {
     it('obtiene y mapea la lista de vehículos desde la API Gateway (/vehiculos)', async () => {
       const rawApiVehicles: VehicleResponseDto[] = [
         {
-          id: 1,
-          license_plate: 'ABCD12',
-          brand: 'Toyota',
-          model: 'Corolla',
-          year: 2020,
-          owner_id: 15,
+          vehiculo_id: 1,
+          cliente_id: 15,
+          patente: 'ABCD12',
+          marca: 'Toyota',
+          modelo: 'Corolla',
+          anio: 2020,
+          kilometraje: null,
         },
       ];
 
@@ -111,10 +112,11 @@ describe('vehiclesService (Capa de Servicios de Vehículos)', () => {
   });
 
   describe('getMyVehicles', () => {
-    it('obtiene los vehículos del cliente autenticado (/vehiculos/mios)', async () => {
+    it('obtiene los vehículos del cliente autenticado (/vehiculos)', async () => {
       const rawVehicles: VehicleResponseDto[] = [
         {
           vehiculo_id: 1,
+          cliente_id: 15,
           patente: 'ABCD12',
           marca: 'Toyota',
           modelo: 'Corolla',
@@ -129,7 +131,7 @@ describe('vehiclesService (Capa de Servicios de Vehículos)', () => {
 
       const result = await vehiclesService.getMyVehicles();
 
-      expect(mockedApiClient.get).toHaveBeenCalledWith('/vehiculos/mios');
+      expect(mockedApiClient.get).toHaveBeenCalledWith('/vehiculos');
       expect(result).toHaveLength(1);
       expect(result[0].plate).toBe('ABCD12');
       expect(result[0].mileage).toBe(65000);
@@ -141,6 +143,7 @@ describe('vehiclesService (Capa de Servicios de Vehículos)', () => {
       const rawVehicles: VehicleResponseDto[] = [
         {
           vehiculo_id: 2,
+          cliente_id: 15,
           patente: 'KJTR45',
           marca: 'Hyundai',
           modelo: 'Accent',
@@ -164,11 +167,13 @@ describe('vehiclesService (Capa de Servicios de Vehículos)', () => {
   describe('getVehicleById', () => {
     it('obtiene un vehículo específico por su identificador', async () => {
       const rawVehicle: VehicleResponseDto = {
-        id: 2,
-        plate: 'EFGH34',
-        brand: 'Nissan',
-        model: 'Versa',
-        year: 2022,
+        vehiculo_id: 2,
+        cliente_id: 15,
+        patente: 'EFGH34',
+        marca: 'Nissan',
+        modelo: 'Versa',
+        anio: 2022,
+        kilometraje: null,
       };
 
       mockedApiClient.get.mockResolvedValueOnce({
@@ -195,12 +200,13 @@ describe('vehiclesService (Capa de Servicios de Vehículos)', () => {
       };
 
       const rawResponse: VehicleResponseDto = {
-        id: 10,
-        license_plate: 'JKLM56',
-        brand: 'Hyundai',
-        model: 'Tucson',
-        year: 2023,
-        owner_id: 8,
+        vehiculo_id: 10,
+        cliente_id: 8,
+        patente: 'JKLM56',
+        marca: 'Hyundai',
+        modelo: 'Tucson',
+        anio: 2023,
+        kilometraje: null,
       };
 
       mockedApiClient.post.mockResolvedValueOnce({

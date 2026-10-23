@@ -50,15 +50,19 @@ export function filterOrdersByParams(
     filtered = filtered.filter((o) => o.vehicleId === vehicleFilter);
   }
 
-  const clientFilter =
-    params.cliente_id != null
+  const creatorFilter =
+    params.creado_por_id != null
+      ? String(params.creado_por_id)
+      : params.createdById
+      ? String(params.createdById)
+      : params.cliente_id != null
       ? String(params.cliente_id)
       : params.clientId
       ? String(params.clientId)
       : undefined;
 
-  if (clientFilter) {
-    filtered = filtered.filter((o) => o.clientId === clientFilter);
+  if (creatorFilter) {
+    filtered = filtered.filter((o) => o.createdById === creatorFilter);
   }
 
   const mechanicFilter =
@@ -162,7 +166,9 @@ export class MockOrderAdapter implements OrderServiceAdapter {
   async createOrder(data: CreateOrderRequestDto): Promise<WorkOrder> {
     await this.simulateDelay();
     const vehicleId = String(data.vehiculo_id ?? data.vehicle_id ?? '').trim();
-    const clientId = String(data.cliente_id ?? data.client_id ?? 'usr-001').trim();
+    const createdById = String(
+      data.cliente_id ?? data.client_id ?? 'usr-003'
+    ).trim();
 
     if (!vehicleId || vehicleId === '0') {
       throw new ServiceError({
@@ -179,8 +185,7 @@ export class MockOrderAdapter implements OrderServiceAdapter {
       id: `ot-00${seq}`,
       vehicleId,
       intakeId: `ing-00${seq}`,
-      clientId,
-      createdById: 'usr-003',
+      createdById,
       status: 'esperando_diagnostico',
       assignedMechanicId: null,
       createdAt: now,

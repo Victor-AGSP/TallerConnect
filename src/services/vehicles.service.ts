@@ -16,6 +16,7 @@ import {
   mapVehiclesResponseList,
 } from '@/mappers/vehicle.mapper';
 import { mockVehicles } from '@/mocks/vehicles.mock';
+import { mockUserByRole } from '@/mocks/users.mock';
 
 export { ServiceError, normalizeVehicleServiceError };
 
@@ -168,7 +169,10 @@ export class MockVehicleAdapter implements VehicleServiceAdapter {
       model: rawModel,
       year: rawYear,
       mileage: rawMileage,
-      ownerId: data.owner_id != null ? String(data.owner_id) : undefined,
+      ownerId:
+        data.owner_id != null
+          ? String(data.owner_id)
+          : mockUserByRole.cliente.id,
     };
 
     this.vehicles.unshift(newMockVehicle);
@@ -225,8 +229,8 @@ export class RealVehicleAdapter implements VehicleServiceAdapter {
 
   async getMyVehicles(params?: VehicleQueryParamsDto): Promise<Vehicle[]> {
     const response = params
-      ? await apiClient.get<VehicleResponseDto[]>('/vehiculos/mios', { params })
-      : await apiClient.get<VehicleResponseDto[]>('/vehiculos/mios');
+      ? await apiClient.get<VehicleResponseDto[]>('/vehiculos', { params })
+      : await apiClient.get<VehicleResponseDto[]>('/vehiculos');
     const mapped = mapVehiclesResponseList(response.data);
     return params ? filterVehiclesByParams(mapped, params) : mapped;
   }
@@ -357,7 +361,7 @@ export class VehiclesService {
 
   /**
    * Obtiene los vehículos asociados al cliente autenticado (portal cliente).
-   * Ruta Gateway: GET /api/vehiculos/mios
+   * Ruta Gateway: GET /api/vehiculos
    */
   async getMyVehicles(params?: VehicleQueryParamsDto): Promise<Vehicle[]> {
     try {

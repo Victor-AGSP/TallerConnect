@@ -49,12 +49,12 @@ describe('Integración de Servicios con Adaptador Simulado (VehicleService + Ord
     // Paso 4: Administrador crea una orden de trabajo para ese vehículo
     const createdOrder = await orderService.createOrder({
       vehiculo_id: createdVehicle.id,
-      cliente_id: 'usr-001',
+      cliente_id: 'usr-003',
       description: 'Mantención de 15.000 km y revisión de frenos',
     });
 
     expect(createdOrder.vehicleId).toBe(createdVehicle.id);
-    expect(createdOrder.clientId).toBe('usr-001');
+    expect(createdOrder.createdById).toBe('usr-003');
     expect(createdOrder.status).toBe('esperando_diagnostico');
 
     // Paso 5: Administrador asigna un mecánico responsable a la orden

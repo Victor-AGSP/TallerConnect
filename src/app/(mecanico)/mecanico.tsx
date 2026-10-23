@@ -289,7 +289,11 @@ export default function MecanicoScreen() {
         {/* =====================================
             CERRAR SESIÓN
             ===================================== */}
-
+        <Button
+          title="Ver mis vehículos"
+          onPress={() => router.push('/(mecanico)/vehiculos')}
+          style={styles.logoutButton}
+        />
         <Button
           title="Cerrar sesión"
           variant="outline"

@@ -1,30 +1,17 @@
 import { WorkOrderStatus } from '@/constants/orderStatus';
 
 /**
- * Representa la respuesta devuelta por GET /api/ordenes y GET /api/ordenes/{orden_id} (OrdenRespuesta en MS2).
- * Tolera tanto el formato en español de Vercel/FastAPI (orden_id, vehiculo_id, estado_codigo)
- * como nombres estándar en inglés (id, vehicle_id, status).
+ * Orden de trabajo devuelta por la API Gateway (`OrdenRespuesta` del contrato MS2).
  */
 export interface OrderResponseDto {
-  id?: number | string;
-  orden_id?: number | string;
-  vehicle_id?: number | string;
-  vehiculo_id?: number | string;
-  client_id?: number | string;
-  cliente_id?: number | string;
-  intake_id?: number | string;
-  ingreso_id?: number | string;
-  created_by_id?: number | string;
-  creado_por_id?: number | string;
-  assigned_mechanic_id?: number | string | null;
-  mecanico_actual_id?: number | string | null;
-  status?: string;
-  estado_codigo?: number;
-  description?: string | null;
-  created_at?: string;
-  creado_en?: string;
-  updated_at?: string;
-  actualizado_en?: string;
+  orden_id: number;
+  vehiculo_id: number;
+  ingreso_id: number;
+  estado_codigo: number;
+  mecanico_actual_id: number | null;
+  creado_por_id: number;
+  creado_en: string;
+  actualizado_en: string;
 }
 
 /**
@@ -72,6 +59,8 @@ export interface OrderQueryParamsDto {
   vehicleId?: string;
   cliente_id?: number | string;
   clientId?: string;
+  creado_por_id?: number | string;
+  createdById?: string;
   mecanico_actual_id?: number | string;
   assignedMechanicId?: string;
   estado_codigo?: number;
