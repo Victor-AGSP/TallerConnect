@@ -1,7 +1,6 @@
 
 import { useRouter } from 'expo-router';
 import {
-  ScrollView,
   StyleSheet,
   Text,
   View,
@@ -10,12 +9,10 @@ import {
 import { AppScreen } from '@/components/layout/AppScreen';
 import { Button, Card } from '@/components/common';
 import { colors, radius, spacing } from '@/constants/theme';
-
-const budgetItems = [
-  { id: '1', name: 'Filtro de aceite', quantity: 1, price: 15000 },
-  { id: '2', name: 'Aceite de motor', quantity: 4, price: 8500 },
-  { id: '3', name: 'Mantención preventiva', quantity: 1, price: 45000 },
-];
+import {
+  calculateBudgetTotal,
+  getBudgetById,
+} from '@/services';
 
 const formatCLP = (amount: number) =>
   amount.toLocaleString('es-CL', {
@@ -24,13 +21,12 @@ const formatCLP = (amount: number) =>
     maximumFractionDigits: 0,
   });
 
-const total = budgetItems.reduce(
-  (sum, item) => sum + item.quantity * item.price,
-  0,
-);
-
 export function BudgetDetailScreen() {
   const router = useRouter();
+
+  const budget = getBudgetById('OT-00124');
+  const budgetItems = budget?.items ?? [];
+  const total = budget ? calculateBudgetTotal(budget) : 0;
 
   return (
     <AppScreen
@@ -42,44 +38,65 @@ export function BudgetDetailScreen() {
         <View style={styles.headerRow}>
           <View style={styles.headerText}>
             <Text style={styles.label}>ORDEN DE TRABAJO</Text>
-            <Text style={styles.orderNumber}>OT-00124</Text>
+            <Text style={styles.orderNumber}>
+              {budget?.orderNumber ?? 'Sin orden'}
+            </Text>
           </View>
 
           <View style={styles.status}>
-            <Text style={styles.statusText}>Aprobado</Text>
+            <Text style={styles.statusText}>
+              {budget?.status ?? 'Sin estado'}
+            </Text>
           </View>
         </View>
 
         <View style={styles.separator} />
 
-        <InfoRow label="Fecha" value="21/10/2026" />
-        <InfoRow label="Versión" value="2" />
-        <InfoRow label="Vehículo" value="AB-CD-12" />
+        <InfoRow
+          label="Fecha"
+          value={budget?.date ?? 'No disponible'}
+        />
+        <InfoRow
+          label="Versión"
+          value={String(budget?.version ?? '—')}
+        />
+        <InfoRow
+          label="Vehículo"
+          value={budget?.vehiclePlate ?? 'No disponible'}
+        />
       </Card>
 
       <Text style={styles.sectionTitle}>Detalle de los trabajos</Text>
 
-      {budgetItems.map((item) => (
-        <Card key={item.id} style={styles.itemCard}>
-          <Text style={styles.itemName}>{item.name}</Text>
+      {budgetItems.length > 0 ? (
+        budgetItems.map((item) => (
+          <Card key={item.id} style={styles.itemCard}>
+            <Text style={styles.itemName}>{item.name}</Text>
 
-          <View style={styles.itemRow}>
-            <Text style={styles.muted}>
-              {item.quantity} × {formatCLP(item.price)}
-            </Text>
-            <Text style={styles.itemTotal}>
-              {formatCLP(item.quantity * item.price)}
-            </Text>
-          </View>
+            <View style={styles.itemRow}>
+              <Text style={styles.muted}>
+                {item.quantity} × {formatCLP(item.price)}
+              </Text>
+              <Text style={styles.itemTotal}>
+                {formatCLP(item.quantity * item.price)}
+              </Text>
+            </View>
+          </Card>
+        ))
+      ) : (
+        <Card style={styles.itemCard}>
+          <Text style={styles.muted}>
+            No hay trabajos disponibles para este presupuesto.
+          </Text>
         </Card>
-      ))}
+      )}
 
       <Card style={styles.totalCard}>
         <Text style={styles.label}>TOTAL DEL PRESUPUESTO</Text>
         <Text style={styles.total}>{formatCLP(total)}</Text>
         <Text style={styles.note}>
-          Información de demostración. Los valores todavía no provienen
-          de un servicio conectado al backend.
+          Información de demostración obtenida desde BudgetService.
+          Los datos todavía no se guardan ni se consultan en el backend.
         </Text>
       </Card>
 

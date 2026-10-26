@@ -10,97 +10,16 @@ import { AppScreen } from '@/components/layout/AppScreen';
 import { Button, Card, Input } from '@/components/common';
 import { colors, radius, spacing } from '@/constants/theme';
 
+import { getParts, getProviders } from '@/services';
+import type { Part } from '@/services/parts.service';
+import type { Provider } from '@/services/providers.service';
+
 type InventoryTab = 'parts' | 'providers';
 
-type Part = {
-  id: string;
-  name: string;
-  providerId: string;
-  providerName: string;
-  stock: number;
-  minimumStock: number;
-  price: number;
-};
 
-type Provider = {
-  id: string;
-  name: string;
-  contact: string;
-  phone: string;
-  parts: string[];
-};
 
-const demoParts: Part[] = [
-  {
-    id: 'REP-001',
-    name: 'Filtro de aceite',
-    providerId: 'PROV-001',
-    providerName: 'Repuestos del Sur',
-    stock: 18,
-    minimumStock: 5,
-    price: 15000,
-  },
-  {
-    id: 'REP-002',
-    name: 'Aceite de motor 5W-30',
-    providerId: 'PROV-002',
-    providerName: 'Lubricantes Chile',
-    stock: 3,
-    minimumStock: 8,
-    price: 8500,
-  },
-  {
-    id: 'REP-003',
-    name: 'Pastillas de freno',
-    providerId: 'PROV-001',
-    providerName: 'Repuestos del Sur',
-    stock: 2,
-    minimumStock: 4,
-    price: 32000,
-  },
-  {
-    id: 'REP-004',
-    name: 'Bujías',
-    providerId: 'PROV-003',
-    providerName: 'AutoPartes Central',
-    stock: 24,
-    minimumStock: 6,
-    price: 6500,
-  },
-  {
-    id: 'REP-005',
-    name: 'Filtro de aire',
-    providerId: 'PROV-002',
-    providerName: 'Lubricantes Chile',
-    stock: 0,
-    minimumStock: 5,
-    price: 12000,
-  },
-];
-
-const demoProviders: Provider[] = [
-  {
-    id: 'PROV-001',
-    name: 'Repuestos del Sur',
-    contact: 'ventas@repuestosdelsur.cl',
-    phone: '+56 9 5555 0101',
-    parts: ['REP-001', 'REP-003'],
-  },
-  {
-    id: 'PROV-002',
-    name: 'Lubricantes Chile',
-    contact: 'contacto@lubricantes.cl',
-    phone: '+56 9 5555 0102',
-    parts: ['REP-002', 'REP-005'],
-  },
-  {
-    id: 'PROV-003',
-    name: 'AutoPartes Central',
-    contact: 'ventas@autopartes.cl',
-    phone: '+56 9 5555 0103',
-    parts: ['REP-004'],
-  },
-];
+const demoParts = getParts();
+const demoProviders = getProviders();
 
 const formatCLP = (amount: number) =>
   amount.toLocaleString('es-CL', {
