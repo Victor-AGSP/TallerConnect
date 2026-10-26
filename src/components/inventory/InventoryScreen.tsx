@@ -1,7 +1,6 @@
 
 import { useMemo, useState } from 'react';
 import {
-  ScrollView,
   StyleSheet,
   Text,
   View,
@@ -122,11 +121,7 @@ export function InventoryScreen() {
   const filteredParts = useMemo(
     () =>
       demoParts.filter((part) =>
-        [
-          part.id,
-          part.name,
-          part.providerName,
-        ].some((value) =>
+        [part.id, part.name, part.providerName].some((value) =>
           value.toLocaleLowerCase('es-CL').includes(normalizedSearch),
         ),
       ),
@@ -211,7 +206,9 @@ export function InventoryScreen() {
 
       {outOfStockCount > 0 ? (
         <View style={styles.alert}>
-          <Text style={styles.alertTitle}>Atención: hay repuestos agotados</Text>
+          <Text style={styles.alertTitle}>
+            Atención: hay repuestos agotados
+          </Text>
           <Text style={styles.alertText}>
             {outOfStockCount} repuesto(s) tienen stock igual a cero.
             Revisa el inventario antes de asignarlos a una orden.
@@ -238,7 +235,9 @@ export function InventoryScreen() {
 
           {filteredParts.length === 0 ? (
             <Card>
-              <Text style={styles.emptyTitle}>No se encontraron repuestos</Text>
+              <Text style={styles.emptyTitle}>
+                No se encontraron repuestos
+              </Text>
               <Text style={styles.muted}>
                 Prueba con otro nombre, código o proveedor.
               </Text>
@@ -261,7 +260,10 @@ export function InventoryScreen() {
                 <View style={styles.separator} />
 
                 <InfoRow label="Proveedor" value={part.providerName} />
-                <InfoRow label="Stock disponible" value={`${part.stock} unidades`} />
+                <InfoRow
+                  label="Stock disponible"
+                  value={`${part.stock} unidades`}
+                />
                 <InfoRow
                   label="Stock mínimo"
                   value={`${part.minimumStock} unidades`}
@@ -286,20 +288,30 @@ export function InventoryScreen() {
               />
 
               <Card>
-                <Text style={styles.providerName}>{selectedProvider.name}</Text>
+                <Text style={styles.providerName}>
+                  {selectedProvider.name}
+                </Text>
                 <Text style={styles.muted}>{selectedProvider.id}</Text>
 
                 <View style={styles.separator} />
 
-                <InfoRow label="Contacto" value={selectedProvider.contact} />
-                <InfoRow label="Teléfono" value={selectedProvider.phone} />
+                <InfoRow
+                  label="Contacto"
+                  value={selectedProvider.contact}
+                />
+                <InfoRow
+                  label="Teléfono"
+                  value={selectedProvider.phone}
+                />
                 <InfoRow
                   label="Repuestos asociados"
                   value={`${selectedProvider.parts.length}`}
                 />
               </Card>
 
-              <Text style={styles.sectionTitle}>Repuestos del proveedor</Text>
+              <Text style={styles.sectionTitle}>
+                Repuestos del proveedor
+              </Text>
 
               {demoParts
                 .filter((part) =>
@@ -309,18 +321,23 @@ export function InventoryScreen() {
                   <Card key={part.id} style={styles.resultCard}>
                     <Text style={styles.partName}>{part.name}</Text>
                     <Text style={styles.muted}>{part.id}</Text>
+
                     <View style={styles.priceRow}>
                       <Text style={styles.muted}>
                         Stock: {part.stock} unidades
                       </Text>
-                      <Text style={styles.price}>{formatCLP(part.price)}</Text>
+                      <Text style={styles.price}>
+                        {formatCLP(part.price)}
+                      </Text>
                     </View>
                   </Card>
                 ))}
             </>
           ) : filteredProviders.length === 0 ? (
             <Card>
-              <Text style={styles.emptyTitle}>No se encontraron proveedores</Text>
+              <Text style={styles.emptyTitle}>
+                No se encontraron proveedores
+              </Text>
               <Text style={styles.muted}>
                 Prueba con otro nombre, correo o teléfono.
               </Text>
@@ -405,17 +422,23 @@ function StockBadge({
 const styles = StyleSheet.create({
   tabs: {
     flexDirection: 'row',
+    flexWrap: 'wrap',
     gap: spacing.sm,
+    marginBottom: spacing.sm,
   },
   tabButton: {
-    flex: 1,
+    flexGrow: 1,
+    flexBasis: 130,
+    minWidth: 0,
   },
   metrics: {
     flexDirection: 'row',
+    flexWrap: 'wrap',
     gap: spacing.sm,
   },
   metric: {
-    flex: 1,
+    flexGrow: 1,
+    flexBasis: 95,
     minWidth: 0,
     padding: spacing.md,
     borderRadius: radius.md,
@@ -433,6 +456,7 @@ const styles = StyleSheet.create({
     color: colors.textSecondary,
     fontSize: 11,
     lineHeight: 15,
+    flexShrink: 1,
   },
   warningText: {
     color: colors.warning,
@@ -449,6 +473,8 @@ const styles = StyleSheet.create({
     color: colors.text,
     fontWeight: '800',
     fontSize: 14,
+    lineHeight: 20,
+    flexShrink: 1,
   },
   alertText: {
     color: colors.textSecondary,
@@ -461,36 +487,44 @@ const styles = StyleSheet.create({
   sectionTitle: {
     color: colors.primary,
     fontSize: 18,
+    lineHeight: 25,
     fontWeight: '900',
+    flexShrink: 1,
   },
   resultCard: {
     gap: spacing.sm,
   },
   cardHeading: {
     flexDirection: 'row',
+    flexWrap: 'wrap',
     alignItems: 'flex-start',
     justifyContent: 'space-between',
     gap: spacing.sm,
   },
   cardHeadingText: {
     flex: 1,
+    minWidth: 140,
     gap: spacing.xs,
   },
   partName: {
     color: colors.text,
     fontSize: 16,
+    lineHeight: 22,
     fontWeight: '800',
     flexShrink: 1,
   },
   providerName: {
     color: colors.primary,
     fontSize: 18,
+    lineHeight: 25,
     fontWeight: '900',
+    flexShrink: 1,
   },
   muted: {
     color: colors.textSecondary,
     fontSize: 12,
     lineHeight: 18,
+    flexShrink: 1,
   },
   separator: {
     height: 1,
@@ -499,44 +533,54 @@ const styles = StyleSheet.create({
   },
   infoRow: {
     flexDirection: 'row',
+    flexWrap: 'wrap',
     justifyContent: 'space-between',
     alignItems: 'flex-start',
-    gap: spacing.md,
+    gap: spacing.sm,
     paddingVertical: spacing.xs,
   },
   infoLabel: {
     flex: 1,
+    minWidth: 100,
     color: colors.textSecondary,
     fontSize: 13,
+    lineHeight: 19,
   },
   infoValue: {
-    flex: 1.2,
+    flex: 1,
+    minWidth: 110,
     color: colors.text,
     fontSize: 13,
+    lineHeight: 19,
     fontWeight: '700',
     textAlign: 'right',
+    flexShrink: 1,
   },
   priceRow: {
     flexDirection: 'row',
+    flexWrap: 'wrap',
     justifyContent: 'space-between',
     alignItems: 'center',
-    flexWrap: 'wrap',
     gap: spacing.sm,
     marginTop: spacing.xs,
   },
   price: {
     color: colors.primary,
     fontSize: 16,
+    lineHeight: 22,
     fontWeight: '900',
+    flexShrink: 1,
   },
   stockBadge: {
     maxWidth: 105,
     paddingHorizontal: spacing.sm,
     paddingVertical: spacing.xs,
     borderRadius: radius.pill,
+    alignSelf: 'flex-start',
   },
   stockText: {
     fontSize: 11,
+    lineHeight: 16,
     fontWeight: '800',
     textAlign: 'center',
   },
@@ -561,8 +605,10 @@ const styles = StyleSheet.create({
   emptyTitle: {
     color: colors.text,
     fontSize: 15,
+    lineHeight: 22,
     fontWeight: '800',
     marginBottom: spacing.xs,
+    flexShrink: 1,
   },
   detailButton: {
     marginTop: spacing.sm,
