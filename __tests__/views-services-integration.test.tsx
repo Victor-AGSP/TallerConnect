@@ -71,7 +71,7 @@ afterEach(() => cleanup());
 
 describe('vistas de vehículos con VehiclesService real', () => {
   it.each([
-    ['cliente', '/mis-vehiculos', '/vehiculos/mios'],
+    ['cliente', '/mis-vehiculos', '/vehiculos'],
     ['mecánico', '/vehiculos-asignados', '/vehiculos/asignados'],
     ['administración', '/vehiculos', '/vehiculos'],
   ] as const)(
@@ -280,7 +280,7 @@ describe('vistas de órdenes con OrdersService real', () => {
     expect(screen.getByLabelText('Vehículo: 7')).toBeTruthy();
     expect(screen.getByLabelText('Ingreso: 201')).toBeTruthy();
     expect(screen.getByLabelText('Mecánico asignado: 2')).toBeTruthy();
-    expect(screen.getByLabelText('Cliente: 12')).toBeTruthy();
+    expect(screen.getByLabelText('Cliente: No disponible')).toBeTruthy();
     expect(screen.getByLabelText('Creada por: 99')).toBeTruthy();
     expect(screen.getByLabelText('Fecha de creación: 01-03-2026')).toBeTruthy();
     expect(
@@ -288,7 +288,7 @@ describe('vistas de órdenes con OrdersService real', () => {
     ).toBeTruthy();
   });
 
-  it('completa los valores ausentes de la respuesta al representar el detalle', async () => {
+  it('muestra un error ante una orden sin estado oficial', async () => {
     mockedApiClient.get.mockResolvedValueOnce({
       data: { orden_id: 130, vehiculo_id: 9 },
     } as never);
@@ -299,17 +299,12 @@ describe('vistas de órdenes con OrdersService real', () => {
     await router;
 
     await waitFor(() =>
-      expect(screen.getByTestId('order-detail-130')).toBeTruthy(),
+      expect(screen.getByTestId('order-detail-error')).toBeTruthy(),
     );
 
-    // Sin estado ni mecánico, el mapper aplica sus valores por defecto.
     expect(
-      screen.getByLabelText('Estado de la orden: Esperando diagnóstico'),
+      screen.getByText('Estado de orden desconocido: undefined'),
     ).toBeTruthy();
-    expect(
-      screen.getByLabelText('Mecánico asignado: Sin asignar'),
-    ).toBeTruthy();
-    expect(screen.getByLabelText('Ingreso: ing-130')).toBeTruthy();
   });
 
   it('muestra el mensaje normalizado cuando la orden no existe', async () => {

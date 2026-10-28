@@ -73,8 +73,6 @@ describe('contrato OrdenRespuesta → mapper → modelo', () => {
       intakeId: '18',
       status: 'esperando_diagnostico',
       assignedMechanicId: '50',
-      // El contrato no incluye cliente: el mapper usa creado_por_id (C3).
-      clientId: '99',
       createdById: '99',
       createdAt: '2026-09-28T10:30:00-03:00',
       updatedAt: '2026-09-28T11:00:00-03:00',
@@ -130,8 +128,18 @@ describe('contrato OrdenRespuesta → servicio', () => {
     ]);
   });
 
-  // Pendiente del servicio de órdenes (C2): PATCH /ordenes/{id}/estado con estado_destino.
-  it.todo('updateOrderStatus usa PATCH /ordenes/{id}/estado con estado_destino');
+  it('updateOrderStatus utiliza el contrato oficial MS2', async () => {
+    mockedApiClient.patch.mockResolvedValueOnce({
+      data: { ...CONTRACT_RECEIVED, estado_codigo: 5 },
+    } as never);
+
+    await ordersService.updateOrderStatus('31', 'en_reparacion');
+
+    expect(mockedApiClient.patch).toHaveBeenCalledWith(
+      '/ordenes/31/estado',
+      { estado_destino: 5 },
+    );
+  });
 });
 
 describe('contrato OrdenRespuesta → vistas de detalle', () => {

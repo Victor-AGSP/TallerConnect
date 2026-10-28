@@ -304,7 +304,6 @@ export default function ClienteScreen() {
         {/* =====================================
             CERRAR SESIÓN
             ===================================== */}
-
         <Button
           title="Ver mis vehículos"
           onPress={() => router.push('./mis-vehiculos')}

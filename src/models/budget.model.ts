@@ -37,6 +37,8 @@ export interface BudgetVersion {
   number: number;
   status: BudgetVersionStatus;
   isModification: boolean;
+  createdById?: string;
+  lockedAt?: string | null;
   createdAt: string;
   sentAt: string | null;
   total: string;
@@ -87,4 +89,19 @@ export interface BudgetDecisionInput {
 
   /** Obligatorio al rechazar antes de la primera aprobación (cancela el servicio). */
   confirmCancellation?: boolean;
+}
+
+/** Tipo compartido con Develop. */
+export type BudgetItemType = BudgetItem['type'];
+
+/** Resumen paginado compatible con Develop. */
+export interface BudgetSummary {
+  id: string;
+  orderId: string;
+  createdAt: string;
+  versionCount: number;
+  latestVersion: number;
+  latestVersionStatus: BudgetVersionStatus;
+  latestVersionTotal: number;
+  currentVersion: number | null;
 }

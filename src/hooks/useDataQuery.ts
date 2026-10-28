@@ -95,6 +95,7 @@ export function useDataQuery<T>(
   );
 
   useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect -- La consulta inicial controla su estado de carga.
     void run('initial');
   }, [run]);
 

@@ -17,6 +17,14 @@ import type {
   MissingPart,
 } from '@/models/budget.model';
 
+import type {
+  BudgetPageResponseDto,
+  BudgetSummaryResponseDto,
+} from '@/dto/budget.dto';
+
+import type { BudgetSummary } from '@/models/budget.model';
+import type { PaginatedList } from '@/models/pagination.model';
+
 /** Mensaje para respuestas que no cumplen el contrato del MS3. */
 export const INVALID_BUDGET_RESPONSE =
   'La respuesta del servicio de presupuestos no es válida.';
@@ -109,6 +117,8 @@ export function mapBudgetVersionResponse(
     number: requireInteger(dto.numero),
     status: requireVersionStatus(dto.estado),
     isModification: dto.es_modificacion === true,
+    createdById: String(requireInteger(dto.creado_por_id)),
+    lockedAt: dto.bloqueada_en ?? null,
     createdAt: toText(dto.creado_en),
     sentAt: dto.enviado_en ?? null,
     total: toText(dto.total),
@@ -173,5 +183,68 @@ export function mapBudgetOperationResult(
       : null,
     missingParts: (dto.repuestos_faltantes ?? []).map(mapMissingPart),
     decisionId: toIdOrNull(dto.decision_id),
+  };
+}
+
+
+/**
+ * Convierte un resumen del backend al modelo paginado.
+ */
+function mapBudgetSummaryResponse(
+  dto: BudgetSummaryResponseDto,
+): BudgetSummary {
+  if (!isObject(dto)) {
+    throw new Error(INVALID_BUDGET_RESPONSE);
+  }
+
+  const decimal = dto.total_ultima_version;
+
+  if (
+    typeof decimal !== 'string' ||
+    !/^\d+(\.\d+)?$/.test(decimal)
+  ) {
+    throw new Error(INVALID_BUDGET_RESPONSE);
+  }
+
+  const amount = Number(decimal);
+
+  if (!Number.isFinite(amount)) {
+    throw new Error(INVALID_BUDGET_RESPONSE);
+  }
+
+  return {
+    id: String(requireInteger(dto.presupuesto_id)),
+    orderId: String(requireInteger(dto.orden_id)),
+    createdAt: toText(dto.creado_en),
+    versionCount: requireInteger(dto.cantidad_versiones),
+    latestVersion: requireInteger(dto.ultima_version),
+    latestVersionStatus: requireVersionStatus(dto.estado_ultima_version),
+    latestVersionTotal: amount,
+    currentVersion:
+      dto.version_vigente === null
+        ? null
+        : requireInteger(dto.version_vigente),
+  };
+}
+
+/**
+ * Mapea páginas de presupuestos de Develop.
+ */
+export function mapBudgetPageResponse(
+  dto: BudgetPageResponseDto,
+): PaginatedList<BudgetSummary> {
+  if (!isObject(dto)) {
+    throw new Error(INVALID_BUDGET_RESPONSE);
+  }
+
+  return {
+    items: requireArray(dto.presupuestos).map((item) =>
+      mapBudgetSummaryResponse(
+        item as BudgetSummaryResponseDto,
+      ),
+    ),
+    total: requireInteger(dto.total),
+    offset: requireInteger(dto.desde),
+    limit: requireInteger(dto.limite),
   };
 }

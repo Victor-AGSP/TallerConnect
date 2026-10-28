@@ -158,7 +158,7 @@ function OrderDetailCard({ order }: { order: WorkOrder }) {
           label="Mecánico asignado"
           value={order.assignedMechanicId ?? 'Sin asignar'}
         />
-        <DetailRow label="Cliente" value={order.clientId} />
+        <DetailRow label="Cliente" value={order.clientId ?? 'No disponible'} />
         <DetailRow label="Creada por" value={order.createdById} />
         <DetailRow label="Fecha de creación" value={formatDate(order.createdAt)} />
         <DetailRow

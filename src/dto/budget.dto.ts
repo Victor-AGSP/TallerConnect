@@ -126,3 +126,6 @@ export interface DecisionApplicationPendingDto {
   estado_ms2?: number | null;
   detalle_ms2?: string | null;
 }
+
+/** Alias compatible con Develop. */
+export type BudgetPageResponseDto = BudgetsPageDto;

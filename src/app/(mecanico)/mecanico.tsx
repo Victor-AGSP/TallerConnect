@@ -317,7 +317,6 @@ export default function MecanicoScreen() {
         {/* =====================================
             CERRAR SESIÓN
             ===================================== */}
-
         <Button
           title="Ver vehículos asignados"
           onPress={() => router.push('./vehiculos-asignados')}

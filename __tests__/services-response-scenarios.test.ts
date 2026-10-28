@@ -76,6 +76,7 @@ describe('VehiclesService: respuestas exitosas', () => {
     const data: VehicleResponseDto[] = [
       {
         vehiculo_id: 7,
+        cliente_id: 12,
         patente: 'ABCD12',
         marca: 'Toyota',
         modelo: 'Yaris',
@@ -96,17 +97,19 @@ describe('VehiclesService: respuestas exitosas', () => {
       model: 'Yaris',
       year: 2021,
       mileage: 42000,
-      ownerId: undefined,
+      ownerId: '12',
     });
   });
 
   it('mapea el detalle de un vehículo en getVehicleById', async () => {
     const data: VehicleResponseDto = {
-      id: 3,
-      license_plate: 'EFGH34',
-      brand: 'Nissan',
-      model: 'Versa',
-      year: 2022,
+      vehiculo_id: 3,
+      cliente_id: 12,
+      patente: 'EFGH34',
+      marca: 'Nissan',
+      modelo: 'Versa',
+      anio: 2022,
+      kilometraje: null,
     };
 
     mockedApiClient.get.mockResolvedValueOnce({ data } as never);
@@ -139,20 +142,12 @@ describe('VehiclesService: respuestas vacías', () => {
     await expect(vehiclesService.getVehicles()).resolves.toEqual([]);
   });
 
-  it('completa los campos ausentes del detalle con valores seguros', async () => {
+  it('rechaza un detalle que incumple el contrato MS2', async () => {
     mockedApiClient.get.mockResolvedValueOnce({ data: {} } as never);
 
-    const result = await vehiclesService.getVehicleById('99');
-
-    expect(result).toEqual({
-      id: '',
-      plate: 'SIN-PATENTE',
-      brand: '',
-      model: '',
-      year: null,
-      mileage: null,
-      ownerId: undefined,
-    });
+    await expect(
+      vehiclesService.getVehicleById('99'),
+    ).rejects.toThrow('Respuesta de vehículo inválida.');
   });
 });
 
@@ -230,9 +225,12 @@ describe('OrdersService: respuestas exitosas', () => {
       {
         orden_id: 55,
         vehiculo_id: 7,
-        cliente_id: 12,
-        estado_codigo: 3,
+        ingreso_id: 200,
+        estado_codigo: 5,
+        mecanico_actual_id: null,
+        creado_por_id: 2,
         creado_en: '2026-04-01T09:00:00Z',
+        actualizado_en: '2026-04-01T09:00:00Z',
       },
     ];
 
@@ -244,7 +242,6 @@ describe('OrdersService: respuestas exitosas', () => {
     expect(result[0]).toMatchObject({
       id: '55',
       vehicleId: '7',
-      clientId: '12',
       status: 'en_reparacion',
       assignedMechanicId: null,
     });
@@ -252,10 +249,14 @@ describe('OrdersService: respuestas exitosas', () => {
 
   it('mapea el detalle de una orden en getOrderById', async () => {
     const data: OrderResponseDto = {
-      id: 101,
-      vehicle_id: 5,
-      client_id: 12,
-      status: 'listo_para_entrega',
+      orden_id: 101,
+      vehiculo_id: 5,
+      ingreso_id: 201,
+      estado_codigo: 6,
+      mecanico_actual_id: null,
+      creado_por_id: 2,
+      creado_en: '2026-04-01T09:00:00Z',
+      actualizado_en: '2026-04-01T09:00:00Z',
     };
 
     mockedApiClient.get.mockResolvedValueOnce({ data } as never);
@@ -280,15 +281,22 @@ describe('OrdersService: respuestas vacías', () => {
     await expect(ordersService.getOrders()).resolves.toEqual([]);
   });
 
-  it('asume un estado por defecto cuando la orden llega sin estado', async () => {
+  it('rechaza una orden sin estado_codigo oficial', async () => {
     mockedApiClient.get.mockResolvedValueOnce({
-      data: { id: 77, vehicle_id: 5 },
+      data: {
+        orden_id: 77,
+        vehiculo_id: 5,
+        ingreso_id: 201,
+        mecanico_actual_id: null,
+        creado_por_id: 2,
+        creado_en: '2026-04-01T09:00:00Z',
+        actualizado_en: '2026-04-01T09:00:00Z',
+      },
     } as never);
 
-    const result = await ordersService.getOrderById('77');
-
-    expect(result.status).toBe('esperando_diagnostico');
-    expect(result.assignedMechanicId).toBeNull();
+    await expect(
+      ordersService.getOrderById('77'),
+    ).rejects.toThrow('Estado de orden desconocido: undefined');
   });
 });
 
