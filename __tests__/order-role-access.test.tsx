@@ -35,7 +35,8 @@ import { STORAGE_KEYS, storage } from '@/utils/storage';
  * sesión. Solo se sustituye el adaptador de red de Axios, de modo que se
  * verifica tanto la protección visual (redirecciones sin consultar al
  * backend) como la respuesta de la app ante la autorización real del
- * backend (401 y visibilidad por 404 según el contrato de MS2).
+ * backend (401 cierra la sesión; 403 y 404 se informan sin cerrarla,
+ * según el contrato de MS2).
  */
 
 const routes = {
@@ -282,7 +283,34 @@ describe('vistas de órdenes: autorización del backend', () => {
     expect(adapter).toHaveBeenCalledTimes(1);
   });
 
-  // El interceptor también cierra la sesión ante 403 (E6 en
-  // docs/discrepancias-integracion.md); el contrato usa 403 para falta de rol.
-  it.todo('un 403 del backend muestra el error de permisos sin cerrar la sesión');
+  // MS2 usa 403 para falta de rol (E6 en docs/discrepancias-integracion.md):
+  // la sesión sigue siendo válida y la vista informa el permiso faltante.
+  it.each(['cliente', 'mecanico', 'administrador'] as const)(
+    'un 403 del backend muestra el error de permisos sin cerrar la sesión (%s)',
+    async (role) => {
+      adapter.mockImplementation((config) => httpError(config, 403));
+
+      const router = renderRouterWithProviders(routes, {
+        initialUrl: ORDER_PATH_BY_ROLE[role],
+        initialAuthState: sessionForRole(role),
+      });
+      await router;
+
+      await waitFor(() =>
+        expect(screen.getByTestId('order-detail-error')).toBeTruthy(),
+      );
+
+      expect(
+        screen.getByText('No tienes permisos para realizar esta acción.'),
+      ).toBeTruthy();
+      expect(screen.getByRole('button', { name: 'Reintentar' })).toBeTruthy();
+      expect(router.getPathname()).toBe(ORDER_PATH_BY_ROLE[role]);
+      expect(useAuthStore.getState()).toMatchObject({
+        isAuthenticated: true,
+        role,
+        token: TOKEN,
+      });
+      expect(adapter).toHaveBeenCalledTimes(1);
+    },
+  );
 });

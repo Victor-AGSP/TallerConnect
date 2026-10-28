@@ -37,7 +37,7 @@ Las discrepancias incluyen tanto diferencias directas entre la app y el contrato
 | E3 | Endpoint `PATCH /api/ordenes/{id}/status` | No existe | `updateOrderStatus()` lo llama | Alto | I1, I5 |
 | E4 | Cuerpo al crear un vehículo | `VehiculoCrear`: `patente`, `marca` y `modelo` obligatorios, `anio` y `kilometraje` opcionales, sin campos adicionales | Corregido (SCRUM-105): `buildCreateVehiclePayload()` envía solo `patente`, `marca`, `modelo`, `anio` y `kilometraje`, y valida obligatorios, tipos y longitudes antes de llamar a MS2 | — | — |
 | E5 | Cuerpo al crear una orden | `OrdenCrear`: solo `vehiculo_id`, entero, sin campos adicionales; requiere rol administrador | `createOrder()` envía `vehiculo_id` como texto, junto con `vehicle_id`, `cliente_id`, `client_id` y `description` | Alto | — |
-| E6 | Cierre de sesión ante 403 | 403 indica falta de permiso por rol | El interceptor cierra la sesión ante 401 y ante 403 | Alto | — |
+| E6 | Cierre de sesión ante 403 | 403 indica falta de permiso por rol | Corregido (SCRUM-102): el interceptor solo cierra la sesión ante 401; un 403 se informa como falta de permisos | — | — |
 | E7 | DTO de vehículos y órdenes | Campos definidos y obligatorios en `VehiculoRespuesta` y `OrdenRespuesta` | `VehicleResponseDto` y `OrderResponseDto` declaran todos los campos opcionales y aceptan nombres que el contrato no usa | Medio | — |
 | E8 | Valores asignados por el mapper de órdenes | Los campos de `OrdenRespuesta` son obligatorios | `mapOrderResponse` completa los datos faltantes con valores propios (fecha `1970-01-01`, cliente `'1'`) | Medio | I2 |
 | E9 | `refreshToken` | La API no entrega refresh token | El campo sigue en `AuthResponse`, en el store, en los mocks y en las pruebas de sesión | Bajo | — |

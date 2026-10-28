@@ -244,9 +244,24 @@ describe('flujo presupuesto → decisión → orden (cliente)', () => {
     expect(adapter).toHaveBeenCalledTimes(1);
   });
 
-  it('un 403 del MS3 cierra la sesión (política del interceptor)', async () => {
+  it('un 403 del MS3 informa la falta de permisos sin cerrar la sesión', async () => {
     adapter.mockImplementation((config) =>
       respond(config, 403, { detail: 'Rol no permitido' }),
+    );
+
+    const { view } = await renderClientBudget();
+
+    await waitFor(() =>
+      expect(screen.getByTestId('order-budget-error')).toBeTruthy(),
+    );
+    expect(screen.getByText('Rol no permitido')).toBeTruthy();
+    expect(view.getPathname()).not.toBe('/login');
+    expect(useAuthStore.getState().isAuthenticated).toBe(true);
+  });
+
+  it('un 401 del MS3 cierra la sesión y devuelve al login', async () => {
+    adapter.mockImplementation((config) =>
+      respond(config, 401, { detail: 'JWT ausente, inválido o expirado' }),
     );
 
     const { view } = await renderClientBudget();

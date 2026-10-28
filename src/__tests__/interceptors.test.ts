@@ -254,7 +254,9 @@ describe('Interceptors y Manejo Centralizado de Errores', () => {
       expect(mockLogout).toHaveBeenCalledTimes(1);
     });
 
-    it('coordina el cierre de sesión ante un HTTP 403 Forbidden en ruta protegida', async () => {
+    // Los contratos definen 403 como rol sin permiso (no como sesión inválida):
+    // la expectativa anterior (logout ante 403) contradecía MS1, MS2 y MS3.
+    it('NO cierra la sesión ante un HTTP 403 Forbidden y propaga el error de permisos', async () => {
       const client = axios.create();
       attachErrorInterceptor(client);
 
@@ -268,9 +270,11 @@ describe('Interceptors y Manejo Centralizado de Errores', () => {
         config: { url: '/api/v1/admin/users' },
       } as unknown as AxiosError;
 
-      await expect(errorInterceptor(error403)).rejects.toBeDefined();
+      await expect(errorInterceptor(error403)).rejects.toMatchObject({
+        normalizedError: { status: HTTP_STATUS.FORBIDDEN, message: 'Acceso no permitido' },
+      });
 
-      expect(mockLogout).toHaveBeenCalledTimes(1);
+      expect(mockLogout).not.toHaveBeenCalled();
     });
 
     it('NO coordina logout si el 401 proviene del endpoint de login (/auth/login)', async () => {

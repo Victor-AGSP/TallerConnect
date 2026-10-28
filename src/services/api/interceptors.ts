@@ -118,7 +118,11 @@ export function attachAuthTokenInterceptor(client: AxiosInstance): void {
 
 /**
  * Registra el interceptor de respuestas en Axios para el manejo centralizado de errores,
- * captura de formato { detail } y tratamiento coordinado de HTTP 401/403 (cierre de sesión).
+ * captura de formato { detail } y cierre de sesión coordinado ante HTTP 401.
+ *
+ * Según los contratos de MS1, MS2 y MS3, 401 significa "JWT ausente, inválido o expirado"
+ * y 403 significa que el rol autenticado no tiene permiso sobre el recurso. Por eso un 403
+ * no cierra una sesión válida: se propaga como error de permisos para que la vista lo informe.
  */
 export function attachErrorInterceptor(client: AxiosInstance): void {
   client.interceptors.response.use(
@@ -145,11 +149,9 @@ export function attachErrorInterceptor(client: AxiosInstance): void {
         }
       }
 
-      // Tratamiento de HTTP 401 / 403: Coordinación de cierre de sesión automático
-      if (
-        normalized.status === HTTP_STATUS.UNAUTHORIZED ||
-        normalized.status === HTTP_STATUS.FORBIDDEN
-      ) {
+      // Tratamiento de HTTP 401: la sesión dejó de ser válida, se coordina el cierre.
+      // HTTP 403 (rol sin permiso) no entra aquí: la sesión sigue siendo válida.
+      if (normalized.status === HTTP_STATUS.UNAUTHORIZED) {
         const requestUrl = error.config?.url ?? '';
         // Si el 401 ocurrió en el login mismo, no hacemos logout (son solo credenciales incorrectas)
         const isLoginRequest =
@@ -166,7 +168,7 @@ export function attachErrorInterceptor(client: AxiosInstance): void {
             const { useAuthStore } = require('@/stores/authStore');
             await useAuthStore.getState().logout();
           } catch (logoutError) {
-            console.error('Error al coordinar logout tras 401/403:', logoutError);
+            console.error('Error al coordinar logout tras 401:', logoutError);
           }
         }
       }

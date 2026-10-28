@@ -93,14 +93,16 @@ En lugar de obligar a cada servicio o pantalla a consultar SecureStore y concate
 
 ---
 
-## 4. Interceptor de Respuestas (Tratamiento de 401/403 y Auto-Logout)
+## 4. Interceptor de Respuestas (Tratamiento de 401 y Auto-Logout)
 
-El ciclo de vida del JWT de TallerConnect tiene una vigencia limitada (60 minutos) y carece de un endpoint de refresco (*refresh token*). Por lo tanto, cuando un token expira o es revocado, la API Gateway responderá con `HTTP 401 Unauthorized` o `HTTP 403 Forbidden`.
+El ciclo de vida del JWT de TallerConnect tiene una vigencia limitada (60 minutos) y carece de un endpoint de refresco (*refresh token*). Por lo tanto, cuando un token expira o es revocado, la API Gateway responderá con `HTTP 401 Unauthorized` ("JWT ausente, inválido o expirado" en MS1, MS2 y MS3).
+
+`HTTP 403 Forbidden` no indica una sesión inválida: los contratos lo usan cuando el rol autenticado no tiene permiso ("Se requiere rol …", "Rol no permitido"). Desde SCRUM-102 (28-10-2026) el interceptor **no** cierra la sesión ante 403; el error se propaga normalizado ("No tienes permisos para realizar esta acción." o el `detail` del backend) y la vista lo muestra con su estado de error.
 
 ### Flujo de Coordinación de Cierre de Sesión (`attachErrorInterceptor`)
 
 ```
-Petición Protegida ──────► Backend responde 401/403
+Petición Protegida ──────► Backend responde 401
                                  │
                                  ▼
                      ¿La URL es /auth/login
@@ -134,4 +136,4 @@ Para certificar la robustez y prevenir regresiones en futuras integraciones, tod
 
 - **Normalizador de errores:** Cobertura de mensajes de backend (`detail`), fallbacks por código de estado, timeouts de red y excepciones JavaScript.
 - **Inyector de autorización:** Cobertura con token presente, sin token y con omisión explícita (`skipAuth`).
-- **Manejador de respuestas:** Cobertura de auto-logout en 401/403 en endpoints protegidos, exclusión en login y adjunto de la propiedad `normalizedError` en la promesa rechazada.
+- **Manejador de respuestas:** Cobertura de auto-logout en 401 en endpoints protegidos, ausencia de logout ante 403, exclusión en login y adjunto de la propiedad `normalizedError` en la promesa rechazada.

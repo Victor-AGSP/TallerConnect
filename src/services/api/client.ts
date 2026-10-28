@@ -35,5 +35,5 @@ attachAuthTokenInterceptor(apiClient);
 // 2. Interceptor de respuestas: Política de reintento con backoff exponencial para operaciones seguras (GET, HEAD, OPTIONS)
 attachRetryInterceptor(apiClient);
 
-// 3. Interceptor de respuestas: Manejo centralizado de errores ({ detail }), timeout y logout en 401/403
+// 3. Interceptor de respuestas: Manejo centralizado de errores ({ detail }), timeout y logout en 401 (403 se informa sin cerrar sesión)
 attachErrorInterceptor(apiClient);

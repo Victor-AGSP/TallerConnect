@@ -93,7 +93,7 @@ Observaciones:
 - Las secciones de órdenes, presupuesto y repuestos de los paneles muestran datos fijos de demostración, y las acciones del panel del mecánico ("Actualizar estado", "Revisar repuestos", etc.) no tienen comportamiento asociado. **Pendiente**: tampoco se modificaron, por la misma razón.
 - Ante un tiempo de espera agotado, el cliente HTTP reintenta dos veces las consultas GET (1 s y 2 s) antes de que la vista muestre el error y ofrezca el reintento manual. Los POST de decisión no se reintentan.
 - **Pendiente (`it.todo`)**: la doble pulsación de "Confirmar" con la decisión aún en curso. El botón queda deshabilitado mientras se envía, pero no se puede automatizar, porque el manejador devuelve la promesa del envío y el `fireEvent` de las pruebas la convierte en un `act()` asíncrono que no admite una segunda pulsación solapada. Se cubre que la decisión se envía una sola vez en los demás escenarios.
-- La política de cerrar la sesión ante cualquier 403 (`attachErrorInterceptor`) no se modificó: requiere acuerdo del equipo (`it.todo` en `order-role-access.test.tsx`).
+- Corregido (SCRUM-102, 28-10-2026): `attachErrorInterceptor` ya no cierra la sesión ante 403, como indican los contratos (403 = rol sin permiso). Pruebas: `order-role-access.test.tsx` (tres roles), `budget-flow-integration.test.tsx` e `interceptors.test.ts`.
 
 ## Endpoints del contrato sin uso en la app
 
@@ -115,7 +115,7 @@ El 12-10-2026 `/ms3/openapi.json` respondía 500 y bloqueaba esta parte. Al 14-1
 
 Pendientes que no corresponden a esta integración:
 
-- Rol Mecánico: el contrato del MS3 no indica qué roles pueden leer repuestos y presupuestos, y la app cierra la sesión ante cualquier 403 (`attachErrorInterceptor`). Las vistas se exponen solo a los roles con permiso seguro hasta que el responsable del MS3 lo confirme. Cambiar la política del interceptor ante 403 requiere acuerdo del equipo.
+- Rol Mecánico: el contrato del MS3 no indica qué roles pueden leer repuestos y presupuestos, Aunque un 403 ya no cierra la sesión (SCRUM-102), las vistas se exponen solo a los roles con permiso seguro hasta que el responsable del MS3 lo confirme.
 - Las tarjetas de presupuesto y repuestos de los paneles (`cliente.tsx`, `mecanico.tsx`, `administrador.tsx`) siguen con datos de demostración, y no hay un listado de órdenes que enlace al detalle. Pueden corresponder a funcionalidades de otros integrantes; no se modificaron.
 
 Detalle de endpoints, roles, reglas y validaciones: `docs/integracion-ms3.md`.

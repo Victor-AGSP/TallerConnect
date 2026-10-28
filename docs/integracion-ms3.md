@@ -33,7 +33,7 @@ El contrato pagina con `desde` y `limite` (valor por defecto 50, máximo 200). L
 
 ### Roles
 
-Los GET de repuestos y proveedores declaran `403 Rol no permitido`, pero el contrato no indica qué roles se admiten. Como el interceptor de la app cierra la sesión ante cualquier 403, las vistas se publican solo para el Administrador (`RoleGuard`). Hay que pedir al responsable del MS3 que confirme si el Mecánico puede consultar repuestos, antes de exponerlos en su panel.
+Los GET de repuestos y proveedores declaran `403 Rol no permitido`, pero el contrato no indica qué roles se admiten. Aunque desde SCRUM-102 un 403 ya no cierra la sesión, las vistas se siguen publicando solo para el Administrador (`RoleGuard`), porque no está confirmado que otro rol tenga permiso. Hay que pedir al responsable del MS3 que confirme si el Mecánico puede consultar repuestos, antes de exponerlos en su panel.
 
 ## Presupuesto ↔ orden de trabajo
 
@@ -69,6 +69,6 @@ La app no llama directamente a `POST /ms2/ordenes/{orden_id}/decisiones-presupue
 
 ### Roles y limitaciones
 
-- El Mecánico no ve el presupuesto: `GET /presupuestos` declara `403 Rol no permitido` sin indicar qué roles admite, y un 403 cierra la sesión.
+- El Mecánico no ve el presupuesto: `GET /presupuestos` declara `403 Rol no permitido` sin indicar qué roles admite; no se expone hasta que el responsable del MS3 lo confirme.
 - El estado de la orden en el detalle sigue usando `CODE_TO_STATUS` (C1 de `docs/integracion-cruzada-ordenes.md`, a cargo de otro integrante). En `Victor`, el código 3 se muestra como "En reparación" y el 5 como "Control de calidad". El flujo del presupuesto no depende de ese catálogo: usa el estado de la versión y `efecto_en_orden` del MS3.
 - Validación: contrato OpenAPI y pruebas con el cliente HTTP simulado (`budget-service.test.ts`) o con el adaptador de red simulado (`budget-flow-integration.test.tsx`). No se enviaron decisiones ni se crearon presupuestos en el MS3 desplegado.
