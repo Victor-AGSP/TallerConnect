@@ -7,14 +7,32 @@ import {
   MockOrderAdapter,
   OrdersService,
 } from '@/services/orders.service';
+import {
+  BudgetsService,
+  MockBudgetAdapter,
+} from '@/services/budgets.service';
+import {
+  MockPartAdapter,
+  PartsService,
+} from '@/services/parts.service';
+import {
+  MockProviderAdapter,
+  ProvidersService,
+} from '@/services/providers.service';
 
-describe('Integración de Servicios con Adaptador Simulado (VehicleService + OrderService)', () => {
+describe('Integración de Servicios con Adaptador Simulado (MS2 + MS3)', () => {
   let vehicleService: VehiclesService;
   let orderService: OrdersService;
+  let budgetService: BudgetsService;
+  let partService: PartsService;
+  let providerService: ProvidersService;
 
   beforeEach(() => {
     vehicleService = new VehiclesService(new MockVehicleAdapter());
     orderService = new OrdersService(new MockOrderAdapter());
+    budgetService = new BudgetsService(new MockBudgetAdapter());
+    partService = new PartsService(new MockPartAdapter());
+    providerService = new ProvidersService(new MockProviderAdapter());
   });
 
   it('1. Flujo completo extremo a extremo: Registrar vehículo → Actualizar kilometraje → Crear orden → Asignar mecánico → Avanzar estados → Consultar historial', async () => {
@@ -150,5 +168,66 @@ describe('Integración de Servicios con Adaptador Simulado (VehicleService + Ord
       expect((error as ServiceError).status).toBe(409);
       expect((error as ServiceError).code).toBe('ORDER_CONFLICT');
     }
+  });
+
+  it('3. Flujo integrado MS3: Consultar proveedor y repuestos → Crear presupuesto de orden → Enviar al cliente → Aprobar versión', async () => {
+    // Paso 1: Consultar detalle del proveedor #1 y sus repuestos disponibles
+    const provider = await providerService.getProviderById('1');
+    expect(provider.name).toBe('Repuestos Sur');
+    expect(provider.parts.length).toBeGreaterThan(0);
+
+    // Paso 2: Buscar repuestos con stock del proveedor #1
+    const availableParts = await partService.getParts({
+      proveedor_id: 1,
+      con_stock: true,
+    });
+    expect(availableParts.length).toBeGreaterThan(0);
+    const chosenPart = availableParts[0];
+
+    // Paso 3: Crear una orden de trabajo y luego su presupuesto en borrador
+    const order = await orderService.createOrder({
+      vehiculo_id: 'veh-001',
+      cliente_id: 'usr-003',
+    });
+
+    const draftBudget = await budgetService.createBudget({
+      orden_id: order.id,
+      items: [
+        {
+          tipo: 'repuesto',
+          descripcion: chosenPart.name,
+          cantidad: 1,
+          precio_unitario: 8500,
+          repuesto_id: chosenPart.id,
+        },
+        {
+          tipo: 'mano_de_obra',
+          descripcion: 'Instalación y revisión general',
+          cantidad: 1,
+          precio_unitario: 15000,
+        },
+      ],
+    });
+
+    expect(draftBudget.orderId).toBe(order.id);
+    expect(draftBudget.latestVersionStatus).toBe('borrador');
+    expect(draftBudget.latestVersionTotal).toBe(23500);
+
+    // Paso 4: Enviar presupuesto al cliente y aprobarlo
+    const sentBudget = await budgetService.sendBudgetVersion(draftBudget.id, 1);
+    expect(sentBudget.latestVersionStatus).toBe('enviada');
+
+    const approvedBudget = await budgetService.submitBudgetDecision(
+      draftBudget.id,
+      1,
+      { decision: 'aprobado' }
+    );
+    expect(approvedBudget.latestVersionStatus).toBe('aprobada');
+    expect(approvedBudget.currentVersion).toBe(1);
+
+    // Paso 5: Verificar consulta por orden (getBudgetByOrderId)
+    const fetchedByOrder = await budgetService.getBudgetByOrderId(order.id);
+    expect(fetchedByOrder?.id).toBe(draftBudget.id);
+    expect(fetchedByOrder?.currentVersion).toBe(1);
   });
 });
