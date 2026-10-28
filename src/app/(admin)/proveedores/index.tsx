@@ -12,6 +12,10 @@ export default function ProveedoresScreen() {
   const router = useRouter();
 
   const loadSuppliers = useCallback(() => partsService.getSuppliers(), []);
+  const loadMoreSuppliers = useCallback(
+    (offset: number) => partsService.getSuppliers({ offset }),
+    [],
+  );
 
   const openSupplier = useCallback(
     (supplierId: string) => router.push(`/proveedores/${supplierId}`),
@@ -22,6 +26,7 @@ export default function ProveedoresScreen() {
     <SupplierListView
       eyebrow="Administración"
       loadSuppliers={loadSuppliers}
+      loadMoreSuppliers={loadMoreSuppliers}
       onSelectSupplier={openSupplier}
     />
   );

@@ -9,11 +9,16 @@ import { partsService } from '@/services/parts.service';
  */
 export default function RepuestosScreen() {
   const loadSpareParts = useCallback(() => partsService.getSpareParts(), []);
+  const loadMoreSpareParts = useCallback(
+    (offset: number) => partsService.getSpareParts({ offset }),
+    [],
+  );
 
   return (
     <SparePartListView
       eyebrow="Administración"
       loadSpareParts={loadSpareParts}
+      loadMoreSpareParts={loadMoreSpareParts}
     />
   );
 }

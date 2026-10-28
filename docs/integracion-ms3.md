@@ -29,7 +29,7 @@ Fuera de alcance, por decisión: alta, edición y eliminación de repuestos y pr
 
 ### Paginación
 
-El contrato pagina con `desde` y `limite` (valor por defecto 50, máximo 200). La app pide la primera página y muestra "Mostrando N de total" cuando el servidor tiene más registros. No hay navegación entre páginas.
+El contrato pagina con `desde` y `limite` (valor por defecto 50, máximo 200). La app pide la primera página sin parámetros y muestra "Mostrando N de total". Desde SCRUM-100 (28-10-2026), si el servidor tiene más registros, "Cargar más repuestos"/"Cargar más proveedores" pide `desde = registros mostrados` y `limite = 50` (`useLoadMore`): descarta repetidos por `id`, se detiene cuando una página no trae registros nuevos, conserva lo cargado ante un error (con reintento) y una actualización vuelve a la primera página. `getSpareParts`/`getSuppliers` rechazan parámetros fuera del contrato sin llamar al MS3. Pruebas: `parts-service.test.ts` y `parts-views-integration.test.tsx`.
 
 ### Roles
 

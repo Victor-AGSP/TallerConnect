@@ -20,6 +20,37 @@ import { mockSpareParts, mockSuppliers } from '@/mocks/parts.mock';
 
 const USE_MOCKS = process.env.EXPO_PUBLIC_USE_MOCK_AUTH === 'true';
 
+/** `limite` por defecto de `GET /repuestos` y `GET /proveedores` (MS3, máximo 200). */
+export const MS3_PAGE_SIZE = 50;
+
+/** Página solicitada a un listado del MS3: `desde` (≥ 0) y `limite` (1–200). */
+export interface PageRequest {
+  offset: number;
+  limit?: number;
+}
+
+/**
+ * Parámetros `desde`/`limite` de una página posterior a la primera. La primera
+ * se pide sin parámetros (el MS3 aplica `desde=0` y `limite=50`).
+ */
+function pageParams(page?: PageRequest): { desde: number; limite: number } | undefined {
+  if (!page || page.offset === 0) return undefined;
+  const limit = page.limit ?? MS3_PAGE_SIZE;
+  if (!Number.isInteger(page.offset) || page.offset < 0 || !Number.isInteger(limit) || limit < 1 || limit > 200) {
+    throw new Error('Parámetros de paginación inválidos.');
+  }
+  return { desde: page.offset, limite: limit };
+}
+
+/** Página simulada a partir de la lista completa en memoria. */
+function mockPage<T>(all: T[], page?: PageRequest): PagedList<T> {
+  const offset = page?.offset ?? 0;
+  return {
+    items: all.slice(offset, offset + (page?.limit ?? MS3_PAGE_SIZE)),
+    total: all.length,
+  };
+}
+
 /**
  * Consulta de repuestos y proveedores del MS3 a través de la API Gateway.
  * Solo lectura: el alta, edición y movimientos de inventario no forman
@@ -27,17 +58,20 @@ const USE_MOCKS = process.env.EXPO_PUBLIC_USE_MOCK_AUTH === 'true';
  */
 export class PartsService {
   /**
-   * Lista los repuestos ordenados por nombre.
-   * Ruta Gateway: GET /api/repuestos
+   * Lista los repuestos ordenados por nombre. Sin `page` consulta la primera página.
+   * Ruta Gateway: GET /api/repuestos?desde=&limite=
    */
-  async getSpareParts(): Promise<PagedList<SparePart>> {
+  async getSpareParts(page?: PageRequest): Promise<PagedList<SparePart>> {
     if (USE_MOCKS) {
       await new Promise((resolve) => setTimeout(resolve, 200));
-      return { items: [...mockSpareParts], total: mockSpareParts.length };
+      return mockPage(mockSpareParts, page);
     }
 
     try {
-      const response = await apiClient.get<SparePartsPageDto>('/repuestos');
+      const params = pageParams(page);
+      const response = params
+        ? await apiClient.get<SparePartsPageDto>('/repuestos', { params })
+        : await apiClient.get<SparePartsPageDto>('/repuestos');
       return mapSparePartsPage(response.data);
     } catch (error: unknown) {
       const normalized = normalizeApiError(error);
@@ -46,17 +80,20 @@ export class PartsService {
   }
 
   /**
-   * Lista los proveedores.
-   * Ruta Gateway: GET /api/proveedores
+   * Lista los proveedores. Sin `page` consulta la primera página.
+   * Ruta Gateway: GET /api/proveedores?desde=&limite=
    */
-  async getSuppliers(): Promise<PagedList<Supplier>> {
+  async getSuppliers(page?: PageRequest): Promise<PagedList<Supplier>> {
     if (USE_MOCKS) {
       await new Promise((resolve) => setTimeout(resolve, 200));
-      return { items: [...mockSuppliers], total: mockSuppliers.length };
+      return mockPage(mockSuppliers, page);
     }
 
     try {
-      const response = await apiClient.get<SuppliersPageDto>('/proveedores');
+      const params = pageParams(page);
+      const response = params
+        ? await apiClient.get<SuppliersPageDto>('/proveedores', { params })
+        : await apiClient.get<SuppliersPageDto>('/proveedores');
       return mapSuppliersPage(response.data);
     } catch (error: unknown) {
       const normalized = normalizeApiError(error);

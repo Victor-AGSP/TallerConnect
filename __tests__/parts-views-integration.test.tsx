@@ -233,6 +233,179 @@ describe('Repuestos (administrador)', () => {
   });
 });
 
+/** Repuesto adicional con el id indicado, para páginas posteriores. */
+function partWithId(id: string, name: string): SparePart {
+  return { ...parts[0], id, name };
+}
+
+describe('Repuestos: carga incremental (desde/limite)', () => {
+  it('carga la página siguiente desde la cantidad mostrada y oculta el botón al completar', async () => {
+    mockedService.getSpareParts
+      .mockResolvedValueOnce({ items: parts, total: 3 })
+      .mockResolvedValueOnce({ items: [partWithId('9', 'Correa de distribución')], total: 3 });
+
+    await renderAs('administrador', '/repuestos');
+    await waitFor(() =>
+      expect(screen.getByText('Mostrando 2 de 3 repuestos')).toBeTruthy(),
+    );
+
+    await fireEvent.press(screen.getByTestId('spare-part-list-load-more'));
+
+    await waitFor(() =>
+      expect(screen.getByText('Mostrando 3 de 3 repuestos')).toBeTruthy(),
+    );
+    expect(mockedService.getSpareParts).toHaveBeenNthCalledWith(1);
+    expect(mockedService.getSpareParts).toHaveBeenNthCalledWith(2, { offset: 2 });
+    expect(screen.getByText('Correa de distribución')).toBeTruthy();
+    expect(screen.getByText('Filtro de aceite')).toBeTruthy();
+    expect(screen.queryByTestId('spare-part-list-load-more')).toBeNull();
+  });
+
+  it('no muestra el botón cuando la primera página ya trae todos los registros', async () => {
+    mockedService.getSpareParts.mockResolvedValueOnce({ items: parts, total: 2 });
+
+    await renderAs('administrador', '/repuestos');
+    await waitFor(() => expect(screen.getByTestId('spare-part-card-8')).toBeTruthy());
+
+    expect(screen.queryByTestId('spare-part-list-load-more')).toBeNull();
+  });
+
+  it('descarta los repuestos repetidos y se detiene si la página no trae nuevos', async () => {
+    mockedService.getSpareParts
+      .mockResolvedValueOnce({ items: parts, total: 4 })
+      // El inventario cambió: la página siguiente repite el último registro.
+      .mockResolvedValueOnce({ items: [parts[1], partWithId('9', 'Correa')], total: 4 })
+      .mockResolvedValueOnce({ items: [], total: 4 });
+
+    await renderAs('administrador', '/repuestos');
+    await waitFor(() => expect(screen.getByTestId('spare-part-card-8')).toBeTruthy());
+
+    await fireEvent.press(screen.getByTestId('spare-part-list-load-more'));
+    await waitFor(() =>
+      expect(screen.getByText('Mostrando 3 de 4 repuestos')).toBeTruthy(),
+    );
+    expect(screen.getAllByTestId('spare-part-card-8')).toHaveLength(1);
+
+    await fireEvent.press(screen.getByTestId('spare-part-list-load-more'));
+    await waitFor(() =>
+      expect(screen.queryByTestId('spare-part-list-load-more')).toBeNull(),
+    );
+    expect(mockedService.getSpareParts).toHaveBeenNthCalledWith(3, { offset: 3 });
+    expect(screen.getByText('Mostrando 3 de 4 repuestos')).toBeTruthy();
+  });
+
+  it('conserva lo cargado ante un error de paginación y permite reintentar', async () => {
+    mockedService.getSpareParts
+      .mockResolvedValueOnce({ items: parts, total: 3 })
+      .mockRejectedValueOnce(new Error('Error interno en el servidor. Intenta nuevamente más tarde.'))
+      .mockResolvedValueOnce({ items: [partWithId('9', 'Correa')], total: 3 });
+
+    await renderAs('administrador', '/repuestos');
+    await waitFor(() => expect(screen.getByTestId('spare-part-card-8')).toBeTruthy());
+
+    await fireEvent.press(screen.getByTestId('spare-part-list-load-more'));
+
+    await waitFor(() =>
+      expect(screen.getByTestId('spare-part-list-load-more-error')).toBeTruthy(),
+    );
+    expect(
+      screen.getByText('Error interno en el servidor. Intenta nuevamente más tarde.'),
+    ).toBeTruthy();
+    expect(screen.getByTestId('spare-part-card-7')).toBeTruthy();
+    expect(screen.queryByTestId('spare-part-list-error')).toBeNull();
+
+    await fireEvent.press(screen.getByRole('button', { name: 'Reintentar cargar más' }));
+
+    await waitFor(() => expect(screen.getByTestId('spare-part-card-9')).toBeTruthy());
+    expect(screen.queryByTestId('spare-part-list-load-more-error')).toBeNull();
+    expect(mockedService.getSpareParts).toHaveBeenNthCalledWith(3, { offset: 2 });
+  });
+
+  it('una actualización descarta las páginas posteriores y vuelve a la primera', async () => {
+    mockedService.getSpareParts
+      .mockResolvedValueOnce({ items: parts, total: 3 })
+      .mockResolvedValueOnce({ items: [partWithId('9', 'Correa')], total: 3 })
+      .mockResolvedValueOnce({ items: parts, total: 3 });
+
+    await renderAs('administrador', '/repuestos');
+    await waitFor(() => expect(screen.getByTestId('spare-part-card-8')).toBeTruthy());
+
+    await fireEvent.press(screen.getByTestId('spare-part-list-load-more'));
+    await waitFor(() => expect(screen.getByTestId('spare-part-card-9')).toBeTruthy());
+
+    await fireEvent.press(screen.getByTestId('spare-part-list-refresh'));
+
+    await waitFor(() => expect(screen.queryByTestId('spare-part-card-9')).toBeNull());
+    expect(screen.getByText('Mostrando 2 de 3 repuestos')).toBeTruthy();
+    expect(mockedService.getSpareParts).toHaveBeenNthCalledWith(3);
+    expect(screen.getByTestId('spare-part-list-load-more')).toBeTruthy();
+  });
+  it('descarta una página posterior que llega después de una actualización', async () => {
+    const late = deferred<{ items: SparePart[]; total: number }>();
+    mockedService.getSpareParts
+      .mockResolvedValueOnce({ items: parts, total: 3 })
+      .mockReturnValueOnce(late.promise)
+      .mockResolvedValueOnce({ items: parts, total: 3 });
+
+    await renderAs('administrador', '/repuestos');
+    await waitFor(() => expect(screen.getByTestId('spare-part-card-8')).toBeTruthy());
+
+    await fireEvent.press(screen.getByTestId('spare-part-list-load-more'));
+    await fireEvent.press(screen.getByTestId('spare-part-list-refresh'));
+    await waitFor(() =>
+      expect(mockedService.getSpareParts).toHaveBeenCalledTimes(3),
+    );
+
+    await act(async () => {
+      late.resolve({ items: [partWithId('9', 'Correa')], total: 3 });
+    });
+
+    expect(screen.queryByTestId('spare-part-card-9')).toBeNull();
+    expect(screen.getByText('Mostrando 2 de 3 repuestos')).toBeTruthy();
+  });
+});
+
+describe('Proveedores: carga incremental (desde/limite)', () => {
+  it('carga la página siguiente de proveedores', async () => {
+    mockedService.getSuppliers
+      .mockResolvedValueOnce({ items: [supplierDetail], total: 2 })
+      .mockResolvedValueOnce({
+        items: [{ id: '4', name: 'Frenos Chile', contact: 'ventas@frenos.cl', partsCount: 1 }],
+        total: 2,
+      });
+
+    await renderAs('administrador', '/proveedores');
+    await waitFor(() =>
+      expect(screen.getByText('Mostrando 1 de 2 proveedores')).toBeTruthy(),
+    );
+
+    await fireEvent.press(screen.getByTestId('supplier-list-load-more'));
+
+    await waitFor(() => expect(screen.getByTestId('supplier-card-4')).toBeTruthy());
+    expect(screen.getByText('Mostrando 2 de 2 proveedores')).toBeTruthy();
+    expect(mockedService.getSuppliers).toHaveBeenNthCalledWith(2, { offset: 1 });
+    expect(screen.queryByTestId('supplier-list-load-more')).toBeNull();
+  });
+
+  it('informa el error de paginación sin perder el listado', async () => {
+    mockedService.getSuppliers
+      .mockResolvedValueOnce({ items: [supplierDetail], total: 2 })
+      .mockRejectedValueOnce(new Error('Rol no permitido'));
+
+    await renderAs('administrador', '/proveedores');
+    await waitFor(() => expect(screen.getByTestId('supplier-card-3')).toBeTruthy());
+
+    await fireEvent.press(screen.getByTestId('supplier-list-load-more'));
+
+    await waitFor(() =>
+      expect(screen.getByTestId('supplier-list-load-more-error')).toBeTruthy(),
+    );
+    expect(screen.getByText('Rol no permitido')).toBeTruthy();
+    expect(screen.getByTestId('supplier-card-3')).toBeTruthy();
+    expect(screen.getByRole('button', { name: 'Reintentar cargar más' })).toBeTruthy();
+  });
+});
+
 describe('Proveedores (administrador)', () => {
   it('lista los proveedores y abre el detalle con sus repuestos', async () => {
     mockedService.getSuppliers.mockResolvedValueOnce({

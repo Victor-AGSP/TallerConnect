@@ -9,6 +9,7 @@ import {
 import { AppScreen } from '@/components/layout/AppScreen';
 import { SparePartCard } from '@/components/parts/SparePartCard';
 import { useDataQuery } from '@/hooks/useDataQuery';
+import { useLoadMore } from '@/hooks/useLoadMore';
 import { colors, spacing } from '@/constants/theme';
 import type { PagedList, SparePart } from '@/models/parts.model';
 
@@ -20,6 +21,9 @@ export interface SparePartListViewProps {
    * porque dispara la carga.
    */
   loadSpareParts: () => Promise<PagedList<SparePart>>;
+
+  /** Página posterior desde `offset`. Sin ella solo se muestra la primera página. */
+  loadMoreSpareParts?: (offset: number) => Promise<PagedList<SparePart>>;
 }
 
 const FALLBACK_ERROR = 'No fue posible cargar los repuestos.';
@@ -30,11 +34,19 @@ const FALLBACK_ERROR = 'No fue posible cargar los repuestos.';
 export function SparePartListView({
   eyebrow,
   loadSpareParts,
+  loadMoreSpareParts,
 }: SparePartListViewProps) {
   const { data, errorMessage, isLoading, isRefreshing, refresh } =
     useDataQuery(loadSpareParts, FALLBACK_ERROR);
 
-  const parts = data?.items ?? [];
+  const {
+    items: parts,
+    total,
+    hasMore,
+    isLoadingMore,
+    loadMoreError,
+    loadMore,
+  } = useLoadMore(data, loadMoreSpareParts, FALLBACK_ERROR);
 
   return (
     <AppScreen
@@ -70,12 +82,31 @@ export function SparePartListView({
           />
 
           <Text testID="spare-part-list-count" style={styles.count}>
-            Mostrando {parts.length} de {data?.total ?? parts.length} repuestos
+            Mostrando {parts.length} de {total} repuestos
           </Text>
 
           {parts.map((part) => (
             <SparePartCard key={part.id} part={part} />
           ))}
+
+          {loadMoreError ? (
+            <Text testID="spare-part-list-load-more-error" accessibilityRole="alert" style={styles.error}>
+              {loadMoreError}
+            </Text>
+          ) : null}
+
+          {hasMore ? (
+            <Button
+              testID="spare-part-list-load-more"
+              title={loadMoreError ? 'Reintentar cargar más' : 'Cargar más repuestos'}
+              variant="outline"
+              loading={isLoadingMore}
+              disabled={isRefreshing}
+              onPress={() => {
+                void loadMore();
+              }}
+            />
+          ) : null}
         </>
       )}
     </AppScreen>
@@ -91,6 +122,11 @@ const styles = StyleSheet.create({
 
   count: {
     color: colors.textSecondary,
+    fontSize: 13,
+  },
+
+  error: {
+    color: colors.danger,
     fontSize: 13,
   },
 });

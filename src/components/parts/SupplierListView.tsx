@@ -9,6 +9,7 @@ import {
 } from '@/components/common';
 import { AppScreen } from '@/components/layout/AppScreen';
 import { useDataQuery } from '@/hooks/useDataQuery';
+import { useLoadMore } from '@/hooks/useLoadMore';
 import { colors, spacing } from '@/constants/theme';
 import type { PagedList, Supplier } from '@/models/parts.model';
 
@@ -20,6 +21,9 @@ export interface SupplierListViewProps {
    * renderizados porque dispara la carga.
    */
   loadSuppliers: () => Promise<PagedList<Supplier>>;
+
+  /** Página posterior desde `offset`. Sin ella solo se muestra la primera página. */
+  loadMoreSuppliers?: (offset: number) => Promise<PagedList<Supplier>>;
 
   /** Abre el detalle del proveedor seleccionado. */
   onSelectSupplier: (supplierId: string) => void;
@@ -33,12 +37,20 @@ const FALLBACK_ERROR = 'No fue posible cargar los proveedores.';
 export function SupplierListView({
   eyebrow,
   loadSuppliers,
+  loadMoreSuppliers,
   onSelectSupplier,
 }: SupplierListViewProps) {
   const { data, errorMessage, isLoading, isRefreshing, refresh } =
     useDataQuery(loadSuppliers, FALLBACK_ERROR);
 
-  const suppliers = data?.items ?? [];
+  const {
+    items: suppliers,
+    total,
+    hasMore,
+    isLoadingMore,
+    loadMoreError,
+    loadMore,
+  } = useLoadMore(data, loadMoreSuppliers, FALLBACK_ERROR);
 
   return (
     <AppScreen
@@ -74,8 +86,7 @@ export function SupplierListView({
           />
 
           <Text testID="supplier-list-count" style={styles.count}>
-            Mostrando {suppliers.length} de {data?.total ?? suppliers.length}{' '}
-            proveedores
+            Mostrando {suppliers.length} de {total} proveedores
           </Text>
 
           {suppliers.map((supplier) => (
@@ -97,6 +108,25 @@ export function SupplierListView({
               </Card>
             </Pressable>
           ))}
+
+          {loadMoreError ? (
+            <Text testID="supplier-list-load-more-error" accessibilityRole="alert" style={styles.error}>
+              {loadMoreError}
+            </Text>
+          ) : null}
+
+          {hasMore ? (
+            <Button
+              testID="supplier-list-load-more"
+              title={loadMoreError ? 'Reintentar cargar más' : 'Cargar más proveedores'}
+              variant="outline"
+              loading={isLoadingMore}
+              disabled={isRefreshing}
+              onPress={() => {
+                void loadMore();
+              }}
+            />
+          ) : null}
         </>
       )}
     </AppScreen>
@@ -112,6 +142,11 @@ const styles = StyleSheet.create({
 
   count: {
     color: colors.textSecondary,
+    fontSize: 13,
+  },
+
+  error: {
+    color: colors.danger,
     fontSize: 13,
   },
 
