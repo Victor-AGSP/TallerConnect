@@ -63,7 +63,7 @@ El endpoint ya existe (I5 y E3 lo daban como inexistente).
 
 ### C3. Cliente de la orden (I2 / E8, vigente)
 
-`OrdenRespuesta` sigue sin cliente. El mapper toma `clientId` de `creado_por_id`, de modo que con la API real la fila "Cliente" del detalle muestra el usuario creador (administrador).
+`OrdenRespuesta` sigue sin cliente. Desde el merge `f25ae44` el mapper ya no toma `clientId` de `creado_por_id`: queda sin valor y el detalle muestra "Cliente: No disponible" (verificado en `views-services-integration.test.tsx`). **Pendiente de backend** (I2): exponer el cliente en `OrdenRespuesta` si la interfaz debe mostrarlo.
 
 ### C4. Respuestas vacías del detalle
 

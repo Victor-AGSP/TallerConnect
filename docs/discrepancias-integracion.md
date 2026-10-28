@@ -32,14 +32,14 @@ Las discrepancias incluyen tanto diferencias directas entre la app y el contrato
 
 | # | Discrepancia | Contrato | App | Impacto | Depende de |
 |---|---|---|---|---|---|
-| E1 | Endpoint `GET /api/vehiculos/mios` | No existe; responde 422. Los vehículos del cliente se obtienen con `GET /api/vehiculos` | `getMyVehicles()` lo llama | Alto | — |
-| E2 | Endpoint `GET /api/vehiculos/asignados` | No existe | `getAssignedVehicles()` lo llama | Alto | I4, I5 |
-| E3 | Endpoint `PATCH /api/ordenes/{id}/status` | No existe | `updateOrderStatus()` lo llama | Alto | I1, I5 |
+| E1 | Endpoint `GET /api/vehiculos/mios` | No existe; responde 422. Los vehículos del cliente se obtienen con `GET /api/vehiculos` | Corregido (merge `f25ae44`): `getMyVehicles()` usa `GET /api/vehiculos` | — | — |
+| E2 | Endpoint `GET /api/vehiculos/asignados` | Publicado en MS2 (rol Mecánico) | Corregido: `getAssignedVehicles()` coincide con el contrato | — | — |
+| E3 | Cambio de estado de una orden | `PATCH /api/ordenes/{orden_id}/estado` con `CambioEstadoSolicitud` | Corregido: `updateOrderStatus()` usa la ruta y el cuerpo del contrato (verificado en SCRUM-104) | — | — |
 | E4 | Cuerpo al crear un vehículo | `VehiculoCrear`: `patente`, `marca` y `modelo` obligatorios, `anio` y `kilometraje` opcionales, sin campos adicionales | Corregido (SCRUM-105): `buildCreateVehiclePayload()` envía solo `patente`, `marca`, `modelo`, `anio` y `kilometraje`, y valida obligatorios, tipos y longitudes antes de llamar a MS2 | — | — |
-| E5 | Cuerpo al crear una orden | `OrdenCrear`: solo `vehiculo_id`, entero, sin campos adicionales; requiere rol administrador | `createOrder()` envía `vehiculo_id` como texto, junto con `vehicle_id`, `cliente_id`, `client_id` y `description` | Alto | — |
+| E5 | Cuerpo al crear una orden | `OrdenCrear`: solo `vehiculo_id`, entero, sin campos adicionales; requiere rol administrador | Corregido (merge `f25ae44`): `createOrder()` envía solo `{ vehiculo_id }` entero | — | — |
 | E6 | Cierre de sesión ante 403 | 403 indica falta de permiso por rol | Corregido (SCRUM-102): el interceptor solo cierra la sesión ante 401; un 403 se informa como falta de permisos | — | — |
-| E7 | DTO de vehículos y órdenes | Campos definidos y obligatorios en `VehiculoRespuesta` y `OrdenRespuesta` | `VehicleResponseDto` y `OrderResponseDto` declaran todos los campos opcionales y aceptan nombres que el contrato no usa | Medio | — |
-| E8 | Valores asignados por el mapper de órdenes | Los campos de `OrdenRespuesta` son obligatorios | `mapOrderResponse` completa los datos faltantes con valores propios (fecha `1970-01-01`, cliente `'1'`) | Medio | I2 |
+| E7 | DTO de vehículos y órdenes | Campos definidos y obligatorios en `VehiculoRespuesta` y `OrdenRespuesta` | Corregido: ambos DTO declaran los campos obligatorios; `mapOrderResponse` valida `OrdenRespuesta` (SCRUM-103) | — | — |
+| E8 | Valores asignados por el mapper de órdenes | Los campos de `OrdenRespuesta` son obligatorios | Corregido (SCRUM-103): una respuesta incompleta se rechaza; sin cliente en el contrato, `clientId` queda sin valor | — | I2 |
 | E9 | `refreshToken` | La API no entrega refresh token | El campo sigue en `AuthResponse`, en el store, en los mocks y en las pruebas de sesión | Bajo | — |
 
 ## Resumen
@@ -50,5 +50,4 @@ Las discrepancias incluyen tanto diferencias directas entre la app y el contrato
 | Equipo móvil | 6 | 2 | 1 | 9 |
 
 - Las discrepancias de impacto alto del equipo móvil corresponden a vehículos, órdenes y la sesión. Autenticación no tiene discrepancias de impacto alto.
-- E1, E4, E5 y E6 no dependen del backend y pueden resolverse con el contrato vigente.
-- E2 y E3 podrán resolverse cuando Integración 2 defina los endpoints correspondientes.
+- Estado al 28-10-2026 (SCRUM-105): E1–E8 están corregidas en la rama `Victor` (E1, E2, E5 y E7 con el merge `f25ae44`; E3 verificada en SCRUM-104; E4 en SCRUM-105; E6 en SCRUM-102; E8 en SCRUM-103). Sigue pendiente E9 (`refreshToken`, impacto bajo). Los conteos de la tabla anterior corresponden a la revisión original.

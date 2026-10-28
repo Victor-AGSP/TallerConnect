@@ -25,6 +25,8 @@ No se hicieron solicitudes autenticadas ni de escritura. El comportamiento con d
 
 Relación representada: cada repuesto pertenece a un proveedor (`proveedor_id`, `proveedor_nombre`), y el detalle del proveedor incluye sus repuestos. Se muestran el stock y el umbral efectivo, indicando si es propio o general, junto con la marca `bajo_umbral`.
 
+**Modelos paralelos (revisado en SCRUM-105, 28-10-2026):** además de `parts.*` existen `src/dto/part.dto.ts`, `provider.dto.ts`, `src/models/part.model.ts`, `provider.model.ts`, `src/mappers/part.mapper.ts`, `provider.mapper.ts` y los esquemas `part-dto.schema.ts`/`provider-dto.schema.ts` (commits `043f762` y `427e354`, de otro integrante). Describen los mismos esquemas del MS3 con otros nombres (`Part`/`Provider` frente a `SparePart`/`Supplier`) y sus DTO coinciden con el contrato. Las pantallas y `PartsService` usan solo `parts.*`; `part.*`/`provider.*` se usan en los payloads simulados (`src/mocks/payloads/`) y se exportan desde `src/models/index.ts`, sin colisión de nombres. No se consolidaron: forman parte de la API pública de otro integrante y no producen errores. Unificarlos requiere acordarlo con su autor.
+
 Fuera de alcance, por decisión: alta, edición y eliminación de repuestos y proveedores, movimientos de inventario, alertas y umbral general. Son operaciones de administración de inventario que la integración de las interfaces no requiere.
 
 ### Paginación

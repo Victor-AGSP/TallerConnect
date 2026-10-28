@@ -23,40 +23,39 @@ Esta matriz muestra, para cada endpoint del contrato y para cada endpoint que ll
 
 | Método y endpoint | Función de la app | DTO de solicitud | DTO de respuesta | Mapper | Modelo | Estado |
 |---|---|---|---|---|---|---|
-| `GET /api/vehiculos` | `getVehicles()` (`vehicles.service.ts`) | — | `VehicleResponseDto[]` | `mapVehiclesResponseList` | `Vehicle[]` | Desalineado |
-| `GET /api/vehiculos/{vehiculo_id}` | `getVehicleById()` | — | `VehicleResponseDto` | `mapVehicleResponse` | `Vehicle` | Desalineado |
+| `GET /api/vehiculos` | `getVehicles()` y `getMyVehicles()` (`vehicles.service.ts`) | — | `VehicleResponseDto[]` | `mapVehiclesResponseList` | `Vehicle[]` | Alineado |
+| `GET /api/vehiculos/{vehiculo_id}` | `getVehicleById()` | — | `VehicleResponseDto` | `mapVehicleResponse` | `Vehicle` | Alineado |
 | `POST /api/vehiculos` | `createVehicle()` | `CreateVehicleRequestDto` → `VehicleCreatePayloadDto` | `VehicleResponseDto` | `mapVehicleResponse` | `Vehicle` | Alineado |
-| `PATCH /api/vehiculos/{vehiculo_id}` | — | — | — | — | — | Sin uso en la app |
-| `GET /api/vehiculos/mios` | `getMyVehicles()` | — | `VehicleResponseDto[]` | `mapVehiclesResponseList` | `Vehicle[]` | No existe en el contrato |
-| `GET /api/vehiculos/asignados` | `getAssignedVehicles()` | — | `VehicleResponseDto[]` | `mapVehiclesResponseList` | `Vehicle[]` | No existe en el contrato |
+| `PATCH /api/vehiculos/{vehiculo_id}` | `updateVehicle()` (sin pantalla) | `UpdateVehicleRequestDto` | `VehicleResponseDto` | `mapVehicleResponse` | `Vehicle` | Alineado |
+| `GET /api/vehiculos/asignados` | `getAssignedVehicles()` | — | `VehicleResponseDto[]` | `mapVehiclesResponseList` | `Vehicle[]` | Alineado (rol Mecánico) |
 
 **Observaciones:**
-- `VehicleResponseDto` declara todos sus campos como opcionales y acepta nombres que el contrato no usa (`id`, `patent`, `license_plate`, `plate`, `brand`, `model`, `year`, `mileage`, `client_id`, `owner_id`). El contrato (`VehiculoRespuesta`) define `vehiculo_id`, `patente`, `marca`, `modelo`, `anio` y `kilometraje`, todos obligatorios.
+- `VehicleResponseDto` declara los campos obligatorios de `VehiculoRespuesta`. `mapVehicleResponse` sigue aceptando, solo como compatibilidad de lectura, nombres anteriores (`patent`, `brand`, etc.) y rechaza respuestas incompletas.
 - `createVehicle()` acepta alias internos (`plate`, `brand`, `model`, `year`, `mileage`), pero `buildCreateVehiclePayload()` envía exactamente `VehiculoCrear`: `patente`, `marca` y `modelo` obligatorios y `anio` y `kilometraje` opcionales, sin campos adicionales ni `owner_id` (MS2 lo toma del JWT).
 - `GET /api/vehiculos` solo responde al rol cliente; mecánico y administrador reciben 403.
-- `GET /api/vehiculos/mios` responde 422, porque el backend interpreta `mios` como `vehiculo_id`.
 
 ## Órdenes de trabajo (MS2)
 
 | Método y endpoint | Función de la app | DTO de solicitud | DTO de respuesta | Mapper | Modelo | Estado |
 |---|---|---|---|---|---|---|
-| `GET /api/ordenes` | `getOrders()` (`orders.service.ts`) | — | `OrderResponseDto[]` | `mapOrdersResponseList` | `WorkOrder[]` | Desalineado |
-| `GET /api/ordenes/{orden_id}` | `getOrderById()` | — | `OrderResponseDto` | `mapOrderResponse` | `WorkOrder` | Desalineado |
-| `POST /api/ordenes` | `createOrder()` | `CreateOrderRequestDto` | `OrderResponseDto` | `mapOrderResponse` | `WorkOrder` | Desalineado |
-| `PUT /api/ordenes/{orden_id}/mecanico` | — | — | — | — | — | Sin uso en la app |
-| `PATCH /api/ordenes/{id}/status` | `updateOrderStatus()` | `UpdateOrderStatusRequestDto` | `OrderResponseDto` | `mapOrderResponse` | `WorkOrder` | No existe en el contrato |
+| `GET /api/ordenes` | `getOrders()` (`orders.service.ts`) | — | `OrderResponseDto[]` | `mapOrdersResponseList` | `WorkOrder[]` | Alineado |
+| `GET /api/ordenes/{orden_id}` | `getOrderById()` | — | `OrderResponseDto` | `mapOrderResponse` | `WorkOrder` | Alineado |
+| `POST /api/ordenes` | `createOrder()` (sin pantalla) | `CreateOrderRequestDto` → `{ vehiculo_id }` | `OrderResponseDto` | `mapOrderResponse` | `WorkOrder` | Alineado |
+| `PUT /api/ordenes/{orden_id}/mecanico` | `assignMechanic()` (sin pantalla) | `AssignMechanicRequestDto` | `OrderResponseDto` | `mapOrderResponse` | `WorkOrder` | Sin uso en pantallas |
+| `PATCH /api/ordenes/{orden_id}/estado` | `updateOrderStatus()` (sin pantalla) | `UpdateOrderStatusRequestDto` (`CambioEstadoSolicitud`) | `OrderResponseDto` | `mapOrderResponse` | `WorkOrder` | Alineado |
 
 **Observaciones:**
-- `OrderResponseDto` declara todos sus campos como opcionales y acepta nombres que el contrato no usa (`id`, `vehicle_id`, `client_id`, `status`, `description`, etc.). El contrato (`OrdenRespuesta`) define `orden_id`, `vehiculo_id`, `ingreso_id`, `estado_codigo`, `mecanico_actual_id`, `creado_por_id`, `creado_en` y `actualizado_en`, todos obligatorios.
-- `mapOrderResponse` convierte `estado_codigo` con un catálogo propio (`CODE_TO_STATUS`). El contrato no publica qué estado representa cada código.
-- Cuando la respuesta no trae un dato, `mapOrderResponse` asigna valores propios: `clientId` se toma de `creado_por_id` o queda como `'1'`, y las fechas faltantes quedan como `1970-01-01T00:00:00.000Z`.
-- `createOrder()` envía `vehiculo_id` como texto, junto con `vehicle_id`, `cliente_id`, `client_id` y `description`. El contrato (`OrdenCrear`) solo admite `vehiculo_id`, como entero, y exige el rol administrador.
+- `OrderResponseDto` declara los ocho campos obligatorios de `OrdenRespuesta`, y `mapOrderResponse` los valida con `orderResponseDtoSchema` (SCRUM-103).
+- `mapOrderResponse` convierte `estado_codigo` con `CODE_TO_STATUS`, alineado con el catálogo 1–8 publicado en `OrdenRespuesta.estado_codigo` (SCRUM-104).
+- `mapOrderResponse` ya no completa datos faltantes: una respuesta incompleta se rechaza con `ORDER_INVALID_RESPONSE`. `OrdenRespuesta` no incluye cliente, por lo que `clientId` queda sin valor ("Cliente: No disponible").
+- `createOrder()` envía solo `{ vehiculo_id }` entero positivo, como exige `OrdenCrear` (rol administrador).
 
 ## Resumen
 
 | Estado | Cantidad | Endpoints |
 |---|---|---|
-| Alineado | 2 | Login y `/auth/me` |
-| Desalineado | 6 | Consulta y creación de vehículos y órdenes |
-| No existe en el contrato | 3 | `/vehiculos/mios`, `/vehiculos/asignados` y `PATCH /ordenes/{id}/status` |
-| Sin uso en la app | 3 | Registro, edición de vehículo y asignación de mecánico |
+| Alineado | 11 | Login, `/auth/me`, cinco de vehículos y cuatro de órdenes |
+| Desalineado | 0 | — |
+| Sin uso en pantallas | 2 | Registro y asignación de mecánico |
+
+Actualizado el 28-10-2026 (SCRUM-105) contra `/ms2/openapi.json`. Los endpoints de vehículos y órdenes quedaron alineados con el merge `f25ae44` y las correcciones de SCRUM-103, SCRUM-104 y SCRUM-105.
