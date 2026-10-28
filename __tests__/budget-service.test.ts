@@ -393,6 +393,41 @@ describe('BudgetsService.decideBudgetVersion', () => {
     );
   });
 
+  it('envía exactamente las propiedades de DecisionEntrada (additionalProperties: false)', async () => {
+    mockedApiClient.post.mockResolvedValueOnce({ data: RESULT });
+
+    await budgetsService.decideBudgetVersion('5', 2, {
+      decision: 'aprobado',
+      reason: ' Conforme ',
+      confirmCancellation: false,
+    });
+
+    const [, body] = mockedApiClient.post.mock.calls[0];
+    expect(body).toStrictEqual({
+      decision: 'aprobado',
+      motivo: 'Conforme',
+      confirmar_cancelacion: false,
+    });
+  });
+
+  it('acepta un motivo de 1000 caracteres y rechaza uno más largo sin enviarlo', async () => {
+    mockedApiClient.post.mockResolvedValueOnce({ data: RESULT });
+
+    await budgetsService.decideBudgetVersion('5', 2, {
+      decision: 'rechazado',
+      reason: 'a'.repeat(1000),
+    });
+    expect(mockedApiClient.post).toHaveBeenCalledTimes(1);
+
+    await expect(
+      budgetsService.decideBudgetVersion('5', 2, {
+        decision: 'rechazado',
+        reason: 'a'.repeat(1001),
+      }),
+    ).rejects.toThrow('El motivo admite como máximo 1000 caracteres.');
+    expect(mockedApiClient.post).toHaveBeenCalledTimes(1);
+  });
+
   it('no envía un rechazo sin motivo', async () => {
     await expect(
       budgetsService.decideBudgetVersion('5', 1, { decision: 'rechazado', reason: '  ' }),
@@ -408,6 +443,18 @@ describe('BudgetsService.decideBudgetVersion', () => {
       budgetsService.decideBudgetVersion(budgetId, version, { decision: 'aprobado' }),
     ).rejects.toThrow(message);
     expect(mockedApiClient.post).not.toHaveBeenCalled();
+  });
+
+  it.each([
+    [404, 'Presupuesto o versión inexistente (o ajeno)'],
+    [422, 'Rechazo sin motivo o sin confirmar la cancelación'],
+  ])('propaga el %i del MS3 al decidir sin reintentar', async (status, detail) => {
+    mockedApiClient.post.mockRejectedValueOnce(httpError(status, { detail }));
+
+    await expect(
+      budgetsService.decideBudgetVersion('5', 1, { decision: 'rechazado', reason: 'Caro' }),
+    ).rejects.toThrow(detail);
+    expect(mockedApiClient.post).toHaveBeenCalledTimes(1);
   });
 
   it('distingue la decisión registrada con aplicación pendiente (503)', async () => {

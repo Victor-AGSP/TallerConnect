@@ -40,6 +40,9 @@ export class DecisionApplicationPendingError extends Error {
   }
 }
 
+/** `maxLength` de `DecisionEntrada.motivo` (MS3). */
+const DECISION_REASON_MAX_LENGTH = 1000;
+
 /** Identificador entero positivo, como exige el contrato. */
 function requirePositiveId(id: string, message: string): number {
   if (!/^[1-9]\d*$/.test(id)) {
@@ -134,6 +137,11 @@ export class BudgetsService {
 
     if (input.decision === 'rechazado' && !reason) {
       throw new Error('Indica el motivo del rechazo.');
+    }
+    if (reason.length > DECISION_REASON_MAX_LENGTH) {
+      throw new Error(
+        `El motivo admite como máximo ${DECISION_REASON_MAX_LENGTH} caracteres.`,
+      );
     }
 
     if (USE_MOCKS) {

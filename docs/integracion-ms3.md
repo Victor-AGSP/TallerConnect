@@ -61,14 +61,15 @@ La app no llama directamente a `POST /ms2/ordenes/{orden_id}/decisiones-presupue
 ### Reglas del contrato que aplica la interfaz
 
 - Solo se puede decidir la versión más reciente visible con estado `enviada` y sin decisión. El MS3 responde 409 si la versión ya se decidió o fue reemplazada, y la app muestra ese mensaje.
-- Todo rechazo exige motivo, que la app valida antes de enviar.
+- `DecisionEntrada` (`additionalProperties: false`): la app envía exactamente `decision` (`aprobado`/`rechazado`), `motivo` (recortado, o `null`) y `confirmar_cancelacion`. Todo rechazo exige motivo y `motivo` admite como máximo 1000 caracteres; la app valida ambas reglas antes de enviar (SCRUM-99, 28-10-2026).
 - Rechazar sin una aprobación previa (`version_vigente = null`) cancela el servicio. La app lo advierte, pide confirmarlo y envía `confirmar_cancelacion: true`. Rechazar una modificación posterior conserva la aprobación vigente y no cancela.
 - Ambas decisiones requieren una confirmación explícita.
 - `efecto_en_orden` y `repuestos_faltantes` se muestran tras decidir. El MS2 confirma el estado resultante de la orden, que se ve en el detalle al actualizarlo.
-- Un POST nunca se reintenta automáticamente (`attachRetryInterceptor` solo reintenta métodos seguros), así que una decisión no se envía dos veces.
+- Un POST nunca se reintenta automáticamente (`attachRetryInterceptor` solo reintenta métodos seguros), y el formulario descarta una segunda pulsación con el envío en curso (bloqueo síncrono, SCRUM-101), así que una decisión no se envía dos veces.
+- Garantías del backend según el contrato: un segundo POST sobre la misma versión responde 409 ("ya decidida"), y la aplicación en MS2 de la primera decisión es idempotente (`POST /presupuestos/decisiones/{decision_id}/aplicacion`). El contrato no declara idempotencia del POST de decisión en sí; la app no la supone.
 
 ### Roles y limitaciones
 
 - El Mecánico no ve el presupuesto: `GET /presupuestos` declara `403 Rol no permitido` sin indicar qué roles admite; no se expone hasta que el responsable del MS3 lo confirme.
-- El estado de la orden en el detalle sigue usando `CODE_TO_STATUS` (C1 de `docs/integracion-cruzada-ordenes.md`, a cargo de otro integrante). En `Victor`, el código 3 se muestra como "En reparación" y el 5 como "Control de calidad". El flujo del presupuesto no depende de ese catálogo: usa el estado de la versión y `efecto_en_orden` del MS3.
+- El estado de la orden en el detalle usa `CODE_TO_STATUS`, alineado con el catálogo de MS2 desde el merge `f25ae44` (C1, verificado en SCRUM-104: 3 = esperando aprobación, 4 = esperando repuestos, 5 = en reparación, 8 = cancelado). El flujo del presupuesto usa además el estado de la versión y `efecto_en_orden` del MS3.
 - Validación: contrato OpenAPI y pruebas con el cliente HTTP simulado (`budget-service.test.ts`) o con el adaptador de red simulado (`budget-flow-integration.test.tsx`). No se enviaron decisiones ni se crearon presupuestos en el MS3 desplegado.
