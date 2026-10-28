@@ -1,5 +1,6 @@
 import { normalizeApiError } from '@/services/api/interceptors';
 import { HTTP_STATUS, NormalizedApiError } from '@/services/api/types';
+import { InvalidOrderResponseError } from '@/mappers/order.mapper';
 
 /**
  * Error normalizado de la capa de servicios (Vehículos y Órdenes).
@@ -108,6 +109,15 @@ export function normalizeOrderServiceError(
 ): ServiceError {
   if (error instanceof ServiceError) {
     return error;
+  }
+
+  if (error instanceof InvalidOrderResponseError) {
+    return new ServiceError({
+      message: error.message,
+      code: 'ORDER_INVALID_RESPONSE',
+      domain: 'orders',
+      originalError: error,
+    });
   }
 
   const validationMsg = extractValidationDetail(error);

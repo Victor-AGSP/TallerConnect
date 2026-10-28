@@ -25,7 +25,7 @@ Estado al 14-10-2026 (contrato MS2 vuelto a consultar):
 | C1 | Pendiente | Corregida (`ORDER_STATUS_BY_CODE`: 3, 5 y 8 alineados con el contrato) |
 | C2 | Pendiente | Pendiente (`PATCH /ordenes/{id}/status`) |
 | C3 | Pendiente (el contrato sigue sin cliente en `OrdenRespuesta`) | No verificado |
-| C4 | Pendiente | No verificado |
+| C4 | Corregida (SCRUM-103, 28-10-2026) | No verificado |
 
 Ninguna bloquea la integración con el MS3: el presupuesto y los repuestos se representan con los datos del MS3 (estado de la versión y `efecto_en_orden`), no con `estado_codigo`.
 
@@ -70,7 +70,7 @@ Comprobado con OrdersService real y el cliente HTTP simulado:
 - Una respuesta 200 con cuerpo `null` llega a `mapOrderResponse`, que falla al leer `dto.status`; `getOrderById` propaga el mensaje técnico y la vista muestra "Cannot read properties of null (reading 'status')".
 - Una respuesta 200 con `{}` se convierte en una orden con `id` vacío y valores por defecto, y la vista la representa como "Orden " sin identificador.
 
-Corrección necesaria: validar la respuesta en el mapper o el servicio (por ejemplo, exigir `orden_id`) y lanzar un error con mensaje propio. Las pruebas correspondientes quedan como `it.todo` en `__tests__/order-view-states.test.tsx`.
+**Corregido (SCRUM-103, 28-10-2026):** `mapOrderResponse` valida la respuesta con `orderResponseDtoSchema` (todos los campos obligatorios de `OrdenRespuesta`, enteros, fechas ISO 8601 y `mecanico_actual_id` entero o `null`) y no completa valores por defecto. Una respuesta inválida o un `estado_codigo` fuera del catálogo lanza `InvalidOrderResponseError`, que `normalizeOrderServiceError` convierte en `ServiceError` con código `ORDER_INVALID_RESPONSE` y mensaje apto para la UI. La vista muestra el error con "Reintentar" y no representa una orden ficticia. Pruebas: `__tests__/order-view-states.test.tsx` ("respuestas vacías o inválidas").
 
 ## Hallazgos de las pruebas funcionales
 

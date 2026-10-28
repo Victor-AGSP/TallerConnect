@@ -232,7 +232,16 @@ describe('vistas de órdenes con OrdersService real', () => {
     'la vista de %s consulta el detalle a través del servicio',
     async (_role, path) => {
       mockedApiClient.get.mockResolvedValueOnce({
-        data: { orden_id: 124, vehiculo_id: 7, cliente_id: 12, estado_codigo: 3 },
+        data: {
+          orden_id: 124,
+          vehiculo_id: 7,
+          ingreso_id: 201,
+          estado_codigo: 3,
+          mecanico_actual_id: null,
+          creado_por_id: 99,
+          creado_en: '2026-03-01T09:00:00Z',
+          actualizado_en: '2026-03-01T09:00:00Z',
+        },
       } as never);
 
       const router = renderRouterWithProviders(routes, { initialUrl: path });
@@ -302,9 +311,11 @@ describe('vistas de órdenes con OrdersService real', () => {
       expect(screen.getByTestId('order-detail-error')).toBeTruthy(),
     );
 
+    // Mensaje comprensible, sin detalles técnicos del mapper.
     expect(
-      screen.getByText('Estado de orden desconocido: undefined'),
+      screen.getByText('El servidor devolvió una orden de trabajo incompleta o inválida.'),
     ).toBeTruthy();
+    expect(screen.queryByTestId('order-detail-130')).toBeNull();
   });
 
   it('muestra el mensaje normalizado cuando la orden no existe', async () => {

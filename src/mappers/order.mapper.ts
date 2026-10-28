@@ -1,6 +1,19 @@
 import { WorkOrder, WorkOrderStatus } from '@/models/order.model';
 import { OrderResponseDto } from '@/dto/order.dto';
 import { ORDER_STATUS, ORDER_STATUS_BY_CODE } from '@/constants/orderStatus';
+import { orderResponseDtoSchema } from '@/schemas/order-dto.schema';
+
+/**
+ * Respuesta 2xx de MS2 que no cumple `OrdenRespuesta` (cuerpo nulo, campos
+ * obligatorios ausentes o estado fuera del catálogo). Su mensaje es apto para la UI.
+ */
+export class InvalidOrderResponseError extends Error {
+  constructor(message = 'El servidor devolvió una orden de trabajo incompleta o inválida.') {
+    super(message);
+    this.name = 'InvalidOrderResponseError';
+    Object.setPrototypeOf(this, InvalidOrderResponseError.prototype);
+  }
+}
 
 /**
  * Catálogo oficial de códigos numéricos de estado (OrdenRespuesta.estado_codigo en MS2) a estados de la aplicación.
@@ -28,15 +41,25 @@ export const STATUS_TO_CODE: Partial<Record<WorkOrderStatus, number>> = {
 function mapOrderStatus(code: number): WorkOrderStatus {
   const status = ORDER_STATUS_BY_CODE[code];
   if (!status) {
-    throw new Error(`Estado de orden desconocido: ${code}`);
+    throw new InvalidOrderResponseError(
+      `La orden informa un estado que la aplicación no reconoce (código ${code}).`
+    );
   }
   return status;
 }
 
 /**
  * Mapea una orden de trabajo devuelta por la API Gateway al modelo WorkOrder de la aplicación.
+ * Valida antes la forma completa de `OrdenRespuesta`: no se completan con valores
+ * por defecto los campos que el contrato declara obligatorios.
  */
-export function mapOrderResponse(dto: OrderResponseDto): WorkOrder {
+export function mapOrderResponse(raw: OrderResponseDto): WorkOrder {
+  const parsed = orderResponseDtoSchema.safeParse(raw);
+  if (!parsed.success) {
+    throw new InvalidOrderResponseError();
+  }
+  const dto = parsed.data;
+
   return {
     id: String(dto.orden_id),
     vehicleId: String(dto.vehiculo_id),

@@ -296,7 +296,10 @@ describe('OrdersService: respuestas vacías', () => {
 
     await expect(
       ordersService.getOrderById('77'),
-    ).rejects.toThrow('Estado de orden desconocido: undefined');
+    ).rejects.toMatchObject({
+      code: 'ORDER_INVALID_RESPONSE',
+      message: 'El servidor devolvió una orden de trabajo incompleta o inválida.',
+    });
   });
 });
 

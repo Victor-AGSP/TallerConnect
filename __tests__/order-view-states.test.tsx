@@ -269,8 +269,97 @@ describe('vistas de órdenes: reintento manual', () => {
   });
 });
 
-describe('vistas de órdenes: respuestas vacías', () => {
-  // Dependen del mapper y del servicio de órdenes (docs/integracion-cruzada-ordenes.md, C4).
-  it.todo('una respuesta 200 sin cuerpo muestra un mensaje comprensible');
-  it.todo('una respuesta 200 sin identificador de orden no se representa como orden válida');
+describe('vistas de órdenes: respuestas vacías o inválidas', () => {
+  // Validación de OrdenRespuesta en mapOrderResponse (docs/integracion-cruzada-ordenes.md, C4).
+  const INVALID_ORDER_MESSAGE =
+    'El servidor devolvió una orden de trabajo incompleta o inválida.';
+
+  it('una respuesta 200 sin cuerpo muestra un mensaje comprensible', async () => {
+    mockedApiClient.get.mockResolvedValueOnce({ data: null } as never);
+
+    await renderOrder();
+
+    await expectErrorMessage(INVALID_ORDER_MESSAGE);
+    expect(screen.queryByText(/Cannot read properties/)).toBeNull();
+  });
+
+  it('una respuesta 200 sin identificador de orden no se representa como orden válida', async () => {
+    mockedApiClient.get.mockResolvedValueOnce({ data: {} } as never);
+
+    await renderOrder('/mis-ordenes/31');
+
+    await expectErrorMessage(INVALID_ORDER_MESSAGE);
+    expect(screen.queryByText(/Estado de orden desconocido/)).toBeNull();
+    expect(screen.queryByText('Orden ')).toBeNull();
+  });
+
+  it.each(Object.keys(CONTRACT_ORDER))(
+    'rechaza la orden cuando falta el campo obligatorio %s',
+    async (field) => {
+      const { [field as keyof typeof CONTRACT_ORDER]: _omitted, ...incomplete } =
+        CONTRACT_ORDER;
+      mockedApiClient.get.mockResolvedValueOnce({ data: incomplete } as never);
+
+      await expect(ordersService.getOrderById('31')).rejects.toMatchObject({
+        code: 'ORDER_INVALID_RESPONSE',
+        message: INVALID_ORDER_MESSAGE,
+      });
+    },
+  );
+
+  it.each([
+    ['orden_id como texto', { orden_id: '31' }],
+    ['estado_codigo decimal', { estado_codigo: 2.5 }],
+    ['creado_en sin formato de fecha', { creado_en: 'ayer' }],
+    ['mecanico_actual_id como texto', { mecanico_actual_id: 'cincuenta' }],
+  ])('rechaza la orden con %s', async (_case, override) => {
+    mockedApiClient.get.mockResolvedValueOnce({
+      data: { ...CONTRACT_ORDER, ...override },
+    } as never);
+
+    await expect(ordersService.getOrderById('31')).rejects.toMatchObject({
+      code: 'ORDER_INVALID_RESPONSE',
+    });
+  });
+
+  it('acepta mecanico_actual_id nulo, que el contrato permite', async () => {
+    mockedApiClient.get.mockResolvedValueOnce({
+      data: { ...CONTRACT_ORDER, mecanico_actual_id: null },
+    } as never);
+
+    await expect(ordersService.getOrderById('31')).resolves.toMatchObject({
+      id: '31',
+      assignedMechanicId: null,
+    });
+  });
+
+  it('informa un estado fuera del catálogo sin representar la orden', async () => {
+    mockedApiClient.get.mockResolvedValueOnce({
+      data: { ...CONTRACT_ORDER, estado_codigo: 99 },
+    } as never);
+
+    await renderOrder('/ordenes-asignadas/31');
+
+    await expectErrorMessage(
+      'La orden informa un estado que la aplicación no reconoce (código 99).',
+    );
+  });
+
+  it('se recupera con el reintento manual cuando la siguiente respuesta es válida', async () => {
+    mockedApiClient.get
+      .mockResolvedValueOnce({ data: {} } as never)
+      .mockResolvedValueOnce({ data: CONTRACT_ORDER } as never);
+
+    await renderOrderView();
+
+    await expectErrorMessage(INVALID_ORDER_MESSAGE);
+
+    await fireEvent.press(screen.getByRole('button', { name: 'Reintentar' }));
+
+    await waitFor(() =>
+      expect(screen.getByTestId('order-detail-31')).toBeTruthy(),
+    );
+    expect(screen.queryByTestId('order-detail-error')).toBeNull();
+    expect(mockedApiClient.get).toHaveBeenCalledTimes(2);
+  });
 });
