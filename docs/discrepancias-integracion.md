@@ -35,7 +35,7 @@ Las discrepancias incluyen tanto diferencias directas entre la app y el contrato
 | E1 | Endpoint `GET /api/vehiculos/mios` | No existe; responde 422. Los vehículos del cliente se obtienen con `GET /api/vehiculos` | `getMyVehicles()` lo llama | Alto | — |
 | E2 | Endpoint `GET /api/vehiculos/asignados` | No existe | `getAssignedVehicles()` lo llama | Alto | I4, I5 |
 | E3 | Endpoint `PATCH /api/ordenes/{id}/status` | No existe | `updateOrderStatus()` lo llama | Alto | I1, I5 |
-| E4 | Cuerpo al crear un vehículo | `VehiculoCrear`: `patente`, `marca` y `modelo` obligatorios, `anio` y `kilometraje` opcionales, sin campos adicionales | `createVehicle()` envía `patent`, `brand`, `model`, `year` y `mileage`, y omite `marca` y `modelo` | Alto | — |
+| E4 | Cuerpo al crear un vehículo | `VehiculoCrear`: `patente`, `marca` y `modelo` obligatorios, `anio` y `kilometraje` opcionales, sin campos adicionales | Corregido (SCRUM-105): `buildCreateVehiclePayload()` envía solo `patente`, `marca`, `modelo`, `anio` y `kilometraje`, y valida obligatorios, tipos y longitudes antes de llamar a MS2 | — | — |
 | E5 | Cuerpo al crear una orden | `OrdenCrear`: solo `vehiculo_id`, entero, sin campos adicionales; requiere rol administrador | `createOrder()` envía `vehiculo_id` como texto, junto con `vehicle_id`, `cliente_id`, `client_id` y `description` | Alto | — |
 | E6 | Cierre de sesión ante 403 | 403 indica falta de permiso por rol | El interceptor cierra la sesión ante 401 y ante 403 | Alto | — |
 | E7 | DTO de vehículos y órdenes | Campos definidos y obligatorios en `VehiculoRespuesta` y `OrdenRespuesta` | `VehicleResponseDto` y `OrderResponseDto` declaran todos los campos opcionales y aceptan nombres que el contrato no usa | Medio | — |

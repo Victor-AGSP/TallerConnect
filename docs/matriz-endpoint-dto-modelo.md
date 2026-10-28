@@ -25,14 +25,14 @@ Esta matriz muestra, para cada endpoint del contrato y para cada endpoint que ll
 |---|---|---|---|---|---|---|
 | `GET /api/vehiculos` | `getVehicles()` (`vehicles.service.ts`) | — | `VehicleResponseDto[]` | `mapVehiclesResponseList` | `Vehicle[]` | Desalineado |
 | `GET /api/vehiculos/{vehiculo_id}` | `getVehicleById()` | — | `VehicleResponseDto` | `mapVehicleResponse` | `Vehicle` | Desalineado |
-| `POST /api/vehiculos` | `createVehicle()` | `CreateVehicleRequestDto` | `VehicleResponseDto` | `mapVehicleResponse` | `Vehicle` | Desalineado |
+| `POST /api/vehiculos` | `createVehicle()` | `CreateVehicleRequestDto` → `VehicleCreatePayloadDto` | `VehicleResponseDto` | `mapVehicleResponse` | `Vehicle` | Alineado |
 | `PATCH /api/vehiculos/{vehiculo_id}` | — | — | — | — | — | Sin uso en la app |
 | `GET /api/vehiculos/mios` | `getMyVehicles()` | — | `VehicleResponseDto[]` | `mapVehiclesResponseList` | `Vehicle[]` | No existe en el contrato |
 | `GET /api/vehiculos/asignados` | `getAssignedVehicles()` | — | `VehicleResponseDto[]` | `mapVehiclesResponseList` | `Vehicle[]` | No existe en el contrato |
 
 **Observaciones:**
 - `VehicleResponseDto` declara todos sus campos como opcionales y acepta nombres que el contrato no usa (`id`, `patent`, `license_plate`, `plate`, `brand`, `model`, `year`, `mileage`, `client_id`, `owner_id`). El contrato (`VehiculoRespuesta`) define `vehiculo_id`, `patente`, `marca`, `modelo`, `anio` y `kilometraje`, todos obligatorios.
-- `createVehicle()` envía `patent`, `patente`, `brand`, `model`, `year` y `mileage`. El contrato (`VehiculoCrear`) admite `patente`, `marca` y `modelo` como obligatorios y `anio` y `kilometraje` como opcionales, y no admite campos adicionales.
+- `createVehicle()` acepta alias internos (`plate`, `brand`, `model`, `year`, `mileage`), pero `buildCreateVehiclePayload()` envía exactamente `VehiculoCrear`: `patente`, `marca` y `modelo` obligatorios y `anio` y `kilometraje` opcionales, sin campos adicionales ni `owner_id` (MS2 lo toma del JWT).
 - `GET /api/vehiculos` solo responde al rol cliente; mecánico y administrador reciben 403.
 - `GET /api/vehiculos/mios` responde 422, porque el backend interpreta `mios` como `vehiculo_id`.
 

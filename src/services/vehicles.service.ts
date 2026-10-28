@@ -9,6 +9,7 @@ import {
   CreateVehicleRequestDto,
   UpdateVehicleRequestDto,
   VehicleQueryParamsDto,
+  VehicleCreatePayloadDto,
   VehicleResponseDto,
 } from '@/dto/vehicle.dto';
 import {
@@ -21,6 +22,9 @@ import { mockUserByRole } from '@/mocks/users.mock';
 export { ServiceError, normalizeVehicleServiceError };
 
 const USE_MOCKS = process.env.EXPO_PUBLIC_USE_MOCK_AUTH === 'true';
+
+/** `maxLength` de `marca` y `modelo` en `VehiculoCrear` (MS2). */
+const VEHICLE_TEXT_MAX_LENGTH = 60;
 
 /**
  * Filtra y pagina localmente una lista de vehículos según VehicleQueryParamsDto.
@@ -66,6 +70,68 @@ export function filterVehiclesByParams(
     params.limit && params.limit > 0 ? start + params.limit : undefined;
 
   return filtered.slice(start, end);
+}
+
+/**
+ * Construye el cuerpo exacto de `VehiculoCrear` (MS2, `additionalProperties: false`).
+ * Acepta los alias internos (`plate`/`patent`, `brand`, `model`, `year`, `mileage`),
+ * pero solo envía `patente`, `marca`, `modelo` y, si se informan, `anio` y `kilometraje`.
+ * El propietario lo resuelve MS2 desde el JWT, por lo que `owner_id` nunca se envía.
+ */
+export function buildCreateVehiclePayload(
+  data: CreateVehicleRequestDto
+): VehicleCreatePayloadDto {
+  const pickText = (...values: unknown[]): string => {
+    const value = values.find((v) => v !== undefined && v !== null);
+    return typeof value === 'string' ? value.trim() : '';
+  };
+  const pickOptionalInt = (
+    field: 'anio' | 'kilometraje',
+    primary: unknown,
+    alias: unknown
+  ): number | null | undefined => {
+    const value = primary !== undefined ? primary : alias;
+    if (value === undefined || value === null) return value as null | undefined;
+    if (typeof value !== 'number' || !Number.isInteger(value)) {
+      throw vehicleValidationError(`El campo ${field} debe ser un número entero.`);
+    }
+    return value;
+  };
+
+  const patente = pickText(data.patente, data.patent, data.plate).toUpperCase();
+  const marca = pickText(data.marca, data.brand);
+  const modelo = pickText(data.modelo, data.model);
+
+  if (!patente || !marca || !modelo) {
+    throw vehicleValidationError(
+      'Patente, marca y modelo son obligatorios para registrar un vehículo.'
+    );
+  }
+  if (marca.length > VEHICLE_TEXT_MAX_LENGTH || modelo.length > VEHICLE_TEXT_MAX_LENGTH) {
+    throw vehicleValidationError(
+      `Marca y modelo admiten como máximo ${VEHICLE_TEXT_MAX_LENGTH} caracteres.`
+    );
+  }
+
+  const anio = pickOptionalInt('anio', data.anio, data.year);
+  const kilometraje = pickOptionalInt('kilometraje', data.kilometraje, data.mileage);
+
+  return {
+    patente,
+    marca,
+    modelo,
+    ...(anio !== undefined ? { anio } : {}),
+    ...(kilometraje !== undefined ? { kilometraje } : {}),
+  };
+}
+
+function vehicleValidationError(message: string): ServiceError {
+  return new ServiceError({
+    message,
+    status: HTTP_STATUS.UNPROCESSABLE_ENTITY,
+    code: 'VEHICLE_VALIDATION_ERROR',
+    domain: 'vehicles',
+  });
 }
 
 /**
@@ -244,24 +310,7 @@ export class RealVehicleAdapter implements VehicleServiceAdapter {
   }
 
   async createVehicle(data: CreateVehicleRequestDto): Promise<Vehicle> {
-    const rawPlate = (data.patent || data.patente || data.plate || '').toUpperCase().trim();
-    const rawBrand = data.brand || data.marca || '';
-    const rawModel = data.model || data.modelo || '';
-    const rawYear = (data.year !== undefined ? data.year : data.anio) ?? null;
-    const rawMileage = (data.mileage !== undefined ? data.mileage : data.kilometraje) ?? null;
-
-    const payload = {
-      patent: rawPlate,
-      patente: rawPlate,
-      brand: rawBrand,
-      marca: rawBrand,
-      model: rawModel,
-      modelo: rawModel,
-      year: rawYear,
-      anio: rawYear,
-      mileage: rawMileage,
-      kilometraje: rawMileage,
-    };
+    const payload = buildCreateVehiclePayload(data);
 
     const response = await apiClient.post<VehicleResponseDto>('/vehiculos', payload);
     return mapVehicleResponse(response.data);

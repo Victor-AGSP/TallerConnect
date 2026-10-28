@@ -12,8 +12,10 @@ export interface VehicleResponseDto {
 }
 
 /**
- * Cuerpo enviado a POST /api/vehiculos para registrar un vehículo (VehiculoCrear en MS2).
- * Soporta tanto patente/marca/modelo (contrato MS2) como patent/brand/model/plate para compatibilidad total.
+ * Datos de entrada de `createVehicle()`. Admite patente/marca/modelo (contrato MS2) y los alias
+ * internos patent/plate/brand/model/year/mileage. No es el cuerpo HTTP: el servicio lo convierte
+ * en `VehicleCreatePayloadDto` antes de enviarlo.
+ * `owner_id` solo lo usa el adaptador simulado; MS2 resuelve el propietario desde el JWT.
  */
 export interface CreateVehicleRequestDto {
   patent?: string;
@@ -28,6 +30,17 @@ export interface CreateVehicleRequestDto {
   mileage?: number | null;
   kilometraje?: number | null;
   owner_id?: number | string;
+}
+
+/**
+ * Cuerpo exacto enviado a POST /api/vehiculos (`VehiculoCrear` en MS2, `additionalProperties: false`).
+ */
+export interface VehicleCreatePayloadDto {
+  patente: string;
+  marca: string;
+  modelo: string;
+  anio?: number | null;
+  kilometraje?: number | null;
 }
 
 /**

@@ -188,46 +188,112 @@ describe('vehiclesService (Capa de Servicios de Vehículos)', () => {
   });
 
   describe('createVehicle', () => {
-    it('registra un vehículo enviando los datos por POST y retornando el modelo mapeado', async () => {
-      const payload = {
-        plate: 'JKLM56',
+    const rawResponse: VehicleResponseDto = {
+      vehiculo_id: 10,
+      cliente_id: 8,
+      patente: 'JKLM56',
+      marca: 'Hyundai',
+      modelo: 'Tucson',
+      anio: 2023,
+      kilometraje: null,
+    };
+
+    it('envía por POST exactamente el cuerpo VehiculoCrear y retorna el modelo mapeado', async () => {
+      mockedApiClient.post.mockResolvedValueOnce({ data: rawResponse } as never);
+
+      const result = await vehiclesService.createVehicle({
+        plate: 'jklm56 ',
         brand: 'Hyundai',
         model: 'Tucson',
         year: 2023,
         owner_id: 8,
-      };
+      });
 
-      const rawResponse: VehicleResponseDto = {
-        vehiculo_id: 10,
-        cliente_id: 8,
+      expect(mockedApiClient.post).toHaveBeenCalledTimes(1);
+      const [url, body] = mockedApiClient.post.mock.calls[0];
+      expect(url).toBe('/vehiculos');
+      // Igualdad estricta: cualquier propiedad adicional rompería additionalProperties: false.
+      expect(body).toStrictEqual({
         patente: 'JKLM56',
         marca: 'Hyundai',
         modelo: 'Tucson',
         anio: 2023,
-        kilometraje: null,
-      };
+      });
+      expect(result).toEqual({
+        id: '10',
+        plate: 'JKLM56',
+        brand: 'Hyundai',
+        model: 'Tucson',
+        year: 2023,
+        mileage: null,
+        ownerId: '8',
+      });
+    });
 
-      mockedApiClient.post.mockResolvedValueOnce({
-        data: rawResponse,
-      } as never);
+    it('solo envía propiedades admitidas por VehiculoCrear aunque la entrada mezcle alias', async () => {
+      mockedApiClient.post.mockResolvedValueOnce({ data: rawResponse } as never);
 
-      const result = await vehiclesService.createVehicle(payload);
+      await vehiclesService.createVehicle({
+        patente: 'JKLM56',
+        patent: 'IGNORADA',
+        marca: 'Hyundai',
+        brand: 'Otra',
+        modelo: 'Tucson',
+        model: 'Otro',
+        anio: 2023,
+        year: 1999,
+        kilometraje: 1200,
+        mileage: 5,
+        owner_id: 99,
+      });
 
-      expect(mockedApiClient.post).toHaveBeenCalledWith(
-        '/vehiculos',
-        expect.objectContaining({
-          patent: 'JKLM56',
-          patente: 'JKLM56',
-          brand: 'Hyundai',
-          marca: 'Hyundai',
-          model: 'Tucson',
-          modelo: 'Tucson',
-        })
+      const body = mockedApiClient.post.mock.calls[0][1] as Record<string, unknown>;
+      expect(Object.keys(body).sort()).toEqual(
+        ['anio', 'kilometraje', 'marca', 'modelo', 'patente']
       );
-      expect(result.id).toBe('10');
-      expect(result.plate).toBe('JKLM56');
-      expect(result.brand).toBe('Hyundai');
-      expect(result.year).toBe(2023);
+      expect(body).toStrictEqual({
+        patente: 'JKLM56',
+        marca: 'Hyundai',
+        modelo: 'Tucson',
+        anio: 2023,
+        kilometraje: 1200,
+      });
+    });
+
+    it('conserva null explícito en anio y kilometraje y omite los no informados', async () => {
+      mockedApiClient.post.mockResolvedValueOnce({ data: rawResponse } as never);
+      await vehiclesService.createVehicle({
+        patente: 'JKLM56', marca: 'Hyundai', modelo: 'Tucson', anio: null,
+      });
+      expect(mockedApiClient.post.mock.calls[0][1]).toStrictEqual({
+        patente: 'JKLM56', marca: 'Hyundai', modelo: 'Tucson', anio: null,
+      });
+    });
+
+    it.each([
+      [{ patente: '  ', marca: 'Kia', modelo: 'Rio' }, 'Patente, marca y modelo son obligatorios'],
+      [{ patente: 'AB12', modelo: 'Rio' }, 'Patente, marca y modelo son obligatorios'],
+      [{ patente: 'AB12', marca: 'Kia', modelo: 'x'.repeat(61) }, 'como máximo 60 caracteres'],
+      [{ patente: 'AB12', marca: 'Kia', modelo: 'Rio', anio: 2020.5 }, 'anio debe ser un número entero'],
+      [
+        { patente: 'AB12', marca: 'Kia', modelo: 'Rio', kilometraje: '100' as unknown as number },
+        'kilometraje debe ser un número entero',
+      ],
+    ])('rechaza localmente datos inválidos sin llamar a MS2 (%o)', async (input, message) => {
+      await expect(vehiclesService.createVehicle(input)).rejects.toMatchObject({
+        status: 422,
+        code: 'VEHICLE_VALIDATION_ERROR',
+        domain: 'vehicles',
+        message: expect.stringContaining(message),
+      });
+      expect(mockedApiClient.post).not.toHaveBeenCalled();
+    });
+
+    it('rechaza una respuesta 201 que no cumple VehiculoRespuesta', async () => {
+      mockedApiClient.post.mockResolvedValueOnce({ data: { vehiculo_id: 10 } } as never);
+      await expect(
+        vehiclesService.createVehicle({ patente: 'AB12', marca: 'Kia', modelo: 'Rio' })
+      ).rejects.toBeInstanceOf(ServiceError);
     });
   });
 
@@ -281,7 +347,8 @@ describe('vehiclesService (Capa de Servicios de Vehículos)', () => {
       });
 
       try {
-        await vehiclesService.createVehicle({ patente: '', marca: 'Kia', modelo: 'Rio' });
+        // Entrada válida localmente: se verifica la normalización del 422 devuelto por MS2.
+        await vehiclesService.createVehicle({ patente: 'AB12', marca: 'Kia', modelo: 'Rio' });
         fail('Debió lanzar un ServiceError');
       } catch (err) {
         expect(err).toBeInstanceOf(ServiceError);
