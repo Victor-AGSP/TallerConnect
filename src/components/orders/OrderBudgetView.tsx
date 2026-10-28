@@ -1,4 +1,4 @@
-import { useCallback, useMemo, useState } from 'react';
+import { useCallback, useMemo, useRef, useState } from 'react';
 
 import { StyleSheet, Text, View } from 'react-native';
 
@@ -303,6 +303,11 @@ function BudgetDecisionForm({
   const [reason, setReason] = useState('');
   const [state, setState] = useState<FormState>({ kind: 'idle' });
   const [error, setError] = useState<string | null>(null);
+  // Bloqueo síncrono de envíos: dos pulsaciones que llegan antes del siguiente
+  // render ven todavía el botón habilitado, así que `loading`/`disabled` no
+  // bastan para impedir una segunda decisión o un segundo reintento. Tras un
+  // envío exitoso sigue bloqueado: la versión ya decidida no admite otro.
+  const inFlight = useRef(false);
 
   // Rechazar antes de la primera aprobación cancela el servicio (contrato MS3).
   const rejectionCancels = budget.currentVersion == null;
@@ -317,6 +322,8 @@ function BudgetDecisionForm({
   };
 
   const submit = async (decision: BudgetDecisionValue) => {
+    if (inFlight.current) return;
+    inFlight.current = true;
     setState({ kind: 'submitting', decision });
     setError(null);
 
@@ -334,6 +341,7 @@ function BudgetDecisionForm({
         missingParts: result.missingParts,
       });
     } catch (caught: unknown) {
+      inFlight.current = false;
       if (caught instanceof DecisionApplicationPendingError) {
         setState({
           kind: 'pending',
@@ -349,6 +357,8 @@ function BudgetDecisionForm({
   };
 
   const retryApplication = async (decisionId: string, message: string) => {
+    if (inFlight.current) return;
+    inFlight.current = true;
     setState({ kind: 'pending', decisionId, message, retrying: true });
     setError(null);
 
@@ -359,6 +369,7 @@ function BudgetDecisionForm({
         missingParts: [],
       });
     } catch (caught: unknown) {
+      inFlight.current = false;
       setState({ kind: 'pending', decisionId, message, retrying: false });
       if (!(caught instanceof DecisionApplicationPendingError)) {
         setError(caught instanceof Error ? caught.message : 'No fue posible aplicar la decisión en la orden.');

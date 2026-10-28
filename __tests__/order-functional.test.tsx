@@ -26,6 +26,12 @@ import ClienteLayout from '@/app/(cliente)/_layout';
 import ClienteScreen from '@/app/(cliente)/cliente';
 import MiOrdenScreen from '@/app/(cliente)/mis-ordenes/[id]';
 import MiOrdenPresupuestoScreen from '@/app/(cliente)/mis-ordenes/[id]/presupuesto';
+import MisVehiculosScreen from '@/app/(cliente)/mis-vehiculos';
+import ProveedorScreen from '@/app/(admin)/proveedores/[id]';
+import ProveedoresScreen from '@/app/(admin)/proveedores';
+import RepuestosScreen from '@/app/(admin)/repuestos';
+import VehiculosScreen from '@/app/(admin)/vehiculos';
+import VehiculosAsignadosScreen from '@/app/(mecanico)/vehiculos-asignados';
 import IndexScreen from '@/app/index';
 import MecanicoLayout from '@/app/(mecanico)/_layout';
 import MecanicoScreen from '@/app/(mecanico)/mecanico';
@@ -49,6 +55,9 @@ import { useAuthStore } from '@/stores/authStore';
  * Desde el detalle, el presupuesto (MS3) se abre con "Ver presupuesto".
  * Las respuestas del MS3 se construyen según su contrato: no se contacta al
  * servicio desplegado ni se envían decisiones reales.
+ *
+ * También se recorren vehículos (MS2), repuestos y proveedores (MS3) desde
+ * los botones de cada panel.
  */
 
 const secureStore = new Map<string, string>();
@@ -73,6 +82,12 @@ const routes = {
   '(admin)/administrador': AdminScreen,
   '(admin)/ordenes/[id]': OrdenScreen,
   '(admin)/ordenes/[id]/presupuesto': OrdenPresupuestoScreen,
+  '(admin)/vehiculos': VehiculosScreen,
+  '(admin)/repuestos': RepuestosScreen,
+  '(admin)/proveedores/index': ProveedoresScreen,
+  '(admin)/proveedores/[id]': ProveedorScreen,
+  '(cliente)/mis-vehiculos': MisVehiculosScreen,
+  '(mecanico)/vehiculos-asignados': VehiculosAsignadosScreen,
   '(cliente)/_layout': ClienteLayout,
   '(cliente)/cliente': ClienteScreen,
   '(cliente)/mis-ordenes/[id]': MiOrdenScreen,
@@ -482,6 +497,23 @@ function requestsTo(method: string, url: string) {
   );
 }
 
+/**
+ * Despacha un clic (como el de accesibilidad) por la ruta real de Pressability
+ * del botón con el testID indicado. Permite emitir dos pulsaciones antes de que
+ * React vuelva a renderizar, cosa que `fireEvent` (un act() por evento) no puede
+ * simular: ambas usan la configuración del último render, con el botón habilitado.
+ */
+function pressHandlerOf(testID: string): () => void {
+  const host = screen.getByTestId(testID);
+  const event = {
+    nativeEvent: {},
+    target: host,
+    currentTarget: host,
+    stopPropagation: () => {},
+  };
+  return () => host.props.onClick(event);
+}
+
 /** login → panel → detalle de la orden → presupuesto. */
 async function openBudgetAsClient() {
   const router = renderRouterWithProviders(routes, { initialUrl: '/login' });
@@ -704,11 +736,96 @@ describe('caso de uso: decidir el presupuesto de una orden', () => {
     expect(requestsTo('post', DECISION_URL)).toHaveLength(1);
   });
 
-  // Pendiente: la doble pulsación con la decisión aún en curso. El botón de
-  // confirmar se deshabilita mientras `loading`, pero su manejador devuelve la
-  // promesa del envío y el fireEvent de las pruebas la convierte en un act()
-  // asíncrono que no puede solaparse con una segunda pulsación.
-  it.todo('una doble pulsación de confirmar con la decisión en curso envía una sola decisión');
+  it('una doble pulsación de confirmar con la decisión en curso envía una sola decisión', async () => {
+    // Respuesta del MS3 controlada: la decisión queda en curso hasta resolverla.
+    let release: () => void = () => {};
+    const gate = new Promise<void>((resolve) => {
+      release = resolve;
+    });
+    const approved = decisionResult('en_reparacion');
+    backend({ decision: [(config) => gate.then(() => approved(config))] });
+
+    await openBudgetAsClient();
+
+    await fireEvent.press(screen.getByRole('button', { name: 'Aprobar presupuesto' }));
+
+    // Dos eventos que llegan antes de que React vuelva a renderizar (y por
+    // tanto antes de que el botón quede deshabilitado): ambos usan el mismo
+    // manejador. La protección no puede depender solo de `disabled`.
+    const confirm = pressHandlerOf('order-budget-confirm');
+    await act(async () => {
+      confirm();
+      confirm();
+    });
+
+    await waitFor(() => expect(requestsTo('post', DECISION_URL)).toHaveLength(1));
+    expect(
+      screen.getByRole('button', { name: 'Confirmar aprobación' }).props.accessibilityState,
+    ).toMatchObject({ busy: true, disabled: true });
+
+    // Una tercera pulsación sobre el botón ya deshabilitado tampoco envía nada.
+    await fireEvent.press(screen.getByRole('button', { name: 'Confirmar aprobación' }));
+
+    await act(async () => {
+      release();
+    });
+
+    await waitFor(() =>
+      expect(
+        screen.getByText('Presupuesto aprobado. La orden pasa a reparación.'),
+      ).toBeTruthy(),
+    );
+    await waitFor(() =>
+      expect(screen.getByLabelText('Estado del presupuesto: Aprobado')).toBeTruthy(),
+    );
+    expect(requestsTo('post', DECISION_URL)).toHaveLength(1);
+  });
+
+  it('una doble pulsación de reintentar la aplicación envía un solo reintento', async () => {
+    jest.spyOn(console, 'warn').mockImplementation(() => {});
+    let release: () => void = () => {};
+    const gate = new Promise<void>((resolve) => {
+      release = resolve;
+    });
+    backend({
+      decision: [(config) => fail(config, 503, PENDING_BODY)],
+      application: [
+        (config) =>
+          gate.then(() =>
+            ok(config, { decision_id: 77, orden_id: 31, estado_aplicado: 5, historial_id: 300 }),
+          ),
+      ],
+    });
+
+    await openBudgetAsClient();
+
+    await fireEvent.press(screen.getByRole('button', { name: 'Aprobar presupuesto' }));
+    await fireEvent.press(screen.getByRole('button', { name: 'Confirmar aprobación' }));
+    await waitFor(() =>
+      expect(screen.getByTestId('order-budget-decision-pending')).toBeTruthy(),
+    );
+
+    const retry = pressHandlerOf('order-budget-retry-application');
+    await act(async () => {
+      retry();
+      retry();
+    });
+
+    await waitFor(() => expect(requestsTo('post', APPLICATION_URL)).toHaveLength(1));
+
+    await act(async () => {
+      release();
+    });
+
+    await waitFor(() =>
+      expect(screen.getByText('Tu decisión ya se aplicó en la orden.')).toBeTruthy(),
+    );
+    await waitFor(() =>
+      expect(screen.getByLabelText('Estado del presupuesto: Aprobado')).toBeTruthy(),
+    );
+    expect(requestsTo('post', APPLICATION_URL)).toHaveLength(1);
+    expect(requestsTo('post', DECISION_URL)).toHaveLength(1);
+  });
 
   it('el presupuesto se recupera con el reintento manual tras agotarse los reintentos automáticos', async () => {
     jest.spyOn(console, 'warn').mockImplementation(() => {});
@@ -756,4 +873,145 @@ describe('caso de uso: decidir el presupuesto de una orden', () => {
     expect(requestsTo('get', '/presupuestos')).toHaveLength(4);
     expect(useAuthStore.getState().isAuthenticated).toBe(true);
   });
+});
+
+/* ------------------------------------------------------------------ */
+/* Vehículos (MS2), repuestos y proveedores (MS3) desde los paneles     */
+/* ------------------------------------------------------------------ */
+
+/** Ejemplos de `VehiculoRespuesta`, `PaginaRepuestos` y `ProveedorDetalle`. */
+const CONTRACT_VEHICLE = {
+  vehiculo_id: 12,
+  cliente_id: 4,
+  patente: 'ABCD12',
+  marca: 'Toyota',
+  modelo: 'Corolla',
+  anio: 2020,
+  kilometraje: 54000,
+};
+
+const CONTRACT_PART = {
+  repuesto_id: 8,
+  nombre: 'Pastillas de freno',
+  proveedor_id: 3,
+  proveedor_nombre: 'Frenos Chile',
+  stock: 1,
+  umbral_particular: null,
+  umbral_efectivo: 5,
+  bajo_umbral: true,
+};
+
+function catalogBackend() {
+  adapter.mockImplementation((config) => {
+    const key = `${config.method} ${config.url}`;
+
+    if (key === 'get /vehiculos' || key === 'get /vehiculos/asignados') {
+      return ok(config, [CONTRACT_VEHICLE]);
+    }
+    if (key === 'get /repuestos') {
+      return ok(config, {
+        total: 1, desde: 0, limite: 50, umbral_general: 5, repuestos: [CONTRACT_PART],
+      });
+    }
+    if (key === 'get /proveedores') {
+      return ok(config, {
+        total: 1,
+        desde: 0,
+        limite: 50,
+        proveedores: [
+          { proveedor_id: 3, nombre: 'Frenos Chile', contacto: 'ventas@frenos.cl', cantidad_repuestos: 1 },
+        ],
+      });
+    }
+    if (key === 'get /proveedores/3') {
+      return ok(config, {
+        proveedor_id: 3,
+        nombre: 'Frenos Chile',
+        contacto: 'ventas@frenos.cl',
+        cantidad_repuestos: 1,
+        repuestos: [CONTRACT_PART],
+      });
+    }
+
+    return fail(config, 404, { detail: `No simulado: ${key}` });
+  });
+}
+
+async function goBack() {
+  await act(async () => {
+    appRouter.back();
+  });
+}
+
+describe('caso de uso: consultar vehículos, repuestos y proveedores', () => {
+  it('el administrador recorre vehículos, repuestos y proveedores desde su panel y cierra la sesión', async () => {
+    catalogBackend();
+    const router = renderRouterWithProviders(routes, { initialUrl: '/login' });
+    await router;
+
+    const session = await loginAs('administrador');
+    await waitFor(() => expect(router.getPathname()).toBe('/administrador'));
+
+    await fireEvent.press(screen.getByRole('button', { name: 'Ver vehículos registrados' }));
+    await waitFor(() => expect(screen.getByTestId('vehicle-card-12')).toBeTruthy());
+    expect(router.getPathname()).toBe('/vehiculos');
+    await goBack();
+
+    await fireEvent.press(screen.getByRole('button', { name: 'Ver repuestos' }));
+    await waitFor(() => expect(screen.getByTestId('spare-part-card-8')).toBeTruthy());
+    expect(router.getPathname()).toBe('/repuestos');
+    await goBack();
+
+    await fireEvent.press(screen.getByRole('button', { name: 'Ver proveedores' }));
+    await waitFor(() => expect(screen.getByTestId('supplier-card-3')).toBeTruthy());
+    await fireEvent.press(screen.getByTestId('supplier-card-3'));
+    await waitFor(() => expect(screen.getByTestId('supplier-detail-3')).toBeTruthy());
+    expect(router.getPathname()).toBe('/proveedores/3');
+    expect(screen.getByTestId('spare-part-card-8')).toBeTruthy();
+
+    await goBack();
+    await waitFor(() => expect(router.getPathname()).toBe('/proveedores'));
+    await goBack();
+    await waitFor(() => expect(router.getPathname()).toBe('/administrador'));
+
+    // Cada consulta pasó por el cliente HTTP real con el token de la sesión.
+    expect(adapter.mock.calls.map(([config]) => `${config.method} ${config.url}`)).toEqual([
+      'get /vehiculos',
+      'get /repuestos',
+      'get /proveedores',
+      'get /proveedores/3',
+    ]);
+    adapter.mock.calls.forEach((call) =>
+      expect(authorizationOf(call)).toBe(`Bearer ${session.token}`),
+    );
+
+    await fireEvent.press(screen.getByRole('button', { name: 'Cerrar sesión' }));
+    await waitFor(() => expect(router.getPathname()).toBe('/login'));
+    expect(useAuthStore.getState().isAuthenticated).toBe(false);
+  });
+
+  it.each([
+    ['cliente', '/cliente', 'Ver mis vehículos', '/mis-vehiculos', 'get /vehiculos'],
+    ['mecanico', '/mecanico', 'Ver vehículos asignados', '/vehiculos-asignados', 'get /vehiculos/asignados'],
+  ] as const)(
+    'el rol %s consulta sus vehículos desde el panel',
+    async (role, home, button, path, request) => {
+      catalogBackend();
+      const router = renderRouterWithProviders(routes, { initialUrl: '/login' });
+      await router;
+
+      await loginAs(role);
+      await waitFor(() => expect(router.getPathname()).toBe(home));
+
+      await fireEvent.press(screen.getByRole('button', { name: button }));
+      await waitFor(() => expect(screen.getByTestId('vehicle-card-12')).toBeTruthy());
+      expect(router.getPathname()).toBe(path);
+      expect(adapter.mock.calls.map(([config]) => `${config.method} ${config.url}`)).toEqual([
+        request,
+      ]);
+
+      await goBack();
+      await waitFor(() => expect(router.getPathname()).toBe(home));
+    },
+  );
 });
