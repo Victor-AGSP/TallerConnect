@@ -11,6 +11,7 @@ const providerShape = z.object({
   proveedor_id: z.number().int(),
   nombre: z.string(),
   contacto: z.string(),
+  tipo_distribuidor: z.enum(['oficial', 'generico']).optional(),
   cantidad_repuestos: z.number().int(),
 });
 

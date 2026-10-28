@@ -10,7 +10,7 @@ import { mapPartResponse } from './part.mapper';
 /**
  * Mapea un proveedor al modelo Provider de la aplicación.
  */
-function mapProviderResponse(dto: ProviderResponseDto): Provider {
+export function mapProviderResponse(dto: ProviderResponseDto): Provider {
   return {
     id: String(dto.proveedor_id),
     name: dto.nombre,

@@ -79,7 +79,7 @@ export function mapBudgetVersionResponse(dto: BudgetVersionResponseDto): BudgetV
 /**
  * Mapea el resumen de un presupuesto al modelo BudgetSummary.
  */
-function mapBudgetSummaryResponse(dto: BudgetSummaryResponseDto): BudgetSummary {
+export function mapBudgetSummaryResponse(dto: BudgetSummaryResponseDto): BudgetSummary {
   return {
     id: String(dto.presupuesto_id),
     orderId: String(dto.orden_id),
