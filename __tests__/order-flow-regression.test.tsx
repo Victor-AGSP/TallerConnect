@@ -43,8 +43,9 @@ import { STORAGE_KEYS, storage } from '@/utils/storage';
  * y PartsService reales sobre el cliente HTTP real; solo se sustituye el
  * adaptador de red con respuestas del contrato del MS3 (docs/integracion-ms3.md).
  *
- * Siguen pendientes (`it.todo`) las comprobaciones que dependen de C1 y C2
- * del mapper y servicio de órdenes (docs/integracion-cruzada-ordenes.md).
+ * Las transiciones de MS2 (C1 y C2 en docs/integracion-cruzada-ordenes.md)
+ * se verifican con OrdersService real sobre el mismo adaptador simulado:
+ * URL, método, cuerpo exacto de CambioEstadoSolicitud, respuesta y errores.
  */
 
 jest.mock('@/services/orders.service', () => ({
@@ -513,8 +514,193 @@ describe('flujo orden → presupuesto → repuestos: integración con MS3', () =
   });
 });
 
-describe('flujo orden → presupuesto → repuestos: dependencias pendientes', () => {
-  // Mapper y servicio de órdenes (C1 y C2 en docs/integracion-cruzada-ordenes.md).
-  it.todo('propaga los códigos 3 → 4 / 5 del contrato hasta la vista');
-  it.todo('registra el cambio de estado mediante PATCH /ordenes/{id}/estado');
+/* ------------------------------------------------------------------ */
+/* Estados y transiciones de MS2 (C1 y C2, corregidos)                  */
+/* ------------------------------------------------------------------ */
+
+/**
+ * OrdersService real (el módulo está simulado en este archivo para las
+ * pruebas de representación): HTTP → mapper → modelo → vista.
+ */
+const {
+  OrdersService: ActualOrdersService,
+  RealOrderAdapter: ActualRealOrderAdapter,
+} = jest.requireActual<typeof import('@/services/orders.service')>(
+  '@/services/orders.service',
+);
+const realOrders = new ActualOrdersService(new ActualRealOrderAdapter());
+
+/** `OrdenRespuesta` de la orden 31 con el código de estado indicado. */
+function ms2Order(estado_codigo: number) {
+  return {
+    orden_id: 31,
+    vehiculo_id: 12,
+    ingreso_id: 18,
+    estado_codigo,
+    mecanico_actual_id: 50,
+    creado_por_id: 99,
+    creado_en: '2026-10-09T10:00:00-03:00',
+    actualizado_en: '2026-10-10T15:00:00-03:00',
+  };
+}
+
+describe('flujo orden → presupuesto → repuestos: estados y transiciones MS2', () => {
+  beforeEach(() => {
+    adapter.mockReset();
+    apiClient.defaults.adapter = adapter;
+    jest
+      .spyOn(storage, 'get')
+      .mockImplementation(async (key) =>
+        key === STORAGE_KEYS.AUTH_TOKEN ? 'token-de-prueba' : null,
+      );
+    mockedService.getOrderById.mockImplementation((id, params) =>
+      realOrders.getOrderById(id, params),
+    );
+  });
+
+  afterEach(() => {
+    apiClient.defaults.adapter = originalAdapter;
+    jest.restoreAllMocks();
+  });
+
+  it.each([
+    [4, ORDER_STATUS.ESPERANDO_REPUESTOS],
+    [5, ORDER_STATUS.EN_REPARACION],
+  ] as const)(
+    'propaga los códigos 3 → %i del contrato hasta la vista',
+    async (nextCode, nextStatus) => {
+      const responses = [ms2Order(3), ms2Order(nextCode)];
+      adapter.mockImplementation((config) =>
+        config.method === 'get' && config.url === '/ordenes/31'
+          ? respond(config, 200, responses.shift())
+          : respond(config, 404, { detail: 'No simulado' }),
+      );
+
+      await renderRouterWithProviders(routes, { initialUrl: '/mis-ordenes/31' });
+      await waitFor(() =>
+        expect(screen.getByTestId('order-detail-31')).toBeTruthy(),
+      );
+      expect(statusPill(ORDER_STATUS.ESPERANDO_APROBACION_PRESUPUESTO)).toBeTruthy();
+
+      // Tras la decisión aplicada por MS3, la actualización muestra el nuevo estado.
+      await fireEvent.press(screen.getByTestId('order-detail-refresh'));
+
+      await waitFor(() => expect(statusPill(nextStatus)).toBeTruthy());
+      expect(
+        screen.queryByLabelText(
+          `Estado de la orden: ${getOrderStatusLabel(ORDER_STATUS.ESPERANDO_APROBACION_PRESUPUESTO)}`,
+        ),
+      ).toBeNull();
+      expect(requestsTo('get', '/ordenes/31')).toHaveLength(2);
+      await waitForRefreshToSettle();
+    },
+  );
+
+  it('registra el cambio de estado mediante PATCH /ordenes/{id}/estado', async () => {
+    adapter.mockImplementation((config) => respond(config, 200, ms2Order(6)));
+
+    const updated = await realOrders.updateOrderStatus(
+      '31',
+      ORDER_STATUS.LISTO_PARA_ENTREGA,
+    );
+
+    expect(adapter).toHaveBeenCalledTimes(1);
+    const [[config]] = adapter.mock.calls;
+    expect(config.method).toBe('patch');
+    expect(config.url).toBe('/ordenes/31/estado');
+    expect(JSON.parse(config.data)).toStrictEqual({ estado_destino: 6 });
+    expect(updated).toMatchObject({ id: '31', status: ORDER_STATUS.LISTO_PARA_ENTREGA });
+  });
+
+  it('envía la observación recortada y omite una vacía (minLength 1)', async () => {
+    adapter.mockImplementation((config) => respond(config, 200, ms2Order(6)));
+
+    await realOrders.updateOrderStatus('31', ORDER_STATUS.LISTO_PARA_ENTREGA, {
+      observacion: '  Trabajo terminado  ',
+    });
+    await realOrders.updateOrderStatus('31', ORDER_STATUS.LISTO_PARA_ENTREGA, {
+      observacion: '   ',
+    });
+
+    const bodies = requestsTo('patch', '/ordenes/31/estado').map(([config]) =>
+      JSON.parse(config.data),
+    );
+    expect(bodies).toStrictEqual([
+      { estado_destino: 6, observacion: 'Trabajo terminado' },
+      { estado_destino: 6 },
+    ]);
+  });
+
+  it('la cancelación exige observación y no llama a MS2 sin ella', async () => {
+    await expect(
+      realOrders.updateOrderStatus('31', ORDER_STATUS.CANCELADO, { observacion: ' ' }),
+    ).rejects.toThrow('La cancelación requiere una observación.');
+    expect(adapter).not.toHaveBeenCalled();
+  });
+
+  it.each([
+    ORDER_STATUS.PAUSADO_POR_PRESUPUESTO_RECHAZADO,
+    ORDER_STATUS.CONTROL_CALIDAD,
+  ])('el estado %s no existe en MS2 y no se envía', async (status) => {
+    await expect(realOrders.updateOrderStatus('31', status)).rejects.toThrow(
+      `Estado no soportado por MS2: ${status}`,
+    );
+    expect(adapter).not.toHaveBeenCalled();
+  });
+
+  it.each([
+    ['3 → 4, reservada a la decisión de presupuesto', ORDER_STATUS.ESPERANDO_REPUESTOS, 4],
+    ['4 → 5, bloqueada hasta verificar repuestos', ORDER_STATUS.EN_REPARACION, 5],
+    ['6 → 7, reservada a la entrega', ORDER_STATUS.ENTREGADO, 7],
+    ['desde un estado terminal', ORDER_STATUS.RECIBIDO, 1],
+  ] as const)(
+    'informa el 409 de una transición %s sin alterar la orden',
+    async (_case, status, code) => {
+      const detail = 'Transición no permitida, terminal o reservada a una operación específica';
+      adapter.mockImplementation((config) =>
+        config.method === 'patch'
+          ? respond(config, 409, { detail })
+          : respond(config, 200, ms2Order(3)),
+      );
+
+      await expect(realOrders.updateOrderStatus('31', status)).rejects.toMatchObject({
+        status: 409,
+        code: 'ORDER_CONFLICT',
+        message: detail,
+      });
+
+      const [[patch]] = requestsTo('patch', '/ordenes/31/estado');
+      expect(JSON.parse(patch.data)).toStrictEqual({ estado_destino: code });
+      // El PATCH no se reintenta y el detalle sigue mostrando el estado anterior.
+      expect(requestsTo('patch', '/ordenes/31/estado')).toHaveLength(1);
+      await expect(realOrders.getOrderById('31')).resolves.toMatchObject({
+        status: ORDER_STATUS.ESPERANDO_APROBACION_PRESUPUESTO,
+      });
+    },
+  );
+
+  it.each([
+    [403, 'ORDER_FORBIDDEN', 'Se requiere rol Administrador o Mecánico asignado; solo este último finaliza el trabajo'],
+    [404, 'ORDER_NOT_FOUND', 'Orden no encontrada'],
+    [422, 'ORDER_VALIDATION_ERROR', 'Estado de destino desconocido, cancelación sin motivo o datos inválidos'],
+    [500, 'ORDER_SERVER_ERROR', 'No fue posible completar la persistencia'],
+  ] as const)(
+    'normaliza el error %i del PATCH de estado',
+    async (status, code, detail) => {
+      adapter.mockImplementation((config) => respond(config, status, { detail }));
+
+      await expect(
+        realOrders.updateOrderStatus('31', ORDER_STATUS.LISTO_PARA_ENTREGA),
+      ).rejects.toMatchObject({ status, code, message: detail });
+      expect(adapter).toHaveBeenCalledTimes(1);
+    },
+  );
+
+  it('rechaza una respuesta del PATCH que no cumple OrdenRespuesta', async () => {
+    adapter.mockImplementation((config) => respond(config, 200, { orden_id: 31 }));
+
+    await expect(
+      realOrders.updateOrderStatus('31', ORDER_STATUS.LISTO_PARA_ENTREGA),
+    ).rejects.toMatchObject({ code: 'ORDER_INVALID_RESPONSE' });
+  });
 });

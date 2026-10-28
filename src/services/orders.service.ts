@@ -407,19 +407,20 @@ export class RealOrderAdapter implements OrderServiceAdapter {
       throw new Error(`Estado no soportado por MS2: ${status}`);
     }
 
-    if (
-      status === 'cancelado' &&
-      (typeof options?.observacion !== 'string' ||
-       !options.observacion.trim())
-    ) {
+    // CambioEstadoSolicitud exige `observacion` con minLength 1 o null: un texto
+    // vacío se omite en lugar de enviarse y provocar un 422.
+    const observacion =
+      typeof options?.observacion === 'string'
+        ? options.observacion.trim() || undefined
+        : options?.observacion;
+
+    if (status === 'cancelado' && !observacion) {
       throw new Error('La cancelación requiere una observación.');
     }
 
     const payload: UpdateOrderStatusRequestDto = {
       estado_destino: code,
-      ...(options?.observacion !== undefined
-        ? { observacion: options.observacion }
-        : {}),
+      ...(observacion !== undefined ? { observacion } : {}),
     };
 
     const response = await apiClient.patch<OrderResponseDto>(

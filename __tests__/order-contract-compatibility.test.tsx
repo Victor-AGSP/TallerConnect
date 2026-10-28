@@ -8,7 +8,13 @@ import {
 import OrdenScreen from '@/app/(admin)/ordenes/[id]';
 import MiOrdenScreen from '@/app/(cliente)/mis-ordenes/[id]';
 import OrdenAsignadaScreen from '@/app/(mecanico)/ordenes-asignadas/[id]';
-import { mapOrderResponse } from '@/mappers/order.mapper';
+import { getOrderStatusLabel } from '@/constants/orderStatus';
+import {
+  CODE_TO_STATUS,
+  InvalidOrderResponseError,
+  STATUS_TO_CODE,
+  mapOrderResponse,
+} from '@/mappers/order.mapper';
 import { apiClient } from '@/services/api/client';
 import { ordersService } from '@/services/orders.service';
 import { formatDate } from '@/utils/formatters';
@@ -98,10 +104,32 @@ describe('contrato OrdenRespuesta → mapper → modelo', () => {
     },
   );
 
-  // Pendientes del mapper de órdenes (C1 en docs/integracion-cruzada-ordenes.md).
-  it.todo('el código 3 corresponde a Esperando aprobación de presupuesto');
-  it.todo('el código 5 corresponde a En reparación');
-  it.todo('el código 8 corresponde a Cancelado');
+  // C1 (docs/integracion-cruzada-ordenes.md), corregido con el merge de Develop.
+  it.each([
+    [3, 'esperando_aprobacion_presupuesto', 'Esperando aprobación del presupuesto'],
+    [5, 'en_reparacion', 'En reparación'],
+    [8, 'cancelado', 'Cancelado'],
+  ] as const)(
+    'el código %i corresponde a %s',
+    (code, expected, label) => {
+      const status = mapOrderResponse({ ...CONTRACT_RECEIVED, estado_codigo: code }).status;
+      expect(status).toBe(expected);
+      expect(getOrderStatusLabel(status)).toBe(label);
+    },
+  );
+
+  it.each([1, 2, 3, 4, 5, 6, 7, 8])(
+    'el código %i se convierte en estado_destino sin pérdida (ida y vuelta)',
+    (code) => {
+      expect(STATUS_TO_CODE[CODE_TO_STATUS[code]]).toBe(code);
+    },
+  );
+
+  it.each([0, 9, -1])('el código %i, fuera del catálogo, se rechaza', (code) => {
+    expect(() =>
+      mapOrderResponse({ ...CONTRACT_RECEIVED, estado_codigo: code }),
+    ).toThrow(InvalidOrderResponseError);
+  });
 });
 
 describe('contrato OrdenRespuesta → servicio', () => {

@@ -22,8 +22,8 @@ Estado al 14-10-2026 (contrato MS2 vuelto a consultar):
 
 | | Rama `Victor` | Rama `Develop` |
 |---|---|---|
-| C1 | Pendiente | Corregida (`ORDER_STATUS_BY_CODE`: 3, 5 y 8 alineados con el contrato) |
-| C2 | Pendiente | Pendiente (`PATCH /ordenes/{id}/status`) |
+| C1 | Corregida (merge de Develop `f25ae44`; verificada en SCRUM-104) | Corregida (`ORDER_STATUS_BY_CODE`: 3, 5 y 8 alineados con el contrato) |
+| C2 | Corregida (`PATCH /ordenes/{id}/estado` con `estado_destino`; verificada en SCRUM-104) | Pendiente (`PATCH /ordenes/{id}/status`) |
 | C3 | Pendiente (el contrato sigue sin cliente en `OrdenRespuesta`) | No verificado |
 | C4 | Corregida (SCRUM-103, 28-10-2026) | No verificado |
 
@@ -47,7 +47,7 @@ El contrato ya publica el catálogo en la descripción de `OrdenRespuesta.estado
 
 Efecto: una orden en código 3 se muestra como "En reparación" y una cancelada (8) como "Esperando aprobación del presupuesto". El tramo presupuesto → repuestos → reparación (3 → 4 → 5) no se representa correctamente.
 
-Corrección necesaria: `3 → esperando_aprobacion_presupuesto`, `5 → en_reparacion`, `8 → cancelado` y eliminar el código 9. `control_calidad` y `pausado_por_presupuesto_rechazado` no tienen código en el contrato. Hay que actualizar las pruebas que fijan el catálogo actual.
+**Corregido en `Victor` (merge `f25ae44`):** `ORDER_STATUS_BY_CODE` asigna 1–8 según el contrato y no existe el código 9; un código fuera del catálogo se rechaza (SCRUM-103). `control_calidad` y `pausado_por_presupuesto_rechazado` no tienen código en el contrato y `updateOrderStatus` los rechaza sin llamar a MS2. Pruebas: `order-contract-compatibility.test.tsx` (códigos 1–8, ida y vuelta, fuera de catálogo).
 
 ### C2. Cambio de estado (`updateOrderStatus`)
 
@@ -57,7 +57,9 @@ Corrección necesaria: `3 → esperando_aprobacion_presupuesto`, `5 → en_repar
 | Cuerpo | `CambioEstadoSolicitud`: `estado_destino` (entero) y `observacion` (obligatoria al pasar a Cancelado) | `{ status: string }` |
 | Restricciones | 1 → 2 y 3 → 4/5 requieren operaciones específicas y no admiten PATCH directo | No se contemplan |
 
-El endpoint ya existe (I5 y E3 lo daban como inexistente). La corrección depende de C1 para convertir el estado a `estado_destino`.
+El endpoint ya existe (I5 y E3 lo daban como inexistente).
+
+**Corregido en `Victor` (merge `f25ae44`, ajustado en SCRUM-104):** `updateOrderStatus` envía `PATCH /ordenes/{id}/estado` con `CambioEstadoSolicitud` exacto (`estado_destino` y, si existe, `observacion` recortada; un texto vacío se omite por `minLength: 1`). La cancelación sin observación se rechaza en la app. La app **no** filtra transiciones: según el contrato, el PATCH genérico solo admite 5 → 6 por el mecánico asignado; 1 → 2, 2 → 3 y 3 → 4/5/8 requieren operaciones específicas, y 4 → 5, 6 → 7 y la cancelación genérica están bloqueadas. MS2 responde 409 en esos casos y la app propaga el `detail` sin reintentar. Ninguna pantalla llama hoy a `updateOrderStatus`. Pruebas: `order-flow-regression.test.tsx` ("estados y transiciones MS2").
 
 ### C3. Cliente de la orden (I2 / E8, vigente)
 
