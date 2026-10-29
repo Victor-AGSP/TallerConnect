@@ -1,21 +1,9 @@
-/**
- * Etapa de la orden de trabajo en la que se adjunta la evidencia (`ContextoEvidencia` en MS4).
- */
-export type EvidenceContext =
-  | 'diagnostico'
-  | 'presupuesto'
-  | 'reparacion'
-  | 'resultado_final';
+import type {
+  AllowedEvidenceMimeType,
+  EvidenceContext,
+} from '@/constants/evidence';
 
-/**
- * Tipos MIME admitidos por la lista blanca del microservicio MS4 (`JPG`, `PNG`, `WEBP`, `MP4`, `MOV`).
- */
-export type AllowedEvidenceMimeType =
-  | 'image/jpeg'
-  | 'image/png'
-  | 'image/webp'
-  | 'video/mp4'
-  | 'video/quicktime';
+export type { AllowedEvidenceMimeType, EvidenceContext };
 
 /**
  * Activo multimedia local capturado por la cámara o seleccionado desde la galería en Expo.
