@@ -34,7 +34,8 @@ jest.mock('@/services/orders.service', () => ({
 }));
 
 jest.mock('@/services/evidence.service', () => ({
-  evidenceService: { uploadEvidence: jest.fn() },
+  EvidenceServiceError: jest.requireActual('@/services/evidence.service').EvidenceServiceError,
+  evidenceService: { uploadEvidence: jest.fn(), findUploadedEvidence: jest.fn() },
 }));
 
 // La bitácora del mecánico (SCRUM-107) se prueba en su propia suite.

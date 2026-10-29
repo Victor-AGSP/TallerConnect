@@ -16,7 +16,7 @@ import type { Evidence } from '@/models/evidence.model';
 import type { OrderLogEntry } from '@/models/order-log.model';
 import type { WorkOrder, WorkOrderStatus } from '@/models/order.model';
 import { apiClient } from '@/services/api/client';
-import { evidenceService } from '@/services/evidence.service';
+import { EvidenceServiceError, evidenceService } from '@/services/evidence.service';
 import { orderLogService, OrderLogService } from '@/services/order-log.service';
 import { ordersService } from '@/services/orders.service';
 import { STORAGE_KEYS, storage } from '@/utils/storage';
@@ -33,7 +33,8 @@ jest.mock('@/services/orders.service', () => ({
 }));
 
 jest.mock('@/services/evidence.service', () => ({
-  evidenceService: { uploadEvidence: jest.fn() },
+  EvidenceServiceError: jest.requireActual('@/services/evidence.service').EvidenceServiceError,
+  evidenceService: { uploadEvidence: jest.fn(), findUploadedEvidence: jest.fn() },
 }));
 
 // Las vistas usan la instancia simulada; las pruebas del servicio usan una
@@ -360,18 +361,28 @@ describe('Avances del mecánico en la orden', () => {
 
     await waitFor(() => expect(screen.getByText('Avance y fotografía registrados')).toBeTruthy());
     expect(calls).toEqual(['bitacora', 'evidencia']);
-    expect(mockedEvidence.uploadEvidence).toHaveBeenCalledWith({
-      orderId: '31',
-      context: 'diagnostico',
-      file: expect.objectContaining({ name: 'avance.jpg' }),
-    });
+    expect(mockedEvidence.uploadEvidence).toHaveBeenCalledWith(
+      {
+        orderId: '31',
+        context: 'diagnostico',
+        file: expect.objectContaining({ name: 'avance.jpg' }),
+      },
+      expect.objectContaining({ signal: expect.anything() }),
+    );
     expect(screen.queryByTestId('order-update-photo-preview')).toBeNull();
   });
 
   it('si la fotografía falla informa el éxito parcial y reintenta solo la carga', async () => {
     mockedLog.addOrderLogEntry.mockResolvedValue(entry());
     mockedEvidence.uploadEvidence
-      .mockRejectedValueOnce(new Error('El servicio de evidencias no está disponible. La fotografía no se guardó.'))
+      .mockRejectedValueOnce(
+        new EvidenceServiceError(
+          'El servicio de evidencias no está disponible. La fotografía no se guardó.',
+          'EVIDENCE_HTTP_503',
+          503,
+          'retryable',
+        ),
+      )
       .mockResolvedValueOnce(EVIDENCE);
     await openOrder();
 
@@ -396,7 +407,9 @@ describe('Avances del mecánico en la orden', () => {
 
   it('tras un fallo de la fotografía se puede continuar sin ella', async () => {
     mockedLog.addOrderLogEntry.mockResolvedValue(entry());
-    mockedEvidence.uploadEvidence.mockRejectedValue(new Error('Sin conexión'));
+    mockedEvidence.uploadEvidence.mockRejectedValue(
+      new EvidenceServiceError('Sin conexión', 'EVIDENCE_NETWORK_ERROR', undefined, 'uncertain'),
+    );
     await openOrder();
 
     await describeUpdate('Pastillas delanteras gastadas');

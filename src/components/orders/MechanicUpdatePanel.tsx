@@ -10,14 +10,15 @@ import {
   Loading,
 } from '@/components/common';
 import { EvidencePhotoPicker } from '@/components/evidence/EvidencePhotoPicker';
+import { EvidenceUploadStatus } from '@/components/evidence/EvidenceUploadStatus';
 import { ORDER_STATUS, getOrderStatusLabel } from '@/constants/orderStatus';
 import { colors, radius, spacing } from '@/constants/theme';
 import { useDataQuery } from '@/hooks/useDataQuery';
 import { useEvidencePicker } from '@/hooks/useEvidencePicker';
+import { useEvidenceUpload } from '@/hooks/useEvidenceUpload';
 import type { Evidence, EvidenceContext } from '@/models/evidence.model';
 import type { OrderLogEntry, OrderLogType } from '@/models/order-log.model';
 import type { WorkOrder } from '@/models/order.model';
-import { evidenceService } from '@/services/evidence.service';
 import { orderLogService } from '@/services/order-log.service';
 import { formatDate } from '@/utils/formatters';
 
@@ -48,7 +49,7 @@ type SubmitState =
   | { status: 'done'; entry: OrderLogEntry; evidence: Evidence | null }
   | { status: 'error'; message: string }
   /** El avance quedó registrado pero la fotografía no se envió. */
-  | { status: 'partial'; entry: OrderLogEntry; message: string };
+  | { status: 'partial'; entry: OrderLogEntry };
 
 export interface MechanicUpdatePanelProps {
   order: WorkOrder;
@@ -68,6 +69,7 @@ export function MechanicUpdatePanel({ order }: MechanicUpdatePanelProps) {
   const allowsPhoto = acceptsEvidence(order.status);
 
   const picker = useEvidencePicker(orderId);
+  const uploader = useEvidenceUpload(orderId);
   const [type, setType] = useState<OrderLogType>('observacion');
   const [description, setDescription] = useState('');
   const [descriptionError, setDescriptionError] = useState<string | null>(null);
@@ -95,6 +97,22 @@ export function MechanicUpdatePanel({ order }: MechanicUpdatePanelProps) {
 
   const { file, clear: clearPhoto } = picker;
 
+  const { upload: uploadEvidence, retry: retryEvidence } = uploader;
+
+  /** Resultado de la carga de la fotografía tras registrar el avance. */
+  const settlePhoto = useCallback(
+    (entry: OrderLogEntry, evidence: Evidence | null) => {
+      if (!isMountedRef.current) return;
+      if (evidence) {
+        clearPhoto();
+        setSubmit({ status: 'done', entry, evidence });
+      } else {
+        setSubmit({ status: 'partial', entry });
+      }
+    },
+    [clearPhoto],
+  );
+
   const uploadPhoto = useCallback(
     async (entry: OrderLogEntry) => {
       if (!file) {
@@ -102,22 +120,9 @@ export function MechanicUpdatePanel({ order }: MechanicUpdatePanelProps) {
         return;
       }
       setSubmit({ status: 'uploading', entry });
-      try {
-        const evidence = await evidenceService.uploadEvidence({ orderId, file, context });
-        if (!isMountedRef.current) return;
-        clearPhoto();
-        setSubmit({ status: 'done', entry, evidence });
-      } catch (error: unknown) {
-        if (!isMountedRef.current) return;
-        setSubmit({
-          status: 'partial',
-          entry,
-          message:
-            error instanceof Error ? error.message : 'No fue posible subir la fotografía.',
-        });
-      }
+      settlePhoto(entry, await uploadEvidence(file, context));
     },
-    [clearPhoto, context, file, orderId],
+    [context, file, settlePhoto, uploadEvidence],
   );
 
   const register = useCallback(async () => {
@@ -160,21 +165,27 @@ export function MechanicUpdatePanel({ order }: MechanicUpdatePanelProps) {
     }
   }, [description, orderId, refreshLog, showLog, type, uploadPhoto]);
 
+  // Reintenta solo la fotografía, con la verificación previa de useEvidenceUpload.
   const retryPhoto = useCallback(async () => {
     if (inFlightRef.current || submit.status !== 'partial') return;
     inFlightRef.current = true;
+    const { entry } = submit;
     try {
-      await uploadPhoto(submit.entry);
+      setSubmit({ status: 'uploading', entry });
+      settlePhoto(entry, await retryEvidence());
     } finally {
       inFlightRef.current = false;
     }
-  }, [submit, uploadPhoto]);
+  }, [retryEvidence, settlePhoto, submit]);
 
   const finishWithoutPhoto = useCallback(() => {
     if (submit.status !== 'partial') return;
     clearPhoto();
+    uploader.reset();
     setSubmit({ status: 'done', entry: submit.entry, evidence: null });
-  }, [clearPhoto, submit]);
+  }, [clearPhoto, submit, uploader]);
+
+  const photoFailure = uploader.state.status === 'failed' ? uploader.state : null;
 
   const isPartial = submit.status === 'partial';
   const isWorking = submit.status === 'saving' || submit.status === 'uploading';
@@ -247,6 +258,16 @@ export function MechanicUpdatePanel({ order }: MechanicUpdatePanelProps) {
         />
       ) : null}
 
+      {submit.status === 'uploading' ? (
+        <EvidenceUploadStatus
+          state={uploader.state}
+          onRetry={retryPhoto}
+          onCancel={uploader.cancel}
+          canRetryCurrent={false}
+          testIDPrefix="order-update-photo-upload"
+        />
+      ) : null}
+
       {submit.status === 'error' ? (
         <ErrorMessage
           testID="order-update-error"
@@ -260,14 +281,16 @@ export function MechanicUpdatePanel({ order }: MechanicUpdatePanelProps) {
         <View testID="order-update-partial" accessibilityRole="alert" style={styles.partial}>
           <Text style={styles.partialTitle}>Avance registrado sin fotografía</Text>
           <Text style={styles.partialText}>
-            {`El avance quedó registrado (${formatDate(submit.entry.createdAt)}), pero la fotografía no se envió: ${submit.message}`}
+            {`El avance quedó registrado (${formatDate(submit.entry.createdAt)}), pero la fotografía no se envió: ${photoFailure?.message ?? ''}`}
           </Text>
-          <Button
-            testID="order-update-retry-photo"
-            title="Reintentar envío de la fotografía"
-            onPress={retryPhoto}
-            style={styles.submit}
-          />
+          {photoFailure?.canRetry ? (
+            <Button
+              testID="order-update-retry-photo"
+              title="Reintentar envío de la fotografía"
+              onPress={retryPhoto}
+              style={styles.submit}
+            />
+          ) : null}
           <Button
             testID="order-update-skip-photo"
             title="Continuar sin fotografía"

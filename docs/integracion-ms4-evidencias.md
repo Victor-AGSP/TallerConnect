@@ -101,3 +101,36 @@ En el backend, la "actualización realizada por el mecánico" es la **bitácora 
 **Historial.** Se consulta solo al pulsar "Ver avances registrados" (o tras registrar un avance) para que abrir la orden no genere solicitudes adicionales. Muestra tipo, descripción, fecha, repuestos e identificador del autor, que son los campos publicados; el contrato no entrega el nombre del autor.
 
 Fuera de alcance: declarar repuestos en las acciones (requiere coordinar con el inventario de MS3).
+
+## Estados de envío, errores y reintento (SCRUM-111)
+
+`useEvidenceUpload` (`src/hooks/useEvidenceUpload.ts`) gobierna el envío en `EvidenceCapturePanel` y en la fotografía de `MechanicUpdatePanel`; `EvidenceUploadStatus` lo muestra.
+
+| Estado | Interfaz |
+|---|---|
+| Sin archivo / archivo seleccionado | Sin botón de envío / "Enviar evidencia" (seleccionar no sube nada) |
+| Validando y preparando | Revalidación (`prepareEvidenceFile`, incluida la firma en web) antes de la red |
+| Enviando | Indicador, "Cancelar envío" y porcentaje **solo** si `onUploadProgress` informa el total; no se inventa progreso |
+| Comprobando | Consulta al servidor antes de reintentar un envío incierto |
+| Completado | Solo con una `EvidenciaLeida` válida de la misma orden, o encontrada en `GET /evidencias` ("ya estaba guardada; no se volvió a enviar") |
+| Fallido | Mensaje según el contrato y "Reintentar envío" solo cuando es seguro |
+
+Clasificación (`EvidenceServiceError.outcome`):
+
+| Resultado | Casos | Reintento |
+|---|---|---|
+| `rejected` | 400, 403, 404, 409, 413, 415, 422, archivo u orden inválidos | No con la misma fotografía; se puede reemplazar |
+| `retryable` | 503 (el contrato garantiza que no quedan archivos ni filas) y 429 | Reenvía |
+| `uncertain` | Timeout, red sin respuesta, cancelación, 500/502/504, 2xx fuera de contrato | Primero `GET /evidencias?orden_id=` y busca la misma orden, nombre original y tamaño creada desde el primer intento (con 5 min de margen de reloj). Si existe, se da por confirmada sin reenviar; si no, reenvía; si la consulta falla, **no** reenvía |
+| `session` | 401 | El interceptor cierra la sesión; sin reintento |
+
+Garantías:
+
+- El POST nunca se reintenta automáticamente (`attachRetryInterceptor` solo repite GET/HEAD/OPTIONS) y tras un resultado incierto el botón "Enviar evidencia" se oculta para no duplicar.
+- Doble pulsación bloqueada con una referencia síncrona, no solo con el botón deshabilitado.
+- 403 informa el permiso sin cerrar la sesión.
+- Timeout de subida local de 60 s (`EVIDENCE_UPLOAD_TIMEOUT_MS`), distinto del general de 15 s.
+- Una respuesta que llega tras cambiar de orden se descarta (el panel se desmonta) y la subida queda asociada a la orden original.
+- No se envía `X-Request-ID` propio: MS4 solo lo registra para trazabilidad (no es clave de idempotencia documentada) y generar UUID en React Native requeriría un polyfill de `crypto.getRandomValues`.
+
+Límite conocido: la verificación compara nombre y tamaño; si en la misma ventana se subió deliberadamente otra copia idéntica, se tomaría como la confirmación. Solo una clave de idempotencia en MS4 lo resolvería del todo.

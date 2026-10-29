@@ -31,7 +31,8 @@ jest.mock('@/services/orders.service', () => ({
 }));
 
 jest.mock('@/services/evidence.service', () => ({
-  evidenceService: { uploadEvidence: jest.fn() },
+  EvidenceServiceError: jest.requireActual('@/services/evidence.service').EvidenceServiceError,
+  evidenceService: { uploadEvidence: jest.fn(), findUploadedEvidence: jest.fn() },
 }));
 
 // La bitácora del mecánico (SCRUM-107) se prueba en su propia suite.
@@ -317,11 +318,14 @@ describe('Captura y selección de fotografías en la orden del mecánico', () =>
 
     await waitFor(() => expect(screen.getByTestId('evidence-upload-success')).toBeTruthy());
     expect(mockedEvidence.uploadEvidence).toHaveBeenCalledTimes(1);
-    expect(mockedEvidence.uploadEvidence).toHaveBeenCalledWith({
-      orderId: '31',
-      context: 'diagnostico',
-      file: expect.objectContaining({ name: 'captura.jpg', mimeType: 'image/jpeg', size: 2048 }),
-    });
+    expect(mockedEvidence.uploadEvidence).toHaveBeenCalledWith(
+      {
+        orderId: '31',
+        context: 'diagnostico',
+        file: expect.objectContaining({ name: 'captura.jpg', mimeType: 'image/jpeg', size: 2048 }),
+      },
+      expect.objectContaining({ signal: expect.anything() }),
+    );
     expect(screen.getByText('Evidencia registrada')).toBeTruthy();
     // La selección enviada se limpia para no reenviarla por error.
     expect(screen.queryByTestId('evidence-preview')).toBeNull();
