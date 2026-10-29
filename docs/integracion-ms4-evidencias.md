@@ -161,3 +161,27 @@ Límite conocido: la verificación compara nombre y tamaño; si en la misma vent
 **Fotografías.** "Ver fotografía" pide `GET /evidencias/{id}/descarga` y muestra la URL prefirmada con `expo-image` y `cachePolicy="none"` (sin caché en disco ni en memoria). La URL se guarda solo en memoria del componente y se reutiliza mientras no caduque (`expira_en`); al caducar se pide otra. Si la imagen falla con la URL ya caducada se renueva una sola vez; cualquier otro fallo se informa con reintento. La URL nunca se registra, no se muestra en textos ni etiquetas accesibles y no lleva el token. Los archivos que no son imagen (MP4/MOV) no se muestran en línea.
 
 **Pruebas y alcance.** Las pruebas usan los layouts reales, el servicio y el cliente HTTP reales y respuestas construidas según el contrato para cada rol. Comprueban cómo la app consulta, filtra y presenta esas respuestas y que las guardas de ruta no generan solicitudes; **no** prueban la autorización real de MS4, que requiere el entorno desplegado con credenciales de prueba de cada rol.
+
+## Pruebas funcionales del módulo (SCRUM-108)
+
+`__tests__/evidence-functional.test.tsx` recorre el caso de uso completo con pantallas, layouts (`RoleGuard`), store de sesión, `OrdersService`, `OrderLogService`, `EvidenceService`, `useEvidencePicker`, `useEvidenceUpload`, el cliente HTTP y sus interceptores reales. Se simulan `AuthService`, el almacenamiento seguro (en memoria), el selector nativo y el adaptador de red, que actúa como un servidor MS2 + MS4 con estado: guarda bitácora y evidencias y responde según los contratos.
+
+**Flujo principal (una sola prueba):** login del mecánico → orden asignada 31 → avance con fotografía de la galería (vista previa, validación, `POST /ordenes/31/bitacora` y luego `POST /evidencias`) → evidencia independiente desde la cámara → "Ver evidencias" y "Ver fotografía" → cambio a la orden 32 sin arrastrar selección ni evidencias → todas las solicitudes con el JWT de la sesión → cierre de sesión y detalle inaccesible sin nuevas solicitudes.
+
+**Flujos alternativos:** cámara rechazada (con galería como alternativa), galería cancelada, imagen inválida, archivo demasiado grande, falta de conectividad con la foto guardada (reintento la encuentra y no duplica), timeout sin guardar (comprueba y reenvía una vez), 503 (reintento directo), doble pulsación, 403 en la bitácora (sin logout ni subida), 404 de MS4, orden inexistente, orden entregada, cambio de orden durante el envío, sesión expirada (401 → login) y error 500 al consultar con recuperación.
+
+Se verificó con mutaciones que las suites no son triviales: desactivar la comprobación previa al reintento hace fallar dos flujos funcionales, y quitar la verificación de orden en `OrderDetailView` hace fallar la prueba correspondiente.
+
+### Niveles de prueba
+
+| Nivel | Estado | Dónde |
+|---|---|---|
+| Unitarias | Ejecutadas | `evidence-file-validation` (validador y firma), `evidence-service` (multipart, errores), bitácora en `evidence-mechanic-updates` |
+| Componentes | Ejecutadas | `evidence-capture`, `evidence-permissions`, `evidence-mechanic-updates` (pantalla real, servicios simulados) |
+| Integración con servicios simulados | Ejecutadas | Las suites anteriores con `jest.mock` de servicios |
+| Integración con adaptador HTTP simulado | Ejecutadas | `evidence-upload-states`, `evidence-role-visibility`, `evidence-functional` (cliente HTTP e interceptores reales) |
+| Empaquetado web con Metro | Ejecutado | `expo export --platform web` termina sin errores e incluye las rutas de detalle |
+| Dispositivo o emulador | **No ejecutadas** | El equipo no tiene Android SDK, emulador ni Xcode. Cámara, galería, permisos nativos, `FormData` nativo y progreso de subida no se comprobaron en hardware |
+| E2E con backend real | **No ejecutadas** | Sin credenciales de prueba por rol ni entorno no productivo, y `/ms4/health/storage` respondía 503. No se enviaron fotografías ni solicitudes mutantes a producción |
+
+Pendiente para cerrar la validación: en un dispositivo, probar los permisos (concedido, rechazado, permanente, revocado, acceso limitado en iOS) y una subida real a un entorno de pruebas de MS4 con almacenamiento operativo, con usuarios de los tres roles.
