@@ -22,3 +22,28 @@ export interface EvidenceFile {
   /** Archivo del navegador (solo web); se envía tal cual en el multipart. */
   webFile?: Blob;
 }
+
+/** Etapa de la orden en la que se adjunta la evidencia (`ContextoEvidencia`). */
+export type EvidenceContext =
+  | 'diagnostico'
+  | 'presupuesto'
+  | 'reparacion'
+  | 'resultado_final';
+
+/**
+ * Evidencia persistida por MS4. Solo contiene los campos que publica el
+ * contrato: no incluye autor ni descripción.
+ */
+export interface Evidence {
+  id: string;
+  orderId: string;
+  budgetId: string | null;
+  context: string;
+  fileKind: string;
+  visibleToClient: boolean;
+  status: string;
+  originalName: string;
+  contentType: string;
+  sizeBytes: number;
+  createdAt: string;
+}

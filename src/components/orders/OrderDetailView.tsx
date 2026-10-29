@@ -1,4 +1,4 @@
-import { useMemo } from 'react';
+import { useMemo, type ReactNode } from 'react';
 
 import { StyleSheet, Text, View } from 'react-native';
 
@@ -38,6 +38,13 @@ export interface OrderDetailViewProps {
    * pueden consultarlo.
    */
   onOpenBudget?: () => void;
+
+  /**
+   * Secciones adicionales de la orden cargada (por ejemplo, evidencias). Solo
+   * se muestran cuando la orden cargada es la de la ruta, para no asociar
+   * acciones a una orden anterior mientras se carga la nueva.
+   */
+  renderSections?: (order: WorkOrder) => ReactNode;
 }
 
 const FALLBACK_ERROR = 'No fue posible cargar la orden de trabajo.';
@@ -68,6 +75,7 @@ export function OrderDetailView({
   orderId,
   loadOrder,
   onOpenBudget,
+  renderSections,
 }: OrderDetailViewProps) {
   // Sin identificador en la ruta no hay nada que consultar.
   const query = useMemo(
@@ -124,6 +132,8 @@ export function OrderDetailView({
               onPress={onOpenBudget}
             />
           ) : null}
+
+          {renderSections && order.id === orderId ? renderSections(order) : null}
         </>
       ) : null}
     </AppScreen>

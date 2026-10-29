@@ -33,7 +33,15 @@
           "imageWidth": 76
         }
       ],
-      "expo-secure-store"
+      "expo-secure-store",
+      [
+        "expo-image-picker",
+        {
+          "photosPermission": "TallerConnect accede a tus fotografías solo cuando eliges una evidencia para una orden de trabajo.",
+          "cameraPermission": "TallerConnect usa la cámara solo cuando tomas una fotografía de evidencia para una orden de trabajo.",
+          "microphonePermission": false
+        }
+      ]
     ],
     "experiments": {
       "typedRoutes": true,
