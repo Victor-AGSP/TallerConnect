@@ -134,3 +134,30 @@ Garantías:
 - No se envía `X-Request-ID` propio: MS4 solo lo registra para trazabilidad (no es clave de idempotencia documentada) y generar UUID en React Native requeriría un polyfill de `crypto.getRandomValues`.
 
 Límite conocido: la verificación compara nombre y tamaño; si en la misma ventana se subió deliberadamente otra copia idéntica, se tomaría como la confirmación. Solo una clave de idempotencia en MS4 lo resolvería del todo.
+
+## Visualización de evidencias según el rol (SCRUM-112)
+
+`OrderEvidenceList` (`src/components/evidence/OrderEvidenceList.tsx`) se muestra en el detalle de la orden de los tres roles (`(cliente)/mis-ordenes/[id]`, `(mecanico)/ordenes-asignadas/[id]`, `(admin)/ordenes/[id]`), siempre detrás de su `RoleGuard`.
+
+**Reglas del contrato MS4** (la autorización la aplica el servidor):
+
+| Solicitante | `GET /evidencias?orden_id=` | Detalle y descarga |
+|---|---|---|
+| Cliente dueño | Solo `visible_cliente = true`, confirmadas y no eliminadas | Igual alcance; fuera de él, 404 |
+| Mecánico asignado / personal | No eliminadas | Igual alcance; fuera de él, 404 |
+| Administrador | Todas, incluidas las eliminadas | Sin consulta a MS2 (auditoría) |
+| Orden ajena o inexistente | 404 (no revela existencia) | 404 |
+| Sin JWT o expirado | 401 | 401 |
+
+**Complementos en la app** (no sustituyen al servidor):
+
+- La lista se pide con "Ver evidencias": abrir la orden no genera solicitudes adicionales.
+- El cliente nunca ve una evidencia con `visible_cliente = false`, aunque llegara en la respuesta, ni los datos internos (visibilidad y estado), que solo ve el personal.
+- Una respuesta que incluya evidencias de otra orden se rechaza completa y no se muestra nada.
+- Se muestran solo los campos publicados: nombre original, etapa, fecha, tamaño y, para el personal, visibilidad y estado. El contrato no entrega autor ni descripción.
+- 401 cierra la sesión (interceptor); 403 y 404 se informan sin cerrarla; error, lista vacía, actualización y reintento se manejan en la vista.
+- Al cambiar de orden la lista se desmonta (`key`): no se reutilizan evidencias, URL ni imágenes de la orden anterior.
+
+**Fotografías.** "Ver fotografía" pide `GET /evidencias/{id}/descarga` y muestra la URL prefirmada con `expo-image` y `cachePolicy="none"` (sin caché en disco ni en memoria). La URL se guarda solo en memoria del componente y se reutiliza mientras no caduque (`expira_en`); al caducar se pide otra. Si la imagen falla con la URL ya caducada se renueva una sola vez; cualquier otro fallo se informa con reintento. La URL nunca se registra, no se muestra en textos ni etiquetas accesibles y no lleva el token. Los archivos que no son imagen (MP4/MOV) no se muestran en línea.
+
+**Pruebas y alcance.** Las pruebas usan los layouts reales, el servicio y el cliente HTTP reales y respuestas construidas según el contrato para cada rol. Comprueban cómo la app consulta, filtra y presenta esas respuestas y que las guardas de ruta no generan solicitudes; **no** prueban la autorización real de MS4, que requiere el entorno desplegado con credenciales de prueba de cada rol.

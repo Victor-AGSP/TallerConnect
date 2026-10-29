@@ -2,6 +2,7 @@ import { Fragment, useCallback } from 'react';
 import { useLocalSearchParams } from 'expo-router';
 
 import { EvidenceCapturePanel } from '@/components/evidence/EvidenceCapturePanel';
+import { OrderEvidenceList } from '@/components/evidence/OrderEvidenceList';
 import {
   MechanicUpdatePanel,
   acceptsEvidence,
@@ -29,6 +30,7 @@ export default function OrdenAsignadaScreen() {
       <Fragment key={order.id}>
         <MechanicUpdatePanel order={order} />
         {acceptsEvidence(order.status) ? <EvidenceCapturePanel orderId={order.id} /> : null}
+        <OrderEvidenceList orderId={order.id} role="mecanico" />
       </Fragment>
     ),
     [],

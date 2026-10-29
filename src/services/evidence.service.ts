@@ -4,6 +4,7 @@ import { apiClient } from '@/services/api/client';
 import { normalizeApiError } from '@/services/api/interceptors';
 import {
   InvalidEvidenceResponseError,
+  mapEvidenceDownloadResponse,
   mapEvidenceListResponse,
   mapEvidenceResponse,
 } from '@/mappers/evidence.mapper';
@@ -152,6 +153,15 @@ export interface UploadEvidenceOptions {
   onProgress?: (fraction: number) => void;
 }
 
+/** URL prefirmada de corta duración para mostrar una evidencia. */
+export interface EvidenceDownloadUrl {
+  url: string;
+  /** Instante (ms, reloj del dispositivo) desde el que ya no debe usarse. */
+  expiresAt: number;
+}
+
+const UUID_PATTERN = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+
 /** Margen ante relojes desfasados entre el dispositivo y el servidor. */
 const CLOCK_SKEW_MS = 5 * 60_000;
 
@@ -246,6 +256,30 @@ export class EvidenceService {
       return evidence;
     } catch (error: unknown) {
       throw toServiceError(error, 'No fue posible cargar las evidencias.', 'query');
+    }
+  }
+
+  /**
+   * URL prefirmada para ver una evidencia. MS4 aplica el mismo alcance que en
+   * la lista (404 fuera de alcance) y la URL caduca a los `expira_en`
+   * segundos. La URL no se registra ni se guarda: se pide de nuevo al caducar.
+   *
+   * Ruta Gateway: GET /api/evidencias/{evidencia_id}/descarga
+   */
+  async getDownloadUrl(evidenceId: string): Promise<EvidenceDownloadUrl> {
+    if (!UUID_PATTERN.test(evidenceId)) {
+      throw new EvidenceServiceError(
+        'El identificador de la evidencia no es válido.',
+        'EVIDENCE_INVALID_ID',
+      );
+    }
+    const requestedAt = Date.now();
+    try {
+      const response = await apiClient.get(`/evidencias/${evidenceId}/descarga`);
+      const { url, expira_en } = mapEvidenceDownloadResponse(response.data);
+      return { url, expiresAt: requestedAt + expira_en * 1000 };
+    } catch (error: unknown) {
+      throw toServiceError(error, 'No fue posible obtener la fotografía.', 'query');
     }
   }
 
