@@ -829,40 +829,24 @@ export class BudgetsService {
       customAdapter ?? (USE_MOCKS ? this.mockAdapter : this.realAdapter);
   }
 
-  /**
-   * Permite inyectar un adaptador personalizado (útil en pruebas unitarias y de integración).
-   */
   setAdapter(adapter: BudgetServiceAdapter): void {
     this.adapter = adapter;
   }
 
-  /**
-   * Activa el adaptador simulado en memoria.
-   */
   useMockAdapter(): MockBudgetAdapter {
     this.adapter = this.mockAdapter;
     return this.mockAdapter;
   }
 
-  /**
-   * Activa el adaptador HTTP real conectado a `apiClient`.
-   */
   useRealAdapter(): RealBudgetAdapter {
     this.adapter = this.realAdapter;
     return this.realAdapter;
   }
 
-  /**
-   * Restaura el estado inicial de los presupuestos simulados.
-   */
   resetMocks(): void {
     this.mockAdapter.resetMocks(mockBudgets);
   }
 
-  /**
-   * Obtiene una página de presupuestos (`PaginaPresupuestos` en MS3).
-   * Ruta Gateway: GET /api/presupuestos
-   */
   async getBudgetsPage(
     params?: BudgetQueryParamsDto
   ): Promise<PaginatedList<BudgetSummary>> {
@@ -876,10 +860,6 @@ export class BudgetsService {
     }
   }
 
-  /**
-   * Obtiene la lista de resúmenes de presupuestos según los parámetros de consulta.
-   * Ruta Gateway: GET /api/presupuestos
-   */
   async getBudgets(params?: BudgetQueryParamsDto): Promise<BudgetSummary[]> {
     try {
       return await this.adapter.getBudgets(params);
@@ -891,10 +871,6 @@ export class BudgetsService {
     }
   }
 
-  /**
-   * Obtiene el detalle completo de un presupuesto con todas sus versiones.
-   * Ruta Gateway: GET /api/presupuestos/{presupuesto_id}
-   */
   async getBudgetById(id: string | number): Promise<Budget> {
     try {
       return await this.adapter.getBudgetById(id);
@@ -906,10 +882,6 @@ export class BudgetsService {
     }
   }
 
-  /**
-   * Busca y devuelve el presupuesto completo asociado a una orden de trabajo (`orden_id`), o `null` si aún no tiene.
-   * Ruta Gateway: GET /api/presupuestos?orden_id={orden_id} + GET /api/presupuestos/{presupuesto_id}
-   */
   async getBudgetByOrderId(orderId: string | number): Promise<Budget | null> {
     try {
       return await this.adapter.getBudgetByOrderId(orderId);
@@ -921,10 +893,6 @@ export class BudgetsService {
     }
   }
 
-  /**
-   * Obtiene una versión específica de un presupuesto con sus ítems y decisión.
-   * Ruta Gateway: GET /api/presupuestos/{presupuesto_id}/versiones/{numero}
-   */
   async getBudgetVersion(
     budgetId: string | number,
     versionNumber: number
@@ -939,10 +907,6 @@ export class BudgetsService {
     }
   }
 
-  /**
-   * Crea el presupuesto de una orden con su versión 1 en borrador.
-   * Ruta Gateway: POST /api/presupuestos
-   */
   async createBudget(data: CreateBudgetRequestDto): Promise<Budget> {
     try {
       return await this.adapter.createBudget(data);
@@ -954,10 +918,6 @@ export class BudgetsService {
     }
   }
 
-  /**
-   * Crea la versión siguiente de un presupuesto sin sobrescribir las anteriores.
-   * Ruta Gateway: POST /api/presupuestos/{presupuesto_id}/versiones
-   */
   async createBudgetVersion(
     budgetId: string | number,
     data?: CreateBudgetVersionRequestDto
@@ -972,10 +932,6 @@ export class BudgetsService {
     }
   }
 
-  /**
-   * Reemplaza los ítems de una versión de presupuesto en borrador.
-   * Ruta Gateway: PUT /api/presupuestos/{presupuesto_id}/versiones/{numero}/items
-   */
   async updateBudgetVersionItems(
     budgetId: string | number,
     versionNumber: number,
@@ -995,10 +951,6 @@ export class BudgetsService {
     }
   }
 
-  /**
-   * Envía la versión en borrador al cliente (queda congelada).
-   * Ruta Gateway: POST /api/presupuestos/{presupuesto_id}/versiones/{numero}/envio
-   */
   async sendBudgetVersion(
     budgetId: string | number,
     versionNumber: number
@@ -1013,10 +965,6 @@ export class BudgetsService {
     }
   }
 
-  /**
-   * Registra la decisión del cliente (aprobar o rechazar) sobre una versión enviada.
-   * Ruta Gateway: POST /api/presupuestos/{presupuesto_id}/versiones/{numero}/decision
-   */
   async submitBudgetDecision(
     budgetId: string | number,
     versionNumber: number,
@@ -1041,3 +989,84 @@ export const budgetsService = new BudgetsService();
 export const budgetService = budgetsService;
 export { BudgetsService as BudgetService };
 
+/**
+ * ============================================================
+ * HELPERS SÍNCRONOS DE DEMOSTRACIÓN PARA VISTAS UI (BudgetDetailScreen)
+ * ============================================================
+ */
+export type DemoBudgetItem = {
+  id: string;
+  name: string;
+  quantity: number;
+  price: number;
+};
+
+export type DemoBudget = {
+  id: string;
+  orderNumber: string;
+  status: string;
+  date: string;
+  version: number;
+  vehiclePlate: string;
+  items: DemoBudgetItem[];
+};
+
+const demoBudgets: DemoBudget[] = [
+  {
+    id: 'PRES-001',
+    orderNumber: 'OT-00124',
+    status: 'Aprobado',
+    date: '21/10/2026',
+    version: 2,
+    vehiclePlate: 'AB-CD-12',
+    items: [
+      {
+        id: '1',
+        name: 'Filtro de aceite',
+        quantity: 1,
+        price: 15000,
+      },
+      {
+        id: '2',
+        name: 'Aceite de motor',
+        quantity: 4,
+        price: 8500,
+      },
+      {
+        id: '3',
+        name: 'Mantención preventiva',
+        quantity: 1,
+        price: 45000,
+      },
+    ],
+  },
+];
+
+export function getBudgets(): DemoBudget[] {
+  return demoBudgets.map((budget) => ({
+    ...budget,
+    items: budget.items.map((item) => ({ ...item })),
+  }));
+}
+
+export function getBudgetById(id: string): DemoBudget | undefined {
+  const budget = demoBudgets.find(
+    (item) => item.id === id || item.orderNumber === id
+  );
+
+  if (!budget) {
+    return undefined;
+  }
+
+  return {
+    ...budget,
+    items: budget.items.map((item) => ({ ...item })),
+  };
+}
+
+export function calculateBudgetTotal(budget: DemoBudget): number {
+  return budget.items.reduce(
+    (total, item) => total + item.quantity * item.price,
+    0
+  );
+}

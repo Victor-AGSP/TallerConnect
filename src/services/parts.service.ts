@@ -5,7 +5,7 @@ import {
   normalizePartServiceError,
 } from '@/services/service-error';
 import type { PaginatedList } from '@/models/pagination.model';
-import type { Part } from '@/models/part.model';
+import type { Part as DomainPart } from '@/models/part.model';
 import type {
   CreatePartRequestDto,
   PartPageResponseDto,
@@ -97,9 +97,9 @@ export function buildPartQueryParams(
  * Filtra, ordena y pagina localmente una lista de repuestos según `PartQueryParamsDto`.
  */
 export function filterPartsByParams(
-  parts: Part[],
+  parts: DomainPart[],
   params?: PartQueryParamsDto
-): PaginatedList<Part> {
+): PaginatedList<DomainPart> {
   let filtered = [...parts];
 
   if (params) {
@@ -169,11 +169,11 @@ export function filterPartsByParams(
  * Contrato común para los adaptadores (Mock y Real HTTP) de Repuestos (MS3).
  */
 export interface PartServiceAdapter {
-  getPartsPage(params?: PartQueryParamsDto): Promise<PaginatedList<Part>>;
-  getParts(params?: PartQueryParamsDto): Promise<Part[]>;
-  getPartById(id: string | number): Promise<Part>;
-  createPart(data: CreatePartRequestDto): Promise<Part>;
-  updatePart(id: string | number, data: UpdatePartRequestDto): Promise<Part>;
+  getPartsPage(params?: PartQueryParamsDto): Promise<PaginatedList<DomainPart>>;
+  getParts(params?: PartQueryParamsDto): Promise<DomainPart[]>;
+  getPartById(id: string | number): Promise<DomainPart>;
+  createPart(data: CreatePartRequestDto): Promise<DomainPart>;
+  updatePart(id: string | number, data: UpdatePartRequestDto): Promise<DomainPart>;
   deletePart(id: string | number): Promise<void>;
   resetMocks?(): void;
 }
@@ -182,10 +182,10 @@ export interface PartServiceAdapter {
  * Adaptador simulado (Mock) en memoria para repuestos del catálogo.
  */
 export class MockPartAdapter implements PartServiceAdapter {
-  private parts: Part[];
+  private parts: DomainPart[];
   private readonly delayMs: number;
 
-  constructor(initialParts: Part[] = mockParts, delayMs = 0) {
+  constructor(initialParts: DomainPart[] = mockParts, delayMs = 0) {
     this.parts = initialParts.map((p) => ({ ...p }));
     this.delayMs = delayMs;
   }
@@ -196,21 +196,21 @@ export class MockPartAdapter implements PartServiceAdapter {
     }
   }
 
-  resetMocks(initialParts: Part[] = mockParts): void {
+  resetMocks(initialParts: DomainPart[] = mockParts): void {
     this.parts = initialParts.map((p) => ({ ...p }));
   }
 
-  async getPartsPage(params?: PartQueryParamsDto): Promise<PaginatedList<Part>> {
+  async getPartsPage(params?: PartQueryParamsDto): Promise<PaginatedList<DomainPart>> {
     await this.simulateDelay();
     return filterPartsByParams(this.parts, params);
   }
 
-  async getParts(params?: PartQueryParamsDto): Promise<Part[]> {
+  async getParts(params?: PartQueryParamsDto): Promise<DomainPart[]> {
     const page = await this.getPartsPage(params);
     return page.items;
   }
 
-  async getPartById(id: string | number): Promise<Part> {
+  async getPartById(id: string | number): Promise<DomainPart> {
     await this.simulateDelay();
     const partId = String(id);
     const found = this.parts.find((p) => p.id === partId);
@@ -225,7 +225,7 @@ export class MockPartAdapter implements PartServiceAdapter {
     return { ...found };
   }
 
-  async createPart(data: CreatePartRequestDto): Promise<Part> {
+  async createPart(data: CreatePartRequestDto): Promise<DomainPart> {
     await this.simulateDelay();
     const name = (data.nombre ?? '').trim();
     const providerId = String(data.proveedor_id ?? '').trim();
@@ -261,7 +261,7 @@ export class MockPartAdapter implements PartServiceAdapter {
       effectiveThreshold !== null ? initialStock <= effectiveThreshold : false;
     const provider = mockProviders.find((pr) => pr.id === providerId);
 
-    const newPart: Part = {
+    const newPart: DomainPart = {
       id: String(this.parts.length + 10),
       name,
       providerId,
@@ -279,7 +279,7 @@ export class MockPartAdapter implements PartServiceAdapter {
   async updatePart(
     id: string | number,
     data: UpdatePartRequestDto
-  ): Promise<Part> {
+  ): Promise<DomainPart> {
     await this.simulateDelay();
     const partId = String(id);
     const index = this.parts.findIndex((p) => p.id === partId);
@@ -338,7 +338,7 @@ export class MockPartAdapter implements PartServiceAdapter {
         : false;
     const provider = mockProviders.find((pr) => pr.id === nextProviderId);
 
-    const updated: Part = {
+    const updated: DomainPart = {
       ...current,
       name: nextName,
       providerId: nextProviderId,
@@ -375,7 +375,7 @@ export class MockPartAdapter implements PartServiceAdapter {
  * Adaptador HTTP real conectado a la API Gateway (`/repuestos` en MS3).
  */
 export class RealPartAdapter implements PartServiceAdapter {
-  async getPartsPage(params?: PartQueryParamsDto): Promise<PaginatedList<Part>> {
+  async getPartsPage(params?: PartQueryParamsDto): Promise<PaginatedList<DomainPart>> {
     const queryParams = buildPartQueryParams(params);
     const response = queryParams
       ? await apiClient.get<PartPageResponseDto>('/repuestos', {
@@ -386,12 +386,12 @@ export class RealPartAdapter implements PartServiceAdapter {
     return mapPartPageResponse(response.data);
   }
 
-  async getParts(params?: PartQueryParamsDto): Promise<Part[]> {
+  async getParts(params?: PartQueryParamsDto): Promise<DomainPart[]> {
     const page = await this.getPartsPage(params);
     return page.items;
   }
 
-  async getPartById(id: string | number): Promise<Part> {
+  async getPartById(id: string | number): Promise<DomainPart> {
     const partId = String(id);
     const response = await apiClient.get<PartResponseDto>(
       `/repuestos/${partId}`
@@ -399,7 +399,7 @@ export class RealPartAdapter implements PartServiceAdapter {
     return mapPartResponse(response.data);
   }
 
-  async createPart(data: CreatePartRequestDto): Promise<Part> {
+  async createPart(data: CreatePartRequestDto): Promise<DomainPart> {
     const numericProviderId = Number(data.proveedor_id);
     const payload: CreatePartRequestDto = {
       proveedor_id: Number.isNaN(numericProviderId)
@@ -423,7 +423,7 @@ export class RealPartAdapter implements PartServiceAdapter {
   async updatePart(
     id: string | number,
     data: UpdatePartRequestDto
-  ): Promise<Part> {
+  ): Promise<DomainPart> {
     const partId = String(id);
     const numericProviderId =
       data.proveedor_id !== undefined && data.proveedor_id !== null
@@ -476,41 +476,25 @@ export class PartsService {
       customAdapter ?? (USE_MOCKS ? this.mockAdapter : this.realAdapter);
   }
 
-  /**
-   * Permite inyectar un adaptador personalizado.
-   */
   setAdapter(adapter: PartServiceAdapter): void {
     this.adapter = adapter;
   }
 
-  /**
-   * Activa el adaptador simulado en memoria.
-   */
   useMockAdapter(): MockPartAdapter {
     this.adapter = this.mockAdapter;
     return this.mockAdapter;
   }
 
-  /**
-   * Activa el adaptador HTTP real conectado a `apiClient`.
-   */
   useRealAdapter(): RealPartAdapter {
     this.adapter = this.realAdapter;
     return this.realAdapter;
   }
 
-  /**
-   * Restaura el estado inicial de los repuestos simulados.
-   */
   resetMocks(): void {
     this.mockAdapter.resetMocks(mockParts);
   }
 
-  /**
-   * Obtiene una página de repuestos (`PaginaRepuestos` en MS3).
-   * Ruta Gateway: GET /api/repuestos
-   */
-  async getPartsPage(params?: PartQueryParamsDto): Promise<PaginatedList<Part>> {
+  async getPartsPage(params?: PartQueryParamsDto): Promise<PaginatedList<DomainPart>> {
     try {
       return await this.adapter.getPartsPage(params);
     } catch (error: unknown) {
@@ -521,11 +505,7 @@ export class PartsService {
     }
   }
 
-  /**
-   * Obtiene la lista de repuestos según los parámetros de consulta.
-   * Ruta Gateway: GET /api/repuestos
-   */
-  async getParts(params?: PartQueryParamsDto): Promise<Part[]> {
+  async getParts(params?: PartQueryParamsDto): Promise<DomainPart[]> {
     try {
       return await this.adapter.getParts(params);
     } catch (error: unknown) {
@@ -536,11 +516,7 @@ export class PartsService {
     }
   }
 
-  /**
-   * Obtiene el detalle de un repuesto por su identificador (`RepuestoSalida` en MS3).
-   * Ruta Gateway: GET /api/repuestos/{repuesto_id}
-   */
-  async getPartById(id: string | number): Promise<Part> {
+  async getPartById(id: string | number): Promise<DomainPart> {
     try {
       return await this.adapter.getPartById(id);
     } catch (error: unknown) {
@@ -551,11 +527,7 @@ export class PartsService {
     }
   }
 
-  /**
-   * Registra un nuevo repuesto en el catálogo.
-   * Ruta Gateway: POST /api/repuestos
-   */
-  async createPart(data: CreatePartRequestDto): Promise<Part> {
+  async createPart(data: CreatePartRequestDto): Promise<DomainPart> {
     try {
       return await this.adapter.createPart(data);
     } catch (error: unknown) {
@@ -566,14 +538,10 @@ export class PartsService {
     }
   }
 
-  /**
-   * Modifica parcialmente un repuesto (nombre, proveedor o umbral particular).
-   * Ruta Gateway: PATCH /api/repuestos/{repuesto_id}
-   */
   async updatePart(
     id: string | number,
     data: UpdatePartRequestDto
-  ): Promise<Part> {
+  ): Promise<DomainPart> {
     try {
       return await this.adapter.updatePart(id, data);
     } catch (error: unknown) {
@@ -584,10 +552,6 @@ export class PartsService {
     }
   }
 
-  /**
-   * Elimina un repuesto que nunca se usó.
-   * Ruta Gateway: DELETE /api/repuestos/{repuesto_id}
-   */
   async deletePart(id: string | number): Promise<void> {
     try {
       await this.adapter.deletePart(id);
@@ -604,3 +568,82 @@ export const partsService = new PartsService();
 export const partService = partsService;
 export { PartsService as PartService };
 
+/**
+ * ============================================================
+ * HELPERS SÍNCRONOS DE DEMOSTRACIÓN PARA VISTAS UI (InventoryScreen)
+ * ============================================================
+ */
+export type Part = {
+  id: string;
+  name: string;
+  providerId: string;
+  providerName: string;
+  stock: number;
+  minimumStock: number;
+  price: number;
+};
+
+const demoParts: Part[] = [
+  {
+    id: 'REP-001',
+    name: 'Filtro de aceite',
+    providerId: 'PROV-001',
+    providerName: 'Repuestos del Sur',
+    stock: 18,
+    minimumStock: 5,
+    price: 15000,
+  },
+  {
+    id: 'REP-002',
+    name: 'Aceite de motor 5W-30',
+    providerId: 'PROV-002',
+    providerName: 'Lubricantes Chile',
+    stock: 3,
+    minimumStock: 8,
+    price: 8500,
+  },
+  {
+    id: 'REP-003',
+    name: 'Pastillas de freno',
+    providerId: 'PROV-001',
+    providerName: 'Repuestos del Sur',
+    stock: 2,
+    minimumStock: 4,
+    price: 32000,
+  },
+  {
+    id: 'REP-004',
+    name: 'Bujías',
+    providerId: 'PROV-003',
+    providerName: 'AutoPartes Central',
+    stock: 24,
+    minimumStock: 6,
+    price: 6500,
+  },
+  {
+    id: 'REP-005',
+    name: 'Filtro de aire',
+    providerId: 'PROV-002',
+    providerName: 'Lubricantes Chile',
+    stock: 0,
+    minimumStock: 5,
+    price: 12000,
+  },
+];
+
+export function getParts(): Part[] {
+  return demoParts.map((part) => ({ ...part }));
+}
+
+export function getPartById(id: string): Part | undefined {
+  const part = demoParts.find((item) => item.id === id);
+  return part ? { ...part } : undefined;
+}
+
+export function getLowStockParts(): Part[] {
+  return getParts().filter((part) => part.stock <= part.minimumStock);
+}
+
+export function getOutOfStockParts(): Part[] {
+  return getParts().filter((part) => part.stock === 0);
+}

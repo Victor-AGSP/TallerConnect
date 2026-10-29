@@ -5,7 +5,10 @@ import {
   normalizeProviderServiceError,
 } from '@/services/service-error';
 import type { PaginatedList } from '@/models/pagination.model';
-import type { Provider, ProviderDetail } from '@/models/provider.model';
+import type {
+  Provider as DomainProvider,
+  ProviderDetail,
+} from '@/models/provider.model';
 import type {
   CreateProviderRequestDto,
   ProviderDetailResponseDto,
@@ -76,9 +79,9 @@ export function buildProviderQueryParams(
  * Filtra y pagina localmente una lista de proveedores según `ProviderQueryParamsDto`.
  */
 export function filterProvidersByParams(
-  providers: Provider[],
+  providers: DomainProvider[],
   params?: ProviderQueryParamsDto
-): PaginatedList<Provider> {
+): PaginatedList<DomainProvider> {
   let filtered = [...providers];
 
   if (params) {
@@ -125,14 +128,14 @@ export function filterProvidersByParams(
  * Contrato común para los adaptadores (Mock y Real HTTP) de Proveedores (MS3).
  */
 export interface ProviderServiceAdapter {
-  getProvidersPage(params?: ProviderQueryParamsDto): Promise<PaginatedList<Provider>>;
-  getProviders(params?: ProviderQueryParamsDto): Promise<Provider[]>;
+  getProvidersPage(params?: ProviderQueryParamsDto): Promise<PaginatedList<DomainProvider>>;
+  getProviders(params?: ProviderQueryParamsDto): Promise<DomainProvider[]>;
   getProviderById(id: string | number): Promise<ProviderDetail>;
-  createProvider(data: CreateProviderRequestDto): Promise<Provider>;
+  createProvider(data: CreateProviderRequestDto): Promise<DomainProvider>;
   updateProvider(
     id: string | number,
     data: UpdateProviderRequestDto
-  ): Promise<Provider>;
+  ): Promise<DomainProvider>;
   deleteProvider(id: string | number): Promise<void>;
   resetMocks?(): void;
 }
@@ -170,15 +173,15 @@ export class MockProviderAdapter implements ProviderServiceAdapter {
 
   async getProvidersPage(
     params?: ProviderQueryParamsDto
-  ): Promise<PaginatedList<Provider>> {
+  ): Promise<PaginatedList<DomainProvider>> {
     await this.simulateDelay();
-    const summaries: Provider[] = this.providerDetails.map(
+    const summaries: DomainProvider[] = this.providerDetails.map(
       ({ parts: _parts, ...provider }) => ({ ...provider })
     );
     return filterProvidersByParams(summaries, params);
   }
 
-  async getProviders(params?: ProviderQueryParamsDto): Promise<Provider[]> {
+  async getProviders(params?: ProviderQueryParamsDto): Promise<DomainProvider[]> {
     const page = await this.getProvidersPage(params);
     return page.items;
   }
@@ -201,7 +204,7 @@ export class MockProviderAdapter implements ProviderServiceAdapter {
     };
   }
 
-  async createProvider(data: CreateProviderRequestDto): Promise<Provider> {
+  async createProvider(data: CreateProviderRequestDto): Promise<DomainProvider> {
     await this.simulateDelay();
     const name = (data.nombre ?? '').trim();
     const contact = (data.contacto ?? '').trim();
@@ -243,7 +246,7 @@ export class MockProviderAdapter implements ProviderServiceAdapter {
   async updateProvider(
     id: string | number,
     data: UpdateProviderRequestDto
-  ): Promise<Provider> {
+  ): Promise<DomainProvider> {
     await this.simulateDelay();
     const providerId = String(id);
     const index = this.providerDetails.findIndex((p) => p.id === providerId);
@@ -331,7 +334,7 @@ export class MockProviderAdapter implements ProviderServiceAdapter {
 export class RealProviderAdapter implements ProviderServiceAdapter {
   async getProvidersPage(
     params?: ProviderQueryParamsDto
-  ): Promise<PaginatedList<Provider>> {
+  ): Promise<PaginatedList<DomainProvider>> {
     const queryParams = buildProviderQueryParams(params);
     const response = queryParams
       ? await apiClient.get<ProviderPageResponseDto>('/proveedores', {
@@ -342,7 +345,7 @@ export class RealProviderAdapter implements ProviderServiceAdapter {
     return mapProviderPageResponse(response.data);
   }
 
-  async getProviders(params?: ProviderQueryParamsDto): Promise<Provider[]> {
+  async getProviders(params?: ProviderQueryParamsDto): Promise<DomainProvider[]> {
     const page = await this.getProvidersPage(params);
     return page.items;
   }
@@ -355,7 +358,7 @@ export class RealProviderAdapter implements ProviderServiceAdapter {
     return mapProviderDetailResponse(response.data);
   }
 
-  async createProvider(data: CreateProviderRequestDto): Promise<Provider> {
+  async createProvider(data: CreateProviderRequestDto): Promise<DomainProvider> {
     const payload: CreateProviderRequestDto = {
       nombre: data.nombre.trim(),
       contacto: data.contacto.trim(),
@@ -373,7 +376,7 @@ export class RealProviderAdapter implements ProviderServiceAdapter {
   async updateProvider(
     id: string | number,
     data: UpdateProviderRequestDto
-  ): Promise<Provider> {
+  ): Promise<DomainProvider> {
     const providerId = String(id);
     const payload: UpdateProviderRequestDto = {
       ...(data.nombre !== undefined ? { nombre: data.nombre } : {}),
@@ -410,43 +413,27 @@ export class ProvidersService {
       customAdapter ?? (USE_MOCKS ? this.mockAdapter : this.realAdapter);
   }
 
-  /**
-   * Permite inyectar un adaptador personalizado.
-   */
   setAdapter(adapter: ProviderServiceAdapter): void {
     this.adapter = adapter;
   }
 
-  /**
-   * Activa el adaptador simulado en memoria.
-   */
   useMockAdapter(): MockProviderAdapter {
     this.adapter = this.mockAdapter;
     return this.mockAdapter;
   }
 
-  /**
-   * Activa el adaptador HTTP real conectado a `apiClient`.
-   */
   useRealAdapter(): RealProviderAdapter {
     this.adapter = this.realAdapter;
     return this.realAdapter;
   }
 
-  /**
-   * Restaura el estado inicial de los proveedores simulados.
-   */
   resetMocks(): void {
     this.mockAdapter.resetMocks(mockProviderDetails);
   }
 
-  /**
-   * Obtiene una página de proveedores (`PaginaProveedores` en MS3).
-   * Ruta Gateway: GET /api/proveedores
-   */
   async getProvidersPage(
     params?: ProviderQueryParamsDto
-  ): Promise<PaginatedList<Provider>> {
+  ): Promise<PaginatedList<DomainProvider>> {
     try {
       return await this.adapter.getProvidersPage(params);
     } catch (error: unknown) {
@@ -457,11 +444,7 @@ export class ProvidersService {
     }
   }
 
-  /**
-   * Obtiene la lista de proveedores según los parámetros de consulta.
-   * Ruta Gateway: GET /api/proveedores
-   */
-  async getProviders(params?: ProviderQueryParamsDto): Promise<Provider[]> {
+  async getProviders(params?: ProviderQueryParamsDto): Promise<DomainProvider[]> {
     try {
       return await this.adapter.getProviders(params);
     } catch (error: unknown) {
@@ -472,10 +455,6 @@ export class ProvidersService {
     }
   }
 
-  /**
-   * Obtiene el detalle de un proveedor junto con sus repuestos (`ProveedorDetalle` en MS3).
-   * Ruta Gateway: GET /api/proveedores/{proveedor_id}
-   */
   async getProviderById(id: string | number): Promise<ProviderDetail> {
     try {
       return await this.adapter.getProviderById(id);
@@ -487,11 +466,7 @@ export class ProvidersService {
     }
   }
 
-  /**
-   * Registra un nuevo proveedor en el catálogo.
-   * Ruta Gateway: POST /api/proveedores
-   */
-  async createProvider(data: CreateProviderRequestDto): Promise<Provider> {
+  async createProvider(data: CreateProviderRequestDto): Promise<DomainProvider> {
     try {
       return await this.adapter.createProvider(data);
     } catch (error: unknown) {
@@ -502,14 +477,10 @@ export class ProvidersService {
     }
   }
 
-  /**
-   * Modifica parcialmente un proveedor existente.
-   * Ruta Gateway: PATCH /api/proveedores/{proveedor_id}
-   */
   async updateProvider(
     id: string | number,
     data: UpdateProviderRequestDto
-  ): Promise<Provider> {
+  ): Promise<DomainProvider> {
     try {
       return await this.adapter.updateProvider(id, data);
     } catch (error: unknown) {
@@ -520,10 +491,6 @@ export class ProvidersService {
     }
   }
 
-  /**
-   * Elimina un proveedor sin repuestos asociados.
-   * Ruta Gateway: DELETE /api/proveedores/{proveedor_id}
-   */
   async deleteProvider(id: string | number): Promise<void> {
     try {
       await this.adapter.deleteProvider(id);
@@ -540,3 +507,54 @@ export const providersService = new ProvidersService();
 export const providerService = providersService;
 export { ProvidersService as ProviderService };
 
+/**
+ * ============================================================
+ * HELPERS SÍNCRONOS DE DEMOSTRACIÓN PARA VISTAS UI (InventoryScreen)
+ * ============================================================
+ */
+export type Provider = {
+  id: string;
+  name: string;
+  contact: string;
+  phone: string;
+  parts: string[];
+};
+
+const demoProviders: Provider[] = [
+  {
+    id: 'PROV-001',
+    name: 'Repuestos del Sur',
+    contact: 'ventas@repuestosdelsur.cl',
+    phone: '+56 9 5555 0101',
+    parts: ['REP-001', 'REP-003'],
+  },
+  {
+    id: 'PROV-002',
+    name: 'Lubricantes Chile',
+    contact: 'contacto@lubricantes.cl',
+    phone: '+56 9 5555 0102',
+    parts: ['REP-002', 'REP-005'],
+  },
+  {
+    id: 'PROV-003',
+    name: 'AutoPartes Central',
+    contact: 'ventas@autopartes.cl',
+    phone: '+56 9 5555 0103',
+    parts: ['REP-004'],
+  },
+];
+
+export function getProviders(): Provider[] {
+  return demoProviders.map((provider) => ({
+    ...provider,
+    parts: [...provider.parts],
+  }));
+}
+
+export function getProviderById(id: string): Provider | undefined {
+  const provider = demoProviders.find((item) => item.id === id);
+
+  return provider
+    ? { ...provider, parts: [...provider.parts] }
+    : undefined;
+}
