@@ -15,5 +15,7 @@ module.exports = {
     // Integración con MS3: presupuestos, repuestos y proveedores.
     '**/__tests__/budget-*.test.ts?(x)',
     '**/__tests__/parts-*.test.ts?(x)',
+    // Evidencias fotográficas (MS4).
+    '**/__tests__/evidence-*.test.ts?(x)',
   ],
 };
