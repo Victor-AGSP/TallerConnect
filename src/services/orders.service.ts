@@ -8,12 +8,12 @@ import {
   OrderHistoryEntryDto,
   OrderQueryParamsDto,
   OrderResponseDto,
-  UpdateOrderStatusRequestDto,
 } from '@/dto/order.dto';
 import {
   CODE_TO_STATUS,
   STATUS_TO_CODE,
   mapOrderResponse,
+  mapOrderStatusUpdateRequest,
   mapOrdersResponseList,
 } from '@/mappers/order.mapper';
 import { mockWorkOrders } from '@/mocks/orders.mock';
@@ -105,7 +105,8 @@ export interface OrderServiceAdapter {
   createOrder(data: CreateOrderRequestDto): Promise<WorkOrder>;
   updateOrderStatus(
     id: string | number,
-    status: WorkOrderStatus
+    status: WorkOrderStatus,
+    observation?: string | null
   ): Promise<WorkOrder>;
   assignMechanic(
     id: string | number,
@@ -211,7 +212,8 @@ export class MockOrderAdapter implements OrderServiceAdapter {
 
   async updateOrderStatus(
     id: string | number,
-    status: WorkOrderStatus
+    status: WorkOrderStatus,
+    observation?: string | null
   ): Promise<WorkOrder> {
     await this.simulateDelay();
     const orderId = String(id);
@@ -267,7 +269,7 @@ export class MockOrderAdapter implements OrderServiceAdapter {
       actor_usuario_id: 50,
       origen: 'usuario',
       fecha_hora: now,
-      observacion: `Cambio de estado a ${status}`,
+      observacion: observation ?? `Cambio de estado a ${status}`,
     });
     this.historyByOrder[orderId] = currentHistory;
 
@@ -393,12 +395,16 @@ export class RealOrderAdapter implements OrderServiceAdapter {
 
   async updateOrderStatus(
     id: string | number,
-    status: WorkOrderStatus
+    status: WorkOrderStatus,
+    observation?: string | null
   ): Promise<WorkOrder> {
     const orderId = String(id);
-    const payload: UpdateOrderStatusRequestDto = { status };
+    const payload = mapOrderStatusUpdateRequest({
+      targetStatus: status,
+      observation,
+    });
     const response = await apiClient.patch<OrderResponseDto>(
-      `/ordenes/${orderId}/status`,
+      `/ordenes/${orderId}/estado`,
       payload
     );
     return mapOrderResponse(response.data);
@@ -524,15 +530,16 @@ export class OrdersService {
   }
 
   /**
-   * Actualiza el estado de una orden de trabajo.
-   * Ruta Gateway: PATCH /api/ordenes/{id}/status
+   * Actualiza el estado de una orden de trabajo (CambioEstadoSolicitud en MS2).
+   * Ruta Gateway: PATCH /api/ordenes/{orden_id}/estado
    */
   async updateOrderStatus(
     id: string | number,
-    status: WorkOrderStatus
+    status: WorkOrderStatus,
+    observation?: string | null
   ): Promise<WorkOrder> {
     try {
-      return await this.adapter.updateOrderStatus(id, status);
+      return await this.adapter.updateOrderStatus(id, status, observation);
     } catch (error: unknown) {
       throw normalizeOrderServiceError(
         error,

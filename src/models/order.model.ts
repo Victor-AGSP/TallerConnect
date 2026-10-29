@@ -19,3 +19,12 @@ export interface WorkOrder {
   createdAt: string;
   updatedAt: string;
 }
+
+/**
+ * Solicitud de cambio de estado de una orden de trabajo (`CambioEstadoSolicitud` en MS2).
+ * La observación es opcional, salvo al pasar a `cancelado`, donde el backend la exige.
+ */
+export interface OrderStatusUpdateRequest {
+  targetStatus: WorkOrderStatus;
+  observation?: string | null;
+}

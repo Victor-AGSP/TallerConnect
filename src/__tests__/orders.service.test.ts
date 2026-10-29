@@ -205,7 +205,7 @@ describe('ordersService (Capa de Servicios de Órdenes)', () => {
   });
 
   describe('updateOrderStatus', () => {
-    it('actualiza el estado de una orden mediante PATCH', async () => {
+    it('actualiza el estado de una orden mediante PATCH /ordenes/{orden_id}/estado', async () => {
       const rawUpdated: OrderResponseDto = {
         orden_id: 101,
         vehiculo_id: 5,
@@ -226,8 +226,8 @@ describe('ordersService (Capa de Servicios de Órdenes)', () => {
         'listo_para_entrega'
       );
 
-      expect(mockedApiClient.patch).toHaveBeenCalledWith('/ordenes/101/status', {
-        status: 'listo_para_entrega',
+      expect(mockedApiClient.patch).toHaveBeenCalledWith('/ordenes/101/estado', {
+        estado_destino: 6,
       });
       expect(result.status).toBe('listo_para_entrega');
     });
