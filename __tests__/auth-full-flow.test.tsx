@@ -70,7 +70,7 @@ describe('flujo completo de Login → rol → Logout', () => {
       const response = mockAuthResponses[role];
       login.mockResolvedValueOnce(response);
 
-      const router = renderRouterWithProviders(routes, {
+      const router = await renderRouterWithProviders(routes, {
         initialUrl: '/login',
       });
       await router;
@@ -120,7 +120,7 @@ it.each(roleCases)('permite reintentar una limpieza fallida desde el logout de %
   deleteItem.mockReset().mockResolvedValue(undefined);
   deleteItem.mockRejectedValueOnce(new Error('fallo de almacenamiento'));
   const response = mockAuthResponses[role];
-  const router = renderRouterWithProviders(routes, {
+  const router = await renderRouterWithProviders(routes, {
     initialUrl: route,
     initialAuthState: {
       ...response, role, isAuthenticated: true, isHydrated: true, isLoading: false,
@@ -144,7 +144,7 @@ it.each(roleCases)('recupera %s al arrancar y no recupera la sesión después de
   setItem.mockReset().mockImplementation(async (key, value) => { disk.set(key, value); });
   deleteItem.mockReset().mockImplementation(async (key) => { disk.delete(key); });
   const appRoutes = { ...routes, _layout: RootLayout };
-  const router = renderRouterWithProviders(appRoutes, {
+  const router = await renderRouterWithProviders(appRoutes, {
     initialUrl: '/', initialAuthState: { isLoading: true, isHydrated: false },
   });
   await router;
@@ -155,7 +155,7 @@ it.each(roleCases)('recupera %s al arrancar y no recupera la sesión después de
   await waitFor(() => expect(disk.size).toBe(0));
   await cleanup();
   resetStores();
-  const restarted = renderRouterWithProviders(appRoutes, {
+  const restarted = await renderRouterWithProviders(appRoutes, {
     initialUrl: '/', initialAuthState: { isLoading: true, isHydrated: false },
   });
   await restarted;
