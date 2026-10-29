@@ -1,12 +1,18 @@
-import { ordersService } from '@/services/orders.service';
+import {
+  MockOrderAdapter,
+  OrdersService,
+  ordersService,
+} from '@/services/orders.service';
+import { ServiceError } from '@/services/vehicles.service';
 import { apiClient } from '@/services/api/client';
-import { OrderResponseDto } from '@/dto/order.dto';
+import { OrderHistoryEntryDto, OrderResponseDto } from '@/dto/order.dto';
 
 jest.mock('@/services/api/client', () => ({
   apiClient: {
     get: jest.fn(),
     post: jest.fn(),
     patch: jest.fn(),
+    put: jest.fn(),
   },
 }));
 
@@ -15,6 +21,8 @@ const mockedApiClient = apiClient as jest.Mocked<typeof apiClient>;
 describe('ordersService (Capa de Servicios de Órdenes)', () => {
   beforeEach(() => {
     jest.clearAllMocks();
+    ordersService.useRealAdapter();
+    ordersService.resetMocks();
   });
 
   describe('getOrders', () => {
@@ -50,6 +58,48 @@ describe('ordersService (Capa de Servicios de Órdenes)', () => {
         createdAt: '2026-03-20T10:00:00Z',
         updatedAt: '2026-03-20T11:00:00Z',
       });
+    });
+
+    it('soporta parámetros de consulta tipados (OrderQueryParamsDto) y mapea estado_codigo oficial de MS2', async () => {
+      const rawMs2Orders: OrderResponseDto[] = [
+        {
+          orden_id: 31,
+          vehiculo_id: 12,
+          ingreso_id: 18,
+          estado_codigo: 5,
+          mecanico_actual_id: 50,
+          creado_por_id: 99,
+          creado_en: '2026-09-28T10:30:00-03:00',
+          actualizado_en: '2026-09-28T11:00:00-03:00',
+        },
+        {
+          orden_id: 32,
+          vehiculo_id: 14,
+          ingreso_id: 19,
+          estado_codigo: 1,
+          mecanico_actual_id: null,
+          creado_por_id: 99,
+          creado_en: '2026-09-28T10:30:00-03:00',
+          actualizado_en: '2026-09-28T10:30:00-03:00',
+        },
+      ];
+
+      mockedApiClient.get.mockResolvedValueOnce({
+        data: rawMs2Orders,
+      } as never);
+
+      const result = await ordersService.getOrders({
+        mecanico_actual_id: 50,
+        estado_codigo: 5,
+      });
+
+      expect(mockedApiClient.get).toHaveBeenCalledWith('/ordenes', {
+        params: { mecanico_actual_id: 50, estado_codigo: 5 },
+      });
+      expect(result).toHaveLength(1);
+      expect(result[0].id).toBe('31');
+      expect(result[0].status).toBe('en_reparacion');
+      expect(result[0].assignedMechanicId).toBe('50');
     });
 
     it('propaga error normalizado si la API Gateway falla', async () => {
@@ -90,6 +140,30 @@ describe('ordersService (Capa de Servicios de Órdenes)', () => {
       expect(result.id).toBe('101');
       expect(result.status).toBe('esperando_diagnostico');
     });
+
+    it('envía el parámetro de consulta solo_propietario cuando se especifica', async () => {
+      const rawOrder: OrderResponseDto = {
+        orden_id: 31,
+        vehiculo_id: 12,
+        ingreso_id: 18,
+        estado_codigo: 2,
+        mecanico_actual_id: 50,
+        creado_por_id: 99,
+        creado_en: '2026-09-28T10:30:00-03:00',
+        actualizado_en: '2026-09-28T11:00:00-03:00',
+      };
+
+      mockedApiClient.get.mockResolvedValueOnce({
+        data: rawOrder,
+      } as never);
+
+      const result = await ordersService.getOrderById(31, { solo_propietario: true });
+
+      expect(mockedApiClient.get).toHaveBeenCalledWith('/ordenes/31', {
+        params: { solo_propietario: true },
+      });
+      expect(result.id).toBe('31');
+    });
   });
 
   describe('createOrder', () => {
@@ -117,10 +191,13 @@ describe('ordersService (Capa de Servicios de Órdenes)', () => {
 
       const result = await ordersService.createOrder(newOrderPayload);
 
-      expect(mockedApiClient.post).toHaveBeenCalledWith('/ordenes', expect.objectContaining({
-        vehicle_id: '5',
-        client_id: '12',
-      }));
+      expect(mockedApiClient.post).toHaveBeenCalledWith(
+        '/ordenes',
+        expect.objectContaining({
+          vehicle_id: '5',
+          client_id: '12',
+        })
+      );
       expect(result.id).toBe('102');
       expect(result.status).toBe('recibido');
       expect(result.vehicleId).toBe('5');
@@ -144,12 +221,102 @@ describe('ordersService (Capa de Servicios de Órdenes)', () => {
         data: rawUpdated,
       } as never);
 
-      const result = await ordersService.updateOrderStatus('101', 'listo_para_entrega');
+      const result = await ordersService.updateOrderStatus(
+        '101',
+        'listo_para_entrega'
+      );
 
       expect(mockedApiClient.patch).toHaveBeenCalledWith('/ordenes/101/status', {
         status: 'listo_para_entrega',
       });
       expect(result.status).toBe('listo_para_entrega');
+    });
+  });
+
+  describe('assignMechanic y getOrderHistory (Endpoints OpenAPI MS2)', () => {
+    it('asigna un mecánico responsable mediante PUT /ordenes/{orden_id}/mecanico', async () => {
+      const rawUpdated: OrderResponseDto = {
+        orden_id: 31,
+        vehiculo_id: 12,
+        ingreso_id: 18,
+        estado_codigo: 2,
+        mecanico_actual_id: 50,
+        creado_por_id: 99,
+        creado_en: '2026-09-28T10:30:00-03:00',
+        actualizado_en: '2026-09-28T11:00:00-03:00',
+      };
+
+      mockedApiClient.put.mockResolvedValueOnce({
+        data: rawUpdated,
+      } as never);
+
+      const result = await ordersService.assignMechanic(31, {
+        mecanico_id: 50,
+        observacion: 'Asignación inicial',
+      });
+
+      expect(mockedApiClient.put).toHaveBeenCalledWith('/ordenes/31/mecanico', {
+        mecanico_id: 50,
+        observacion: 'Asignación inicial',
+      });
+      expect(result.assignedMechanicId).toBe('50');
+    });
+
+    it('consulta el historial de estados mediante GET /ordenes/{orden_id}/historial', async () => {
+      const rawHistory: OrderHistoryEntryDto[] = [
+        {
+          historial_id: 41,
+          orden_id: 31,
+          estado_anterior: 1,
+          estado_nuevo: 2,
+          actor_usuario_id: 50,
+          origen: 'usuario',
+          fecha_hora: '2026-09-28T11:00:00-03:00',
+          observacion: 'Inicia evaluación técnica',
+        },
+      ];
+
+      mockedApiClient.get.mockResolvedValueOnce({
+        data: rawHistory,
+      } as never);
+
+      const history = await ordersService.getOrderHistory(31);
+
+      expect(mockedApiClient.get).toHaveBeenCalledWith('/ordenes/31/historial');
+      expect(history).toHaveLength(1);
+      expect(history[0].estado_nuevo).toBe(2);
+    });
+  });
+
+  describe('Normalización de errores y Adaptador Simulado', () => {
+    it('normaliza errores HTTP 409 y 422 de MS2 como ServiceError con metadatos', async () => {
+      mockedApiClient.put.mockRejectedValueOnce({
+        isAxiosError: true,
+        response: {
+          status: 409,
+          data: { detail: 'No se puede cambiar el mecánico de una orden terminal' },
+        },
+      });
+
+      try {
+        await ordersService.assignMechanic(31, { mecanico_id: 50 });
+        fail('Debió lanzar un ServiceError');
+      } catch (err) {
+        expect(err).toBeInstanceOf(ServiceError);
+        const serviceErr = err as ServiceError;
+        expect(serviceErr.status).toBe(409);
+        expect(serviceErr.code).toBe('ORDER_CONFLICT');
+        expect(serviceErr.domain).toBe('orders');
+        expect(serviceErr.message).toBe(
+          'No se puede cambiar el mecánico de una orden terminal'
+        );
+      }
+    });
+
+    it('permite instanciar OrdersService con MockOrderAdapter', async () => {
+      const mockService = new OrdersService(new MockOrderAdapter());
+      const orders = await mockService.getOrders({ limit: 1 });
+      expect(orders.length).toBeLessThanOrEqual(1);
     });
   });
 });

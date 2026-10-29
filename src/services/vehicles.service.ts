@@ -1,8 +1,14 @@
 import { apiClient } from '@/services/api/client';
-import { normalizeApiError } from '@/services/api/interceptors';
+import { HTTP_STATUS } from '@/services/api/types';
+import {
+  ServiceError,
+  normalizeVehicleServiceError,
+} from '@/services/service-error';
 import { Vehicle } from '@/models/vehicle.model';
 import {
   CreateVehicleRequestDto,
+  UpdateVehicleRequestDto,
+  VehicleQueryParamsDto,
   VehicleResponseDto,
 } from '@/dto/vehicle.dto';
 import {
@@ -12,46 +18,359 @@ import {
 import { mockVehicles } from '@/mocks/vehicles.mock';
 import { mockUserByRole } from '@/mocks/users.mock';
 
+export { ServiceError, normalizeVehicleServiceError };
+
 const USE_MOCKS = process.env.EXPO_PUBLIC_USE_MOCK_AUTH === 'true';
 
-let localMockVehicles = [...mockVehicles];
+/**
+ * Filtra y pagina localmente una lista de vehículos según VehicleQueryParamsDto.
+ */
+export function filterVehiclesByParams(
+  vehicles: Vehicle[],
+  params?: VehicleQueryParamsDto
+): Vehicle[] {
+  if (!params) {
+    return [...vehicles];
+  }
 
-export class VehiclesService {
-  /**
-   * Obtiene todos los vehículos registrados (catálogo general / rol administrador).
-   * Ruta Gateway: GET /api/vehiculos
-   */
-  async getVehicles(): Promise<Vehicle[]> {
-    if (USE_MOCKS) {
-      await new Promise((resolve) => setTimeout(resolve, 300));
-      return [...localMockVehicles];
+  let filtered = [...vehicles];
+
+  const ownerFilter =
+    params.cliente_id != null
+      ? String(params.cliente_id)
+      : params.ownerId
+      ? String(params.ownerId)
+      : undefined;
+
+  if (ownerFilter) {
+    filtered = filtered.filter((v) => v.ownerId === ownerFilter);
+  }
+
+  const plateFilter = (params.patente ?? params.plate)?.trim().toUpperCase();
+  if (plateFilter) {
+    filtered = filtered.filter((v) => v.plate.toUpperCase().includes(plateFilter));
+  }
+
+  const brandFilter = (params.marca ?? params.brand)?.trim().toLowerCase();
+  if (brandFilter) {
+    filtered = filtered.filter((v) => v.brand.toLowerCase().includes(brandFilter));
+  }
+
+  const modelFilter = (params.modelo ?? params.model)?.trim().toLowerCase();
+  if (modelFilter) {
+    filtered = filtered.filter((v) => v.model.toLowerCase().includes(modelFilter));
+  }
+
+  const start = params.skip && params.skip > 0 ? params.skip : 0;
+  const end =
+    params.limit && params.limit > 0 ? start + params.limit : undefined;
+
+  return filtered.slice(start, end);
+}
+
+/**
+ * Contrato común para los adaptadores (Mock y Real HTTP) de Vehículos.
+ */
+export interface VehicleServiceAdapter {
+  getVehicles(params?: VehicleQueryParamsDto): Promise<Vehicle[]>;
+  getMyVehicles(params?: VehicleQueryParamsDto): Promise<Vehicle[]>;
+  getAssignedVehicles(params?: VehicleQueryParamsDto): Promise<Vehicle[]>;
+  getVehicleById(id: string | number): Promise<Vehicle>;
+  createVehicle(data: CreateVehicleRequestDto): Promise<Vehicle>;
+  updateVehicle(id: string | number, data: UpdateVehicleRequestDto): Promise<Vehicle>;
+  resetMocks?(): void;
+}
+
+/**
+ * Adaptador simulado (Mock) en memoria para pruebas y desarrollo offline.
+ */
+export class MockVehicleAdapter implements VehicleServiceAdapter {
+  private vehicles: Vehicle[];
+  private readonly delayMs: number;
+
+  constructor(initialVehicles: Vehicle[] = mockVehicles, delayMs = 0) {
+    this.vehicles = [...initialVehicles];
+    this.delayMs = delayMs;
+  }
+
+  private async simulateDelay(): Promise<void> {
+    if (this.delayMs > 0) {
+      await new Promise((resolve) => setTimeout(resolve, this.delayMs));
+    }
+  }
+
+  resetMocks(initialVehicles: Vehicle[] = mockVehicles): void {
+    this.vehicles = [...initialVehicles];
+  }
+
+  async getVehicles(params?: VehicleQueryParamsDto): Promise<Vehicle[]> {
+    await this.simulateDelay();
+    return filterVehiclesByParams(this.vehicles, params);
+  }
+
+  async getMyVehicles(params?: VehicleQueryParamsDto): Promise<Vehicle[]> {
+    await this.simulateDelay();
+    return filterVehiclesByParams(this.vehicles, params);
+  }
+
+  async getAssignedVehicles(params?: VehicleQueryParamsDto): Promise<Vehicle[]> {
+    await this.simulateDelay();
+    return filterVehiclesByParams(this.vehicles, params);
+  }
+
+  async getVehicleById(id: string | number): Promise<Vehicle> {
+    await this.simulateDelay();
+    const vehicleId = String(id);
+    const found = this.vehicles.find((v) => v.id === vehicleId);
+    if (!found) {
+      throw new ServiceError({
+        message: 'El vehículo solicitado no existe.',
+        status: HTTP_STATUS.NOT_FOUND,
+        code: 'VEHICLE_NOT_FOUND',
+        domain: 'vehicles',
+      });
+    }
+    return { ...found };
+  }
+
+  async createVehicle(data: CreateVehicleRequestDto): Promise<Vehicle> {
+    await this.simulateDelay();
+    const rawPlate = (data.patent || data.patente || data.plate || '').toUpperCase().trim();
+    const rawBrand = (data.brand || data.marca || '').trim();
+    const rawModel = (data.model || data.modelo || '').trim();
+    const rawYear = (data.year !== undefined ? data.year : data.anio) ?? null;
+    const rawMileage = (data.mileage !== undefined ? data.mileage : data.kilometraje) ?? null;
+
+    if (!rawPlate || !rawBrand || !rawModel) {
+      throw new ServiceError({
+        message: 'Patente, marca y modelo son obligatorios para registrar un vehículo.',
+        status: HTTP_STATUS.UNPROCESSABLE_ENTITY,
+        code: 'VEHICLE_VALIDATION_ERROR',
+        domain: 'vehicles',
+      });
     }
 
+    const exists = this.vehicles.some(
+      (v) => v.plate.toUpperCase() === rawPlate
+    );
+    if (exists) {
+      throw new ServiceError({
+        message: 'La patente exacta ya está registrada.',
+        status: HTTP_STATUS.CONFLICT,
+        code: 'VEHICLE_CONFLICT',
+        domain: 'vehicles',
+      });
+    }
+
+    const newMockVehicle: Vehicle = {
+      id: `veh-00${this.vehicles.length + 1}`,
+      plate: rawPlate,
+      brand: rawBrand,
+      model: rawModel,
+      year: rawYear,
+      mileage: rawMileage,
+      ownerId:
+        data.owner_id != null
+          ? String(data.owner_id)
+          : mockUserByRole.cliente.id,
+    };
+
+    this.vehicles.unshift(newMockVehicle);
+    return { ...newMockVehicle };
+  }
+
+  async updateVehicle(
+    id: string | number,
+    data: UpdateVehicleRequestDto
+  ): Promise<Vehicle> {
+    await this.simulateDelay();
+    const vehicleId = String(id);
+    const index = this.vehicles.findIndex((v) => v.id === vehicleId);
+    if (index === -1) {
+      throw new ServiceError({
+        message: 'El vehículo solicitado no existe.',
+        status: HTTP_STATUS.NOT_FOUND,
+        code: 'VEHICLE_NOT_FOUND',
+        domain: 'vehicles',
+      });
+    }
+
+    const marca = data.marca !== undefined ? data.marca : data.brand;
+    const modelo = data.modelo !== undefined ? data.modelo : data.model;
+    const anio = data.anio !== undefined ? data.anio : data.year;
+    const kilometraje =
+      data.kilometraje !== undefined ? data.kilometraje : data.mileage;
+
+    const current = this.vehicles[index];
+    const updated: Vehicle = {
+      ...current,
+      brand: marca != null ? marca : current.brand,
+      model: modelo != null ? modelo : current.model,
+      year: anio !== undefined ? anio : current.year,
+      mileage: kilometraje !== undefined ? kilometraje : current.mileage,
+    };
+
+    this.vehicles[index] = updated;
+    return { ...updated };
+  }
+}
+
+/**
+ * Adaptador HTTP real conectado a la API Gateway (`/vehiculos`).
+ */
+export class RealVehicleAdapter implements VehicleServiceAdapter {
+  async getVehicles(params?: VehicleQueryParamsDto): Promise<Vehicle[]> {
+    const response = params
+      ? await apiClient.get<VehicleResponseDto[]>('/vehiculos', { params })
+      : await apiClient.get<VehicleResponseDto[]>('/vehiculos');
+    const mapped = mapVehiclesResponseList(response.data);
+    return params ? filterVehiclesByParams(mapped, params) : mapped;
+  }
+
+  async getMyVehicles(params?: VehicleQueryParamsDto): Promise<Vehicle[]> {
+    const response = params
+      ? await apiClient.get<VehicleResponseDto[]>('/vehiculos', { params })
+      : await apiClient.get<VehicleResponseDto[]>('/vehiculos');
+    const mapped = mapVehiclesResponseList(response.data);
+    return params ? filterVehiclesByParams(mapped, params) : mapped;
+  }
+
+  async getAssignedVehicles(params?: VehicleQueryParamsDto): Promise<Vehicle[]> {
+    const response = params
+      ? await apiClient.get<VehicleResponseDto[]>('/vehiculos/asignados', { params })
+      : await apiClient.get<VehicleResponseDto[]>('/vehiculos/asignados');
+    const mapped = mapVehiclesResponseList(response.data);
+    return params ? filterVehiclesByParams(mapped, params) : mapped;
+  }
+
+  async getVehicleById(id: string | number): Promise<Vehicle> {
+    const vehicleId = String(id);
+    const response = await apiClient.get<VehicleResponseDto>(`/vehiculos/${vehicleId}`);
+    return mapVehicleResponse(response.data);
+  }
+
+  async createVehicle(data: CreateVehicleRequestDto): Promise<Vehicle> {
+    const rawPlate = (data.patent || data.patente || data.plate || '').toUpperCase().trim();
+    const rawBrand = data.brand || data.marca || '';
+    const rawModel = data.model || data.modelo || '';
+    const rawYear = (data.year !== undefined ? data.year : data.anio) ?? null;
+    const rawMileage = (data.mileage !== undefined ? data.mileage : data.kilometraje) ?? null;
+
+    const payload = {
+      patent: rawPlate,
+      patente: rawPlate,
+      brand: rawBrand,
+      marca: rawBrand,
+      model: rawModel,
+      modelo: rawModel,
+      year: rawYear,
+      anio: rawYear,
+      mileage: rawMileage,
+      kilometraje: rawMileage,
+    };
+
+    const response = await apiClient.post<VehicleResponseDto>('/vehiculos', payload);
+    return mapVehicleResponse(response.data);
+  }
+
+  async updateVehicle(
+    id: string | number,
+    data: UpdateVehicleRequestDto
+  ): Promise<Vehicle> {
+    const vehicleId = String(id);
+    const marca = data.marca !== undefined ? data.marca : data.brand;
+    const modelo = data.modelo !== undefined ? data.modelo : data.model;
+    const anio = data.anio !== undefined ? data.anio : data.year;
+    const kilometraje =
+      data.kilometraje !== undefined ? data.kilometraje : data.mileage;
+
+    const payload: UpdateVehicleRequestDto = {
+      ...(marca !== undefined ? { marca } : {}),
+      ...(modelo !== undefined ? { modelo } : {}),
+      ...(anio !== undefined ? { anio } : {}),
+      ...(kilometraje !== undefined ? { kilometraje } : {}),
+    };
+
+    const response = await apiClient.patch<VehicleResponseDto>(
+      `/vehiculos/${vehicleId}`,
+      payload
+    );
+    return mapVehicleResponse(response.data);
+  }
+}
+
+/**
+ * Servicio de Vehículos con soporte intercambiable para adaptador Mock y Real HTTP.
+ */
+export class VehiclesService {
+  private adapter: VehicleServiceAdapter;
+  private readonly mockAdapter: MockVehicleAdapter;
+  private readonly realAdapter: RealVehicleAdapter;
+
+  constructor(customAdapter?: VehicleServiceAdapter) {
+    this.mockAdapter = new MockVehicleAdapter(mockVehicles, 0);
+    this.realAdapter = new RealVehicleAdapter();
+    this.adapter =
+      customAdapter ?? (USE_MOCKS ? this.mockAdapter : this.realAdapter);
+  }
+
+  /**
+   * Permite inyectar un adaptador personalizado (útil en pruebas unitarias y de integración).
+   */
+  setAdapter(adapter: VehicleServiceAdapter): void {
+    this.adapter = adapter;
+  }
+
+  /**
+   * Activa el adaptador simulado en memoria.
+   */
+  useMockAdapter(): MockVehicleAdapter {
+    this.adapter = this.mockAdapter;
+    return this.mockAdapter;
+  }
+
+  /**
+   * Activa el adaptador HTTP real conectado a `apiClient`.
+   */
+  useRealAdapter(): RealVehicleAdapter {
+    this.adapter = this.realAdapter;
+    return this.realAdapter;
+  }
+
+  /**
+   * Restaura el estado inicial de los vehículos simulados.
+   */
+  resetMocks(): void {
+    this.mockAdapter.resetMocks(mockVehicles);
+  }
+
+  /**
+   * Obtiene todos los vehículos registrados (rol cliente o administrador en MS2).
+   * Ruta Gateway: GET /api/vehiculos
+   */
+  async getVehicles(params?: VehicleQueryParamsDto): Promise<Vehicle[]> {
     try {
-      const response = await apiClient.get<VehicleResponseDto[]>('/vehiculos');
-      return mapVehiclesResponseList(response.data);
+      return await this.adapter.getVehicles(params);
     } catch (error: unknown) {
-      const normalized = normalizeApiError(error);
-      throw new Error(normalized.message || 'No fue posible cargar los vehículos.');
+      throw normalizeVehicleServiceError(
+        error,
+        'No fue posible cargar los vehículos.'
+      );
     }
   }
 
   /**
    * Obtiene los vehículos asociados al cliente autenticado (portal cliente).
-   * Ruta Gateway: GET /api/vehiculos/mios
+   * Ruta Gateway: GET /api/vehiculos
    */
-  async getMyVehicles(): Promise<Vehicle[]> {
-    if (USE_MOCKS) {
-      await new Promise((resolve) => setTimeout(resolve, 200));
-      return [...localMockVehicles];
-    }
-
+  async getMyVehicles(params?: VehicleQueryParamsDto): Promise<Vehicle[]> {
     try {
-      const response = await apiClient.get<VehicleResponseDto[]>('/vehiculos');
-      return mapVehiclesResponseList(response.data);
+      return await this.adapter.getMyVehicles(params);
     } catch (error: unknown) {
-      const normalized = normalizeApiError(error);
-      throw new Error(normalized.message || 'No fue posible cargar tus vehículos.');
+      throw normalizeVehicleServiceError(
+        error,
+        'No fue posible cargar tus vehículos.'
+      );
     }
   }
 
@@ -59,84 +378,65 @@ export class VehiclesService {
    * Obtiene los vehículos asignados al mecánico autenticado (portal mecánico).
    * Ruta Gateway: GET /api/vehiculos/asignados
    */
-  async getAssignedVehicles(): Promise<Vehicle[]> {
-    if (USE_MOCKS) {
-      await new Promise((resolve) => setTimeout(resolve, 200));
-      return [...localMockVehicles];
-    }
-
+  async getAssignedVehicles(params?: VehicleQueryParamsDto): Promise<Vehicle[]> {
     try {
-      const response = await apiClient.get<VehicleResponseDto[]>('/vehiculos/asignados');
-      return mapVehiclesResponseList(response.data);
+      return await this.adapter.getAssignedVehicles(params);
     } catch (error: unknown) {
-      const normalized = normalizeApiError(error);
-      throw new Error(normalized.message || 'No fue posible cargar los vehículos asignados.');
+      throw normalizeVehicleServiceError(
+        error,
+        'No fue posible cargar los vehículos asignados.'
+      );
     }
   }
 
   /**
    * Obtiene un vehículo por su ID.
-   * Ruta Gateway: GET /api/vehiculos/{id}
+   * Ruta Gateway: GET /api/vehiculos/{vehiculo_id}
    */
-  async getVehicleById(id: string): Promise<Vehicle> {
-    if (USE_MOCKS) {
-      await new Promise((resolve) => setTimeout(resolve, 200));
-      const found = localMockVehicles.find((v) => v.id === id);
-      if (!found) {
-        throw new Error('El vehículo solicitado no existe.');
-      }
-      return found;
-    }
-
+  async getVehicleById(id: string | number): Promise<Vehicle> {
     try {
-      const response = await apiClient.get<VehicleResponseDto>(`/vehiculos/${id}`);
-      return mapVehicleResponse(response.data);
+      return await this.adapter.getVehicleById(id);
     } catch (error: unknown) {
-      const normalized = normalizeApiError(error);
-      throw new Error(normalized.message || 'No fue posible cargar el vehículo.');
+      throw normalizeVehicleServiceError(
+        error,
+        'No fue posible cargar el vehículo.'
+      );
     }
   }
 
   /**
    * Registra un nuevo vehículo en el sistema.
    * Ruta Gateway: POST /api/vehiculos
-   * El clientId no viene en el body: el backend lo extrae del sub del JWT.
    */
   async createVehicle(data: CreateVehicleRequestDto): Promise<Vehicle> {
-    const rawPlate = (data.patent || data.patente || data.plate || '').toUpperCase().trim();
-
-    if (USE_MOCKS) {
-      await new Promise((resolve) => setTimeout(resolve, 400));
-      const newMockVehicle: Vehicle = {
-        id: `veh-00${localMockVehicles.length + 1}`,
-        plate: rawPlate,
-        brand: data.brand || data.marca || '',
-        model: data.model || data.modelo || '',
-        year: (data.year !== undefined ? data.year : data.anio) ?? null,
-        mileage: (data.mileage !== undefined ? data.mileage : data.kilometraje) ?? null,
-        ownerId: mockUserByRole.cliente.id,
-      };
-      localMockVehicles.unshift(newMockVehicle);
-      return newMockVehicle;
-    }
-
     try {
-      const payload = {
-        patent: rawPlate,
-        patente: rawPlate,
-        brand: data.brand || data.marca || '',
-        model: data.model || data.modelo || '',
-        year: (data.year !== undefined ? data.year : data.anio) ?? null,
-        mileage: (data.mileage !== undefined ? data.mileage : data.kilometraje) ?? null,
-      };
-
-      const response = await apiClient.post<VehicleResponseDto>('/vehiculos', payload);
-      return mapVehicleResponse(response.data);
+      return await this.adapter.createVehicle(data);
     } catch (error: unknown) {
-      const normalized = normalizeApiError(error);
-      throw new Error(normalized.message || 'No fue posible registrar el vehículo.');
+      throw normalizeVehicleServiceError(
+        error,
+        'No fue posible registrar el vehículo.'
+      );
+    }
+  }
+
+  /**
+   * Actualiza parcialmente un vehículo existente (VehiculoActualizar en MS2).
+   * Ruta Gateway: PATCH /api/vehiculos/{vehiculo_id}
+   */
+  async updateVehicle(
+    id: string | number,
+    data: UpdateVehicleRequestDto
+  ): Promise<Vehicle> {
+    try {
+      return await this.adapter.updateVehicle(id, data);
+    } catch (error: unknown) {
+      throw normalizeVehicleServiceError(
+        error,
+        'No fue posible actualizar el vehículo.'
+      );
     }
   }
 }
 
 export const vehiclesService = new VehiclesService();
+export { VehiclesService as VehicleService };

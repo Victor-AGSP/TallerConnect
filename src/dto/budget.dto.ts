@@ -80,3 +80,92 @@ export interface BudgetPageResponseDto {
   limite: number;
   presupuestos: BudgetSummaryResponseDto[];
 }
+
+/**
+ * Parámetros de consulta de `GET /api/presupuestos` en el contrato MS3.
+ */
+export interface BudgetQueryParamsDto {
+  orden_id?: number | string | null;
+  orderId?: string;
+  estado?: BudgetVersionStatus;
+  status?: BudgetVersionStatus;
+  desde?: number;
+  limite?: number;
+  skip?: number;
+  limit?: number;
+}
+
+/**
+ * Ítem enviado al crear un presupuesto o al reemplazar los ítems de un borrador (`ItemEntrada` del contrato MS3).
+ */
+export interface BudgetItemInputDto {
+  tipo: BudgetItemType;
+  descripcion: string;
+  cantidad: number | string;
+  precio_unitario?: number | string;
+  repuesto_id?: number | string | null;
+}
+
+/**
+ * Cuerpo para crear el presupuesto de una orden (`PresupuestoCrear` en `POST /api/presupuestos`).
+ */
+export interface CreateBudgetRequestDto {
+  orden_id: number | string;
+  items?: BudgetItemInputDto[];
+}
+
+/**
+ * Cuerpo opcional para crear una nueva versión (`NuevaVersion` en `POST /api/presupuestos/{presupuesto_id}/versiones`).
+ */
+export interface CreateBudgetVersionRequestDto {
+  items?: BudgetItemInputDto[] | null;
+  copiar_de?: number | null;
+}
+
+/**
+ * Cuerpo para reemplazar los ítems de una versión en borrador (`ItemsVersion` en `PUT /api/presupuestos/{presupuesto_id}/versiones/{numero}/items`).
+ */
+export interface UpdateBudgetVersionItemsRequestDto {
+  items: BudgetItemInputDto[];
+}
+
+/**
+ * Cuerpo para aprobar o rechazar una versión enviada (`DecisionEntrada` en `POST /api/presupuestos/{presupuesto_id}/versiones/{numero}/decision`).
+ */
+export interface BudgetDecisionRequestDto {
+  decision: BudgetDecisionValue;
+  motivo?: string | null;
+  confirmar_cancelacion?: boolean;
+}
+
+/**
+ * Efecto producido sobre la orden de trabajo en MS2 tras enviar o decidir un presupuesto.
+ */
+export type BudgetOperationEffect =
+  | 'esperando_aprobacion'
+  | 'en_reparacion'
+  | 'esperando_repuestos'
+  | 'cancelado'
+  | null;
+
+/**
+ * Repuesto faltante reportado por MS3 (`RepuestoFaltante`).
+ */
+export interface BudgetMissingPartDto {
+  repuesto_id: number;
+  nombre: string;
+  requerido: string;
+  disponible: number;
+}
+
+/**
+ * Respuesta de enviar o decidir una versión de presupuesto (`ResultadoOperacion` del contrato MS3).
+ */
+export interface BudgetOperationResultDto {
+  presupuesto: BudgetDetailResponseDto;
+  efecto_en_orden: BudgetOperationEffect;
+  repuestos_faltantes?: BudgetMissingPartDto[];
+  repuestos_reservados?: Record<string, number>;
+  decision_id?: number | null;
+  aplicacion_en_orden?: Record<string, unknown> | null;
+}
