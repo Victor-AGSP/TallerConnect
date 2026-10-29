@@ -139,6 +139,12 @@ beforeEach(() => {
   jest.resetAllMocks();
   resetStores();
   mockedOrders.getOrderById.mockImplementation(async (id) => order(String(id)));
+  // Primer uso: el permiso aún no se ha decidido y se solicita al pulsar.
+  picker.getCameraPermissionsAsync.mockResolvedValue({
+    ...GRANTED,
+    status: 'undetermined',
+    granted: false,
+  } as ImagePicker.PermissionResponse);
   picker.requestCameraPermissionsAsync.mockResolvedValue(GRANTED);
 });
 

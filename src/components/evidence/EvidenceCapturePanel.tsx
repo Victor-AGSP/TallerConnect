@@ -106,6 +106,16 @@ export function EvidenceCapturePanel({ orderId }: EvidenceCapturePanelProps) {
         </Text>
       ) : null}
 
+      {picker.permissionIssue && picker.canOpenSettings ? (
+        <Button
+          testID="evidence-open-settings"
+          title="Abrir Ajustes"
+          variant="outline"
+          onPress={picker.openSettings}
+          style={styles.action}
+        />
+      ) : null}
+
       {file ? (
         <View testID="evidence-preview" style={styles.preview}>
           <Image

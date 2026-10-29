@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
+import { Linking, Platform } from 'react-native';
 import * as ImagePicker from 'expo-image-picker';
 
 import type { EvidenceFile, EvidenceSource } from '@/models/evidence.model';
@@ -16,6 +17,22 @@ const PICKER_OPTIONS: ImagePicker.ImagePickerOptions = {
 export const CAMERA_DENIED_MESSAGE =
   'No se concedió acceso a la cámara. Puedes seleccionar una fotografía desde la galería.';
 
+export const CAMERA_BLOCKED_MESSAGE =
+  'El acceso a la cámara está desactivado. Revisa los permisos de la aplicación en Ajustes o selecciona una fotografía desde la galería.';
+
+export const LIBRARY_DENIED_MESSAGE =
+  'No se concedió acceso a las fotografías. Revisa los permisos de la aplicación en Ajustes.';
+
+/** Permiso que impidió la última selección. */
+export type EvidencePermissionIssue = 'camera' | 'library';
+
+/** Los módulos nativos informan la falta de permiso con códigos o mensajes que lo mencionan. */
+function isPermissionError(error: unknown): boolean {
+  if (typeof error !== 'object' || error === null) return false;
+  const { code, message } = error as { code?: unknown; message?: unknown };
+  return /permission/i.test(`${typeof code === 'string' ? code : ''} ${typeof message === 'string' ? message : ''}`);
+}
+
 export interface EvidencePickerResult {
   /** Fotografía validada para la orden actual, o `null`. */
   file: EvidenceFile | null;
@@ -23,6 +40,12 @@ export interface EvidencePickerResult {
   message: string | null;
   /** El selector del sistema está abierto. */
   isPicking: boolean;
+  /** Permiso denegado en el último intento, para ofrecer alternativas. */
+  permissionIssue: EvidencePermissionIssue | null;
+  /** La plataforma permite abrir los ajustes de la aplicación (no en web). */
+  canOpenSettings: boolean;
+  /** Abre los ajustes de la aplicación; solo a petición del usuario. */
+  openSettings: () => Promise<void>;
   takePhoto: () => Promise<void>;
   pickFromLibrary: () => Promise<void>;
   clear: () => void;
@@ -32,6 +55,7 @@ interface SelectionState {
   orderId: string;
   file: EvidenceFile | null;
   message: string | null;
+  permissionIssue: EvidencePermissionIssue | null;
 }
 
 /**
@@ -47,6 +71,7 @@ export function useEvidencePicker(orderId: string): EvidencePickerResult {
     orderId,
     file: null,
     message: null,
+    permissionIssue: null,
   });
   const [isPicking, setIsPicking] = useState(false);
 
@@ -82,18 +107,35 @@ export function useEvidencePicker(orderId: string): EvidencePickerResult {
           orderId: requestedFor,
           file: prev.orderId === requestedFor ? prev.file : null,
           message: null,
+          permissionIssue: null,
           ...patch,
         }));
 
       try {
         if (source === 'camera') {
-          const permission = await ImagePicker.requestCameraPermissionsAsync();
+          // Se consulta en cada intento: un permiso revocado en Ajustes se
+          // detecta, y uno concedido después se aprovecha sin reiniciar.
+          let permission = await ImagePicker.getCameraPermissionsAsync();
           if (!isCurrent()) return;
+
+          // Una sola solicitud por pulsación, y nunca si el sistema ya no
+          // permite volver a preguntar: evita bucles de solicitudes.
+          if (!permission.granted && permission.canAskAgain) {
+            permission = await ImagePicker.requestCameraPermissionsAsync();
+            if (!isCurrent()) return;
+          }
+
           if (!permission.granted) {
-            update({ message: CAMERA_DENIED_MESSAGE });
+            update({
+              message: permission.canAskAgain ? CAMERA_DENIED_MESSAGE : CAMERA_BLOCKED_MESSAGE,
+              permissionIssue: 'camera',
+            });
             return;
           }
         }
+
+        // La galería usa el selector del sistema, que no requiere acceso
+        // completo (ni limitado) a la biblioteca: no se solicita ese permiso.
 
         let result: ImagePicker.ImagePickerResult;
         try {
@@ -101,8 +143,14 @@ export function useEvidencePicker(orderId: string): EvidencePickerResult {
             source === 'camera'
               ? await ImagePicker.launchCameraAsync(PICKER_OPTIONS)
               : await ImagePicker.launchImageLibraryAsync(PICKER_OPTIONS);
-        } catch {
-          if (isCurrent()) {
+        } catch (error: unknown) {
+          if (!isCurrent()) return;
+          if (isPermissionError(error)) {
+            update({
+              message: source === 'camera' ? CAMERA_BLOCKED_MESSAGE : LIBRARY_DENIED_MESSAGE,
+              permissionIssue: source,
+            });
+          } else {
             update({
               message:
                 source === 'camera'
@@ -138,9 +186,19 @@ export function useEvidencePicker(orderId: string): EvidencePickerResult {
   const takePhoto = useCallback(() => run('camera'), [run]);
   const pickFromLibrary = useCallback(() => run('library'), [run]);
   const clear = useCallback(
-    () => setState({ orderId, file: null, message: null }),
+    () => setState({ orderId, file: null, message: null, permissionIssue: null }),
     [orderId],
   );
+
+  const canOpenSettings = Platform.OS !== 'web';
+  const openSettings = useCallback(async () => {
+    if (!canOpenSettings) return;
+    try {
+      await Linking.openSettings();
+    } catch {
+      // Si el sistema no puede abrir Ajustes, el mensaje visible ya orienta al usuario.
+    }
+  }, [canOpenSettings]);
 
   const isSameOrder = state.orderId === orderId;
 
@@ -148,6 +206,9 @@ export function useEvidencePicker(orderId: string): EvidencePickerResult {
     file: isSameOrder ? state.file : null,
     message: isSameOrder ? state.message : null,
     isPicking,
+    permissionIssue: isSameOrder ? state.permissionIssue : null,
+    canOpenSettings,
+    openSettings,
     takePhoto,
     pickFromLibrary,
     clear,

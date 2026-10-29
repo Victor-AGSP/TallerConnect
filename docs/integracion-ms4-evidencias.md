@@ -59,3 +59,19 @@ Decisiones:
 - **Contexto.** El mecánico elige `diagnostico`, `reparacion` o `resultado_final`. `presupuesto` se omite porque MS4 valida contra MS3 un `presupuesto_id` que esta vista no gestiona.
 - **Seleccionar no sube.** La carga solo ocurre con "Enviar evidencia"; tras la confirmación del servidor la selección se limpia.
 - **Permisos nativos** (`app.json`, plugin `expo-image-picker`): textos propios para cámara y fotografías en iOS; micrófono bloqueado porque el módulo es solo fotográfico.
+
+## Permisos de cámara y galería (SCRUM-110)
+
+| Situación | Comportamiento |
+|---|---|
+| Al abrir la orden | No se consulta ni se solicita ningún permiso. |
+| Cámara concedida | `getCameraPermissionsAsync` en cada pulsación; si está concedida se abre sin volver a preguntar. |
+| Cámara sin decidir o rechazada con `canAskAgain` | Una sola solicitud por pulsación; si se rechaza se informa y se sugiere la galería. |
+| Rechazo permanente (`canAskAgain: false`) | No se vuelve a preguntar; mensaje que remite a Ajustes y botón "Abrir Ajustes" (`Linking.openSettings`), que nunca se abre solo. |
+| Permiso revocado en Ajustes | Se detecta en la siguiente pulsación (se consulta siempre); la fotografía válida ya elegida se conserva. Un rechazo informado al abrir la cámara (`ERR_MISSING_PERMISSIONS`) se trata como permiso bloqueado. |
+| Cámara no disponible o error nativo | Mensaje recuperable, sin Ajustes; la galería sigue disponible. |
+| Galería | Selector del sistema sin `requestMediaLibraryPermissionsAsync`: en Android 13+ (Photo Picker) e iOS 14+ (PHPicker) no requiere acceso a la biblioteca, ni completo ni limitado. Si una plataforma antigua lo exige y lo rechazó, se informa y se ofrece Ajustes. |
+| Archivo ilegible | Se informa (`UNREADABLE`) y se puede elegir otro. |
+| Web | El navegador decide los permisos; no se ofrece "Abrir Ajustes". |
+
+Ningún rechazo cambia la ruta, pierde la orden ni envía evidencias. Pendiente: comprobar estos casos en un dispositivo o emulador real; solo se verificaron con respuestas nativas simuladas en Jest.
