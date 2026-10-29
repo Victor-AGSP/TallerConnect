@@ -1,15 +1,19 @@
-import { useCallback } from 'react';
+import { Fragment, useCallback } from 'react';
 import { useLocalSearchParams } from 'expo-router';
 
 import { EvidenceCapturePanel } from '@/components/evidence/EvidenceCapturePanel';
+import {
+  MechanicUpdatePanel,
+  acceptsEvidence,
+} from '@/components/orders/MechanicUpdatePanel';
 import { OrderDetailView } from '@/components/orders/OrderDetailView';
 import type { WorkOrder } from '@/models/order.model';
 import { ordersService } from '@/services/orders.service';
 
 /**
  * Detalle de una orden de trabajo asignada al mecánico autenticado.
- * Consulta GET /api/ordenes/{id} mediante OrdersService y permite adjuntar
- * evidencia fotográfica (MS4) a esa orden.
+ * Consulta GET /api/ordenes/{id} mediante OrdersService, registra avances en
+ * la bitácora (MS2) y permite adjuntar evidencia fotográfica (MS4) a esa orden.
  */
 export default function OrdenAsignadaScreen() {
   const { id } = useLocalSearchParams<{ id?: string }>();
@@ -19,9 +23,14 @@ export default function OrdenAsignadaScreen() {
     [],
   );
 
-  // `key` reinicia la selección y el envío al cambiar de orden.
+  // `key` reinicia formularios, selección y envíos al cambiar de orden.
   const renderSections = useCallback(
-    (order: WorkOrder) => <EvidenceCapturePanel key={order.id} orderId={order.id} />,
+    (order: WorkOrder) => (
+      <Fragment key={order.id}>
+        <MechanicUpdatePanel order={order} />
+        {acceptsEvidence(order.status) ? <EvidenceCapturePanel orderId={order.id} /> : null}
+      </Fragment>
+    ),
     [],
   );
 

@@ -1,22 +1,13 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
-import { Image, Pressable, StyleSheet, Text, View } from 'react-native';
+import { StyleSheet, Text, View } from 'react-native';
 
 import { Button, Card, ErrorMessage } from '@/components/common';
+import { EvidencePhotoPicker } from '@/components/evidence/EvidencePhotoPicker';
 import { colors, radius, spacing } from '@/constants/theme';
 import { useEvidencePicker } from '@/hooks/useEvidencePicker';
 import type { Evidence, EvidenceContext } from '@/models/evidence.model';
 import { evidenceService } from '@/services/evidence.service';
 import { formatDate } from '@/utils/formatters';
-
-/**
- * Contextos que el mecánico puede elegir. `presupuesto` se omite: MS4 valida
- * contra MS3 el `presupuesto_id` asociado y esta vista no lo gestiona.
- */
-export const MECHANIC_EVIDENCE_CONTEXTS: { value: EvidenceContext; label: string }[] = [
-  { value: 'diagnostico', label: 'Diagnóstico' },
-  { value: 'reparacion', label: 'Reparación' },
-  { value: 'resultado_final', label: 'Resultado final' },
-];
 
 export interface EvidenceCapturePanelProps {
   /** Orden a la que se adjunta la evidencia (identificador de la ruta). */
@@ -81,88 +72,22 @@ export function EvidenceCapturePanel({ orderId }: EvidenceCapturePanelProps) {
       title="Evidencia fotográfica"
       subtitle={`Se adjuntará a la orden ${orderId}.`}
     >
-      <View style={styles.actions}>
-        <Button
-          testID="evidence-take-photo"
-          title={file ? 'Tomar otra fotografía' : 'Tomar fotografía'}
-          variant="outline"
-          disabled={busy}
-          onPress={picker.takePhoto}
-          style={styles.action}
-        />
-        <Button
-          testID="evidence-pick-library"
-          title={file ? 'Elegir otra de la galería' : 'Elegir de la galería'}
-          variant="outline"
-          disabled={busy}
-          onPress={picker.pickFromLibrary}
-          style={styles.action}
-        />
-      </View>
-
-      {picker.message ? (
-        <Text testID="evidence-picker-message" accessibilityRole="alert" style={styles.notice}>
-          {picker.message}
-        </Text>
-      ) : null}
-
-      {picker.permissionIssue && picker.canOpenSettings ? (
-        <Button
-          testID="evidence-open-settings"
-          title="Abrir Ajustes"
-          variant="outline"
-          onPress={picker.openSettings}
-          style={styles.action}
-        />
-      ) : null}
+      <EvidencePhotoPicker
+        picker={picker}
+        context={context}
+        onContextChange={setContext}
+        disabled={busy}
+      />
 
       {file ? (
-        <View testID="evidence-preview" style={styles.preview}>
-          <Image
-            source={{ uri: file.uri }}
-            style={styles.previewImage}
-            accessibilityLabel={`Vista previa de la fotografía ${file.name}`}
-          />
-          <Text style={styles.previewName}>{file.name}</Text>
-
-          <Text style={styles.label}>Etapa de la evidencia</Text>
-          <View style={styles.contexts} accessibilityRole="radiogroup">
-            {MECHANIC_EVIDENCE_CONTEXTS.map((option) => {
-              const selected = option.value === context;
-              return (
-                <Pressable
-                  key={option.value}
-                  testID={`evidence-context-${option.value}`}
-                  accessibilityRole="radio"
-                  accessibilityState={{ checked: selected, disabled: busy }}
-                  disabled={busy}
-                  onPress={() => setContext(option.value)}
-                  style={[styles.chip, selected && styles.chipSelected]}
-                >
-                  <Text style={[styles.chipText, selected && styles.chipTextSelected]}>
-                    {option.label}
-                  </Text>
-                </Pressable>
-              );
-            })}
-          </View>
-
-          <Button
-            testID="evidence-send"
-            title="Enviar evidencia"
-            loading={isSending}
-            disabled={picker.isPicking}
-            onPress={send}
-          />
-          <Button
-            testID="evidence-remove"
-            title="Quitar fotografía"
-            variant="outline"
-            disabled={busy}
-            onPress={clear}
-            style={styles.remove}
-          />
-        </View>
+        <Button
+          testID="evidence-send"
+          title="Enviar evidencia"
+          loading={isSending}
+          disabled={picker.isPicking}
+          onPress={send}
+          style={styles.send}
+        />
       ) : null}
 
       {upload.status === 'error' ? (
@@ -187,63 +112,8 @@ export function EvidenceCapturePanel({ orderId }: EvidenceCapturePanelProps) {
 }
 
 const styles = StyleSheet.create({
-  actions: {
-    gap: spacing.sm,
-  },
-  action: {
-    minHeight: 44,
-  },
-  notice: {
+  send: {
     marginTop: spacing.md,
-    color: colors.warning,
-    fontSize: 14,
-  },
-  preview: {
-    marginTop: spacing.md,
-    gap: spacing.sm,
-  },
-  previewImage: {
-    width: '100%',
-    aspectRatio: 4 / 3,
-    borderRadius: radius.md,
-    backgroundColor: colors.surfaceSoft,
-  },
-  previewName: {
-    color: colors.textSecondary,
-    fontSize: 13,
-  },
-  label: {
-    marginTop: spacing.sm,
-    color: colors.text,
-    fontSize: 14,
-    fontWeight: '700',
-  },
-  contexts: {
-    flexDirection: 'row',
-    flexWrap: 'wrap',
-    gap: spacing.sm,
-  },
-  chip: {
-    borderWidth: 1,
-    borderColor: colors.border,
-    borderRadius: radius.md,
-    paddingHorizontal: spacing.md,
-    paddingVertical: spacing.sm,
-    backgroundColor: colors.surface,
-  },
-  chipSelected: {
-    borderColor: colors.primary,
-    backgroundColor: colors.primarySoft,
-  },
-  chipText: {
-    color: colors.text,
-    fontSize: 13,
-  },
-  chipTextSelected: {
-    fontWeight: '800',
-  },
-  remove: {
-    minHeight: 44,
   },
   feedback: {
     marginTop: spacing.md,

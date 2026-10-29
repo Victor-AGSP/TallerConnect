@@ -34,6 +34,11 @@ jest.mock('@/services/evidence.service', () => ({
   evidenceService: { uploadEvidence: jest.fn() },
 }));
 
+// La bitácora del mecánico (SCRUM-107) se prueba en su propia suite.
+jest.mock('@/services/order-log.service', () => ({
+  orderLogService: { getOrderLog: jest.fn(async () => []), addOrderLogEntry: jest.fn() },
+}));
+
 const picker = jest.mocked(ImagePicker);
 const mockedOrders = jest.mocked(ordersService);
 const mockedEvidence = jest.mocked(evidenceService);

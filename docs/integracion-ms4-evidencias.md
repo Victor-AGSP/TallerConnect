@@ -75,3 +75,29 @@ Decisiones:
 | Web | El navegador decide los permisos; no se ofrece "Abrir Ajustes". |
 
 Ningún rechazo cambia la ruta, pierde la orden ni envía evidencias. Pendiente: comprobar estos casos en un dispositivo o emulador real; solo se verificaron con respuestas nativas simuladas en Jest.
+
+## Actualizaciones del mecánico (SCRUM-107)
+
+En el backend, la "actualización realizada por el mecánico" es la **bitácora de trabajo de MS2**: `POST /ordenes/{orden_id}/bitacora` registra una observación (nota libre) o una acción (puede declarar repuestos) **sin cambiar el estado de la orden**; solo el mecánico asignado o un administrador pueden hacerlo (403), y una orden inexistente o ajena responde 404. `GET` devuelve las entradas con autor (`autor_usuario_id`) y fecha (`creado_en`) del servidor. Los cambios de estado siguen en `PATCH /ordenes/{id}/estado`, que no se modificó.
+
+| Capa | Elemento |
+|---|---|
+| DTO / esquema / modelo | `src/dto/order-log.dto.ts`, `src/schemas/order-log-dto.schema.ts`, `src/models/order-log.model.ts` |
+| Mapper | `src/mappers/order-log.mapper.ts` (rechaza respuestas fuera del contrato) |
+| Servicio | `OrderLogService` (`src/services/order-log.service.ts`): servicio propio, como `BudgetsService`, para no ampliar `OrderServiceAdapter` ni sus implementaciones simuladas |
+| Vista | `MechanicUpdatePanel` en `(mecanico)/ordenes-asignadas/[id]`: tipo, descripción, fotografía opcional e historial bajo demanda |
+
+**Asociación con la evidencia.** MS2 y MS4 no comparten identificadores: `BitacoraCrear` no admite adjuntos y `Body_subir_evidencias_post` no admite `bitacora_id`. La fotografía queda asociada a la orden y a su etapa (`contexto`), no a la entrada concreta de la bitácora. Vincularlas requiere un cambio de contrato en MS2 o MS4.
+
+**Integridad entre las dos operaciones.**
+
+1. Se registra primero el avance (texto) y después la fotografía: la carga es la operación que más falla (almacenamiento, tamaño, formato) y puede repetirse sola.
+2. Si el avance falla, la fotografía no se envía y el formulario se conserva.
+3. Si el avance se registra y la fotografía falla, se muestra "Avance registrado sin fotografía" (nunca éxito completo), el texto queda bloqueado y solo se ofrece "Reintentar envío de la fotografía" o "Continuar sin fotografía". El avance no se reenvía: el POST no es idempotente y el contrato no ofrece idempotencia.
+4. La doble pulsación se bloquea con una referencia síncrona.
+
+**Estados terminales.** En órdenes entregadas o canceladas no se ofrecen fotografías (MS4 responde 409). El contrato de la bitácora no documenta restricciones por estado, así que el registro del avance lo decide el servidor y su error se muestra.
+
+**Historial.** Se consulta solo al pulsar "Ver avances registrados" (o tras registrar un avance) para que abrir la orden no genere solicitudes adicionales. Muestra tipo, descripción, fecha, repuestos e identificador del autor, que son los campos publicados; el contrato no entrega el nombre del autor.
+
+Fuera de alcance: declarar repuestos en las acciones (requiere coordinar con el inventario de MS3).
