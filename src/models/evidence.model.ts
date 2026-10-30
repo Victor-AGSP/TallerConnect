@@ -20,6 +20,25 @@ export interface SelectedMediaAsset {
 }
 
 /**
+ * Metadatos que la app adjunta a una evidencia al subirla (campos de texto de `Body_subir_evidencias_post` en MS4).
+ * `budgetId` y `visibleToClient` son opcionales y admiten `null`, como en el contrato.
+ */
+export interface EvidenceUploadMetadata {
+  orderId: string;
+  context: EvidenceContext;
+  budgetId?: string | null;
+  visibleToClient?: boolean | null;
+}
+
+/**
+ * Solicitud de subida de una evidencia: el archivo local seleccionado y sus metadatos.
+ */
+export interface EvidenceUploadRequest {
+  file: SelectedMediaAsset;
+  metadata: EvidenceUploadMetadata;
+}
+
+/**
  * Modelo de dominio de una evidencia multimedia asociada a una orden de trabajo (`EvidenciaLeida` en MS4).
  */
 export interface Evidence {
