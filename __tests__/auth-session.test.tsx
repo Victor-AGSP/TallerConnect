@@ -178,7 +178,7 @@ describe('persistencia y recuperación de sesión', () => {
     const response = mockAuthResponses.mecanico;
     getItem.mockResolvedValueOnce(JSON.stringify(response));
 
-    const router = renderRouterWithProviders(routes, {
+    const router = await renderRouterWithProviders(routes, {
       initialUrl: '/',
       initialAuthState: { isLoading: true },
     });
