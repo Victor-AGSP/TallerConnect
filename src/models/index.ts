@@ -9,3 +9,5 @@ export * from './provider.model';
 export * from './pagination.model';
 export * from './evidence.model';
 export * from './order-log.model';
+export * from './admin.model';
+export * from './notice.model';
