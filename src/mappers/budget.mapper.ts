@@ -5,6 +5,8 @@ import type {
   BudgetOperationResultDto,
   BudgetVersionResponseDto,
   MissingPartResponseDto,
+  BudgetPageResponseDto,
+  BudgetSummaryResponseDto,
 } from '@/dto/budget.dto';
 import type {
   Budget,
@@ -15,14 +17,8 @@ import type {
   BudgetVersion,
   BudgetVersionStatus,
   MissingPart,
+  BudgetSummary,
 } from '@/models/budget.model';
-
-import type {
-  BudgetPageResponseDto,
-  BudgetSummaryResponseDto,
-} from '@/dto/budget.dto';
-
-import type { BudgetSummary } from '@/models/budget.model';
 import type { PaginatedList } from '@/models/pagination.model';
 
 /** Mensaje para respuestas que no cumplen el contrato del MS3. */
@@ -190,7 +186,7 @@ export function mapBudgetOperationResult(
 /**
  * Convierte un resumen del backend al modelo paginado.
  */
-function mapBudgetSummaryResponse(
+export function mapBudgetSummaryResponse(
   dto: BudgetSummaryResponseDto,
 ): BudgetSummary {
   if (!isObject(dto)) {

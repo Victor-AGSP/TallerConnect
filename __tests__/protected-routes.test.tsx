@@ -61,7 +61,7 @@ describe('rutas protegidas por sesión y rol', () => {
   ] as const)(
     'redirige de %s al login si no hay una sesión autenticada',
     async (initialUrl) => {
-      const router = renderRouterWithProviders(routes, {
+      const router = await renderRouterWithProviders(routes, {
         initialUrl,
         initialAuthState: {
           isAuthenticated: false,
@@ -71,7 +71,7 @@ describe('rutas protegidas por sesión y rol', () => {
       });
       await router;
 
-      await waitFor(() => expect(router.getPathname()).toBe('/login'));
+      await waitFor(() => expect(screen).toHavePathname('/login'));
       expect(screen.getByText('Iniciar sesión')).toBeTruthy();
     },
   );
@@ -79,13 +79,13 @@ describe('rutas protegidas por sesión y rol', () => {
   it.each(Object.entries(routeByRole))(
     'permite que el rol %s acceda a su ruta',
     async (role, destination) => {
-      const router = renderRouterWithProviders(routes, {
+      const router = await renderRouterWithProviders(routes, {
         initialUrl: destination.path,
         initialAuthState: sessionForRole(role as keyof typeof routeByRole),
       });
       await router;
 
-      await waitFor(() => expect(router.getPathname()).toBe(destination.path));
+      await waitFor(() => expect(screen).toHavePathname(destination.path));
       expect(screen.getByText(destination.content)).toBeTruthy();
     },
   );
@@ -100,13 +100,13 @@ describe('rutas protegidas por sesión y rol', () => {
   ] as const)(
     'redirige al rol %s a su propia ruta al intentar entrar a %s',
     async (role, requestedPath, expectedPath) => {
-      const router = renderRouterWithProviders(routes, {
+      const router = await renderRouterWithProviders(routes, {
         initialUrl: requestedPath,
         initialAuthState: sessionForRole(role),
       });
       await router;
 
-      await waitFor(() => expect(router.getPathname()).toBe(expectedPath));
+      await waitFor(() => expect(screen).toHavePathname(expectedPath));
       expect(screen.getByText(routeByRole[role].content)).toBeTruthy();
     },
   );
@@ -120,7 +120,7 @@ describe('rutas protegidas por sesión y rol', () => {
     async (initialRole, updatedRole) => {
       const initialDestination = routeByRole[initialRole];
       const updatedDestination = routeByRole[updatedRole];
-      const router = renderRouterWithProviders(routes, {
+      const router = await renderRouterWithProviders(routes, {
         initialUrl: initialDestination.path,
         initialAuthState: sessionForRole(initialRole),
       });
@@ -133,7 +133,7 @@ describe('rutas protegidas por sesión y rol', () => {
       });
 
       await waitFor(() =>
-        expect(router.getPathname()).toBe(updatedDestination.path),
+        expect(screen).toHavePathname(updatedDestination.path),
       );
       expect(screen.getByText(updatedDestination.content)).toBeTruthy();
       expect(screen.queryByText(initialDestination.content)).toBeNull();
@@ -141,7 +141,7 @@ describe('rutas protegidas por sesión y rol', () => {
   );
 
   it('espera a que termine la recuperación de sesión antes de decidir la ruta', async () => {
-    const router = renderRouterWithProviders(routes, {
+    const router = await renderRouterWithProviders(routes, {
       initialUrl: '/administrador',
       initialAuthState: { isLoading: true, isHydrated: false },
     });
@@ -153,7 +153,7 @@ describe('rutas protegidas por sesión y rol', () => {
       useAuthStore.setState(sessionForRole('administrador'));
     });
 
-    await waitFor(() => expect(router.getPathname()).toBe('/administrador'));
+    await waitFor(() => expect(screen).toHavePathname('/administrador'));
     expect(screen.getByText('Panel administrador')).toBeTruthy();
   });
 });

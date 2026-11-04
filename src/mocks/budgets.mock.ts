@@ -1,11 +1,18 @@
-import type { Budget } from '@/models/budget.model';
+import type { Budget as LegacyBudget, BudgetSummary } from '@/models/budget.model';
+
+import { mapBudgetDetailResponse, mapBudgetPageResponse } from '@/mappers/budget-management.mapper';
+import {
+  budgetDetailPayloads,
+  budgetPagePayload,
+} from '@/mocks/payloads/budget.payload';
+import type { ManagedBudget as Budget } from '@/models/budget-management.model';
 
 /**
  * Presupuestos locales para el modo sin backend
  * (`EXPO_PUBLIC_USE_MOCK_AUTH=true`), indexados por orden. No provienen del
  * MS3.
  */
-export const mockBudgetsByOrder: Record<string, Budget> = {
+export const mockBudgetsByOrder: Record<string, LegacyBudget> = {
   'ot-00126': {
     id: '1',
     orderId: 'ot-00126',
@@ -51,3 +58,16 @@ export const mockBudgetsByOrder: Record<string, Budget> = {
     ],
   },
 };
+
+/**
+ * Presupuestos completos simulados con sus versiones, derivados de los payloads del contrato MS3.
+ */
+export const mockBudgets: Budget[] = Object.values(budgetDetailPayloads).map(
+  mapBudgetDetailResponse
+);
+
+/**
+ * Resúmenes de presupuestos simulados para listados paginados.
+ */
+export const mockBudgetSummaries: BudgetSummary[] =
+  mapBudgetPageResponse(budgetPagePayload).items;

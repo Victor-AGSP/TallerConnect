@@ -1,3 +1,4 @@
+import type { BudgetVersionStatus, BudgetItemType } from '@/models/budget.model';
 /**
  * DTO de presupuestos del MS3, tal como los publica su contrato OpenAPI
  * (`/ms3/openapi.json`). La app los consume a través de la API Gateway
@@ -108,6 +109,7 @@ export interface BudgetOperationResultDto {
   presupuesto: BudgetDetailResponseDto;
   efecto_en_orden: BudgetOrderEffectDto | null;
   repuestos_faltantes?: MissingPartResponseDto[];
+  repuestos_reservados?: Record<string, number>;
   decision_id?: number | null;
   aplicacion_en_orden?: DecisionApplicationResponseDto | null;
 }
@@ -129,3 +131,38 @@ export interface DecisionApplicationPendingDto {
 
 /** Alias compatible con Develop. */
 export type BudgetPageResponseDto = BudgetsPageDto;
+export type BudgetOperationEffect = BudgetOrderEffectDto | null;
+export type BudgetMissingPartDto = MissingPartResponseDto;
+
+export interface BudgetQueryParamsDto {
+  orden_id?: number | string | null;
+  orderId?: string;
+  estado?: BudgetVersionStatus;
+  status?: BudgetVersionStatus;
+  desde?: number;
+  limite?: number;
+  skip?: number;
+  limit?: number;
+}
+
+export interface BudgetItemInputDto {
+  tipo: BudgetItemType;
+  descripcion: string;
+  cantidad: number | string;
+  precio_unitario?: number | string;
+  repuesto_id?: number | string | null;
+}
+
+export interface CreateBudgetRequestDto {
+  orden_id: number | string;
+  items?: BudgetItemInputDto[];
+}
+
+export interface CreateBudgetVersionRequestDto {
+  items?: BudgetItemInputDto[] | null;
+  copiar_de?: number | null;
+}
+
+export interface UpdateBudgetVersionItemsRequestDto {
+  items: BudgetItemInputDto[];
+}

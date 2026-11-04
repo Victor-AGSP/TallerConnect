@@ -201,7 +201,7 @@ describe('ordersService (Capa de Servicios de Órdenes)', () => {
   });
 
   describe('updateOrderStatus', () => {
-    it('actualiza el estado de una orden mediante PATCH', async () => {
+    it('actualiza el estado de una orden mediante PATCH /ordenes/{orden_id}/estado', async () => {
       const rawUpdated: OrderResponseDto = {
         orden_id: 101,
         vehiculo_id: 5,

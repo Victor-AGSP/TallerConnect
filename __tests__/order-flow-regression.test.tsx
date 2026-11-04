@@ -412,7 +412,7 @@ describe('flujo orden → presupuesto → repuestos: integración con MS3', () =
       await waitFor(() =>
         expect(screen.getByTestId('order-budget-5')).toBeTruthy(),
       );
-      expect(view.getPathname()).toBe(budgetPath);
+      expect(screen).toHavePathname(budgetPath);
 
       // El presupuesto se busca por la orden de la ruta y se consulta su detalle.
       const [[search]] = requestsTo('get', '/presupuestos');

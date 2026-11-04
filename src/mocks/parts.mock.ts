@@ -1,5 +1,12 @@
 import type { SparePart, Supplier } from '@/models/parts.model';
 
+import { mapPartResponse } from '@/mappers/part.mapper';
+import {
+  partPagePayload,
+  partResponsePayloads,
+} from '@/mocks/payloads/part.payload';
+import type { Part } from '@/models/part.model';
+
 /**
  * Datos locales de repuestos y proveedores para el modo sin backend
  * (`EXPO_PUBLIC_USE_MOCK_AUTH=true`). No provienen del MS3.
@@ -51,3 +58,15 @@ export const mockSpareParts: SparePart[] = [
     belowThreshold: true,
   },
 ];
+
+/**
+ * Catálogo de repuestos simulados derivado de los payloads del contrato MS3.
+ */
+export const mockParts: Part[] = Object.values(partResponsePayloads).map(
+  mapPartResponse
+);
+
+/**
+ * Umbral general simulado para el catálogo de repuestos.
+ */
+export const mockGeneralThreshold: number | null = partPagePayload.umbral_general;

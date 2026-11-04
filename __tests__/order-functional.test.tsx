@@ -203,15 +203,20 @@ describe('caso de uso: consultar una orden de trabajo', () => {
   it.each(roleCases)(
     'el rol %s inicia sesión, consulta y actualiza una orden, vuelve al panel y cierra la sesión',
     async (role, home, heading, orderPath) => {
-      adapter
-        .mockImplementationOnce((config) => ok(config, CONTRACT_ORDER))
-        .mockImplementationOnce((config) =>
-          ok(config, {
-            ...CONTRACT_ORDER,
-            estado_codigo: 4,
+      let detailRequests = 0;
+      adapter.mockImplementation((config) => {
+        const key = `${config.method} ${config.url}`;
+        if (key === 'get /ordenes') return ok(config, [CONTRACT_ORDER]);
+        if (key === 'get /vehiculos') return ok(config, [CONTRACT_VEHICLE]);
+        if (key === 'get /ordenes/31') {
+          detailRequests += 1;
+          return ok(config, detailRequests === 1 ? CONTRACT_ORDER : {
+            ...CONTRACT_ORDER, estado_codigo: 4,
             actualizado_en: '2026-09-29T09:00:00-03:00',
-          }),
-        );
+          });
+        }
+        return fail(config, 404, { detail: `No simulado: ${key}` });
+      });
 
       const router = renderRouterWithProviders(routes, {
         initialUrl: '/login',
@@ -220,16 +225,22 @@ describe('caso de uso: consultar una orden de trabajo', () => {
 
       const session = await loginAs(role);
 
-      await waitFor(() => expect(router.getPathname()).toBe(home));
+      await waitFor(() => expect(screen).toHavePathname(home));
       expect(screen.getByText(heading)).toBeTruthy();
-      expect(adapter).not.toHaveBeenCalled();
+      if (role === 'administrador') {
+        await screen.findByRole('button', { name: 'Ver vehículos registrados' });
+      }
+      const dashboardRequests = role === 'administrador' ? 2 : 0;
+      expect(adapter.mock.calls.map(([config]) => `${config.method} ${config.url}`)).toEqual(
+        role === 'administrador' ? ['get /ordenes', 'get /vehiculos'] : [],
+      );
 
       await openOrder(orderPath);
 
       await waitFor(() =>
         expect(screen.getByTestId('order-detail-31')).toBeTruthy(),
       );
-      expect(router.getPathname()).toBe(orderPath);
+      expect(screen).toHavePathname(orderPath);
       expect(
         screen.getByLabelText('Estado de la orden: Esperando diagnóstico'),
       ).toBeTruthy();
@@ -237,8 +248,8 @@ describe('caso de uso: consultar una orden de trabajo', () => {
       expect(screen.getByLabelText('Mecánico asignado: 50')).toBeTruthy();
 
       // La petición usa el token que dejó el login en el almacenamiento.
-      expect(adapter.mock.calls[0][0].url).toBe('/ordenes/31');
-      expect(authorizationOf(adapter.mock.calls[0])).toBe(
+      expect(adapter.mock.calls[dashboardRequests][0].url).toBe('/ordenes/31');
+      expect(authorizationOf(adapter.mock.calls[dashboardRequests])).toBe(
         `Bearer ${session.token}`,
       );
 
@@ -249,25 +260,25 @@ describe('caso de uso: consultar una orden de trabajo', () => {
           screen.getByLabelText('Estado de la orden: Esperando repuestos'),
         ).toBeTruthy(),
       );
-      expect(adapter).toHaveBeenCalledTimes(2);
+      expect(adapter).toHaveBeenCalledTimes(dashboardRequests + 2);
 
       await act(async () => {
         appRouter.back();
       });
 
-      await waitFor(() => expect(router.getPathname()).toBe(home));
+      await waitFor(() => expect(screen).toHavePathname(home));
       expect(screen.getByText(heading)).toBeTruthy();
 
       await fireEvent.press(screen.getByText('Cerrar sesión'));
 
-      await waitFor(() => expect(router.getPathname()).toBe('/login'));
+      await waitFor(() => expect(screen).toHavePathname('/login'));
 
       // Tras cerrar la sesión el detalle ya no es accesible ni se consulta.
       await openOrder(orderPath);
 
-      await waitFor(() => expect(router.getPathname()).toBe('/login'));
+      await waitFor(() => expect(screen).toHavePathname('/login'));
       expect(screen.queryByTestId('order-detail-31')).toBeNull();
-      expect(adapter).toHaveBeenCalledTimes(2);
+      expect(adapter).toHaveBeenCalledTimes(dashboardRequests + 2);
     },
   );
 
@@ -286,7 +297,7 @@ describe('caso de uso: consultar una orden de trabajo', () => {
     await router;
 
     await loginAs('cliente');
-    await waitFor(() => expect(router.getPathname()).toBe('/cliente'));
+    await waitFor(() => expect(screen).toHavePathname('/cliente'));
 
     await openOrder('/mis-ordenes/31');
 
@@ -520,7 +531,7 @@ async function openBudgetAsClient() {
   await router;
 
   const session = await loginAs('cliente');
-  await waitFor(() => expect(router.getPathname()).toBe('/cliente'));
+  await waitFor(() => expect(screen).toHavePathname('/cliente'));
 
   await openOrder('/mis-ordenes/31');
   await waitFor(() =>
@@ -532,7 +543,7 @@ async function openBudgetAsClient() {
   await waitFor(() =>
     expect(screen.getByTestId('order-budget-decision-form')).toBeTruthy(),
   );
-  expect(router.getPathname()).toBe('/mis-ordenes/31/presupuesto');
+  expect(screen).toHavePathname('/mis-ordenes/31/presupuesto');
 
   return { router, session };
 }
@@ -582,7 +593,7 @@ describe('caso de uso: decidir el presupuesto de una orden', () => {
     await act(async () => {
       appRouter.back();
     });
-    await waitFor(() => expect(router.getPathname()).toBe('/mis-ordenes/31'));
+    await waitFor(() => expect(screen).toHavePathname('/mis-ordenes/31'));
 
     await fireEvent.press(screen.getByRole('button', { name: 'Actualizar' }));
 
@@ -841,7 +852,7 @@ describe('caso de uso: decidir el presupuesto de una orden', () => {
     const router = renderRouterWithProviders(routes, { initialUrl: '/login' });
     await router;
     await loginAs('cliente');
-    await waitFor(() => expect(router.getPathname()).toBe('/cliente'));
+    await waitFor(() => expect(screen).toHavePathname('/cliente'));
 
     await openOrder('/mis-ordenes/31');
     await waitFor(() =>
@@ -905,6 +916,7 @@ function catalogBackend() {
   adapter.mockImplementation((config) => {
     const key = `${config.method} ${config.url}`;
 
+    if (key === 'get /ordenes') return ok(config, [CONTRACT_ORDER]);
     if (key === 'get /vehiculos' || key === 'get /vehiculos/asignados') {
       return ok(config, [CONTRACT_VEHICLE]);
     }
@@ -950,33 +962,35 @@ describe('caso de uso: consultar vehículos, repuestos y proveedores', () => {
     await router;
 
     const session = await loginAs('administrador');
-    await waitFor(() => expect(router.getPathname()).toBe('/administrador'));
+    await waitFor(() => expect(screen).toHavePathname('/administrador'));
 
-    await fireEvent.press(screen.getByRole('button', { name: 'Ver vehículos registrados' }));
+    await fireEvent.press(await screen.findByRole('button', { name: 'Ver vehículos registrados' }));
     await waitFor(() => expect(screen.getByTestId('vehicle-card-12')).toBeTruthy());
-    expect(router.getPathname()).toBe('/vehiculos');
+    expect(screen).toHavePathname('/vehiculos');
     await goBack();
 
     await fireEvent.press(screen.getByRole('button', { name: 'Ver repuestos' }));
     await waitFor(() => expect(screen.getByTestId('spare-part-card-8')).toBeTruthy());
-    expect(router.getPathname()).toBe('/repuestos');
+    expect(screen).toHavePathname('/repuestos');
     await goBack();
 
     await fireEvent.press(screen.getByRole('button', { name: 'Ver proveedores' }));
     await waitFor(() => expect(screen.getByTestId('supplier-card-3')).toBeTruthy());
     await fireEvent.press(screen.getByTestId('supplier-card-3'));
     await waitFor(() => expect(screen.getByTestId('supplier-detail-3')).toBeTruthy());
-    expect(router.getPathname()).toBe('/proveedores/3');
+    expect(screen).toHavePathname('/proveedores/3');
     expect(screen.getByTestId('spare-part-card-8')).toBeTruthy();
 
     await goBack();
-    await waitFor(() => expect(router.getPathname()).toBe('/proveedores'));
+    await waitFor(() => expect(screen).toHavePathname('/proveedores'));
     await goBack();
-    await waitFor(() => expect(router.getPathname()).toBe('/administrador'));
+    await waitFor(() => expect(screen).toHavePathname('/administrador'));
 
     // Cada consulta pasó por el cliente HTTP real con el token de la sesión.
     expect(adapter.mock.calls.map(([config]) => `${config.method} ${config.url}`)).toEqual([
+      'get /ordenes', // Dashboard: una consulta por recurso.
       'get /vehiculos',
+      'get /vehiculos', // Listado solicitado al navegar.
       'get /repuestos',
       'get /proveedores',
       'get /proveedores/3',
@@ -986,7 +1000,7 @@ describe('caso de uso: consultar vehículos, repuestos y proveedores', () => {
     );
 
     await fireEvent.press(screen.getByRole('button', { name: 'Cerrar sesión' }));
-    await waitFor(() => expect(router.getPathname()).toBe('/login'));
+    await waitFor(() => expect(screen).toHavePathname('/login'));
     expect(useAuthStore.getState().isAuthenticated).toBe(false);
   });
 
@@ -1001,17 +1015,17 @@ describe('caso de uso: consultar vehículos, repuestos y proveedores', () => {
       await router;
 
       await loginAs(role);
-      await waitFor(() => expect(router.getPathname()).toBe(home));
+      await waitFor(() => expect(screen).toHavePathname(home));
 
       await fireEvent.press(screen.getByRole('button', { name: button }));
       await waitFor(() => expect(screen.getByTestId('vehicle-card-12')).toBeTruthy());
-      expect(router.getPathname()).toBe(path);
+      expect(screen).toHavePathname(path);
       expect(adapter.mock.calls.map(([config]) => `${config.method} ${config.url}`)).toEqual([
         request,
       ]);
 
       await goBack();
-      await waitFor(() => expect(router.getPathname()).toBe(home));
+      await waitFor(() => expect(screen).toHavePathname(home));
     },
   );
 });

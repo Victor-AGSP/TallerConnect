@@ -127,7 +127,7 @@ function expectMessage(text: string) {
 
 /** El contexto de la orden y la navegación siguen intactos. */
 function expectOrderContextKept() {
-  expect(view.getPathname()).toBe('/ordenes-asignadas/31');
+  expect(screen).toHavePathname('/ordenes-asignadas/31');
   expect(screen.getByTestId('order-detail-31')).toBeTruthy();
   expect(screen.getByText('Se adjuntará a la orden 31.')).toBeTruthy();
 }

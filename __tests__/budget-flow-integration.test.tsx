@@ -255,7 +255,7 @@ describe('flujo presupuesto → decisión → orden (cliente)', () => {
       expect(screen.getByTestId('order-budget-error')).toBeTruthy(),
     );
     expect(screen.getByText('Rol no permitido')).toBeTruthy();
-    expect(view.getPathname()).not.toBe('/login');
+    expect(screen).not.toHavePathname('/login');
     expect(useAuthStore.getState().isAuthenticated).toBe(true);
   });
 
@@ -266,7 +266,7 @@ describe('flujo presupuesto → decisión → orden (cliente)', () => {
 
     const { view } = await renderClientBudget();
 
-    await waitFor(() => expect(view.getPathname()).toBe('/login'));
+    await waitFor(() => expect(screen).toHavePathname('/login'));
     expect(useAuthStore.getState().isAuthenticated).toBe(false);
   });
 });

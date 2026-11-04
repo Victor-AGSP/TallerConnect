@@ -14,6 +14,7 @@ import {
   CODE_TO_STATUS,
   STATUS_TO_CODE,
   mapOrderResponse,
+  mapOrderStatusUpdateRequest,
   mapOrdersResponseList,
 } from '@/mappers/order.mapper';
 import { mockWorkOrders } from '@/mocks/orders.mock';
@@ -26,8 +27,11 @@ export { ServiceError, normalizeOrderServiceError };
 
 const USE_MOCKS = process.env.EXPO_PUBLIC_USE_MOCK_AUTH === 'true';
 
-export type UpdateOrderStatusOptions =
-  Pick<UpdateOrderStatusRequestDto, 'observacion'>;
+export type UpdateOrderStatusOptions = Pick<UpdateOrderStatusRequestDto, 'observacion'>;
+export type UpdateOrderStatusArgument = UpdateOrderStatusOptions | string | null;
+function normalizeStatusOptions(input?: UpdateOrderStatusArgument): UpdateOrderStatusOptions {
+  return typeof input === 'string' || input === null ? { observacion: input } : input ?? {};
+}
 
 /**
  * Filtra y pagina localmente una lista de órdenes según OrderQueryParamsDto.
@@ -113,7 +117,7 @@ export interface OrderServiceAdapter {
   updateOrderStatus(
     id: string | number,
     status: WorkOrderStatus,
-    options?: UpdateOrderStatusOptions
+    options?: UpdateOrderStatusArgument
   ): Promise<WorkOrder>;
   assignMechanic(
     id: string | number,
@@ -220,7 +224,7 @@ export class MockOrderAdapter implements OrderServiceAdapter {
   async updateOrderStatus(
     id: string | number,
     status: WorkOrderStatus,
-    options?: UpdateOrderStatusOptions
+    options?: UpdateOrderStatusArgument
   ): Promise<WorkOrder> {
     await this.simulateDelay();
     const orderId = String(id);
@@ -276,7 +280,7 @@ export class MockOrderAdapter implements OrderServiceAdapter {
       actor_usuario_id: 50,
       origen: 'usuario',
       fecha_hora: now,
-      observacion: options?.observacion ?? `Cambio de estado a ${status}`,
+      observacion: normalizeStatusOptions(options).observacion ?? `Cambio de estado a ${status}`,
     });
     this.historyByOrder[orderId] = currentHistory;
 
@@ -399,7 +403,7 @@ export class RealOrderAdapter implements OrderServiceAdapter {
   async updateOrderStatus(
     id: string | number,
     status: WorkOrderStatus,
-    options?: UpdateOrderStatusOptions
+    options?: UpdateOrderStatusArgument
   ): Promise<WorkOrder> {
     const code = STATUS_TO_CODE[status];
 
@@ -409,19 +413,20 @@ export class RealOrderAdapter implements OrderServiceAdapter {
 
     // CambioEstadoSolicitud exige `observacion` con minLength 1 o null: un texto
     // vacío se omite en lugar de enviarse y provocar un 422.
+    const requestedObservation = normalizeStatusOptions(options).observacion;
     const observacion =
-      typeof options?.observacion === 'string'
-        ? options.observacion.trim() || undefined
-        : options?.observacion;
+      typeof requestedObservation === 'string'
+        ? requestedObservation.trim() || undefined
+        : requestedObservation;
 
     if (status === 'cancelado' && !observacion) {
       throw new Error('La cancelación requiere una observación.');
     }
 
-    const payload: UpdateOrderStatusRequestDto = {
-      estado_destino: code,
-      ...(observacion !== undefined ? { observacion } : {}),
-    };
+    const payload: UpdateOrderStatusRequestDto = mapOrderStatusUpdateRequest({
+      targetStatus: status,
+      ...(observacion !== undefined ? { observation: observacion } : {}),
+    });
 
     const response = await apiClient.patch<OrderResponseDto>(
       `/ordenes/${id}/estado`,
@@ -556,7 +561,7 @@ export class OrdersService {
   async updateOrderStatus(
     id: string | number,
     status: WorkOrderStatus,
-    options?: UpdateOrderStatusOptions
+    options?: UpdateOrderStatusArgument
   ): Promise<WorkOrder> {
     try {
       return await this.adapter.updateOrderStatus(id, status, options);

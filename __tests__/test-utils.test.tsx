@@ -19,13 +19,13 @@ it('ejecuta el ejemplo documentado de eventos asíncronos', async () => {
 });
 
 it('navega con Router real y consulta la ruta desde el resultado del render', async () => {
-  const router = renderRouterWithProviders({
+  const router = await renderRouterWithProviders({
     index: () => <Link href="./perfil">Abrir perfil</Link>,
     perfil: () => <Text>Perfil</Text>,
   });
   await router;
   await fireEvent.press(screen.getByText('Abrir perfil'));
-  await waitFor(() => expect(router.getPathname()).toBe('/perfil'));
+  await waitFor(() => expect(screen).toHavePathname('/perfil'));
   expect(screen.getByText('Perfil')).toBeTruthy();
 });
 

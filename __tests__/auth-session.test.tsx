@@ -178,7 +178,7 @@ describe('persistencia y recuperación de sesión', () => {
     const response = mockAuthResponses.mecanico;
     getItem.mockResolvedValueOnce(JSON.stringify(response));
 
-    const router = renderRouterWithProviders(routes, {
+    const router = await renderRouterWithProviders(routes, {
       initialUrl: '/',
       initialAuthState: { isLoading: true },
     });
@@ -190,7 +190,7 @@ describe('persistencia y recuperación de sesión', () => {
       await useAuthStore.getState().hydrateSession();
     });
 
-    await waitFor(() => expect(router.getPathname()).toBe('/mecanico'));
+    await waitFor(() => expect(screen).toHavePathname('/mecanico'));
     expect(screen.getByText('Inicio mecánico')).toBeTruthy();
   });
 });

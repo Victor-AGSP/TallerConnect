@@ -11,6 +11,7 @@ export const partResponseDtoSchema: z.ZodType<PartResponseDto> = z.object({
   nombre: z.string(),
   proveedor_id: z.number().int(),
   proveedor_nombre: z.string(),
+  proveedor_tipo_distribuidor: z.enum(['oficial', 'generico']).optional(),
   stock: z.number().int(),
   umbral_particular: z.number().int().nullable(),
   umbral_efectivo: z.number().int().nullable(),

@@ -266,7 +266,7 @@ async function loginAsMechanic() {
   await fireEvent.changeText(screen.getByTestId('login-email'), mockAuthResponses.mecanico.user.email);
   await fireEvent.changeText(screen.getByTestId('login-password'), 'clave-segura');
   await fireEvent.press(screen.getByTestId('login-submit'));
-  await waitFor(() => expect(router.getPathname()).toBe('/mecanico'));
+  await waitFor(() => expect(screen).toHavePathname('/mecanico'));
 }
 
 async function openOrder(id: number) {
@@ -424,12 +424,12 @@ describe('Flujo principal del mecánico', () => {
       appRouter.push('/mecanico' as Href);
     });
     await fireEvent.press(screen.getByRole('button', { name: 'Cerrar sesión' }));
-    await waitFor(() => expect(router.getPathname()).toBe('/login'));
+    await waitFor(() => expect(screen).toHavePathname('/login'));
     expect(useAuthStore.getState().isAuthenticated).toBe(false);
 
     const requestsBefore = adapter.mock.calls.length;
     await openOrder(31);
-    await waitFor(() => expect(router.getPathname()).toBe('/login'));
+    await waitFor(() => expect(screen).toHavePathname('/login'));
     expect(adapter.mock.calls.length).toBe(requestsBefore);
   });
 });
@@ -575,7 +575,7 @@ describe('Flujos alternativos', () => {
     );
     expect(evidencePosts()).toHaveLength(0);
     expect(useAuthStore.getState().isAuthenticated).toBe(true);
-    expect(router.getPathname()).toBe('/ordenes-asignadas/31');
+    expect(screen).toHavePathname('/ordenes-asignadas/31');
   });
 
   it('orden no asignada (404 de MS4): informa sin reintento', async () => {
@@ -645,7 +645,7 @@ describe('Flujos alternativos', () => {
 
     await sendEvidence();
 
-    await waitFor(() => expect(router.getPathname()).toBe('/login'));
+    await waitFor(() => expect(screen).toHavePathname('/login'));
     expect(useAuthStore.getState().isAuthenticated).toBe(false);
   });
 

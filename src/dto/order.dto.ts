@@ -27,8 +27,7 @@ export interface CreateOrderRequestDto {
 }
 
 /**
- * Cuerpo enviado para actualizar el estado de una orden.
- * Soporta tanto status textual como CambioEstadoSolicitud (estado_destino, observacion) de MS2.
+ * Cuerpo enviado a PATCH /api/ordenes/{orden_id}/estado (CambioEstadoSolicitud en MS2, sin propiedades adicionales).
  */
 export interface UpdateOrderStatusRequestDto {
   estado_destino: number;

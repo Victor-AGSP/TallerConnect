@@ -314,9 +314,17 @@ export default function MecanicoScreen() {
           </View>
         </View>
 
-        {/* =====================================
+        {/* ====================================
             CERRAR SESIÓN
             ===================================== */}
+
+
+          <Button
+            title="Ver repuestos y proveedores"
+            onPress={() => router.push('/(mecanico)/inventario' as never)}
+            style={styles.logoutButton}
+          />
+
         <Button
           title="Ver vehículos asignados"
           onPress={() => router.push('./vehiculos-asignados')}

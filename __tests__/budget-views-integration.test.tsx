@@ -234,7 +234,7 @@ describe('Orden → presupuesto', () => {
       await fireEvent.press(screen.getByTestId('order-detail-open-budget'));
 
       await waitForTestId('order-budget-5');
-      expect(view.getPathname()).toBe(budgetPath);
+      expect(screen).toHavePathname(budgetPath);
       expect(mockedBudgets.getBudgetForOrder).toHaveBeenCalledWith('31');
     },
   );
@@ -526,7 +526,7 @@ describe('Restricciones de acceso por rol', () => {
     async (role, path, home, content) => {
       await renderAs(role, path, guardedRoutes);
 
-      await waitFor(() => expect(view.getPathname()).toBe(home));
+      await waitFor(() => expect(screen).toHavePathname(home));
       expect(screen.getByText(content)).toBeTruthy();
       expect(mockedBudgets.getBudgetForOrder).not.toHaveBeenCalled();
     },
@@ -541,6 +541,6 @@ describe('Restricciones de acceso por rol', () => {
     await renderAs(role, path, guardedRoutes);
 
     await waitForTestId('order-budget-5');
-    expect(view.getPathname()).toBe(path);
+    expect(screen).toHavePathname(path);
   });
 });

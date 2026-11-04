@@ -1,3 +1,4 @@
+import { Text } from 'react-native';
 import { router } from 'expo-router';
 
 import {
@@ -16,6 +17,7 @@ import MisVehiculosScreen from '@/app/(cliente)/mis-vehiculos';
 import MecanicoScreen from '@/app/(mecanico)/mecanico';
 import VehiculosAsignadosScreen from '@/app/(mecanico)/vehiculos-asignados';
 import { vehiclesService } from '@/services/vehicles.service';
+import { ordersService } from '@/services/orders.service';
 import type { Vehicle } from '@/models/vehicle.model';
 
 jest.mock('@/services/vehicles.service', () => ({
@@ -42,6 +44,9 @@ const routes = {
   '(mecanico)/vehiculos-asignados': VehiculosAsignadosScreen,
   '(admin)/administrador': AdministradorScreen,
   '(admin)/vehiculos': VehiculosScreen,
+  '(admin)/vehiculos/[id]': () => <Text>Detalle del vehículo seleccionado</Text>,
+  '(cliente)/vehiculos/[id]': () => <Text>Detalle del vehículo seleccionado</Text>,
+  '(mecanico)/vehiculos/[id]': () => <Text>Detalle del vehículo seleccionado</Text>,
 };
 
 const vehicles: Vehicle[] = [
@@ -92,6 +97,7 @@ const SCREENS = [
 
 beforeEach(() => {
   jest.clearAllMocks();
+  Object.values(mockedService).forEach((method) => method.mockReset());
   resetStores();
 });
 
@@ -100,6 +106,15 @@ beforeEach(() => {
 afterEach(() => cleanup());
 
 describe('listado de vehículos: consulta al servicio', () => {
+  it.each(SCREENS)('el listado de $name permite abrir el detalle', async ({ path, method }) => {
+    mockedService[method].mockResolvedValueOnce(vehicles);
+    await renderRouterWithProviders(routes, { initialUrl: path });
+    await fireEvent.press(await screen.findByRole('button', { name: 'Ver detalle del vehículo AB·CD·12' }));
+    await screen.findByText('Detalle del vehículo seleccionado');
+    expect(screen).toHavePathname('/vehiculos/veh-001');
+    expect(mockedService[method]).toHaveBeenCalledTimes(1);
+  });
+
   it.each(SCREENS)(
     'la vista de $name consulta $method y representa los vehículos recibidos',
     async ({ path, title, method }) => {
@@ -243,6 +258,7 @@ describe('listado de vehículos: acceso desde cada panel', () => {
    * paneles con el router de la aplicación.
    */
   it('cada panel ofrece un control que abre su propio listado', async () => {
+    jest.spyOn(ordersService, 'getOrders').mockResolvedValue([]);
     mockedService.getMyVehicles.mockResolvedValue([]);
     mockedService.getAssignedVehicles.mockResolvedValue([]);
     mockedService.getVehicles.mockResolvedValue([]);
@@ -252,33 +268,35 @@ describe('listado de vehículos: acceso desde cada panel', () => {
     });
     await testRouter;
 
-    fireEvent.press(screen.getByRole('button', { name: 'Ver mis vehículos' }));
+    await fireEvent.press(screen.getByRole('button', { name: 'Ver mis vehículos' }));
     await waitFor(() =>
-      expect(testRouter.getPathname()).toBe('/mis-vehiculos'),
+      expect(screen).toHavePathname('/mis-vehiculos'),
     );
 
     await act(async () => {
       router.replace('/mecanico');
     });
-    await waitFor(() => expect(testRouter.getPathname()).toBe('/mecanico'));
+    await waitFor(() => expect(screen).toHavePathname('/mecanico'));
 
-    fireEvent.press(
+    await fireEvent.press(
       screen.getByRole('button', { name: 'Ver vehículos asignados' }),
     );
     await waitFor(() =>
-      expect(testRouter.getPathname()).toBe('/vehiculos-asignados'),
+      expect(screen).toHavePathname('/vehiculos-asignados'),
     );
 
     await act(async () => {
       router.replace('/administrador');
     });
     await waitFor(() =>
-      expect(testRouter.getPathname()).toBe('/administrador'),
+      expect(screen).toHavePathname('/administrador'),
     );
 
-    fireEvent.press(
-      screen.getByRole('button', { name: 'Ver vehículos registrados' }),
+    await fireEvent.press(
+      await screen.findByRole('button', { name: 'Ver vehículos registrados' }),
     );
-    await waitFor(() => expect(testRouter.getPathname()).toBe('/vehiculos'));
+    await waitFor(() => expect(screen).toHavePathname('/vehiculos'));
+    expect(mockedService.getVehicles).toHaveBeenCalledTimes(2);
+    expect(ordersService.getOrders).toHaveBeenCalledTimes(1);
   });
 });

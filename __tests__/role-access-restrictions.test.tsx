@@ -96,7 +96,7 @@ describe('ProtectedRoute: acceso autorizado', () => {
       await router;
 
       await waitFor(() =>
-        expect(router.getPathname()).toBe(PATH_BY_ROLE[role]),
+        expect(screen).toHavePathname(PATH_BY_ROLE[role]),
       );
       expect(screen.getByText(CONTENT_BY_ROLE[role])).toBeTruthy();
     },
@@ -120,7 +120,7 @@ describe('ProtectedRoute: acceso restringido', () => {
       });
       await router;
 
-      await waitFor(() => expect(router.getPathname()).toBe(PATH_BY_ROLE[role]));
+      await waitFor(() => expect(screen).toHavePathname(PATH_BY_ROLE[role]));
 
       // El contenido reservado al otro rol nunca llega a renderizarse.
       expect(screen.queryByText(CONTENT_BY_ROLE[restrictedRole])).toBeNull();
@@ -141,7 +141,7 @@ describe('ProtectedRoute: acceso restringido', () => {
       });
       await router;
 
-      await waitFor(() => expect(router.getPathname()).toBe('/login'));
+      await waitFor(() => expect(screen).toHavePathname('/login'));
       expect(screen.getByText('Iniciar sesión')).toBeTruthy();
     },
   );
@@ -162,7 +162,7 @@ describe('RoleGuard: sesiones incompletas', () => {
     });
     await router;
 
-    await waitFor(() => expect(router.getPathname()).toBe('/login'));
+    await waitFor(() => expect(screen).toHavePathname('/login'));
     expect(screen.queryByText(CONTENT_BY_ROLE.administrador)).toBeNull();
   });
 
@@ -187,7 +187,7 @@ describe('RoleGuard: sesiones incompletas', () => {
     });
     await router;
 
-    await waitFor(() => expect(router.getPathname()).toBe('/cliente'));
+    await waitFor(() => expect(screen).toHavePathname('/cliente'));
     expect(screen.queryByText(CONTENT_BY_ROLE.administrador)).toBeNull();
     expect(screen.getByText(CONTENT_BY_ROLE.cliente)).toBeTruthy();
   });

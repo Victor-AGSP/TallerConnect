@@ -425,7 +425,7 @@ describe('Proveedores (administrador)', () => {
     await waitFor(() =>
       expect(screen.getByTestId('supplier-detail-3')).toBeTruthy(),
     );
-    expect(view.getPathname()).toBe('/proveedores/3');
+    expect(screen).toHavePathname('/proveedores/3');
     expect(mockedService.getSupplierById).toHaveBeenCalledWith('3');
     expect(screen.getByText('ventas@repuestosdelsur.cl')).toBeTruthy();
     expect(screen.getByText('Filtro de aceite')).toBeTruthy();
@@ -504,7 +504,7 @@ describe('Navegación desde el panel del administrador', () => {
     await waitFor(() =>
       expect(screen.getByTestId(testID)).toBeTruthy(),
     );
-    expect(view.getPathname()).toBe(path);
+    expect(screen).toHavePathname(path);
   });
 });
 
@@ -521,7 +521,7 @@ describe('Restricciones de acceso por rol', () => {
       await waitFor(() =>
         expect(screen.getByRole('header', { name: /Repuestos|Proveedores|Repuestos del Sur/ })).toBeTruthy(),
       );
-      expect(view.getPathname()).toBe(path);
+      expect(screen).toHavePathname(path);
     },
   );
 
@@ -537,7 +537,7 @@ describe('Restricciones de acceso por rol', () => {
     async (role, path, home, content) => {
       await renderGuarded(role, path);
 
-      await waitFor(() => expect(view.getPathname()).toBe(home));
+      await waitFor(() => expect(screen).toHavePathname(home));
       expect(screen.getByText(content)).toBeTruthy();
       expect(mockedService.getSpareParts).not.toHaveBeenCalled();
       expect(mockedService.getSuppliers).not.toHaveBeenCalled();

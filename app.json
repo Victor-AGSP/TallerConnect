@@ -35,11 +35,17 @@
       ],
       "expo-secure-store",
       [
+        "expo-camera",
+        {
+          "cameraPermission": "TallerConnect necesita acceso a la cámara para capturar evidencias fotográficas y en video de las órdenes de trabajo.",
+          "microphonePermission": "TallerConnect necesita acceso al micrófono para grabar videos de evidencia técnica."
+        }
+      ],
+      [
         "expo-image-picker",
         {
-          "photosPermission": "TallerConnect accede a tus fotografías solo cuando eliges una evidencia para una orden de trabajo.",
-          "cameraPermission": "TallerConnect usa la cámara solo cuando tomas una fotografía de evidencia para una orden de trabajo.",
-          "microphonePermission": false
+          "photosPermission": "TallerConnect necesita acceso a tu galería para adjuntar fotos y videos de evidencia a las órdenes de trabajo.",
+          "cameraPermission": "TallerConnect necesita acceso a la cámara para tomar fotos o videos de evidencia técnica."
         }
       ]
     ],

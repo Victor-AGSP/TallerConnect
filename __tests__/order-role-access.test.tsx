@@ -157,7 +157,7 @@ describe('vistas de órdenes: acceso autorizado', () => {
         expect(screen.getByTestId('order-detail-31')).toBeTruthy(),
       );
 
-      expect(router.getPathname()).toBe(ORDER_PATH_BY_ROLE[role]);
+      expect(screen).toHavePathname(ORDER_PATH_BY_ROLE[role]);
       expect(adapter).toHaveBeenCalledTimes(1);
 
       const [config] = adapter.mock.calls[0];
@@ -187,7 +187,7 @@ describe('vistas de órdenes: protección visual por rol', () => {
       await router;
 
       await waitFor(() =>
-        expect(router.getPathname()).toBe(HOME_BY_ROLE[role].path),
+        expect(screen).toHavePathname(HOME_BY_ROLE[role].path),
       );
 
       expect(screen.getByText(HOME_BY_ROLE[role].content)).toBeTruthy();
@@ -209,7 +209,7 @@ describe('vistas de órdenes: protección visual por rol', () => {
       });
       await router;
 
-      await waitFor(() => expect(router.getPathname()).toBe('/login'));
+      await waitFor(() => expect(screen).toHavePathname('/login'));
 
       expect(screen.getByText('Iniciar sesión')).toBeTruthy();
       expect(adapter).not.toHaveBeenCalled();
@@ -236,7 +236,7 @@ describe('vistas de órdenes: protección visual por rol', () => {
     await waitFor(() =>
       expect(screen.getByTestId('order-detail-31')).toBeTruthy(),
     );
-    expect(router.getPathname()).toBe('/ordenes/31');
+    expect(screen).toHavePathname('/ordenes/31');
     expect(adapter).toHaveBeenCalledTimes(1);
   });
 });
@@ -251,7 +251,7 @@ describe('vistas de órdenes: autorización del backend', () => {
     });
     await router;
 
-    await waitFor(() => expect(router.getPathname()).toBe('/login'));
+    await waitFor(() => expect(screen).toHavePathname('/login'));
 
     expect(screen.getByText('Iniciar sesión')).toBeTruthy();
     expect(screen.queryByTestId('order-detail-31')).toBeNull();
@@ -278,7 +278,7 @@ describe('vistas de órdenes: autorización del backend', () => {
     expect(
       screen.getByText('El recurso solicitado no fue encontrado.'),
     ).toBeTruthy();
-    expect(router.getPathname()).toBe('/ordenes-asignadas/31');
+    expect(screen).toHavePathname('/ordenes-asignadas/31');
     expect(useAuthStore.getState().isAuthenticated).toBe(true);
     expect(adapter).toHaveBeenCalledTimes(1);
   });
@@ -304,7 +304,7 @@ describe('vistas de órdenes: autorización del backend', () => {
         screen.getByText('No tienes permisos para realizar esta acción.'),
       ).toBeTruthy();
       expect(screen.getByRole('button', { name: 'Reintentar' })).toBeTruthy();
-      expect(router.getPathname()).toBe(ORDER_PATH_BY_ROLE[role]);
+      expect(screen).toHavePathname(ORDER_PATH_BY_ROLE[role]);
       expect(useAuthStore.getState()).toMatchObject({
         isAuthenticated: true,
         role,

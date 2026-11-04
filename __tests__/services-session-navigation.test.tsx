@@ -107,13 +107,13 @@ describe('Pruebas Integradas: Servicios, Sesión y Navegación', () => {
     expect(state.token).toBe(authData.token);
 
     // El router con sesión activa renderiza el dashboard de cliente
-    const router = renderRouterWithProviders(routes, { initialUrl: '/cliente' });
+    const router = await renderRouterWithProviders(routes, { initialUrl: '/cliente' });
     await router;
 
     await waitFor(() => {
       expect(screen.getByText('Inicio Cliente')).toBeTruthy();
     });
-    expect(router.getPathname()).toBe('/cliente');
+    expect(screen).toHavePathname('/cliente');
   });
 
   it('2. Sesión activa ➔ Consumo de Servicios: Mecánico consulta órdenes autenticado', async () => {
@@ -132,7 +132,7 @@ describe('Pruebas Integradas: Servicios, Sesión y Navegación', () => {
     ]);
 
     // Establecemos la sesión del mecánico antes de montar la vista
-    const router = renderRouterWithProviders(routes, {
+    const router = await renderRouterWithProviders(routes, {
       initialUrl: '/mecanico',
       initialAuthState: {
         user: mechanicAuth.user,
@@ -155,14 +155,14 @@ describe('Pruebas Integradas: Servicios, Sesión y Navegación', () => {
     expect(orders[0].id).toBe('ot-101');
     expect(orders[0].status).toBe('en_reparacion');
     expect(useAuthStore.getState().isAuthenticated).toBe(true);
-    expect(router.getPathname()).toBe('/mecanico');
+    expect(screen).toHavePathname('/mecanico');
   });
 
   it('3. Expiración/Cierre de Sesión ➔ Navegación: Logout devuelve al usuario a /login', async () => {
     const clientAuth = mockAuthResponses.cliente;
 
     // Iniciar con sesión activa en pantalla de cliente
-    const router = renderRouterWithProviders(routes, {
+    const router = await renderRouterWithProviders(routes, {
       initialUrl: '/cliente',
       initialAuthState: {
         user: clientAuth.user,
@@ -195,7 +195,7 @@ describe('Pruebas Integradas: Servicios, Sesión y Navegación', () => {
     await waitFor(() => {
       expect(screen.getByText('Pantalla Iniciar Sesión')).toBeTruthy();
     });
-    expect(router.getPathname()).toBe('/login');
+    expect(screen).toHavePathname('/login');
   });
 
   it('4. Consumo de Vehículos: Cliente autenticado consulta sus vehículos', async () => {
@@ -212,7 +212,7 @@ describe('Pruebas Integradas: Servicios, Sesión y Navegación', () => {
       },
     ]);
 
-    const router = renderRouterWithProviders(routes, {
+    const router = await renderRouterWithProviders(routes, {
       initialUrl: '/cliente',
       initialAuthState: {
         user: clientAuth.user,
@@ -237,7 +237,7 @@ describe('Pruebas Integradas: Servicios, Sesión y Navegación', () => {
   it('5. Resiliencia de Red: Pérdida de conectividad activa banner sin destruir la sesión ni la navegación', async () => {
     const adminAuth = mockAuthResponses.administrador;
 
-    const router = renderRouterWithProviders(routes, {
+    const router = await renderRouterWithProviders(routes, {
       initialUrl: '/administrador',
       initialAuthState: {
         user: adminAuth.user,

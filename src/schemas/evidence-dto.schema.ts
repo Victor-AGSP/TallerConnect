@@ -26,3 +26,5 @@ export const evidenceDownloadResponseDtoSchema = z.object({
   url: z.url({ protocol: /^https?$/ }),
   expira_en: z.number().int().positive(),
 });
+
+export const evidenceDownloadUrlResponseDtoSchema = evidenceDownloadResponseDtoSchema;

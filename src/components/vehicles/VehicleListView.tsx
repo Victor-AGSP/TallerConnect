@@ -28,6 +28,7 @@ export interface VehicleListViewProps {
    * (por ejemplo, memorizada con `useCallback`) porque dispara la carga.
    */
   loadVehicles: () => Promise<Vehicle[]>;
+  onOpenVehicle?: (vehicleId: string) => void;
 }
 
 const FALLBACK_ERROR = 'No fue posible cargar los vehículos.';
@@ -45,6 +46,7 @@ export function VehicleListView({
   subtitle,
   emptyMessage,
   loadVehicles,
+  onOpenVehicle,
 }: VehicleListViewProps) {
   const { data, errorMessage, isLoading, isRefreshing, refresh } =
     useDataQuery(loadVehicles, FALLBACK_ERROR);
@@ -84,7 +86,15 @@ export function VehicleListView({
           />
 
           {vehicles.map((vehicle) => (
-            <VehicleCard key={vehicle.id} vehicle={vehicle} />
+            <View key={vehicle.id}>
+              <VehicleCard vehicle={vehicle} />
+              {onOpenVehicle ? (
+                <Button
+                  title={`Ver detalle del vehículo ${formatPlate(vehicle.plate)}`}
+                  onPress={() => onOpenVehicle(vehicle.id)}
+                />
+              ) : null}
+            </View>
           ))}
         </>
       )}

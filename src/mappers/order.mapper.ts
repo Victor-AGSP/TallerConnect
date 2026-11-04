@@ -1,5 +1,9 @@
-import { WorkOrder, WorkOrderStatus } from '@/models/order.model';
-import { OrderResponseDto } from '@/dto/order.dto';
+import {
+  OrderStatusUpdateRequest,
+  WorkOrder,
+  WorkOrderStatus,
+} from '@/models/order.model';
+import { OrderResponseDto, UpdateOrderStatusRequestDto } from '@/dto/order.dto';
 import { ORDER_STATUS, ORDER_STATUS_BY_CODE } from '@/constants/orderStatus';
 import { orderResponseDtoSchema } from '@/schemas/order-dto.schema';
 
@@ -79,4 +83,24 @@ export function mapOrderResponse(raw: OrderResponseDto): WorkOrder {
 export function mapOrdersResponseList(dtos: OrderResponseDto[]): WorkOrder[] {
   if (!Array.isArray(dtos)) return [];
   return dtos.map(mapOrderResponse);
+}
+
+/**
+ * Mapea una solicitud de cambio de estado de la app al cuerpo CambioEstadoSolicitud esperado por MS2.
+ * `observacion` solo se envía cuando fue indicada.
+ */
+export function mapOrderStatusUpdateRequest(
+  request: OrderStatusUpdateRequest
+): UpdateOrderStatusRequestDto {
+  const code = STATUS_TO_CODE[request.targetStatus];
+  if (code === undefined) {
+    throw new Error(`Estado no soportado por MS2: ${request.targetStatus}`);
+  }
+  const payload: UpdateOrderStatusRequestDto = {
+    estado_destino: code,
+  };
+  if (request.observation !== undefined) {
+    payload.observacion = request.observation;
+  }
+  return payload;
 }

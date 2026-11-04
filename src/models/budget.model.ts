@@ -22,6 +22,8 @@ export interface BudgetItem {
   partId: string | null;
   partName: string | null;
   supplierName: string | null;
+  /** Alias opcional usado por integraciones de MS3. */
+  providerName?: string | null;
 }
 
 /** Decisión del cliente sobre una versión enviada. */

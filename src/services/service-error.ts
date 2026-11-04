@@ -1,9 +1,21 @@
 import { normalizeApiError } from '@/services/api/interceptors';
 import { HTTP_STATUS, NormalizedApiError } from '@/services/api/types';
+import { MediaPermissionError } from '@/utils/media-permissions';
 import { InvalidOrderResponseError } from '@/mappers/order.mapper';
 
 /**
- * Error normalizado de la capa de servicios (Vehículos y Órdenes).
+ * Dominios soportados por la normalización de errores de la capa de servicios.
+ */
+export type ServiceErrorDomain =
+  | 'vehicles'
+  | 'orders'
+  | 'budgets'
+  | 'parts'
+  | 'providers'
+  | 'evidences';
+
+/**
+ * Error normalizado de la capa de servicios (Vehículos, Órdenes, Presupuestos, Repuestos, Proveedores y Evidencias).
  * Conserva compatibilidad con `instanceof Error` y expone metadatos estructurados para la UI.
  */
 export class ServiceError extends Error {
@@ -11,7 +23,7 @@ export class ServiceError extends Error {
   readonly code: string;
   readonly isNetworkError: boolean;
   readonly isTimeout: boolean;
-  readonly domain: 'vehicles' | 'orders';
+  readonly domain: ServiceErrorDomain;
   readonly originalError?: unknown;
 
   constructor(params: {
@@ -20,7 +32,7 @@ export class ServiceError extends Error {
     code?: string;
     isNetworkError?: boolean;
     isTimeout?: boolean;
-    domain: 'vehicles' | 'orders';
+    domain: ServiceErrorDomain;
     originalError?: unknown;
   }) {
     super(params.message);
@@ -36,7 +48,7 @@ export class ServiceError extends Error {
 }
 
 /**
- * Extrae el mensaje de validación cuando FastAPI/MS2 devuelve HTTP 422 con un arreglo `detail`.
+ * Extrae el mensaje de validación cuando FastAPI (MS2 / MS3 / MS4) devuelve HTTP 422 o un objeto `detail`.
  */
 export function extractValidationDetail(error: unknown): string | null {
   if (typeof error !== 'object' || error === null) return null;
@@ -111,6 +123,8 @@ export function normalizeOrderServiceError(
     return error;
   }
 
+  // Una respuesta MS2 inválida no es un fallo genérico de transporte.
+  // Conservamos el contrato ORDER_INVALID_RESPONSE para la UI y los tests.
   if (error instanceof InvalidOrderResponseError) {
     return new ServiceError({
       message: error.message,
@@ -143,6 +157,197 @@ export function normalizeOrderServiceError(
     isNetworkError: normalized.isNetworkError,
     isTimeout: normalized.isTimeout,
     domain: 'orders',
+    originalError: error,
+  });
+}
+
+/**
+ * Normaliza cualquier error originado en BudgetService (adaptador HTTP real o adaptador simulado).
+ * Contempla HTTP 503 cuando MS3 guarda la operación pero falla la coordinación con MS2.
+ */
+export function normalizeBudgetServiceError(
+  error: unknown,
+  fallbackMessage: string
+): ServiceError {
+  if (error instanceof ServiceError) {
+    return error;
+  }
+
+  const validationMsg = extractValidationDetail(error);
+  const normalized: NormalizedApiError = normalizeApiError(error);
+  const status = normalized.status;
+
+  let code = 'BUDGET_SERVICE_ERROR';
+  if (normalized.isTimeout) code = 'BUDGET_TIMEOUT';
+  else if (normalized.isNetworkError) code = 'BUDGET_NETWORK_ERROR';
+  else if (status === HTTP_STATUS.UNAUTHORIZED) code = 'BUDGET_UNAUTHORIZED';
+  else if (status === HTTP_STATUS.FORBIDDEN) code = 'BUDGET_FORBIDDEN';
+  else if (status === HTTP_STATUS.NOT_FOUND) code = 'BUDGET_NOT_FOUND';
+  else if (status === HTTP_STATUS.CONFLICT) code = 'BUDGET_CONFLICT';
+  else if (status === HTTP_STATUS.UNPROCESSABLE_ENTITY) code = 'BUDGET_VALIDATION_ERROR';
+  else if (status === HTTP_STATUS.SERVICE_UNAVAILABLE) code = 'BUDGET_COORDINATION_ERROR';
+  else if (status && status >= 500) code = 'BUDGET_SERVER_ERROR';
+
+  const message = validationMsg || normalized.message || fallbackMessage;
+
+  return new ServiceError({
+    message,
+    status,
+    code,
+    isNetworkError: normalized.isNetworkError,
+    isTimeout: normalized.isTimeout,
+    domain: 'budgets',
+    originalError: error,
+  });
+}
+
+/**
+ * Normaliza cualquier error originado en PartService (adaptador HTTP real o adaptador simulado).
+ */
+export function normalizePartServiceError(
+  error: unknown,
+  fallbackMessage: string
+): ServiceError {
+  if (error instanceof ServiceError) {
+    return error;
+  }
+
+  const validationMsg = extractValidationDetail(error);
+  const normalized: NormalizedApiError = normalizeApiError(error);
+  const status = normalized.status;
+
+  let code = 'PART_SERVICE_ERROR';
+  if (normalized.isTimeout) code = 'PART_TIMEOUT';
+  else if (normalized.isNetworkError) code = 'PART_NETWORK_ERROR';
+  else if (status === HTTP_STATUS.UNAUTHORIZED) code = 'PART_UNAUTHORIZED';
+  else if (status === HTTP_STATUS.FORBIDDEN) code = 'PART_FORBIDDEN';
+  else if (status === HTTP_STATUS.NOT_FOUND) code = 'PART_NOT_FOUND';
+  else if (status === HTTP_STATUS.CONFLICT) code = 'PART_CONFLICT';
+  else if (status === HTTP_STATUS.UNPROCESSABLE_ENTITY) code = 'PART_VALIDATION_ERROR';
+  else if (status && status >= 500) code = 'PART_SERVER_ERROR';
+
+  const message = validationMsg || normalized.message || fallbackMessage;
+
+  return new ServiceError({
+    message,
+    status,
+    code,
+    isNetworkError: normalized.isNetworkError,
+    isTimeout: normalized.isTimeout,
+    domain: 'parts',
+    originalError: error,
+  });
+}
+
+/**
+ * Normaliza cualquier error originado en ProviderService (adaptador HTTP real o adaptador simulado).
+ */
+export function normalizeProviderServiceError(
+  error: unknown,
+  fallbackMessage: string
+): ServiceError {
+  if (error instanceof ServiceError) {
+    return error;
+  }
+
+  const validationMsg = extractValidationDetail(error);
+  const normalized: NormalizedApiError = normalizeApiError(error);
+  const status = normalized.status;
+
+  let code = 'PROVIDER_SERVICE_ERROR';
+  if (normalized.isTimeout) code = 'PROVIDER_TIMEOUT';
+  else if (normalized.isNetworkError) code = 'PROVIDER_NETWORK_ERROR';
+  else if (status === HTTP_STATUS.UNAUTHORIZED) code = 'PROVIDER_UNAUTHORIZED';
+  else if (status === HTTP_STATUS.FORBIDDEN) code = 'PROVIDER_FORBIDDEN';
+  else if (status === HTTP_STATUS.NOT_FOUND) code = 'PROVIDER_NOT_FOUND';
+  else if (status === HTTP_STATUS.CONFLICT) code = 'PROVIDER_CONFLICT';
+  else if (status === HTTP_STATUS.UNPROCESSABLE_ENTITY) code = 'PROVIDER_VALIDATION_ERROR';
+  else if (status && status >= 500) code = 'PROVIDER_SERVER_ERROR';
+
+  const message = validationMsg || normalized.message || fallbackMessage;
+
+  return new ServiceError({
+    message,
+    status,
+    code,
+    isNetworkError: normalized.isNetworkError,
+    isTimeout: normalized.isTimeout,
+    domain: 'providers',
+    originalError: error,
+  });
+}
+
+/**
+ * Normaliza cualquier error originado en EvidenceService (permisos de cámara/galería, carga multipart o MS4).
+ */
+export function normalizeEvidenceServiceError(
+  error: unknown,
+  fallbackMessage: string
+): ServiceError {
+  if (error instanceof ServiceError) {
+    return error;
+  }
+
+  if (error instanceof MediaPermissionError) {
+    return new ServiceError({
+      message: error.message,
+      code: 'EVIDENCE_PERMISSION_DENIED',
+      domain: 'evidences',
+      originalError: error,
+    });
+  }
+
+  const validationMsg = extractValidationDetail(error);
+  const normalized: NormalizedApiError = normalizeApiError(error);
+  const status = normalized.status;
+
+  let code = 'EVIDENCE_SERVICE_ERROR';
+  let defaultStatusMessage: string | undefined;
+
+  if (normalized.isTimeout) {
+    code = 'EVIDENCE_TIMEOUT';
+  } else if (normalized.isNetworkError) {
+    code = 'EVIDENCE_NETWORK_ERROR';
+  } else if (status === HTTP_STATUS.BAD_REQUEST) {
+    code = 'EVIDENCE_BAD_FILE';
+    defaultStatusMessage = 'No se pudo leer el archivo enviado.';
+  } else if (status === HTTP_STATUS.UNAUTHORIZED) {
+    code = 'EVIDENCE_UNAUTHORIZED';
+  } else if (status === HTTP_STATUS.FORBIDDEN) {
+    code = 'EVIDENCE_FORBIDDEN';
+  } else if (status === HTTP_STATUS.NOT_FOUND) {
+    code = 'EVIDENCE_NOT_FOUND';
+  } else if (status === HTTP_STATUS.CONFLICT) {
+    code = 'EVIDENCE_CONFLICT';
+    defaultStatusMessage = 'La orden está entregada o cancelada y no admite nuevas evidencias.';
+  } else if (status === HTTP_STATUS.PAYLOAD_TOO_LARGE) {
+    code = 'EVIDENCE_TOO_LARGE';
+    defaultStatusMessage = 'El archivo supera el tamaño máximo permitido para este tipo de evidencia.';
+  } else if (status === HTTP_STATUS.UNSUPPORTED_MEDIA_TYPE) {
+    code = 'EVIDENCE_UNSUPPORTED_MEDIA';
+    defaultStatusMessage = 'Formato de archivo no permitido: solo se aceptan JPG, PNG, WEBP, MP4 y MOV.';
+  } else if (status === HTTP_STATUS.UNPROCESSABLE_ENTITY) {
+    code = 'EVIDENCE_VALIDATION_ERROR';
+  } else if (status === HTTP_STATUS.SERVICE_UNAVAILABLE) {
+    code = 'EVIDENCE_STORAGE_UNAVAILABLE';
+    defaultStatusMessage = 'El almacenamiento de evidencias o el servicio de órdenes no está disponible temporalmente.';
+  } else if (status && status >= 500) {
+    code = 'EVIDENCE_SERVER_ERROR';
+  }
+
+  const message =
+    validationMsg ||
+    defaultStatusMessage ||
+    normalized.message ||
+    fallbackMessage;
+
+  return new ServiceError({
+    message,
+    status,
+    code,
+    isNetworkError: normalized.isNetworkError,
+    isTimeout: normalized.isTimeout,
+    domain: 'evidences',
     originalError: error,
   });
 }

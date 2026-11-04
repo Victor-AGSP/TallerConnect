@@ -7,6 +7,12 @@ import {
 import AdministradorScreen from '@/app/(admin)/administrador';
 import ClienteScreen from '@/app/(cliente)/cliente';
 import MecanicoScreen from '@/app/(mecanico)/mecanico';
+import { ordersService } from '@/services/orders.service';
+import { vehiclesService } from '@/services/vehicles.service';
+import { mapOrderResponse } from '@/mappers/order.mapper';
+import { mapVehicleResponse } from '@/mappers/vehicle.mapper';
+import { orderResponsePayloads } from '@/mocks/payloads/order.payload';
+import { vehicleResponsePayloads } from '@/mocks/payloads/vehicle.payload';
 import { StatusPill } from '@/components/ui/StatusPill';
 
 /**
@@ -30,6 +36,9 @@ async function renderScreen(
   );
 
   await router;
+  if (path === '/administrador') {
+    await screen.findByRole('header', { name: 'Panel del taller' });
+  }
 
   return router;
 }
@@ -212,6 +221,16 @@ describe('vista de órdenes del mecánico', () => {
 });
 
 describe('vista de vehículos y órdenes del administrador', () => {
+  beforeEach(() => {
+    jest.spyOn(ordersService, 'getOrders').mockResolvedValue([
+      mapOrderResponse(orderResponsePayloads.en_reparacion),
+      mapOrderResponse(orderResponsePayloads.esperando_aprobacion_presupuesto),
+    ]);
+    jest.spyOn(vehiclesService, 'getVehicles').mockResolvedValue([
+      mapVehicleResponse(vehicleResponsePayloads.completo),
+    ]);
+  });
+  afterEach(() => jest.restoreAllMocks());
   it('expone los títulos de la vista como encabezados', async () => {
     await renderScreen('/administrador');
 
@@ -219,10 +238,10 @@ describe('vista de vehículos y órdenes del administrador', () => {
       screen.getByRole('header', { name: 'Panel del taller' }),
     ).toBeTruthy();
     expect(
-      screen.getByRole('header', { name: 'Estado de las órdenes' }),
+      screen.getByRole('header', { name: 'Resumen general' }),
     ).toBeTruthy();
     expect(
-      screen.getByRole('header', { name: 'Vehículos en atención' }),
+      screen.getByRole('header', { name: 'Órdenes recientes' }),
     ).toBeTruthy();
   });
 
@@ -231,12 +250,12 @@ describe('vista de vehículos y órdenes del administrador', () => {
 
     expect(
       screen.getByLabelText(
-        'Orden OT-00124. Patente AB-CD-12. Estado: En reparación',
+        'Orden OT 105. Patente ABCD12. Estado: En reparación',
       ),
     ).toBeTruthy();
     expect(
       screen.getByLabelText(
-        'Orden OT-00127. Patente XY-ZW-90. Estado: Listo para entrega',
+        'Orden OT 103. Patente ABCD12. Estado: Esperando aprobación del presupuesto',
       ),
     ).toBeTruthy();
   });
@@ -244,17 +263,12 @@ describe('vista de vehículos y órdenes del administrador', () => {
   it('agrupa el resumen por estado, los mecánicos y las aprobaciones pendientes', async () => {
     await renderScreen('/administrador');
 
-    expect(screen.getByLabelText('En reparación: 4')).toBeTruthy();
-    expect(
-      screen.getByLabelText(
-        'Mecánico de demostración. 3 órdenes asignadas. Estado: Activo',
-      ),
-    ).toBeTruthy();
-    expect(
-      screen.getByLabelText(
-        'Orden OT-00126. Vehículo IJ-KL-56. Monto $185.000. Pendiente de aprobación',
-      ),
-    ).toBeTruthy();
-    expect(screen.getByLabelText('Vehículos registrados: 32')).toBeTruthy();
+    expect(screen.getByLabelText('Órdenes activas: 2')).toBeTruthy();
+    expect(screen.getByLabelText('Mecánicos asignados: 1')).toBeTruthy();
+    expect(screen.getByLabelText('Pendientes de aprobación: 1')).toBeTruthy();
+    expect(screen.getByLabelText('Vehículos registrados: 1')).toBeTruthy();
+    for (const name of ['Ver vehículos registrados', 'Inventario', 'Ver repuestos', 'Ver proveedores', 'Cerrar sesión']) {
+      expect(screen.getByRole('button', { name })).toBeTruthy();
+    }
   });
 });

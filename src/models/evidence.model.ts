@@ -1,6 +1,9 @@
-/**
- * Evidencia fotográfica de una orden de trabajo (MS4 — Evidencia Multimedia).
- */
+import type {
+  AllowedEvidenceMimeType,
+  EvidenceContext,
+} from '@/constants/evidence';
+
+export type { AllowedEvidenceMimeType, EvidenceContext };
 
 /** Tipos MIME de fotografía que la aplicación permite enviar. */
 export type EvidenceMimeType = 'image/jpeg' | 'image/png' | 'image/webp';
@@ -23,27 +26,63 @@ export interface EvidenceFile {
   webFile?: Blob;
 }
 
-/** Etapa de la orden en la que se adjunta la evidencia (`ContextoEvidencia`). */
-export type EvidenceContext =
-  | 'diagnostico'
-  | 'presupuesto'
-  | 'reparacion'
-  | 'resultado_final';
 
 /**
- * Evidencia persistida por MS4. Solo contiene los campos que publica el
- * contrato: no incluye autor ni descripción.
+ * Activo multimedia local capturado por la cámara o seleccionado desde la galería en Expo.
+ */
+export interface SelectedMediaAsset {
+  uri: string;
+  fileName: string;
+  mimeType: string;
+  fileSize?: number;
+  mediaType: 'image' | 'video';
+  width?: number;
+  height?: number;
+  duration?: number | null;
+}
+
+/**
+ * Metadatos que la app adjunta a una evidencia al subirla (campos de texto de `Body_subir_evidencias_post` en MS4).
+ * `budgetId` y `visibleToClient` son opcionales y admiten `null`, como en el contrato.
+ */
+export interface EvidenceUploadMetadata {
+  orderId: string;
+  context: EvidenceContext;
+  budgetId?: string | null;
+  visibleToClient?: boolean | null;
+}
+
+/**
+ * Solicitud de subida de una evidencia: el archivo local seleccionado y sus metadatos.
+ */
+export interface EvidenceUploadRequest {
+  file: SelectedMediaAsset;
+  metadata: EvidenceUploadMetadata;
+}
+
+/**
+ * Modelo de dominio de una evidencia multimedia asociada a una orden de trabajo (`EvidenciaLeida` en MS4).
  */
 export interface Evidence {
   id: string;
   orderId: string;
   budgetId: string | null;
-  context: string;
-  fileKind: string;
+  context: EvidenceContext;
+  fileType?: string;
+  /** Compatibilidad con vistas anteriores basadas en evidencia fotográfica. */
+  fileKind?: string;
   visibleToClient: boolean;
   status: string;
   originalName: string;
   contentType: string;
   sizeBytes: number;
   createdAt: string;
+}
+
+/**
+ * URL prefirmada de corta duración para descargar una evidencia (`UrlDescarga` en MS4).
+ */
+export interface EvidenceDownloadUrl {
+  url: string;
+  expiresInSeconds: number;
 }

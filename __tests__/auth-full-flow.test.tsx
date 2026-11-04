@@ -70,7 +70,7 @@ describe('flujo completo de Login → rol → Logout', () => {
       const response = mockAuthResponses[role];
       login.mockResolvedValueOnce(response);
 
-      const router = renderRouterWithProviders(routes, {
+      const router = await renderRouterWithProviders(routes, {
         initialUrl: '/login',
       });
       await router;
@@ -85,7 +85,7 @@ describe('flujo completo de Login → rol → Logout', () => {
       );
       await fireEvent.press(screen.getByTestId('login-submit'));
 
-      await waitFor(() => expect(router.getPathname()).toBe(expectedRoute));
+      await waitFor(() => expect(screen).toHavePathname(expectedRoute));
       expect(screen.getByText(expectedHeading)).toBeTruthy();
       expect(useAuthStore.getState()).toMatchObject({
         user: response.user,
@@ -100,7 +100,7 @@ describe('flujo completo de Login → rol → Logout', () => {
 
       await fireEvent.press(screen.getByText('Cerrar sesión'));
 
-      await waitFor(() => expect(router.getPathname()).toBe('/login'));
+      await waitFor(() => expect(screen).toHavePathname('/login'));
       expect(screen.getByTestId('login-submit')).toBeTruthy();
       expect(useAuthStore.getState()).toMatchObject({
         user: null,
@@ -120,7 +120,7 @@ it.each(roleCases)('permite reintentar una limpieza fallida desde el logout de %
   deleteItem.mockReset().mockResolvedValue(undefined);
   deleteItem.mockRejectedValueOnce(new Error('fallo de almacenamiento'));
   const response = mockAuthResponses[role];
-  const router = renderRouterWithProviders(routes, {
+  const router = await renderRouterWithProviders(routes, {
     initialUrl: route,
     initialAuthState: {
       ...response, role, isAuthenticated: true, isHydrated: true, isLoading: false,
@@ -128,7 +128,7 @@ it.each(roleCases)('permite reintentar una limpieza fallida desde el logout de %
   });
   await router;
   await fireEvent.press(screen.getByText('Cerrar sesión'));
-  await waitFor(() => expect(router.getPathname()).toBe('/login'));
+  await waitFor(() => expect(screen).toHavePathname('/login'));
   expect(await screen.findByText(/no se pudieron borrar todos los datos/)).toBeTruthy();
   expect(useAuthStore.getState().isAuthenticated).toBe(false);
   await fireEvent.press(screen.getByRole('button', { name: 'Reintentar' }));
@@ -144,21 +144,21 @@ it.each(roleCases)('recupera %s al arrancar y no recupera la sesión después de
   setItem.mockReset().mockImplementation(async (key, value) => { disk.set(key, value); });
   deleteItem.mockReset().mockImplementation(async (key) => { disk.delete(key); });
   const appRoutes = { ...routes, _layout: RootLayout };
-  const router = renderRouterWithProviders(appRoutes, {
+  const router = await renderRouterWithProviders(appRoutes, {
     initialUrl: '/', initialAuthState: { isLoading: true, isHydrated: false },
   });
   await router;
-  await waitFor(() => expect(router.getPathname()).toBe(route));
+  await waitFor(() => expect(screen).toHavePathname(route));
   expect(useAuthStore.getState().role).toBe(role);
   await fireEvent.press(screen.getByText('Cerrar sesión'));
-  await waitFor(() => expect(router.getPathname()).toBe('/login'));
+  await waitFor(() => expect(screen).toHavePathname('/login'));
   await waitFor(() => expect(disk.size).toBe(0));
   await cleanup();
   resetStores();
-  const restarted = renderRouterWithProviders(appRoutes, {
+  const restarted = await renderRouterWithProviders(appRoutes, {
     initialUrl: '/', initialAuthState: { isLoading: true, isHydrated: false },
   });
   await restarted;
-  await waitFor(() => expect(restarted.getPathname()).toBe('/login'));
+  await waitFor(() => expect(screen).toHavePathname('/login'));
   expect(useAuthStore.getState()).toMatchObject({ isAuthenticated: false, token: null, role: null });
 });

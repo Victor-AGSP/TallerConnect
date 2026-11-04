@@ -16,6 +16,10 @@ import {
   screen,
   waitFor,
 } from '../test-utils';
+import ClienteOrderDetailRoute from '@/app/(cliente)/ordenes/[id]';
+import MecanicoOrderDetailRoute from '@/app/(mecanico)/ordenes/[id]';
+import { vehiclesService } from '@/services/vehicles.service';
+import { mockVehicles } from '@/mocks/vehicles.mock';
 import AdminLayout from '@/app/(admin)/_layout';
 import OrdenScreen from '@/app/(admin)/ordenes/[id]';
 import AuthLayout from '@/app/(auth)/_layout';
@@ -68,15 +72,17 @@ const routes = {
   '(cliente)/_layout': ClienteLayout,
   '(cliente)/cliente': () => <Text>Portal cliente</Text>,
   '(cliente)/mis-ordenes/[id]': MiOrdenScreen,
+  '(cliente)/ordenes/[id]': ClienteOrderDetailRoute,
   '(mecanico)/_layout': MecanicoLayout,
   '(mecanico)/mecanico': () => <Text>Panel mecánico</Text>,
   '(mecanico)/ordenes-asignadas/[id]': OrdenAsignadaScreen,
+  '(mecanico)/ordenes/[id]': MecanicoOrderDetailRoute,
 };
 
 const PATH_BY_ROLE: Record<UserRole, string> = {
   cliente: '/mis-ordenes/31',
   mecanico: '/ordenes-asignadas/31',
-  administrador: '/ordenes/31',
+  administrador: '/(admin)/ordenes/31',
 };
 
 const ID_VISIBLE = '11111111-1111-4111-8111-111111111111';
@@ -200,6 +206,28 @@ afterAll(() => {
 });
 
 describe('Visualización de evidencias por rol', () => {
+  it.each<UserRole>(['cliente', 'mecanico'])(
+    'la nueva ruta de %s conserva evidencias y sus acciones por rol',
+    async (role) => {
+      jest.spyOn(vehiclesService, 'getVehicleById').mockResolvedValue(mockVehicles[0]);
+      handlers.push(ok([VISIBLE, HIDDEN]));
+      await openAs(role, role === 'cliente' ? '/(cliente)/ordenes/31' : '/(mecanico)/ordenes/31');
+      await showEvidence();
+      await screen.findByTestId(`order-evidence-${ID_VISIBLE}`);
+      expect(requests(/evidencias/)).toHaveLength(1);
+      expect(requests(/evidencias/)[0][0].params).toEqual({ orden_id: 31 });
+      if (role === 'cliente') {
+        expect(screen.queryByTestId(`order-evidence-${ID_HIDDEN}`)).toBeNull();
+        expect(screen.getByRole('button', { name: 'Ver presupuesto' })).toBeTruthy();
+        expect(screen.queryByTestId('order-update-panel')).toBeNull();
+      } else {
+        expect(screen.getByTestId(`order-evidence-${ID_HIDDEN}`)).toBeTruthy();
+        expect(screen.getByTestId('order-update-panel')).toBeTruthy();
+        expect(screen.getByTestId('evidence-capture-panel')).toBeTruthy();
+      }
+    },
+  );
+
   it.each<UserRole>(['cliente', 'mecanico', 'administrador'])(
     'abrir la orden como %s no consulta evidencias hasta que se piden',
     async (role) => {
@@ -272,18 +300,18 @@ describe('Visualización de evidencias por rol', () => {
   it('sin sesión la ruta redirige al login y no consulta evidencias', async () => {
     await openAs(null, '/mis-ordenes/31');
 
-    await waitFor(() => expect(view.getPathname()).toBe('/login'));
+    await waitFor(() => expect(screen).toHavePathname('/login'));
     expect(adapter).not.toHaveBeenCalled();
   });
 
   it.each<[UserRole, string]>([
     ['cliente', '/ordenes-asignadas/31'],
-    ['cliente', '/ordenes/31'],
+    ['cliente', '/(admin)/ordenes/31'],
     ['mecanico', '/mis-ordenes/31'],
   ])('%s no accede a %s: la guarda redirige sin solicitudes', async (role, path) => {
     await openAs(role, path);
 
-    await waitFor(() => expect(view.getPathname()).not.toBe(path));
+    await waitFor(() => expect(screen).toHavePathname(role === 'cliente' ? '/cliente' : '/mecanico'));
     expect(screen.queryByTestId('order-evidence-list')).toBeNull();
     expect(adapter).not.toHaveBeenCalled();
   });
@@ -305,7 +333,7 @@ describe('Visualización de evidencias por rol', () => {
       expect(screen.getByText('No tienes permisos para ver las evidencias de esta orden.')).toBeTruthy(),
     );
     expect(useAuthStore.getState().isAuthenticated).toBe(true);
-    expect(view.getPathname()).toBe('/mis-ordenes/31');
+    expect(screen).toHavePathname('/mis-ordenes/31');
   });
 
   it('una lista vacía se muestra como tal', async () => {

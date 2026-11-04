@@ -1,993 +1,587 @@
-import { useRouter } from 'expo-router';
 
+import { useCallback, useEffect, useMemo, useState } from 'react';
+import { SafeAreaView } from 'react-native-safe-area-context';
+import { useRouter } from 'expo-router';
 import {
-  Platform,
+  ActivityIndicator,
+  Pressable,
+  RefreshControl,
   ScrollView,
   StyleSheet,
   Text,
   View,
 } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
 
-import { Button } from '@/components/common';
-import { StatusPill } from '@/components/ui/StatusPill';
+import { EmptyState, ErrorMessage } from '@/components/common';
+import { ORDER_STATUS_LABELS } from '@/constants/orderStatus';
+import { colors, radius, spacing } from '@/constants/theme';
+import type { WorkOrder } from '@/models/order.model';
+import type { Vehicle } from '@/models/vehicle.model';
+import { ordersService } from '@/services/orders.service';
+import { vehiclesService } from '@/services/vehicles.service';
 import { useAuthStore } from '@/stores/authStore';
-
-import {
-  colors,
-  radius,
-  spacing,
-} from '@/constants/theme';
 
 export default function AdministradorScreen() {
   const router = useRouter();
-  const logout = useAuthStore(
-  (state) => state.logout
-);
+  const logout = useAuthStore((state) => state.logout);
+
+  const [orders, setOrders] = useState<WorkOrder[]>([]);
+  const [vehicles, setVehicles] = useState<Vehicle[]>([]);
+  const [ordersError, setOrdersError] = useState<string | null>(null);
+  const [vehiclesError, setVehiclesError] = useState<string | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
+  const [isRefreshing, setIsRefreshing] = useState(false);
+
+  const loadDashboard = useCallback(async () => {
+    try {
+      const [ordersResult, vehiclesResult] = await Promise.allSettled([
+        ordersService.getOrders(),
+        vehiclesService.getVehicles(),
+      ]);
+
+      if (ordersResult.status === 'fulfilled') {
+        setOrders(ordersResult.value);
+      } else {
+        setOrdersError(
+          ordersResult.reason instanceof Error
+            ? ordersResult.reason.message
+            : 'No fue posible cargar las órdenes.',
+        );
+      }
+
+      if (vehiclesResult.status === 'fulfilled') {
+        setVehicles(vehiclesResult.value);
+      } else {
+        setVehiclesError(
+          vehiclesResult.reason instanceof Error
+            ? vehiclesResult.reason.message
+            : 'No fue posible cargar los vehículos.',
+        );
+      }
+    } finally {
+      setIsLoading(false);
+      setIsRefreshing(false);
+    }
+  }, []);
+
+  const reload = (refresh = false) => {
+    if (refresh) {
+      setIsRefreshing(true);
+    } else {
+      setIsLoading(true);
+    }
+
+    setOrdersError(null);
+    setVehiclesError(null);
+
+    void loadDashboard();
+  };
+
+  useEffect(() => {
+    void loadDashboard();
+  }, [loadDashboard]);
+
+  const metrics = useMemo(() => {
+    const activeOrders = orders.filter(
+      (order) =>
+        order.status !== 'entregado' && order.status !== 'cancelado',
+    );
+
+    const awaitingApproval = orders.filter(
+      (order) => order.status === 'esperando_aprobacion_presupuesto',
+    );
+
+    const assignedMechanics = new Set(
+      activeOrders
+        .map((order) => order.assignedMechanicId)
+        .filter((id): id is string => id !== null),
+    );
+
+    return {
+      vehicles: vehicles.length,
+      activeOrders: activeOrders.length,
+      awaitingApproval: awaitingApproval.length,
+      assignedMechanics: assignedMechanics.size,
+    };
+  }, [orders, vehicles]);
+
+  const vehicleById = useMemo(
+    () => new Map(vehicles.map((vehicle) => [vehicle.id, vehicle])),
+    [vehicles],
+  );
+
+  const recentOrders = useMemo(
+    () =>
+      [...orders]
+        .sort(
+          (a, b) =>
+            new Date(b.updatedAt).getTime() -
+            new Date(a.updatedAt).getTime(),
+        )
+        .slice(0, 4),
+    [orders],
+  );
+
+  const handleLogout = async () => {
+    await logout();
+    router.replace('/login');
+  };
+
+  if (isLoading) {
+    return (
+      <SafeAreaView style={styles.safeArea}>
+        <View style={styles.centered}>
+          <ActivityIndicator size="large" color={colors.primary} />
+          <Text style={styles.loadingText}>
+            Cargando panel de administración...
+          </Text>
+        </View>
+      </SafeAreaView>
+    );
+  }
+
   return (
-    <SafeAreaView style={styles.root}>
+    <SafeAreaView style={styles.safeArea}>
       <ScrollView
-        contentContainerStyle={styles.container}
+        contentContainerStyle={styles.content}
         showsVerticalScrollIndicator={false}
-        keyboardShouldPersistTaps="handled"
-        keyboardDismissMode={
-          Platform.OS === 'ios'
-            ? 'interactive'
-            : 'on-drag'
+        refreshControl={
+          <RefreshControl
+            refreshing={isRefreshing}
+            onRefresh={() => void reload(true)}
+          />
         }
       >
-
-        {/* =====================================
-            ENCABEZADO
-            ===================================== */}
-{/* =====================================
-            ENCABEZADO
-            ===================================== */}
-
         <View style={styles.header}>
-          <Text style={styles.eyebrow}>
-            Administración
-          </Text>
+          <View style={styles.headerText}>
+            <Text style={styles.eyebrow}>TALLERCONNECT</Text>
+            <Text accessibilityRole="header" style={styles.title}>Panel del taller</Text>
+            <Text style={styles.subtitle}>
+              Resumen general del funcionamiento del taller.
+            </Text>
+          </View>
 
-          <Text
-            accessibilityRole="header"
-            style={styles.title}
+          <Pressable
+            style={styles.logoutButton}
+            onPress={() => void handleLogout()}
+            accessibilityRole="button"
           >
-            Panel del taller
-          </Text>
-
-          <Text style={styles.subtitle}>
-            Vista general de vehículos, órdenes y
-            actividad operativa del taller.
-          </Text>
+            <Text style={styles.logoutText}>Cerrar sesión</Text>
+          </Pressable>
         </View>
 
-        {/* =====================================
-            MÉTRICAS
-            ===================================== */}
+        <Text accessibilityRole="header" style={styles.sectionTitle}>Resumen general</Text>
 
-        <View style={styles.stats}>
-          <Stat
-            value="12"
-            label="Vehículos en atención"
+        <View style={styles.metricsGrid}>
+          <MetricCard
+            label="Vehículos registrados"
+            value={metrics.vehicles}
+            accent={colors.info}
           />
-
-          <Stat
-            value="8"
+          <MetricCard
             label="Órdenes activas"
+            value={metrics.activeOrders}
+            accent={colors.success}
           />
-
-          <Stat
-            value="4"
-            label="Mecánicos activos"
+          <MetricCard
+            label="Pendientes de aprobación"
+            value={metrics.awaitingApproval}
+            accent={colors.warning}
           />
-
-          <Stat
-            value="3"
-            label="Esperando aprobación"
-          />
-        </View>
-
-        {/* =====================================
-            ESTADO DE LAS ÓRDENES
-            ===================================== */}
-
-        <View style={styles.card}>
-          <Text
-            accessibilityRole="header"
-            style={styles.cardTitle}
-          >
-            Estado de las órdenes
-          </Text>
-
-          <Text style={styles.cardSubtitle}>
-            Resumen operativo de demostración.
-          </Text>
-
-          <View style={styles.statusList}>
-            <StatusRow
-              label="Diagnóstico"
-              value="2"
-              tone="info"
-            />
-
-            <StatusRow
-              label="En reparación"
-              value="4"
-              tone="warning"
-            />
-
-            <StatusRow
-              label="Listas para entrega"
-              value="2"
-              tone="success"
-            />
-
-            <StatusRow
-              label="Esperando aprobación"
-              value="3"
-              tone="danger"
-            />
-          </View>
-        </View>
-
-        {/* =====================================
-            VEHÍCULOS EN ATENCIÓN
-            ===================================== */}
-
-        <View style={styles.card}>
-          <Text
-            accessibilityRole="header"
-            style={styles.cardTitle}
-          >
-            Vehículos en atención
-          </Text>
-
-          <Text style={styles.cardSubtitle}>
-            Operaciones actuales del taller.
-          </Text>
-
-          <View style={styles.orders}>
-            <AdminOrder
-              code="OT-00124"
-              plate="AB-CD-12"
-              status="En reparación"
-            />
-
-            <AdminOrder
-              code="OT-00125"
-              plate="EF-GH-34"
-              status="Diagnóstico"
-            />
-
-            <AdminOrder
-              code="OT-00126"
-              plate="IJ-KL-56"
-              status="Espera presupuesto"
-            />
-
-            <AdminOrder
-              code="OT-00127"
-              plate="XY-ZW-90"
-              status="Listo para entrega"
-            />
-          </View>
-        </View>
-
-        {/* =====================================
-            MECÁNICOS
-            ===================================== */}
-
-        <View style={styles.card}>
-          <Text
-            accessibilityRole="header"
-            style={styles.cardTitle}
-          >
-            Mecánicos
-          </Text>
-
-          <Text style={styles.cardSubtitle}>
-            Resumen de la actividad del equipo.
-          </Text>
-
-          <Mechanic
-            name="Mecánico de demostración"
-            orders="3 órdenes asignadas"
-            status="Activo"
-          />
-
-          <Mechanic
-            name="Segundo mecánico"
-            orders="2 órdenes asignadas"
-            status="Activo"
-          />
-
-          <Mechanic
-            name="Tercer mecánico"
-            orders="Sin órdenes asignadas"
-            status="Disponible"
+          <MetricCard
+            label="Mecánicos asignados"
+            value={metrics.assignedMechanics}
+            accent={colors.accent}
           />
         </View>
 
-        {/* =====================================
-            APROBACIONES
-            ===================================== */}
+        {vehiclesError ? (
+          <ErrorMessage
+            title="No se pudieron cargar los vehículos"
+            message={vehiclesError}
+            onRetry={() => void reload()}
+          />
+        ) : null}
 
-        <View style={styles.card}>
-          <Text
-            accessibilityRole="header"
-            style={styles.cardTitle}
-          >
-            Pendientes de aprobación
-          </Text>
+        {ordersError ? (
+          <ErrorMessage
+            title="No se pudieron cargar las órdenes"
+            message={ordersError}
+            onRetry={() => void reload()}
+          />
+        ) : null}
 
-          <Text style={styles.cardSubtitle}>
-            Elementos que requieren revisión
-            administrativa.
-          </Text>
+        <Text accessibilityRole="header" style={styles.sectionTitle}>Accesos rápidos</Text>
 
-          <Approval
-            order="OT-00126"
-            vehicle="IJ-KL-56"
-            amount="$185.000"
+        <View style={styles.actions}>
+          <ActionCard
+            title="Ver vehículos registrados"
+            description="Consultar los vehículos registrados"
+            icon="🚗"
+            onPress={() => router.push('/(admin)/vehiculos')}
           />
 
-          <Approval
-            order="OT-00129"
-            vehicle="MN-OP-78"
-            amount="$240.000"
+          <ActionCard
+            title="Inventario"
+            description="Revisar repuestos y proveedores"
+            icon="📦"
+            onPress={() => router.push('/(admin)/inventario')}
           />
-
-          <Approval
-            order="OT-00130"
-            vehicle="QR-ST-12"
-            amount="$95.000"
+          <ActionCard
+            title="Ver repuestos"
+            description="Consultar el catálogo y sus existencias"
+            icon="🔧"
+            onPress={() => router.push('/(admin)/repuestos')}
+          />
+          <ActionCard
+            title="Ver proveedores"
+            description="Consultar los proveedores registrados"
+            icon="🏭"
+            onPress={() => router.push('/(admin)/proveedores')}
           />
         </View>
 
-        {/* =====================================
-            ACTIVIDAD
-            ===================================== */}
-
-        <View style={styles.card}>
-          <Text
-            accessibilityRole="header"
-            style={styles.cardTitle}
-          >
-            Resumen del sistema
+        <View style={styles.sectionHeader}>
+          <Text accessibilityRole="header" style={styles.sectionTitle}>Órdenes recientes</Text>
+          <Text style={styles.orderCount}>
+            {ordersError ? 'No disponibles' : `${orders.length} registradas`}
           </Text>
-
-          <View
-            accessible
-            accessibilityLabel="Vehículos registrados: 32"
-            style={styles.systemRow}
-          >
-            <Text style={styles.systemLabel}>
-              Vehículos registrados
-            </Text>
-
-            <Text style={styles.systemValue}>
-              32
-            </Text>
-          </View>
-
-          <View
-            accessible
-            accessibilityLabel="Órdenes completadas: 87"
-            style={styles.systemRow}
-          >
-            <Text style={styles.systemLabel}>
-              Órdenes completadas
-            </Text>
-
-            <Text style={styles.systemValue}>
-              87
-            </Text>
-          </View>
-
-          <View
-            accessible
-            accessibilityLabel="Mecánicos registrados: 6"
-            style={styles.systemRow}
-          >
-            <Text style={styles.systemLabel}>
-              Mecánicos registrados
-            </Text>
-
-            <Text style={styles.systemValue}>
-              6
-            </Text>
-          </View>
-
-          <View
-            accessible
-            accessibilityLabel="Clientes registrados: 41"
-            style={styles.systemRow}
-          >
-            <Text style={styles.systemLabel}>
-              Clientes registrados
-            </Text>
-
-            <Text style={styles.systemValue}>
-              41
-            </Text>
-          </View>
         </View>
 
-        {/* =====================================
-            CERRAR SESIÓN
-            ===================================== */}
-        <Button
-          title="Ver mis vehículos"
-          onPress={() => router.push('/(admin)/vehiculos')}
-          style={styles.logoutButton}
-        />
-        <Button
-          title="Ver vehículos registrados"
-          onPress={() => router.push('./vehiculos')}
-          style={styles.navButton}
-        />
+        {ordersError ? (
+          <EmptyState
+            title="Órdenes no disponibles"
+            message="No se pudo obtener la información de las órdenes. Intenta nuevamente más tarde."
+          />
+        ) : recentOrders.length === 0 ? (
+          <EmptyState
+            title="Sin órdenes registradas"
+            message="Cuando existan órdenes de trabajo, aparecerán en esta sección."
+          />
+        ) : (
+          <View style={styles.ordersList}>
+            {recentOrders.map((order) => {
+              const vehicle = vehicleById.get(order.vehicleId);
+              const statusLabel =
+                ORDER_STATUS_LABELS[order.status] ?? order.status;
 
-        <Button
-          title="Ver repuestos"
-          onPress={() => router.push('./repuestos')}
-          style={styles.navButton}
-        />
+              return (
+                <Pressable
+                  key={order.id}
+                  style={({ pressed }) => [
+                    styles.orderCard,
+                    pressed && styles.orderCardPressed,
+                  ]}
+                  onPress={() =>
+                    router.push(`/(admin)/ordenes/${order.id}`)
+                  }
+                  accessibilityRole="button"
+                  accessibilityLabel={`Orden OT ${order.id.toUpperCase()}. ${vehicle ? `Patente ${vehicle.plate}` : `Vehículo ${order.vehicleId}`}. Estado: ${statusLabel}`}
+                >
+                  <View style={styles.orderTop}>
+                    <Text style={styles.orderId}>
+                      OT {order.id.toUpperCase()}
+                    </Text>
+                    <Text style={styles.orderDate}>
+                      {new Date(order.updatedAt).toLocaleDateString('es-CL')}
+                    </Text>
+                  </View>
 
-        <Button
-          title="Ver proveedores"
-          onPress={() => router.push('./proveedores')}
-          style={styles.navButton}
-        />
+                  <Text style={styles.vehicleName}>
+                    {vehicle
+                      ? `${vehicle.brand} ${vehicle.model} · ${vehicle.plate}`
+                      : `Vehículo ${order.vehicleId}`}
+                  </Text>
 
-        <Button
-          title="Cerrar sesión"
-          variant="outline"
-          onPress={async () => {
-          await logout();
-          router.replace('/login');
-          }}
-          style={styles.logoutButton}
-        />
+                  <View style={styles.statusContainer}>
+                    <Text style={styles.statusText}>{statusLabel}</Text>
+                  </View>
+                </Pressable>
+              );
+            })}
+          </View>
+        )}
+
+        <Text style={styles.footer}>
+          Desliza hacia abajo para actualizar la información.
+        </Text>
       </ScrollView>
     </SafeAreaView>
   );
 }
 
-/* ==========================================
-   COMPONENTES
-   ========================================== */
-
-function Stat({
-  value,
-  label,
-}: {
-  value: string;
+interface MetricCardProps {
   label: string;
-}) {
-  return (
-    <View
-      accessible
-      accessibilityLabel={`${label}: ${value}`}
-      style={styles.stat}
-    >
-      <Text style={styles.statValue}>
-        {value}
-      </Text>
+  value: number;
+  accent: string;
+}
 
-      <Text style={styles.statLabel}>
-        {label}
-      </Text>
+function MetricCard({ label, value, accent }: MetricCardProps) {
+  return (
+    <View accessible accessibilityLabel={`${label}: ${value}`} style={styles.metricCard}>
+      <View style={[styles.metricAccent, { backgroundColor: accent }]} />
+      <Text style={styles.metricValue}>{value}</Text>
+      <Text style={styles.metricLabel}>{label}</Text>
     </View>
   );
 }
 
-function StatusRow({
-  label,
-  value,
-  tone,
-}: {
-  label: string;
-  value: string;
-  tone:
-    | 'success'
-    | 'warning'
-    | 'info'
-    | 'danger';
-}) {
-  return (
-    <View
-      accessible
-      accessibilityLabel={`${label}: ${value}`}
-      style={styles.statusRow}
-    >
-      <Text style={styles.statusLabel}>
-        {label}
-      </Text>
+interface ActionCardProps {
+  title: string;
+  description: string;
+  icon: string;
+  onPress: () => void;
+}
 
-      <StatusPill
-        label={value}
-        tone={tone}
-      />
-    </View>
+function ActionCard({
+  title,
+  description,
+  icon,
+  onPress,
+}: ActionCardProps) {
+  return (
+    <Pressable
+      style={({ pressed }) => [
+        styles.actionCard,
+        pressed && styles.actionCardPressed,
+      ]}
+      onPress={onPress}
+      accessibilityRole="button"
+      accessibilityLabel={title}
+    >
+      <View style={styles.actionCardTop}>
+        <View style={styles.actionIcon}>
+          <Text style={styles.actionIconText}>{icon}</Text>
+        </View>
+
+        <Text style={styles.actionArrow}>↗</Text>
+      </View>
+
+      <Text style={styles.actionTitle}>{title}</Text>
+
+      <Text style={styles.actionDescription}>{description}</Text>
+
+      <Text style={styles.actionLink}>Explorar sección →</Text>
+    </Pressable>
   );
 }
-
-function AdminOrder({
-  code,
-  plate,
-  status,
-}: {
-  code: string;
-  plate: string;
-  status: string;
-}) {
-  const color =
-    getStatusColor(status);
-
-  return (
-    <View
-      accessible
-      accessibilityLabel={`Orden ${code}. Patente ${plate}. Estado: ${status}`}
-      style={styles.orderRow}
-    >
-      <View style={styles.orderLeft}>
-        <Text style={styles.orderCode}>
-          {code}
-        </Text>
-
-        <Text style={styles.orderPlate}>
-          {plate}
-        </Text>
-      </View>
-
-      <View style={styles.orderStatus}>
-        <View
-          style={[
-            styles.statusDot,
-            {
-              backgroundColor: color,
-            },
-          ]}
-        />
-
-        <Text
-          style={[
-            styles.orderStatusText,
-            {
-              color,
-            },
-          ]}
-        >
-          {status.toUpperCase()}
-        </Text>
-      </View>
-    </View>
-  );
-}
-
-function Mechanic({
-  name,
-  orders,
-  status,
-}: {
-  name: string;
-  orders: string;
-  status: string;
-}) {
-  return (
-    <View
-      accessible
-      accessibilityLabel={`${name}. ${orders}. Estado: ${status}`}
-      style={styles.mechanicRow}
-    >
-      <View style={styles.mechanicInfo}>
-        <Text style={styles.mechanicName}>
-          {name}
-        </Text>
-
-        <Text style={styles.mechanicDetail}>
-          {orders}
-        </Text>
-      </View>
-
-      <StatusPill
-        label={status}
-        tone="success"
-      />
-    </View>
-  );
-}
-
-function Approval({
-  order,
-  vehicle,
-  amount,
-}: {
-  order: string;
-  vehicle: string;
-  amount: string;
-}) {
-  return (
-    <View
-      accessible
-      accessibilityLabel={`Orden ${order}. Vehículo ${vehicle}. Monto ${amount}. Pendiente de aprobación`}
-      style={styles.approvalRow}
-    >
-      <View>
-        <Text style={styles.approvalOrder}>
-          {order}
-        </Text>
-
-        <Text style={styles.approvalVehicle}>
-          {vehicle}
-        </Text>
-      </View>
-
-      <View style={styles.approvalRight}>
-        <Text style={styles.approvalAmount}>
-          {amount}
-        </Text>
-
-        <Text style={styles.approvalPending}>
-          Pendiente
-        </Text>
-      </View>
-    </View>
-  );
-}
-
-function getStatusColor(
-  status: string
-) {
-  const normalized =
-    status.toUpperCase();
-
-  if (
-    normalized.includes('DIAGNÓSTICO')
-  ) {
-    return colors.warning;
-  }
-
-  if (
-    normalized.includes('ESPERA')
-  ) {
-    return colors.info;
-  }
-
-  if (
-    normalized.includes('REPARACIÓN')
-  ) {
-    return colors.success;
-  }
-
-  if (
-    normalized.includes('ENTREGA')
-  ) {
-    return colors.info;
-  }
-
-  return colors.textSecondary;
-}
-
-/* ==========================================
-   TEMA
-   ========================================== */
-
-const localTheme = {
-  background: colors.background,
-  surface: colors.surface,
-  surfaceSoft: colors.surfaceSoft,
-  border: colors.border,
-
-  primary: colors.primary,
-  primaryDark: colors.primary,
-
-  text: colors.text,
-  textSecondary: colors.textSecondary,
-  textMuted: colors.textSecondary,
-
-  accent: colors.accent,
-  info: colors.info,
-  success: colors.success,
-  warning: colors.warning,
-  danger: colors.danger,
-};
-
-/* ==========================================
-   ESTILOS
-   ========================================== */
 
 const styles = StyleSheet.create({
-  root: {
+  safeArea: {
     flex: 1,
-    backgroundColor: localTheme.background,
+    backgroundColor: colors.background,
   },
-
-  container: {
-    paddingHorizontal: spacing.lg,
+  content: {
+    padding: spacing.lg,
     paddingBottom: spacing.xxl,
+    gap: spacing.lg,
   },
-
-  decorations: {
-    position: 'absolute',
-    top: 0,
-    right: 0,
-    bottom: 0,
-    left: 0,
-    overflow: 'hidden',
+  centered: {
+    flex: 1,
+    alignItems: 'center',
+    justifyContent: 'center',
+    padding: spacing.xl,
   },
-
-  orbRedLarge: {
-    position: 'absolute',
-    width: 300,
-    height: 300,
-    borderRadius: 150,
-    backgroundColor: localTheme.primary,
-    top: -50,
-    right: -100,
-    opacity: 0.15,
+  loadingText: {
+    marginTop: spacing.md,
+    color: colors.textSecondary,
+    fontSize: 14,
   },
-
-  orbDarkRed: {
-    position: 'absolute',
-    width: 200,
-    height: 200,
-    borderRadius: 100,
-    backgroundColor: localTheme.primaryDark,
-    top: 400,
-    left: -80,
-    opacity: 0.25,
-  },
-
-  crystalRed: {
-    position: 'absolute',
-    width: 80,
-    height: 80,
-    borderRadius: 16,
-    backgroundColor: localTheme.primary,
-    top: 150,
-    left: -20,
-    opacity: 0.15,
-    transform: [
-      {
-        rotate: '45deg',
-      },
-    ],
-  },
-
-  crystalGrey: {
-    position: 'absolute',
-    width: 100,
-    height: 100,
-    borderRadius: 20,
-    backgroundColor: colors.surfaceSoft,
-    bottom: 200,
-    right: -40,
-    opacity: 0.2,
-    transform: [
-      {
-        rotate: '45deg',
-      },
-    ],
-  },
-
-  ringStrong1: {
-    position: 'absolute',
-    width: 120,
-    height: 120,
-    borderRadius: 60,
-    borderWidth: 4,
-    borderColor: localTheme.primary,
-    top: 600,
-    right: -40,
-    opacity: 0.25,
-  },
-
-  ringStrong2: {
-    position: 'absolute',
-    width: 60,
-    height: 60,
-    borderRadius: 30,
-    borderWidth: 2,
-    borderColor: '#444444',
-    top: 50,
-    left: 40,
-    opacity: 0.3,
-  },
-
-  glowDot1: {
-    position: 'absolute',
-    width: 12,
-    height: 12,
-    borderRadius: 6,
-    backgroundColor: localTheme.primary,
-    top: 280,
-    left: 60,
-    opacity: 0.9,
-    shadowColor: localTheme.primary,
-    shadowOffset: {
-      width: 0,
-      height: 0,
-    },
-    shadowOpacity: 1,
-    shadowRadius: 10,
-    elevation: 4,
-  },
-
-  glowDot2: {
-    position: 'absolute',
-    width: 10,
-    height: 10,
-    borderRadius: 5,
-    backgroundColor: '#666666',
-    bottom: 100,
-    right: 70,
-    opacity: 0.5,
-  },
-
-  glowDot3: {
-    position: 'absolute',
-    width: 14,
-    height: 14,
-    borderRadius: 7,
-    backgroundColor: localTheme.primary,
-    top: 100,
-    right: 50,
-    opacity: 0.8,
-  },
-
   header: {
-    marginTop: spacing.xl,
-    marginBottom: spacing.xl,
+    flexDirection: 'row',
+    alignItems: 'flex-start',
+    justifyContent: 'space-between',
+    gap: spacing.md,
   },
-
+  headerText: {
+    flex: 1,
+  },
   eyebrow: {
     color: colors.accent,
-    fontSize: 13,
+    fontSize: 11,
     fontWeight: '900',
-    textTransform: 'uppercase',
-    letterSpacing: 0.5,
-    marginBottom: 4,
+    letterSpacing: 1.5,
   },
-
   title: {
-    color: localTheme.text,
-    fontSize: 30,
+    marginTop: spacing.xs,
+    color: colors.primary,
+    fontSize: 27,
     fontWeight: '900',
-    letterSpacing: -0.5,
-    marginBottom: 8,
   },
-
   subtitle: {
-    color: localTheme.textSecondary,
+    marginTop: spacing.xs,
+    color: colors.textSecondary,
     fontSize: 14,
     lineHeight: 20,
   },
-
-  stats: {
+  logoutButton: {
+    paddingHorizontal: spacing.sm,
+    paddingVertical: spacing.sm,
+    borderRadius: radius.md,
+    backgroundColor: colors.primarySoft,
+  },
+  logoutText: {
+    color: colors.primary,
+    fontSize: 12,
+    fontWeight: '800',
+  },
+  sectionTitle: {
+    color: colors.primary,
+    fontSize: 19,
+    fontWeight: '900',
+  },
+  metricsGrid: {
     flexDirection: 'row',
     flexWrap: 'wrap',
-    gap: spacing.sm,
-    marginBottom: spacing.lg,
+    gap: spacing.md,
   },
-
-  stat: {
-    width: '48%',
+  metricCard: {
+    width: '47%',
+    flexGrow: 1,
     minHeight: 112,
+    padding: spacing.md,
     borderRadius: radius.lg,
-    backgroundColor: localTheme.surfaceSoft,
+    backgroundColor: colors.surface,
     borderWidth: 1,
     borderColor: colors.border,
+  },
+  metricAccent: {
+    width: 30,
+    height: 4,
+    borderRadius: radius.pill,
+    marginBottom: spacing.sm,
+  },
+  metricValue: {
+    color: colors.primary,
+    fontSize: 29,
+    fontWeight: '900',
+  },
+  metricLabel: {
+    marginTop: spacing.xs,
+    color: colors.textSecondary,
+    fontSize: 12,
+    fontWeight: '700',
+  },
+  actions: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    gap: spacing.md,
+  },
+  actionCard: {
+    flex: 1,
+    minWidth: '45%',
+    minHeight: 170,
     padding: spacing.lg,
+    borderRadius: radius.lg,
+    backgroundColor: colors.surface,
+    borderWidth: 1,
+    borderColor: colors.border,
+    justifyContent: 'space-between',
+  },
+  actionCardPressed: {
+    opacity: 0.75,
+    transform: [{ scale: 0.98 }],
+  },
+  actionCardTop: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    marginBottom: spacing.md,
+  },
+  actionIcon: {
+    width: 46,
+    height: 46,
+    borderRadius: radius.md,
+    backgroundColor: colors.primarySoft,
+    alignItems: 'center',
     justifyContent: 'center',
   },
-
-  statValue: {
-    color: localTheme.text,
-    fontSize: 28,
+  actionIconText: {
+    fontSize: 23,
+  },
+  actionArrow: {
+    color: colors.accent,
+    fontSize: 22,
     fontWeight: '900',
   },
-
-  statLabel: {
-    color: localTheme.textSecondary,
-    marginTop: 5,
+  actionTitle: {
+    color: colors.primary,
+    fontSize: 17,
+    fontWeight: '900',
+  },
+  actionDescription: {
+    marginTop: spacing.xs,
+    color: colors.textSecondary,
     fontSize: 12,
-    lineHeight: 17,
+    lineHeight: 18,
   },
-
-  card: {
-    backgroundColor: localTheme.surface,
-    borderRadius: radius.lg,
-    borderWidth: 1,
-    borderColor: colors.border,
-    padding: spacing.lg,
-    marginBottom: spacing.lg,
-
-    shadowColor: colors.primary,
-    shadowOffset: {
-      width: 0,
-      height: 8,
-    },
-    shadowOpacity: 0.4,
-    shadowRadius: 12,
-    elevation: 6,
-  },
-
-  cardTitle: {
-    color: localTheme.text,
-    fontSize: 18,
+  actionLink: {
+    marginTop: spacing.md,
+    color: colors.accent,
+    fontSize: 12,
     fontWeight: '900',
-    marginBottom: 4,
   },
-
-  cardSubtitle: {
-    color: localTheme.textSecondary,
-    fontSize: 13,
-    marginBottom: spacing.lg,
-  },
-
-  statusList: {
-    gap: spacing.md,
-  },
-
-  statusRow: {
+  sectionHeader: {
     flexDirection: 'row',
-    alignItems: 'center',
     justifyContent: 'space-between',
-    paddingBottom: spacing.md,
-    borderBottomWidth: 1,
-    borderBottomColor: localTheme.border,
-  },
-
-  statusLabel: {
-    color: localTheme.text,
-    fontWeight: '700',
-    fontSize: 14,
-  },
-
-  orders: {
-    gap: 0,
-  },
-
-  orderRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    paddingVertical: spacing.md,
-    borderBottomWidth: 1,
-    borderBottomColor: localTheme.border,
-  },
-
-  orderLeft: {
-    flexDirection: 'row',
     alignItems: 'center',
     gap: spacing.sm,
-    flex: 1,
   },
-
-  orderCode: {
-    color: localTheme.text,
-    fontSize: 15,
-    fontWeight: '900',
-  },
-
-  orderPlate: {
-    color: localTheme.textSecondary,
-    fontSize: 14,
-    fontWeight: '600',
-  },
-
-  orderStatus: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 6,
-  },
-
-  statusDot: {
-    width: 8,
-    height: 8,
-    borderRadius: 4,
-  },
-
-  orderStatusText: {
-    fontSize: 11,
-    fontWeight: '900',
-    letterSpacing: 0.2,
-  },
-
-  mechanicRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    gap: spacing.md,
-    paddingVertical: spacing.md,
-    borderBottomWidth: 1,
-    borderBottomColor: localTheme.border,
-  },
-
-  mechanicInfo: {
-    flex: 1,
-  },
-
-  mechanicName: {
-    color: localTheme.text,
-    fontSize: 14,
-    fontWeight: '800',
-  },
-
-  mechanicDetail: {
-    color: localTheme.textSecondary,
+  orderCount: {
+    color: colors.textMuted,
     fontSize: 12,
-    marginTop: 4,
+    fontWeight: '700',
   },
-
-  approvalRow: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
+  ordersList: {
     gap: spacing.md,
-    paddingVertical: spacing.md,
-    borderBottomWidth: 1,
-    borderBottomColor: localTheme.border,
   },
-
-  approvalOrder: {
-    color: localTheme.text,
-    fontSize: 14,
-    fontWeight: '900',
-  },
-
-  approvalVehicle: {
-    color: localTheme.textSecondary,
-    fontSize: 12,
-    marginTop: 4,
-  },
-
-  approvalRight: {
-    alignItems: 'flex-end',
-  },
-
-  approvalAmount: {
-    color: localTheme.text,
-    fontSize: 14,
-    fontWeight: '900',
-  },
-
-  approvalPending: {
-    color: colors.warning,
-    fontSize: 11,
-    fontWeight: '800',
-    marginTop: 4,
-  },
-
-  systemRow: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    paddingVertical: spacing.md,
-    borderBottomWidth: 1,
-    borderBottomColor: localTheme.border,
-  },
-
-  systemLabel: {
-    color: localTheme.textSecondary,
-    fontSize: 13,
-  },
-
-  systemValue: {
-    color: localTheme.text,
-    fontSize: 18,
-    fontWeight: '900',
-  },
-
-  navButton: {
-    marginTop: spacing.sm,
-  },
-
-  logoutButton: {
-    marginTop: spacing.sm,
-    marginBottom: spacing.xl,
+  orderCard: {
+    padding: spacing.md,
+    borderRadius: radius.lg,
+    backgroundColor: colors.surface,
+    borderWidth: 1,
     borderColor: colors.border,
+  },
+  orderCardPressed: {
+    opacity: 0.75,
+  },
+  orderTop: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    gap: spacing.sm,
+  },
+  orderId: {
+    color: colors.primary,
+    fontSize: 14,
+    fontWeight: '900',
+  },
+  orderDate: {
+    color: colors.textMuted,
+    fontSize: 11,
+  },
+  vehicleName: {
+    marginTop: spacing.sm,
+    color: colors.text,
+    fontSize: 14,
+    fontWeight: '700',
+  },
+  statusContainer: {
+    alignSelf: 'flex-start',
+    marginTop: spacing.sm,
+    paddingHorizontal: spacing.sm,
+    paddingVertical: spacing.xs,
+    borderRadius: radius.pill,
+    backgroundColor: colors.primarySoft,
+  },
+  statusText: {
+    color: colors.primary,
+    fontSize: 11,
+    fontWeight: '800',
+  },
+  footer: {
+    color: colors.textMuted,
+    fontSize: 12,
+    textAlign: 'center',
   },
 });

@@ -1,3 +1,4 @@
+import { useRouter } from 'expo-router';
 import { useCallback } from 'react';
 
 import { VehicleListView } from '@/components/vehicles/VehicleListView';
@@ -8,6 +9,7 @@ import { vehiclesService } from '@/services/vehicles.service';
  * Consulta GET /api/vehiculos/mios mediante VehiclesService.
  */
 export default function MisVehiculosScreen() {
+  const router = useRouter();
   const loadVehicles = useCallback(
     () => vehiclesService.getMyVehicles(),
     [],
@@ -19,6 +21,7 @@ export default function MisVehiculosScreen() {
       title="Mis vehículos"
       subtitle="Vehículos registrados a tu nombre en el taller."
       emptyMessage="Todavía no tienes vehículos registrados en el taller."
+      onOpenVehicle={(id) => router.push(`/(cliente)/vehiculos/${id}`)}
       loadVehicles={loadVehicles}
     />
   );

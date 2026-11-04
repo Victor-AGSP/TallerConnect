@@ -53,7 +53,7 @@ describe('flujo de autenticación', () => {
   });
 
   it('valida, muestra errores y completa el login con redirección por rol', async () => {
-    const router = renderRouterWithProviders(routes, {
+    const router = await renderRouterWithProviders(routes, {
       initialUrl: '/login',
     });
 
@@ -74,7 +74,7 @@ describe('flujo de autenticación', () => {
     ).toBeTruthy();
 
     expect(login).not.toHaveBeenCalled();
-    expect(router.getPathname()).toBe('/login');
+    expect(screen).toHavePathname('/login');
 
     login.mockRejectedValueOnce(
       new Error('Credenciales inválidas'),
@@ -90,7 +90,7 @@ describe('flujo de autenticación', () => {
       await screen.findByText('Credenciales inválidas'),
     ).toBeTruthy();
 
-    expect(router.getPathname()).toBe('/login');
+    expect(screen).toHavePathname('/login');
 
     let resolveLogin!:
       (response: typeof mockAuthResponses.cliente) => void;
@@ -125,7 +125,7 @@ describe('flujo de autenticación', () => {
     });
 
     await waitFor(() => {
-      expect(router.getPathname()).toBe('/cliente');
+      expect(screen).toHavePathname('/cliente');
     });
 
     expect(
