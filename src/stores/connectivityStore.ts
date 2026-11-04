@@ -2,6 +2,8 @@ import { create } from 'zustand';
 import axios from 'axios';
 import { ENV } from '@/config/env';
 
+export type ConnectivityIssueType = 'offline' | 'timeout' | 'gateway_unavailable' | null;
+
 export interface ConnectivityState {
   /**
    * Indica si el dispositivo tiene conectividad con la red y la API Gateway.
@@ -24,6 +26,21 @@ export interface ConnectivityState {
   hasNetworkIssue: boolean;
 
   /**
+   * Categoría del problema de conectividad actual (offline, timeout o indisponibilidad de Gateway).
+   */
+  issueType: ConnectivityIssueType;
+
+  /**
+   * Contador de fallos consecutivos de red/conectividad detectados.
+   */
+  consecutiveFailures: number;
+
+  /**
+   * Marca de tiempo ISO de la última verificación activa de conectividad.
+   */
+  lastCheckedAt: string | null;
+
+  /**
    * Actualiza el estado de conectividad directamente.
    */
   setConnected: (connected: boolean) => void;
@@ -31,7 +48,17 @@ export interface ConnectivityState {
   /**
    * Registra un problema de red o timeout detectado por los interceptores.
    */
-  setNetworkIssue: (message: string) => void;
+  setNetworkIssue: (message: string, issueType?: ConnectivityIssueType) => void;
+
+  /**
+   * Registra un fallo estructurado proveniente del interceptor HTTP o capa de servicios.
+   */
+  reportNetworkError: (params: {
+    message: string;
+    isTimeout?: boolean;
+    isServerError?: boolean;
+    status?: number;
+  }) => void;
 
   /**
    * Limpia los errores de red y restablece el estado de conectividad a saludable.
@@ -52,8 +79,11 @@ export interface ConnectivityState {
 const initialState = {
   isConnected: true,
   isChecking: false,
-  errorMessage: null,
+  errorMessage: null as string | null,
   hasNetworkIssue: false,
+  issueType: null as ConnectivityIssueType,
+  consecutiveFailures: 0,
+  lastCheckedAt: null as string | null,
 };
 
 export const useConnectivityStore = create<ConnectivityState>((set, get) => ({
@@ -63,14 +93,38 @@ export const useConnectivityStore = create<ConnectivityState>((set, get) => ({
     set({
       isConnected: connected,
       hasNetworkIssue: !connected,
+      issueType: connected ? null : get().issueType ?? 'offline',
+      consecutiveFailures: connected ? 0 : Math.max(1, get().consecutiveFailures),
       errorMessage: connected ? null : get().errorMessage ?? 'Sin conexión a internet',
     });
   },
 
-  setNetworkIssue: (message: string) => {
+  setNetworkIssue: (message: string, issueType?: ConnectivityIssueType) => {
+    const resolvedType: ConnectivityIssueType =
+      issueType ??
+      (message.toLowerCase().includes('tiempo de espera') ? 'timeout' : 'offline');
+
     set({
       isConnected: false,
       hasNetworkIssue: true,
+      issueType: resolvedType,
+      consecutiveFailures: get().consecutiveFailures + 1,
+      errorMessage: message,
+    });
+  },
+
+  reportNetworkError: ({ message, isTimeout, isServerError, status }) => {
+    const issueType: ConnectivityIssueType = isTimeout
+      ? 'timeout'
+      : isServerError || status === 502 || status === 503 || status === 504
+      ? 'gateway_unavailable'
+      : 'offline';
+
+    set({
+      isConnected: false,
+      hasNetworkIssue: true,
+      issueType,
+      consecutiveFailures: get().consecutiveFailures + 1,
       errorMessage: message,
     });
   },
@@ -79,12 +133,15 @@ export const useConnectivityStore = create<ConnectivityState>((set, get) => ({
     set({
       isConnected: true,
       hasNetworkIssue: false,
+      issueType: null,
+      consecutiveFailures: 0,
       errorMessage: null,
     });
   },
 
   checkConnectivity: async (customPing?: () => Promise<boolean>): Promise<boolean> => {
     set({ isChecking: true });
+    const checkedAt = new Date().toISOString();
 
     try {
       if (customPing) {
@@ -92,37 +149,50 @@ export const useConnectivityStore = create<ConnectivityState>((set, get) => ({
         if (success) {
           get().clearNetworkIssue();
         } else {
-          get().setNetworkIssue('No fue posible conectar con el servidor.');
+          get().setNetworkIssue('No fue posible conectar con el servidor.', 'offline');
         }
-        set({ isChecking: false });
+        set({ isChecking: false, lastCheckedAt: checkedAt });
         return success;
       }
 
       // Verificación directa mediante ping HTTP ligero hacia la API Gateway (timeout de 5s)
       await axios.get(ENV.API_URL, {
-        timeout: 5000,
+        timeout: ENV.PING_TIMEOUT_MS,
         headers: { Accept: 'application/json' },
       });
 
       get().clearNetworkIssue();
-      set({ isChecking: false });
+      set({ isChecking: false, lastCheckedAt: checkedAt });
       return true;
     } catch (error: unknown) {
-      // Si el servidor respondió con cualquier código HTTP (ej. 401, 404, 405), significa que hay conexión de red
+      // Si el servidor respondió con un código HTTP que demuestra alcance a la Gateway (ej. 401, 404, 405)
       if (axios.isAxiosError(error) && error.response) {
+        const status = error.response.status;
+        if (status === 502 || status === 503 || status === 504) {
+          get().setNetworkIssue(
+            'La API Gateway no se encuentra disponible temporalmente.',
+            'gateway_unavailable'
+          );
+          set({ isChecking: false, lastCheckedAt: checkedAt });
+          return false;
+        }
+
         get().clearNetworkIssue();
-        set({ isChecking: false });
+        set({ isChecking: false, lastCheckedAt: checkedAt });
         return true;
       }
 
       // Si no hubo respuesta o fue timeout, la red sigue caída
-      const message =
-        axios.isAxiosError(error) && error.code === 'ECONNABORTED'
-          ? 'Tiempo de espera agotado al verificar conexión.'
-          : 'Backend no disponible o sin conexión a internet.';
+      const isTimeout =
+        axios.isAxiosError(error) &&
+        (error.code === 'ECONNABORTED' || error.code === 'ETIMEDOUT');
 
-      get().setNetworkIssue(message);
-      set({ isChecking: false });
+      const message = isTimeout
+        ? 'Tiempo de espera agotado al verificar conexión.'
+        : 'Backend no disponible o sin conexión a internet.';
+
+      get().setNetworkIssue(message, isTimeout ? 'timeout' : 'offline');
+      set({ isChecking: false, lastCheckedAt: checkedAt });
       return false;
     }
   },
