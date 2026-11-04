@@ -1,12 +1,16 @@
 import axios, { AxiosError, AxiosResponse, InternalAxiosRequestConfig } from 'axios';
 import {
   normalizeApiError,
+  extractApiErrorDetail,
+  normalizeRequestConfig,
+  registerUnauthorizedHandler,
   attachAuthTokenInterceptor,
   attachErrorInterceptor,
 } from '@/services/api/interceptors';
 import { HTTP_STATUS, ApiRequestConfig } from '@/services/api/types';
 import { storage, STORAGE_KEYS } from '@/utils/storage';
 import { useAuthStore } from '@/stores/authStore';
+import { useConnectivityStore } from '@/stores/connectivityStore';
 
 // Mocks
 jest.mock('@/utils/storage', () => ({
@@ -32,6 +36,8 @@ describe('Interceptors y Manejo Centralizado de Errores', () => {
 
   beforeEach(() => {
     jest.clearAllMocks();
+    registerUnauthorizedHandler(null);
+    useConnectivityStore.getState().reset();
     mockedStorage.get.mockReset();
     mockedStorage.set.mockReset();
     mockedStorage.clearSession.mockReset();
@@ -41,7 +47,7 @@ describe('Interceptors y Manejo Centralizado de Errores', () => {
     });
   });
 
-  describe('normalizeApiError', () => {
+  describe('normalizeApiError y extractApiErrorDetail', () => {
     it('extrae el mensaje de error { detail } retornado por la API Gateway', () => {
       const axiosError = {
         isAxiosError: true,
@@ -57,6 +63,32 @@ describe('Interceptors y Manejo Centralizado de Errores', () => {
       expect(result.message).toBe('Las credenciales proporcionadas son inválidas');
       expect(result.isNetworkError).toBe(false);
       expect(result.isTimeout).toBe(false);
+    });
+
+    it('extrae listas de validación FastAPI / OpenAPI (HTTP 422 detail array)', () => {
+      const axiosError = {
+        isAxiosError: true,
+        response: {
+          status: 422,
+          data: {
+            detail: [
+              { loc: ['body', 'patente'], msg: 'Campo obligatorio' },
+              { loc: ['body', 'anio'], msg: 'Debe ser mayor a 1950' },
+            ],
+          },
+        },
+      } as unknown as AxiosError;
+
+      const extracted = extractApiErrorDetail(axiosError.response?.data);
+      const result = normalizeApiError(axiosError);
+
+      expect(extracted.validationErrors).toEqual([
+        'patente: Campo obligatorio',
+        'anio: Debe ser mayor a 1950',
+      ]);
+      expect(result.status).toBe(422);
+      expect(result.message).toContain('patente: Campo obligatorio');
+      expect(result.validationErrors).toHaveLength(2);
     });
 
     it('asigna mensajes por defecto según el código HTTP cuando el backend no envía detail', () => {
@@ -81,8 +113,20 @@ describe('Interceptors y Manejo Centralizado de Errores', () => {
       expect(normalizeApiError(createError(HTTP_STATUS.CONFLICT)).message).toContain(
         'Conflicto'
       );
+      expect(normalizeApiError(createError(HTTP_STATUS.PAYLOAD_TOO_LARGE)).message).toContain(
+        'tamaño máximo'
+      );
+      expect(normalizeApiError(createError(HTTP_STATUS.UNSUPPORTED_MEDIA_TYPE)).message).toContain(
+        'formato del archivo'
+      );
       expect(normalizeApiError(createError(HTTP_STATUS.UNPROCESSABLE_ENTITY)).message).toContain(
         'no son válidos'
+      );
+      expect(normalizeApiError(createError(HTTP_STATUS.TOO_MANY_REQUESTS)).message).toContain(
+        'Demasiadas solicitudes'
+      );
+      expect(normalizeApiError(createError(HTTP_STATUS.SERVICE_UNAVAILABLE)).message).toContain(
+        'disponible temporalmente'
       );
       expect(normalizeApiError(createError(HTTP_STATUS.INTERNAL_SERVER_ERROR)).message).toContain(
         'Error interno en el servidor'
@@ -126,7 +170,23 @@ describe('Interceptors y Manejo Centralizado de Errores', () => {
     });
   });
 
-  describe('attachAuthTokenInterceptor', () => {
+  describe('normalizeRequestConfig y attachAuthTokenInterceptor', () => {
+    it('normaliza rutas relativas evitando duplicar /api y ajusta FormData multipart', () => {
+      const fakeFormData = { append: jest.fn() };
+      const config = {
+        baseURL: 'https://tallerconect.vercel.app/api',
+        url: '/api/evidencias',
+        data: fakeFormData,
+        headers: new axios.AxiosHeaders({ 'Content-Type': 'application/json' }),
+      } as unknown as InternalAxiosRequestConfig & ApiRequestConfig;
+
+      const normalized = normalizeRequestConfig(config);
+
+      expect(normalized.url).toBe('/evidencias');
+      expect(normalized.timeout).toBe(60000);
+      expect(normalized.headers.get('Content-Type')).toBeUndefined();
+    });
+
     it('no envía un token viejo en el login público', async () => {
       mockedStorage.get.mockResolvedValueOnce('token-anterior');
       const client = axios.create();
@@ -138,7 +198,7 @@ describe('Interceptors y Manejo Centralizado de Errores', () => {
         url: '/auth/login',
         headers: new axios.AxiosHeaders(),
       } as InternalAxiosRequestConfig;
-      const result = await requestInterceptor(config) as InternalAxiosRequestConfig;
+      const result = (await requestInterceptor(config)) as InternalAxiosRequestConfig;
       expect(mockedStorage.get).not.toHaveBeenCalled();
       expect(result.headers.Authorization).toBeUndefined();
     });
@@ -154,7 +214,7 @@ describe('Interceptors y Manejo Centralizado de Errores', () => {
         url: '/auth/me',
         headers: new axios.AxiosHeaders({ Authorization: 'Bearer token-nuevo' }),
       } as InternalAxiosRequestConfig;
-      const result = await requestInterceptor(config) as InternalAxiosRequestConfig;
+      const result = (await requestInterceptor(config)) as InternalAxiosRequestConfig;
       expect(result.headers.Authorization).toBe('Bearer token-nuevo');
     });
 
@@ -164,7 +224,6 @@ describe('Interceptors y Manejo Centralizado de Errores', () => {
       const client = axios.create();
       attachAuthTokenInterceptor(client);
 
-      // Obtenemos el interceptor registrado en la instancia
       const requestInterceptor = (client.interceptors.request as unknown as {
         handlers: Array<{ fulfilled: (config: unknown) => Promise<unknown> }>;
       }).handlers[0].fulfilled;
@@ -221,7 +280,8 @@ describe('Interceptors y Manejo Centralizado de Errores', () => {
   });
 
   describe('attachErrorInterceptor', () => {
-    it('pasa transparentemente las respuestas HTTP exitosas', () => {
+    it('pasa transparentemente las respuestas HTTP exitosas y limpia alertas de red previas', () => {
+      useConnectivityStore.getState().setNetworkIssue('Error previo');
       const client = axios.create();
       attachErrorInterceptor(client);
 
@@ -233,6 +293,7 @@ describe('Interceptors y Manejo Centralizado de Errores', () => {
       const result = responseInterceptor(mockResponse);
 
       expect(result).toBe(mockResponse);
+      expect(useConnectivityStore.getState().hasNetworkIssue).toBe(false);
     });
 
     it('coordina el cierre de sesión ante un HTTP 401 en ruta protegida', async () => {
@@ -273,6 +334,46 @@ describe('Interceptors y Manejo Centralizado de Errores', () => {
       expect(mockLogout).toHaveBeenCalledTimes(1);
     });
 
+    it('permite omitir el cierre de sesión en 403 cuando skipSessionLogoutOn403 es true', async () => {
+      const client = axios.create();
+      attachErrorInterceptor(client);
+
+      const errorInterceptor = (client.interceptors.response as unknown as {
+        handlers: Array<{ rejected: (error: unknown) => Promise<never> }>;
+      }).handlers[0].rejected;
+
+      const error403 = {
+        isAxiosError: true,
+        response: { status: HTTP_STATUS.FORBIDDEN, data: { detail: 'Rol insuficiente' } },
+        config: { url: '/proveedores', skipSessionLogoutOn403: true },
+      } as unknown as AxiosError;
+
+      await expect(errorInterceptor(error403)).rejects.toBeDefined();
+      expect(mockLogout).not.toHaveBeenCalled();
+    });
+
+    it('permite usar un manejador desacoplado registrado mediante registerUnauthorizedHandler', async () => {
+      const customHandler = jest.fn();
+      registerUnauthorizedHandler(customHandler);
+
+      const client = axios.create();
+      attachErrorInterceptor(client);
+
+      const errorInterceptor = (client.interceptors.response as unknown as {
+        handlers: Array<{ rejected: (error: unknown) => Promise<never> }>;
+      }).handlers[0].rejected;
+
+      const error401 = {
+        isAxiosError: true,
+        response: { status: HTTP_STATUS.UNAUTHORIZED, data: { detail: 'Expirado' } },
+        config: { url: '/ordenes' },
+      } as unknown as AxiosError;
+
+      await expect(errorInterceptor(error401)).rejects.toBeDefined();
+      expect(customHandler).toHaveBeenCalledWith(401, '/ordenes');
+      expect(mockLogout).not.toHaveBeenCalled();
+    });
+
     it('NO coordina logout si el 401 proviene del endpoint de login (/auth/login)', async () => {
       const client = axios.create();
       attachErrorInterceptor(client);
@@ -303,7 +404,7 @@ describe('Interceptors y Manejo Centralizado de Errores', () => {
       const publicError401 = {
         isAxiosError: true,
         response: { status: HTTP_STATUS.UNAUTHORIZED, data: { detail: 'No autorizado' } },
-        config: { url: '/api/v1/public-data', skipAuth: true } as ApiRequestConfig,
+        config: { url: '/public-endpoint', skipAuth: true },
       } as unknown as AxiosError;
 
       await expect(errorInterceptor(publicError401)).rejects.toBeDefined();
@@ -311,7 +412,7 @@ describe('Interceptors y Manejo Centralizado de Errores', () => {
       expect(mockLogout).not.toHaveBeenCalled();
     });
 
-    it('adjunta el error normalizado en la propiedad normalizedError del error rechazado', async () => {
+    it('adjunta la propiedad normalizedError al error rechazado y notifica a connectivityStore en fallos de red', async () => {
       const client = axios.create();
       attachErrorInterceptor(client);
 
@@ -319,28 +420,21 @@ describe('Interceptors y Manejo Centralizado de Errores', () => {
         handlers: Array<{ rejected: (error: unknown) => Promise<never> }>;
       }).handlers[0].rejected;
 
-      const serverError = {
+      const networkError = {
         isAxiosError: true,
-        response: {
-          status: HTTP_STATUS.CONFLICT,
-          data: { detail: 'El vehículo ya se encuentra registrado' },
-        },
-        config: { url: '/api/v1/vehicles' },
-      } as unknown as AxiosError;
+        message: 'Network Error',
+      } as unknown as AxiosError & { normalizedError?: unknown };
 
       try {
-        await errorInterceptor(serverError);
-        fail('Se esperaba que la promesa fuera rechazada');
-      } catch (err: unknown) {
-        const errorWithNormalized = err as AxiosError & {
-          normalizedError?: { status: number; message: string };
-        };
-        expect(errorWithNormalized.normalizedError).toBeDefined();
-        expect(errorWithNormalized.normalizedError?.status).toBe(HTTP_STATUS.CONFLICT);
-        expect(errorWithNormalized.normalizedError?.message).toBe(
-          'El vehículo ya se encuentra registrado'
-        );
+        await errorInterceptor(networkError);
+      } catch (rejected: unknown) {
+        const err = rejected as { normalizedError?: { isNetworkError: boolean; message: string } };
+        expect(err.normalizedError).toBeDefined();
+        expect(err.normalizedError?.isNetworkError).toBe(true);
+        expect(err.normalizedError?.message).toContain('Backend no disponible');
       }
+
+      expect(useConnectivityStore.getState().hasNetworkIssue).toBe(true);
     });
   });
 });
