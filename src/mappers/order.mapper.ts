@@ -29,7 +29,7 @@ export const STATUS_TO_CODE: Record<WorkOrderStatus, number> = {
  * Convierte el `estado_codigo` del backend al estado de la aplicación.
  * Lanza un error si el código no pertenece al catálogo oficial.
  */
-function mapOrderStatus(code: number): WorkOrderStatus {
+export function mapOrderStatus(code: number): WorkOrderStatus {
   const status = ORDER_STATUS_BY_CODE[code];
   if (!status) {
     throw new Error(`Estado de orden desconocido: ${code}`);

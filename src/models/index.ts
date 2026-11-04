@@ -7,4 +7,6 @@ export * from './part.model';
 export * from './provider.model';
 export * from './pagination.model';
 export * from './evidence.model';
+export * from './admin.model';
+export * from './notice.model';
 export * from './notification.model';

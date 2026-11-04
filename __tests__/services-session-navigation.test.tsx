@@ -107,7 +107,7 @@ describe('Pruebas Integradas: Servicios, Sesión y Navegación', () => {
     expect(state.token).toBe(authData.token);
 
     // El router con sesión activa renderiza el dashboard de cliente
-    const router = renderRouterWithProviders(routes, { initialUrl: '/cliente' });
+    const router = await renderRouterWithProviders(routes, { initialUrl: '/cliente' });
     await router;
 
     await waitFor(() => {
@@ -132,7 +132,7 @@ describe('Pruebas Integradas: Servicios, Sesión y Navegación', () => {
     ]);
 
     // Establecemos la sesión del mecánico antes de montar la vista
-    const router = renderRouterWithProviders(routes, {
+    const router = await renderRouterWithProviders(routes, {
       initialUrl: '/mecanico',
       initialAuthState: {
         user: mechanicAuth.user,
@@ -162,7 +162,7 @@ describe('Pruebas Integradas: Servicios, Sesión y Navegación', () => {
     const clientAuth = mockAuthResponses.cliente;
 
     // Iniciar con sesión activa en pantalla de cliente
-    const router = renderRouterWithProviders(routes, {
+    const router = await renderRouterWithProviders(routes, {
       initialUrl: '/cliente',
       initialAuthState: {
         user: clientAuth.user,
@@ -212,7 +212,7 @@ describe('Pruebas Integradas: Servicios, Sesión y Navegación', () => {
       },
     ]);
 
-    const router = renderRouterWithProviders(routes, {
+    const router = await renderRouterWithProviders(routes, {
       initialUrl: '/cliente',
       initialAuthState: {
         user: clientAuth.user,
@@ -237,7 +237,7 @@ describe('Pruebas Integradas: Servicios, Sesión y Navegación', () => {
   it('5. Resiliencia de Red: Pérdida de conectividad activa banner sin destruir la sesión ni la navegación', async () => {
     const adminAuth = mockAuthResponses.administrador;
 
-    const router = renderRouterWithProviders(routes, {
+    const router = await renderRouterWithProviders(routes, {
       initialUrl: '/administrador',
       initialAuthState: {
         user: adminAuth.user,

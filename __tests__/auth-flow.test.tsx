@@ -53,7 +53,7 @@ describe('flujo de autenticación', () => {
   });
 
   it('valida, muestra errores y completa el login con redirección por rol', async () => {
-    const router = renderRouterWithProviders(routes, {
+    const router = await renderRouterWithProviders(routes, {
       initialUrl: '/login',
     });
 

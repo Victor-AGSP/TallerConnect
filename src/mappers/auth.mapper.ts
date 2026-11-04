@@ -19,7 +19,7 @@ const VALID_ROLES: readonly string[] = Object.values(ROLES);
  * Indica si un valor recibido del backend corresponde a un rol de la app.
  * Evita convertir con `as UserRole` un valor que podría ser inválido.
  */
-function isUserRole(value: unknown): value is UserRole {
+export function isUserRole(value: unknown): value is UserRole {
   return typeof value === 'string' && VALID_ROLES.includes(value);
 }
 
