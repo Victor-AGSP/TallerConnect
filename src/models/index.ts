@@ -7,3 +7,4 @@ export * from './part.model';
 export * from './provider.model';
 export * from './pagination.model';
 export * from './evidence.model';
+export * from './notification.model';
