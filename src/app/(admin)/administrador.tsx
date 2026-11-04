@@ -1,3 +1,4 @@
+import { useEffect, useState } from 'react';
 import { useRouter } from 'expo-router';
 
 import {
@@ -11,6 +12,11 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { Button } from '@/components/common';
 import { StatusPill } from '@/components/ui/StatusPill';
+import {
+  AdminDashboardData,
+  adminDashboardService,
+  INITIAL_ADMIN_DASHBOARD_DATA,
+} from '@/services/admin-dashboard.service';
 import { useAuthStore } from '@/stores/authStore';
 
 import {
@@ -21,9 +27,30 @@ import {
 
 export default function AdministradorScreen() {
   const router = useRouter();
-  const logout = useAuthStore(
-  (state) => state.logout
-);
+  const logout = useAuthStore((state) => state.logout);
+  const [dashboard, setDashboard] = useState<AdminDashboardData>(
+    INITIAL_ADMIN_DASHBOARD_DATA
+  );
+
+  useEffect(() => {
+    let isMounted = true;
+
+    adminDashboardService
+      .getDashboardData()
+      .then((data) => {
+        if (isMounted) {
+          setDashboard(data);
+        }
+      })
+      .catch(() => {
+        // Mantiene snapshot inicial en caso de fallo de red
+      });
+
+    return () => {
+      isMounted = false;
+    };
+  }, []);
+
   return (
     <SafeAreaView style={styles.root}>
       <ScrollView
@@ -36,11 +63,7 @@ export default function AdministradorScreen() {
             : 'on-drag'
         }
       >
-
         {/* =====================================
-            ENCABEZADO
-            ===================================== */}
-{/* =====================================
             ENCABEZADO
             ===================================== */}
 
@@ -65,22 +88,22 @@ export default function AdministradorScreen() {
 
         <View style={styles.stats}>
           <Stat
-            value="12"
+            value={dashboard.stats.vehiclesInService}
             label="Vehículos en atención"
           />
 
           <Stat
-            value="8"
+            value={dashboard.stats.activeOrders}
             label="Órdenes activas"
           />
 
           <Stat
-            value="4"
+            value={dashboard.stats.activeMechanics}
             label="Mecánicos activos"
           />
 
           <Stat
-            value="3"
+            value={dashboard.stats.pendingApprovals}
             label="Esperando aprobación"
           />
         </View>
@@ -101,25 +124,25 @@ export default function AdministradorScreen() {
           <View style={styles.statusList}>
             <StatusRow
               label="Diagnóstico"
-              value="2"
+              value={dashboard.statusSummary.diagnosis}
               tone="info"
             />
 
             <StatusRow
               label="En reparación"
-              value="4"
+              value={dashboard.statusSummary.inRepair}
               tone="warning"
             />
 
             <StatusRow
               label="Listas para entrega"
-              value="2"
+              value={dashboard.statusSummary.readyForDelivery}
               tone="success"
             />
 
             <StatusRow
               label="Esperando aprobación"
-              value="3"
+              value={dashboard.statusSummary.waitingApproval}
               tone="danger"
             />
           </View>
@@ -139,29 +162,14 @@ export default function AdministradorScreen() {
           </Text>
 
           <View style={styles.orders}>
-            <AdminOrder
-              code="OT-00124"
-              plate="AB-CD-12"
-              status="En reparación"
-            />
-
-            <AdminOrder
-              code="OT-00125"
-              plate="EF-GH-34"
-              status="Diagnóstico"
-            />
-
-            <AdminOrder
-              code="OT-00126"
-              plate="IJ-KL-56"
-              status="Espera presupuesto"
-            />
-
-            <AdminOrder
-              code="OT-00127"
-              plate="XY-ZW-90"
-              status="Listo para entrega"
-            />
+            {dashboard.activeOrderRows.map((row) => (
+              <AdminOrder
+                key={row.id}
+                code={row.code}
+                plate={row.plate}
+                status={row.status}
+              />
+            ))}
           </View>
         </View>
 
@@ -211,24 +219,49 @@ export default function AdministradorScreen() {
             administrativa.
           </Text>
 
-          <Approval
-            order="OT-00126"
-            vehicle="IJ-KL-56"
-            amount="$185.000"
-          />
-
-          <Approval
-            order="OT-00129"
-            vehicle="MN-OP-78"
-            amount="$240.000"
-          />
-
-          <Approval
-            order="OT-00130"
-            vehicle="QR-ST-12"
-            amount="$95.000"
-          />
+          {dashboard.pendingApprovalRows.map((item) => (
+            <Approval
+              key={item.id}
+              order={item.order}
+              vehicle={item.vehicle}
+              amount={item.amount}
+            />
+          ))}
         </View>
+
+        {/* =====================================
+            AVISOS Y NOTIFICACIONES
+            ===================================== */}
+
+        {dashboard.notifications.length > 0 ? (
+          <View style={styles.card}>
+            <Text style={styles.cardTitle}>
+              Avisos del taller
+            </Text>
+
+            <Text style={styles.cardSubtitle}>
+              Alertas operativas de órdenes, presupuestos y stock.
+            </Text>
+
+            {dashboard.notifications.slice(0, 3).map((notice) => (
+              <View key={notice.id} style={styles.mechanicRow}>
+                <View style={styles.mechanicInfo}>
+                  <Text style={styles.mechanicName}>
+                    {notice.title}
+                  </Text>
+                  <Text style={styles.mechanicDetail}>
+                    {notice.message}
+                  </Text>
+                </View>
+
+                <StatusPill
+                  label={notice.read ? 'Leído' : 'Nuevo'}
+                  tone={notice.priority === 'critical' ? 'danger' : 'warning'}
+                />
+              </View>
+            ))}
+          </View>
+        ) : null}
 
         {/* =====================================
             ACTIVIDAD
@@ -245,7 +278,7 @@ export default function AdministradorScreen() {
             </Text>
 
             <Text style={styles.systemValue}>
-              32
+              {dashboard.systemSummary.registeredVehicles}
             </Text>
           </View>
 
@@ -255,35 +288,34 @@ export default function AdministradorScreen() {
             </Text>
 
             <Text style={styles.systemValue}>
-              87
+              {dashboard.systemSummary.completedOrders}
             </Text>
           </View>
 
           <View style={styles.systemRow}>
             <Text style={styles.systemLabel}>
-              Mecánicos registrados
+              Repuestos bajo umbral
             </Text>
 
             <Text style={styles.systemValue}>
-              6
+              {dashboard.systemSummary.lowStockParts}
             </Text>
           </View>
 
           <View style={styles.systemRow}>
             <Text style={styles.systemLabel}>
-              Clientes registrados
+              Proveedores registrados
             </Text>
 
             <Text style={styles.systemValue}>
-              41
+              {dashboard.systemSummary.registeredProviders}
             </Text>
           </View>
         </View>
 
         {/* =====================================
-            CERRAR SESIÓN
+            NAVEGACIÓN Y CERRAR SESIÓN
             ===================================== */}
-            
 
         <Button
           title="Ver repuestos y proveedores"
@@ -293,7 +325,7 @@ export default function AdministradorScreen() {
 
         <Button
           title="Ver mis vehículos"
-          onPress={() => router.push('/(admin)/vehiculos')}
+          onPress={() => router.push('/(admin)/vehiculos' as never)}
           style={styles.logoutButton}
         />
 
@@ -301,8 +333,8 @@ export default function AdministradorScreen() {
           title="Cerrar sesión"
           variant="outline"
           onPress={async () => {
-          await logout();
-          router.replace('/login');
+            await logout();
+            router.replace('/login');
           }}
           style={styles.logoutButton}
         />
@@ -544,134 +576,6 @@ const styles = StyleSheet.create({
   container: {
     paddingHorizontal: spacing.lg,
     paddingBottom: spacing.xxl,
-  },
-
-  decorations: {
-    position: 'absolute',
-    top: 0,
-    right: 0,
-    bottom: 0,
-    left: 0,
-    overflow: 'hidden',
-  },
-
-  orbRedLarge: {
-    position: 'absolute',
-    width: 300,
-    height: 300,
-    borderRadius: 150,
-    backgroundColor: localTheme.primary,
-    top: -50,
-    right: -100,
-    opacity: 0.15,
-  },
-
-  orbDarkRed: {
-    position: 'absolute',
-    width: 200,
-    height: 200,
-    borderRadius: 100,
-    backgroundColor: localTheme.primaryDark,
-    top: 400,
-    left: -80,
-    opacity: 0.25,
-  },
-
-  crystalRed: {
-    position: 'absolute',
-    width: 80,
-    height: 80,
-    borderRadius: 16,
-    backgroundColor: localTheme.primary,
-    top: 150,
-    left: -20,
-    opacity: 0.15,
-    transform: [
-      {
-        rotate: '45deg',
-      },
-    ],
-  },
-
-  crystalGrey: {
-    position: 'absolute',
-    width: 100,
-    height: 100,
-    borderRadius: 20,
-    backgroundColor: colors.surfaceSoft,
-    bottom: 200,
-    right: -40,
-    opacity: 0.2,
-    transform: [
-      {
-        rotate: '45deg',
-      },
-    ],
-  },
-
-  ringStrong1: {
-    position: 'absolute',
-    width: 120,
-    height: 120,
-    borderRadius: 60,
-    borderWidth: 4,
-    borderColor: localTheme.primary,
-    top: 600,
-    right: -40,
-    opacity: 0.25,
-  },
-
-  ringStrong2: {
-    position: 'absolute',
-    width: 60,
-    height: 60,
-    borderRadius: 30,
-    borderWidth: 2,
-    borderColor: '#444444',
-    top: 50,
-    left: 40,
-    opacity: 0.3,
-  },
-
-  glowDot1: {
-    position: 'absolute',
-    width: 12,
-    height: 12,
-    borderRadius: 6,
-    backgroundColor: localTheme.primary,
-    top: 280,
-    left: 60,
-    opacity: 0.9,
-    shadowColor: localTheme.primary,
-    shadowOffset: {
-      width: 0,
-      height: 0,
-    },
-    shadowOpacity: 1,
-    shadowRadius: 10,
-    elevation: 4,
-  },
-
-  glowDot2: {
-    position: 'absolute',
-    width: 10,
-    height: 10,
-    borderRadius: 5,
-    backgroundColor: '#666666',
-    bottom: 100,
-    right: 70,
-    opacity: 0.5,
-  },
-
-  glowDot3: {
-    position: 'absolute',
-    width: 14,
-    height: 14,
-    borderRadius: 7,
-    backgroundColor: localTheme.primary,
-    top: 100,
-    right: 50,
-    opacity: 0.8,
   },
 
   header: {
