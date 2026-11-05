@@ -1,3 +1,4 @@
+export * from './admin-dashboard.service';
 export * from './api';
 export * from './auth.service';
 export {
@@ -48,6 +49,9 @@ export {
   EvidencesService,
   EvidenceService,
   EvidenceServiceError,
+  getGlobalErrorMessage,
+  isConnectivityOrTimeoutError,
+  normalizeNotificationServiceError,
   EVIDENCE_UPLOAD_TIMEOUT_MS,
   evidenceService,
   evidencesService,
@@ -79,3 +83,15 @@ export {
 export type { ServiceErrorDomain } from './service-error';
 export { filterVehiclesByParams, MockVehicleAdapter, RealVehicleAdapter, VehiclesService, VehicleService, vehiclesService } from './vehicles.service';
 export type { VehicleServiceAdapter } from './vehicles.service';
+export {
+  filterNotificationsByParams,
+  MockNotificationAdapter,
+  RealNotificationAdapter,
+  NotificationsService,
+  NotificationService,
+  notificationsService,
+} from './notifications.service';
+export type {
+  NotificationServiceAdapter,
+  RealNotificationAdapterOptions,
+} from './notifications.service';

@@ -1,9 +1,7 @@
-
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useRouter } from 'expo-router';
 import {
-  ActivityIndicator,
   Pressable,
   RefreshControl,
   ScrollView,
@@ -13,13 +11,28 @@ import {
 } from 'react-native';
 
 import { EmptyState, ErrorMessage } from '@/components/common';
+import { StatusPill } from '@/components/ui/StatusPill';
 import { ORDER_STATUS_LABELS } from '@/constants/orderStatus';
+import { ROLES } from '@/constants/roles';
 import { colors, radius, spacing } from '@/constants/theme';
+import type { WorkshopNotification } from '@/models/notification.model';
 import type { WorkOrder } from '@/models/order.model';
 import type { Vehicle } from '@/models/vehicle.model';
+import { notificationsService } from '@/services/notifications.service';
 import { ordersService } from '@/services/orders.service';
 import { vehiclesService } from '@/services/vehicles.service';
 import { useAuthStore } from '@/stores/authStore';
+
+type DashboardAlertTone = 'warning' | 'info' | 'success';
+
+interface DashboardAlert {
+  id: string;
+  orderId: string;
+  title: string;
+  description: string;
+  tone: DashboardAlertTone;
+  updatedAt: string;
+}
 
 export default function AdministradorScreen() {
   const router = useRouter();
@@ -27,17 +40,28 @@ export default function AdministradorScreen() {
 
   const [orders, setOrders] = useState<WorkOrder[]>([]);
   const [vehicles, setVehicles] = useState<Vehicle[]>([]);
+  const [notifications, setNotifications] = useState<WorkshopNotification[]>(
+    [],
+  );
   const [ordersError, setOrdersError] = useState<string | null>(null);
   const [vehiclesError, setVehiclesError] = useState<string | null>(null);
-  const [isLoading, setIsLoading] = useState(true);
   const [isRefreshing, setIsRefreshing] = useState(false);
 
-  const loadDashboard = useCallback(async () => {
+  const loadDashboard = useCallback(async (refresh = false) => {
+    if (refresh) {
+      setIsRefreshing(true);
+    }
+
+    setOrdersError(null);
+    setVehiclesError(null);
+
     try {
-      const [ordersResult, vehiclesResult] = await Promise.allSettled([
-        ordersService.getOrders(),
-        vehiclesService.getVehicles(),
-      ]);
+      const [ordersResult, vehiclesResult, notificationsResult] =
+        await Promise.allSettled([
+          ordersService.getOrders(),
+          vehiclesService.getVehicles(),
+          notificationsService.getNotifications({ role: ROLES.ADMINISTRADOR }),
+        ]);
 
       if (ordersResult.status === 'fulfilled') {
         setOrders(ordersResult.value);
@@ -58,8 +82,11 @@ export default function AdministradorScreen() {
             : 'No fue posible cargar los vehículos.',
         );
       }
+
+      if (notificationsResult.status === 'fulfilled') {
+        setNotifications(notificationsResult.value);
+      }
     } finally {
-      setIsLoading(false);
       setIsRefreshing(false);
     }
   }, []);
@@ -122,23 +149,77 @@ export default function AdministradorScreen() {
     [orders],
   );
 
+  // Genera alertas operativas a partir del estado actual de las órdenes.
+  const alerts = useMemo<DashboardAlert[]>(() => {
+    const nextAlerts: DashboardAlert[] = [];
+
+    orders.forEach((order) => {
+      const orderLabel = `OT ${order.id.toUpperCase()}`;
+
+      if (
+        !order.assignedMechanicId &&
+        order.status !== 'entregado' &&
+        order.status !== 'cancelado'
+      ) {
+        nextAlerts.push({
+          id: `${order.id}-sin-mecanico`,
+          orderId: order.id,
+          title: 'Orden sin mecánico asignado',
+          description: `${orderLabel} necesita un mecánico.`,
+          tone: 'warning',
+          updatedAt: order.updatedAt,
+        });
+      }
+
+      switch (order.status) {
+        case 'esperando_aprobacion_presupuesto':
+          nextAlerts.push({
+            id: `${order.id}-presupuesto`,
+            orderId: order.id,
+            title: 'Presupuesto pendiente',
+            description: `${orderLabel} espera aprobación del presupuesto.`,
+            tone: 'warning',
+            updatedAt: order.updatedAt,
+          });
+          break;
+
+        case 'esperando_repuestos':
+          nextAlerts.push({
+            id: `${order.id}-repuestos`,
+            orderId: order.id,
+            title: 'Repuestos pendientes',
+            description: `${orderLabel} está esperando repuestos.`,
+            tone: 'info',
+            updatedAt: order.updatedAt,
+          });
+          break;
+
+        case 'listo_para_entrega':
+          nextAlerts.push({
+            id: `${order.id}-entrega`,
+            orderId: order.id,
+            title: 'Vehículo listo para entrega',
+            description: `${orderLabel} puede coordinar su entrega.`,
+            tone: 'success',
+            updatedAt: order.updatedAt,
+          });
+          break;
+      }
+    });
+
+    return nextAlerts
+      .sort(
+        (a, b) =>
+          new Date(b.updatedAt).getTime() -
+          new Date(a.updatedAt).getTime(),
+      )
+      .slice(0, 6);
+  }, [orders]);
+
   const handleLogout = async () => {
     await logout();
     router.replace('/login');
   };
-
-  if (isLoading) {
-    return (
-      <SafeAreaView style={styles.safeArea}>
-        <View style={styles.centered}>
-          <ActivityIndicator size="large" color={colors.primary} />
-          <Text style={styles.loadingText}>
-            Cargando panel de administración...
-          </Text>
-        </View>
-      </SafeAreaView>
-    );
-  }
 
   return (
     <SafeAreaView style={styles.safeArea}>
@@ -211,21 +292,87 @@ export default function AdministradorScreen() {
           />
         ) : null}
 
-        <Text accessibilityRole="header" style={styles.sectionTitle}>Accesos rápidos</Text>
+        {!ordersError ? (
+          <View style={styles.alertsSection}>
+            <View style={styles.sectionHeader}>
+              <Text style={styles.sectionTitle}>Alertas del taller</Text>
+              <Text style={styles.orderCount}>
+                {alerts.length} {alerts.length === 1 ? 'alerta' : 'alertas'}
+              </Text>
+            </View>
+
+            {alerts.length === 0 ? (
+              <View style={styles.noAlertsCard}>
+                <Text style={styles.noAlertsTitle}>
+                  Todo está al día
+                </Text>
+                <Text style={styles.noAlertsDescription}>
+                  No hay alertas operativas pendientes en este momento.
+                </Text>
+              </View>
+            ) : (
+              <View style={styles.alertsList}>
+                {alerts.map((alert) => {
+                  const toneColor =
+                    alert.tone === 'warning'
+                      ? colors.warning
+                      : alert.tone === 'success'
+                        ? colors.success
+                        : colors.info;
+
+                  return (
+                    <Pressable
+                      key={alert.id}
+                      style={({ pressed }) => [
+                        styles.alertCard,
+                        pressed && styles.alertCardPressed,
+                      ]}
+                      onPress={() =>
+                        router.push(`/(admin)/ordenes/${alert.orderId}`)
+                      }
+                      accessibilityRole="button"
+                      accessibilityLabel={`${alert.title}. ${alert.description}`}
+                    >
+                      <View
+                        style={[
+                          styles.alertIndicator,
+                          { backgroundColor: toneColor },
+                        ]}
+                      />
+
+                      <View style={styles.alertTextContainer}>
+                        <Text style={styles.alertTitle}>
+                          {alert.title}
+                        </Text>
+                        <Text style={styles.alertDescription}>
+                          {alert.description}
+                        </Text>
+                      </View>
+
+                      <Text style={styles.alertArrow}>›</Text>
+                    </Pressable>
+                  );
+                })}
+              </View>
+            )}
+          </View>
+        ) : null}
+
+        <Text style={styles.sectionTitle}>Accesos rápidos</Text>
 
         <View style={styles.actions}>
           <ActionCard
             title="Ver vehículos registrados"
             description="Consultar los vehículos registrados"
             icon="🚗"
-            onPress={() => router.push('/(admin)/vehiculos')}
+            onPress={() => router.push('/(admin)/vehiculos' as never)}
           />
 
           <ActionCard
             title="Inventario"
             description="Revisar repuestos y proveedores"
             icon="📦"
-            onPress={() => router.push('/(admin)/inventario')}
+            onPress={() => router.push('/(admin)/inventario' as never)}
           />
           <ActionCard
             title="Ver repuestos"
@@ -240,6 +387,24 @@ export default function AdministradorScreen() {
             onPress={() => router.push('/(admin)/proveedores')}
           />
         </View>
+
+        {notifications.length > 0 ? (
+          <View style={styles.ordersList}>
+            <Text style={styles.sectionTitle}>Avisos del taller</Text>
+            {notifications.slice(0, 3).map((notice) => (
+              <View key={notice.id} style={styles.orderCard}>
+                <View style={styles.orderTop}>
+                  <Text style={styles.orderId}>{notice.title}</Text>
+                  <StatusPill
+                    label={notice.read ? 'Leído' : 'Nuevo'}
+                    tone={notice.priority === 'critical' ? 'danger' : 'warning'}
+                  />
+                </View>
+                <Text style={styles.vehicleName}>{notice.message}</Text>
+              </View>
+            ))}
+          </View>
+        ) : null}
 
         <View style={styles.sectionHeader}>
           <Text accessibilityRole="header" style={styles.sectionTitle}>Órdenes recientes</Text>
@@ -273,7 +438,7 @@ export default function AdministradorScreen() {
                     pressed && styles.orderCardPressed,
                   ]}
                   onPress={() =>
-                    router.push(`/(admin)/ordenes/${order.id}`)
+                    router.push(`/(admin)/ordenes/${order.id}` as never)
                   }
                   accessibilityRole="button"
                   accessibilityLabel={`Orden OT ${order.id.toUpperCase()}. ${vehicle ? `Patente ${vehicle.plate}` : `Vehículo ${order.vehicleId}`}. Estado: ${statusLabel}`}
@@ -375,17 +540,6 @@ const styles = StyleSheet.create({
     padding: spacing.lg,
     paddingBottom: spacing.xxl,
     gap: spacing.lg,
-  },
-  centered: {
-    flex: 1,
-    alignItems: 'center',
-    justifyContent: 'center',
-    padding: spacing.xl,
-  },
-  loadingText: {
-    marginTop: spacing.md,
-    color: colors.textSecondary,
-    fontSize: 14,
   },
   header: {
     flexDirection: 'row',
@@ -531,6 +685,67 @@ const styles = StyleSheet.create({
     color: colors.textMuted,
     fontSize: 12,
     fontWeight: '700',
+  },
+  alertsSection: {
+    gap: spacing.md,
+  },
+  alertsList: {
+    gap: spacing.sm,
+  },
+  alertCard: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    padding: spacing.md,
+    borderRadius: radius.lg,
+    backgroundColor: colors.surface,
+    borderWidth: 1,
+    borderColor: colors.border,
+    gap: spacing.md,
+  },
+  alertCardPressed: {
+    opacity: 0.7,
+  },
+  alertIndicator: {
+    width: 9,
+    height: 9,
+    borderRadius: radius.pill,
+  },
+  alertTextContainer: {
+    flex: 1,
+    gap: spacing.xs,
+  },
+  alertTitle: {
+    color: colors.primary,
+    fontSize: 14,
+    fontWeight: '800',
+  },
+  alertDescription: {
+    color: colors.textSecondary,
+    fontSize: 12,
+    lineHeight: 18,
+  },
+  alertArrow: {
+    color: colors.textMuted,
+    fontSize: 25,
+    fontWeight: '700',
+  },
+  noAlertsCard: {
+    padding: spacing.lg,
+    borderRadius: radius.lg,
+    backgroundColor: colors.surface,
+    borderWidth: 1,
+    borderColor: colors.border,
+    gap: spacing.xs,
+  },
+  noAlertsTitle: {
+    color: colors.success,
+    fontSize: 15,
+    fontWeight: '900',
+  },
+  noAlertsDescription: {
+    color: colors.textSecondary,
+    fontSize: 13,
+    lineHeight: 19,
   },
   ordersList: {
     gap: spacing.md,

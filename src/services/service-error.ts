@@ -12,10 +12,11 @@ export type ServiceErrorDomain =
   | 'budgets'
   | 'parts'
   | 'providers'
-  | 'evidences';
+  | 'evidences'
+  | 'notifications';
 
 /**
- * Error normalizado de la capa de servicios (Vehículos, Órdenes, Presupuestos, Repuestos, Proveedores y Evidencias).
+ * Error normalizado de la capa de servicios (Vehículos, Órdenes, Presupuestos, Repuestos, Proveedores, Evidencias y Notificaciones).
  * Conserva compatibilidad con `instanceof Error` y expone metadatos estructurados para la UI.
  */
 export class ServiceError extends Error {
@@ -45,6 +46,35 @@ export class ServiceError extends Error {
     this.originalError = params.originalError;
     Object.setPrototypeOf(this, ServiceError.prototype);
   }
+}
+
+/**
+ * Determina si un error corresponde a una falla global de conectividad o timeout.
+ */
+export function isConnectivityOrTimeoutError(error: unknown): boolean {
+  if (error instanceof ServiceError) {
+    return error.isNetworkError || error.isTimeout;
+  }
+  const normalized = normalizeApiError(error);
+  return normalized.isNetworkError || normalized.isTimeout;
+}
+
+/**
+ * Obtiene un mensaje de error seguro y legible para mostrar en cualquier pantalla de la app.
+ */
+export function getGlobalErrorMessage(
+  error: unknown,
+  fallbackMessage = 'Ocurrió un error al procesar la solicitud.'
+): string {
+  if (error instanceof ServiceError && error.message.trim().length > 0) {
+    return error.message;
+  }
+  const validation = extractValidationDetail(error);
+  if (validation) {
+    return validation;
+  }
+  const normalized = normalizeApiError(error);
+  return normalized.message || fallbackMessage;
 }
 
 /**
@@ -348,6 +378,44 @@ export function normalizeEvidenceServiceError(
     isNetworkError: normalized.isNetworkError,
     isTimeout: normalized.isTimeout,
     domain: 'evidences',
+    originalError: error,
+  });
+}
+
+/**
+ * Normaliza cualquier error originado en NotificationsService (avisos/notificaciones operativas).
+ */
+export function normalizeNotificationServiceError(
+  error: unknown,
+  fallbackMessage: string
+): ServiceError {
+  if (error instanceof ServiceError) {
+    return error;
+  }
+
+  const validationMsg = extractValidationDetail(error);
+  const normalized: NormalizedApiError = normalizeApiError(error);
+  const status = normalized.status;
+
+  let code = 'NOTIFICATION_SERVICE_ERROR';
+  if (normalized.isTimeout) code = 'NOTIFICATION_TIMEOUT';
+  else if (normalized.isNetworkError) code = 'NOTIFICATION_NETWORK_ERROR';
+  else if (status === HTTP_STATUS.UNAUTHORIZED) code = 'NOTIFICATION_UNAUTHORIZED';
+  else if (status === HTTP_STATUS.FORBIDDEN) code = 'NOTIFICATION_FORBIDDEN';
+  else if (status === HTTP_STATUS.NOT_FOUND) code = 'NOTIFICATION_NOT_FOUND';
+  else if (status === HTTP_STATUS.UNPROCESSABLE_ENTITY) code = 'NOTIFICATION_VALIDATION_ERROR';
+  else if (status === HTTP_STATUS.SERVICE_UNAVAILABLE) code = 'NOTIFICATION_CONTRACT_UNAVAILABLE';
+  else if (status && status >= 500) code = 'NOTIFICATION_SERVER_ERROR';
+
+  const message = validationMsg || normalized.message || fallbackMessage;
+
+  return new ServiceError({
+    message,
+    status,
+    code,
+    isNetworkError: normalized.isNetworkError,
+    isTimeout: normalized.isTimeout,
+    domain: 'notifications',
     originalError: error,
   });
 }

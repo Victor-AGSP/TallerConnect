@@ -8,3 +8,6 @@ export * from './providers.mock';
 export * from './evidences.mock';
 export * from './evidence-uploads.mock';
 export * from './order-status-updates.mock';
+export * from './admin.mock';
+export * from './notices.mock';
+export * from './notifications.mock';

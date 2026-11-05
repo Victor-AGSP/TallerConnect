@@ -1,13 +1,30 @@
-import { resolveApiUrl, API_GATEWAY_URLS, DEFAULT_TIMEOUT_MS, ENV } from '@/config/env';
+import {
+  resolveApiUrl,
+  resolveAppEnvironment,
+  normalizeGatewayBaseUrl,
+  buildGatewayEndpointPath,
+  resolveTimeoutMs,
+  isSecureGatewayUrl,
+  isMockModeEnabled,
+  API_GATEWAY_URLS,
+  GATEWAY_ROUTES,
+  DEFAULT_TIMEOUT_MS,
+  DEFAULT_UPLOAD_TIMEOUT_MS,
+  DEFAULT_PING_TIMEOUT_MS,
+  ENV,
+} from '@/config/env';
 import { API_BASE_URL, DEFAULT_TIMEOUT_MS as CLIENT_TIMEOUT } from '@/services/api/client';
 
 describe('Configuración de Entornos y URL de la API Gateway', () => {
-  describe('resolveApiUrl', () => {
-    it('prioriza la URL explícita (EXPO_PUBLIC_API_URL) por sobre cualquier entorno', () => {
-      const explicitUrl = 'http://192.168.1.100:8000/api';
+  describe('resolveApiUrl y normalizeGatewayBaseUrl', () => {
+    it('prioriza la URL explícita (EXPO_PUBLIC_API_URL) por sobre cualquier entorno y limpia barras finales', () => {
+      const explicitUrl = 'http://192.168.1.100:8000/api/';
       const resolved = resolveApiUrl('production', explicitUrl, 'ios');
 
-      expect(resolved).toBe(explicitUrl);
+      expect(resolved).toBe('http://192.168.1.100:8000/api');
+      expect(normalizeGatewayBaseUrl('  https://tallerconect.vercel.app/api/// ')).toBe(
+        'https://tallerconect.vercel.app/api'
+      );
     });
 
     it('resuelve la URL de la nube (Vercel) para entorno de integración', () => {
@@ -40,10 +57,67 @@ describe('Configuración de Entornos y URL de la API Gateway', () => {
     });
   });
 
+  describe('buildGatewayEndpointPath', () => {
+    it('evita duplicar el prefijo /api cuando la URL base ya termina en /api', () => {
+      expect(
+        buildGatewayEndpointPath('/api/vehiculos', 'https://tallerconect.vercel.app/api')
+      ).toBe('/vehiculos');
+      expect(
+        buildGatewayEndpointPath('ordenes/15', 'https://tallerconect.vercel.app/api/')
+      ).toBe('/ordenes/15');
+      expect(
+        buildGatewayEndpointPath('/presupuestos', 'https://tallerconect.vercel.app/api')
+      ).toBe('/presupuestos');
+    });
+
+    it('respeta URLs absolutas o bases sin sufijo /api', () => {
+      expect(
+        buildGatewayEndpointPath('https://tallerconect.vercel.app/ms3/openapi.json')
+      ).toBe('https://tallerconect.vercel.app/ms3/openapi.json');
+      expect(
+        buildGatewayEndpointPath('/api/vehiculos', 'https://tallerconect.vercel.app')
+      ).toBe('/api/vehiculos');
+    });
+  });
+
+  describe('Helpers de validación de entorno, seguridad y timeouts', () => {
+    it('resuelve entornos correctamente mediante resolveAppEnvironment', () => {
+      expect(resolveAppEnvironment('integration', 'development')).toBe('integration');
+      expect(resolveAppEnvironment('production', 'development')).toBe('production');
+      expect(resolveAppEnvironment(undefined, 'test')).toBe('test');
+      expect(resolveAppEnvironment('development', 'development')).toBe('development');
+    });
+
+    it('valida timeouts personalizados y usa fallback ante valores inválidos', () => {
+      expect(resolveTimeoutMs('25000', DEFAULT_TIMEOUT_MS)).toBe(25000);
+      expect(resolveTimeoutMs(45000, DEFAULT_TIMEOUT_MS)).toBe(45000);
+      expect(resolveTimeoutMs('invalido', DEFAULT_TIMEOUT_MS)).toBe(DEFAULT_TIMEOUT_MS);
+      expect(resolveTimeoutMs(-100, DEFAULT_TIMEOUT_MS)).toBe(DEFAULT_TIMEOUT_MS);
+      expect(resolveTimeoutMs('', DEFAULT_UPLOAD_TIMEOUT_MS)).toBe(DEFAULT_UPLOAD_TIMEOUT_MS);
+    });
+
+    it('exige HTTPS en entornos de integración y producción', () => {
+      expect(isSecureGatewayUrl('https://tallerconect.vercel.app/api', 'integration')).toBe(true);
+      expect(isSecureGatewayUrl('http://tallerconect.vercel.app/api', 'production')).toBe(false);
+      expect(isSecureGatewayUrl('http://localhost:8000/api', 'development')).toBe(true);
+    });
+
+    it('evalúa flags de modo simulado (mocks) con prioridad para EXPO_PUBLIC_USE_MOCK_SERVICES', () => {
+      expect(isMockModeEnabled('false', 'true')).toBe(true);
+      expect(isMockModeEnabled('true', 'false')).toBe(false);
+      expect(isMockModeEnabled('true', undefined)).toBe(true);
+      expect(isMockModeEnabled('false', undefined)).toBe(false);
+    });
+  });
+
   describe('Constantes de Timeout y Configuración Global (ENV)', () => {
-    it('define un timeout estándar de 15 segundos (15000 ms)', () => {
+    it('define timeouts estándar (15s), de subida multimedia (60s) y de ping (5s)', () => {
       expect(DEFAULT_TIMEOUT_MS).toBe(15000);
+      expect(DEFAULT_UPLOAD_TIMEOUT_MS).toBe(60000);
+      expect(DEFAULT_PING_TIMEOUT_MS).toBe(5000);
       expect(ENV.TIMEOUT_MS).toBe(15000);
+      expect(ENV.UPLOAD_TIMEOUT_MS).toBe(60000);
+      expect(ENV.PING_TIMEOUT_MS).toBe(5000);
       expect(CLIENT_TIMEOUT).toBe(15000);
     });
 
@@ -51,12 +125,18 @@ describe('Configuración de Entornos y URL de la API Gateway', () => {
       expect(API_BASE_URL).toBe(ENV.API_URL);
     });
 
-    it('expone propiedades de configuración tipadas en el objeto ENV', () => {
+    it('expone propiedades de configuración tipadas y rutas de Gateway en el objeto ENV', () => {
       expect(ENV).toHaveProperty('APP_ENV');
       expect(ENV).toHaveProperty('API_URL');
       expect(ENV).toHaveProperty('IS_DEV');
       expect(ENV).toHaveProperty('USE_MOCK_AUTH');
+      expect(ENV).toHaveProperty('USE_MOCK_SERVICES');
+      expect(ENV).toHaveProperty('ENABLE_NOTIFICATIONS_API');
       expect(ENV).toHaveProperty('TIMEOUT_MS');
+      expect(ENV).toHaveProperty('UPLOAD_TIMEOUT_MS');
+      expect(ENV).toHaveProperty('PING_TIMEOUT_MS');
+      expect(ENV).toHaveProperty('IS_SECURE_GATEWAY');
+      expect(ENV.ROUTES).toEqual(GATEWAY_ROUTES);
     });
   });
 });

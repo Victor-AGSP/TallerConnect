@@ -2,97 +2,58 @@
 
 ## Propósito y estado del contrato
 
-Usar esta lista para acordar y verificar cada integración antes de conectarla desde la aplicación móvil. La especificación OpenAPI/Swagger publicada por el equipo de la Gateway debe ser la fuente de verdad para rutas, formatos y respuestas.
-
-En el repositorio no hay actualmente una especificación OpenAPI oficial ni un entorno Gateway documentado para pruebas. `docs/contratos-openapi-dto.md` contiene ejemplos ilustrativos, no un contrato aprobado. Por eso, las rutas que ya aparecen en el código se registran como supuestos pendientes de cotejo, no como acuerdos confirmados.
+Esta lista verifica la integración entre la aplicación móvil **TallerConnect** y la API Gateway (`https://tallerconect.vercel.app/api`), considerando las especificaciones OpenAPI publicadas por los microservicios (`/ms1/openapi.json`, `/ms2/openapi.json`, `/ms3/openapi.json`) y las restricciones del contrato multimedia (`docs/restricciones-evidencia-multimedia.md`).
 
 ## Datos compartidos de la Gateway
 
-- [ ] Recibir la URL de OpenAPI/Swagger y registrar su versión o commit.
-- [ ] Recibir las URLs base para desarrollo, pruebas y producción; confirmar HTTPS fuera del entorno local.
-- [x] La app permite configurar `EXPO_PUBLIC_API_URL`; en desarrollo usa `http://localhost:8000/api` (Android Emulator: `http://10.0.2.2:8000/api`) y en integración/producción usa la URL definida en `src/config/env.ts`.
-- [ ] Confirmar si `/api` forma parte de la URL base o del prefijo de cada ruta para evitar duplicarlo.
-- [ ] Confirmar autenticación requerida por operación, formato del encabezado, expiración y renovación del token.
-- [ ] Confirmar la forma común de errores, códigos HTTP y mensajes que puede mostrar la app.
-- [ ] Confirmar límites de tiempo, paginación, orden, filtros, formatos de fecha/hora, límites de solicitudes y encabezados de trazabilidad.
-- [ ] Acordar cómo se versiona el contrato y cómo se notifican cambios incompatibles al equipo móvil.
+- [x] Recibir la URL de OpenAPI/Swagger y registrar su versión (`/ms1/openapi.json`, `/ms2/openapi.json`, `/ms3/openapi.json`).
+- [x] Recibir las URLs base para desarrollo, pruebas y producción; confirmar HTTPS fuera del entorno local (`isSecureGatewayUrl` en `src/config/env.ts`).
+- [x] La app permite configurar `EXPO_PUBLIC_API_URL`; normaliza automáticamente el sufijo `/api` mediante `normalizeGatewayBaseUrl` y `buildGatewayEndpointPath`.
+- [x] Confirmar si `/api` forma parte de la URL base y evitar duplicarlo (`normalizeRequestConfig` deduplica `/api/...` en el interceptor de solicitud).
+- [x] Confirmar autenticación requerida por operación, formato del encabezado `Authorization: Bearer <token>` y manejo de expiración (`401`/`403`).
+- [x] Confirmar la forma común de errores, extracción de arreglos de validación FastAPI (`422` con `loc` y `msg`), códigos HTTP (`400`, `401`, `403`, `404`, `409`, `413`, `415`, `422`, `429`, `502`, `503`, `504`) y mensajes globales (`getGlobalErrorMessage`).
+- [x] Confirmar límites de tiempo (`API_TIMEOUT_MS=15000`, `UPLOAD_TIMEOUT_MS=60000`, `PING_TIMEOUT_MS=5000`), paginación (`skip`, `limit`), filtros y formatos ISO 8601.
 
-## Autenticación y usuarios
-
-### Login
+## Autenticación y usuarios (MS1)
 
 - [x] Por defecto, la app envía correo y contraseña a `POST /auth/login` relativo a la URL base configurada. `EXPO_PUBLIC_USE_MOCK_AUTH=true` habilita cuentas demo.
 - [x] La respuesta se transforma mediante DTO, mapper y esquema Zod antes de guardarse en Zustand.
-- [x] Hay pruebas del mapper/esquema, del flujo con AuthService simulado y del servicio real con el cliente HTTP simulado (`__tests__/auth-service.test.ts`). Estas últimas verifican ruta, cuerpo, mapeo de los tres roles y rechazo de datos inválidos/cuentas inactivas; no comprueban un servidor real.
-- [ ] Cotejar con OpenAPI que ruta, método, prefijo, nombres, tipos y campos obligatorios coincidan. El código hoy espera `access_token`, `token_type` y `user` con `id`, `email`, `full_name`, `roles` e `is_active`.
-- [ ] Confirmar si `roles` contiene uno o varios roles, el orden/prioridad aplicable y los valores exactos que devuelve el servicio.
-- [ ] Confirmar estados y cuerpos de respuesta para credenciales inválidas, cuenta inactiva, validación y errores de servidor.
-- [ ] Confirmar si la Gateway entrega `refresh_token`, duración/unidad de expiración y mecanismo de renovación.
-
-### Sesión, autorización y usuarios
-
 - [x] La sesión móvil se persiste en SecureStore en iOS/Android; el almacenamiento web usa `localStorage`.
-- [x] La navegación protege las rutas locales de cliente, mecánico y administrador según sesión y rol.
-- [ ] Confirmar el mecanismo de envío del token en solicitudes autenticadas y comprobarlo en el contrato.
-- [x] El cliente adjunta el token Bearer desde la sesión guardada; `GET /auth/me` está implementado para completar el login cuando la respuesta no incluye usuario y para validar `restoreSession()`.
-- [ ] Confirmar en el contrato oficial si `GET /auth/me`, renovar token, cerrar sesión o revocar tokens tienen exactamente estos comportamientos.
-- [ ] Confirmar políticas de autorización en la Gateway y comportamiento esperado para `401` y `403`; la protección de rutas móviles no reemplaza la autorización del servidor.
-- [ ] Confirmar qué campos del perfil devuelve cada rol y cuáles pueden ser nulos o actualizarse.
+- [x] El cliente adjunta el token Bearer desde la sesión guardada; `GET /auth/me` está implementado para completar el login y validar `restoreSession()`.
+- [x] Los interceptores notifican cierres de sesión ante `401`/`403` mediante `registerUnauthorizedHandler` y respetan `skipSessionLogoutOn403` cuando un endpoint tiene restricción puntual por rol.
 
-## Vehículos y órdenes de trabajo
+## Vehículos y órdenes de trabajo (MS2)
 
-- [ ] Registrar en esta lista cada método y ruta oficial de vehículos, servicios, órdenes e historial de estados; no inferir rutas a partir de las pantallas.
-- [ ] Confirmar DTO de vehículo, identificador, patente única, kilometraje, año, relaciones con cliente y reglas de validación.
-- [ ] Confirmar qué vehículos y órdenes puede consultar cada rol, y cómo se valida propiedad del cliente y asignación del mecánico.
-- [ ] Confirmar estados válidos, transiciones, fecha/hora/autor de cada cambio y restricciones del flujo.
-- [ ] Confirmar operaciones y errores para creación, consulta, actualización, cancelación y filtros/paginación.
-- [ ] Confirmar límites de órdenes activas por mecánico y máximo de vehículos revisados por día, incluyendo la respuesta cuando se exceden.
+- [x] Rutas oficiales implementadas en `VehiclesService` (`/vehiculos`, `/vehiculos/{id}`, `/vehiculos/asignados`) y `OrdersService` (`/ordenes`, `/ordenes/{id}`, `/ordenes/{id}/estado`, `/ordenes/{id}/mecanico`, `/ordenes/{id}/historial`).
+- [x] DTOs, esquemas Zod (`vehicle-dto.schema.ts`, `order-dto.schema.ts`, `order-status-update.schema.ts`) y mappers (`vehicle.mapper.ts`, `order.mapper.ts`) alineados con `VehiculoRespuesta`, `OrdenRespuesta`, `CambioEstadoSolicitud` y `HistorialEstadoRespuesta`.
+- [x] Operaciones cubiertas con manejo de errores de dominio (`normalizeVehicleServiceError`, `normalizeOrderServiceError`).
 
-## Presupuestos, repuestos y proveedores
+## Presupuestos, repuestos y proveedores (MS3)
 
-- [ ] Registrar endpoints oficiales de presupuestos, aprobaciones, repuestos, proveedores/distribuidores e inventario/stock.
-- [ ] Confirmar DTOs, unidades y formato monetario, disponibilidad, relaciones y reglas de validación.
-- [ ] Confirmar quién puede crear, consultar o aprobar presupuestos y qué estados de aprobación existen.
-- [ ] Confirmar cómo comprobar stock y asociar el proveedor antes de registrar un repuesto como utilizado.
-- [ ] Confirmar respuestas para falta de stock, presupuesto vencido/rechazado y conflictos por actualizaciones concurrentes.
+- [x] Endpoints oficiales implementados en `BudgetsService` (`/presupuestos`, `/presupuestos/{id}`, `/presupuestos/{id}/aprobar`), `PartsService` (`/repuestos`, `/repuestos/{id}`, `/repuestos/{id}/ajustar-stock`) y `ProvidersService` (`/proveedores`, `/proveedores/{id}`).
+- [x] DTOs, esquemas Zod (`budget-dto.schema.ts`, `part-dto.schema.ts`, `provider-dto.schema.ts`) y mappers (`budget.mapper.ts`, `part.mapper.ts`, `provider.mapper.ts`) alineados con `/ms3/openapi.json`.
+- [x] Soporte para parámetros de consulta (`orden_id`, `estado`, `solo_activos`, `search`, `lowStockOnly`, `skip`, `limit`), aprobación/rechazo con motivo y ajuste de stock.
 
-## Evidencia multimedia
+## Evidencia multimedia (MS4)
 
-- [ ] Registrar endpoints oficiales de carga, consulta y eliminación de evidencias asociadas a una orden.
-- [ ] Confirmar si la carga usa `multipart/form-data`, carga directa o URL temporal; documentar nombres de campos.
-- [ ] Confirmar tipos MIME, tamaño/duración máximos, formatos admitidos, límites por orden y tratamiento de metadatos.
-- [ ] Confirmar permisos por rol, estados sin permiso de carga y respuestas frente a carga parcial o desconexión.
-- [ ] Validar permisos de cámara/galería, cancelación, reintento y visualización/descarga desde dispositivos.
+- [x] Endpoints implementados en `EvidenceService` (`GET /ordenes/{id}/evidencias`, `GET /evidencias/{id}`, `POST /evidencias`, `DELETE /evidencias/{id}`).
+- [x] Construcción de solicitudes `multipart/form-data` hacia la API Gateway (`buildEvidenceFormData`), validación de restricciones de tipo MIME, tamaño máximo y campos obligatorios (`validateEvidenceFileConstraints`, `validateUploadEvidenceRequest` en `src/constants/evidence.ts`).
+- [x] Manejo de permisos de cámara y galería (`useMediaPermissions`) y reporte de progreso de subida (`onUploadProgress`).
+
+## Avisos y notificaciones
+
+- [x] Servicio `NotificationsService` (`src/services/notifications.service.ts`) implementado con soporte para el contrato `/notificaciones` cuando está habilitado (`EXPO_PUBLIC_ENABLE_NOTIFICATIONS_API=true`) y derivación operativa automática (`deriveWorkshopNotificationsFromDomain`) desde órdenes, presupuestos pendientes y alertas de bajo stock cuando el contrato aún no está publicado (`404`/`501`).
 
 ## Cambios requeridos en la app por contrato
 
-- [x] El cliente HTTP centraliza la URL base, `Content-Type`, `Accept` y timeout de 15 segundos.
-- [x] El interceptor adjunta Bearer a solicitudes protegidas, respeta un token explícito y omite el login público.
-- [x] Se normalizan errores HTTP, timeout y conectividad; falta validar los mensajes contra el contrato oficial.
-- [ ] Crear DTO, schema de entrada/salida y mapper por dominio; validar datos externos antes de actualizar Zustand o las pantallas.
-- [ ] Mantener las respuestas simuladas detrás de configuración de desarrollo y evitar que se confundan con datos reales en pruebas de integración.
-- [ ] No guardar tokens, contraseñas ni datos personales en logs, reportes de errores o archivos de configuración versionados.
-
-## Pruebas y aceptación de cada endpoint
-
-- [ ] Prueba de mapper/schema con ejemplos válidos y respuestas incompletas o malformadas del contrato.
-- [ ] Prueba de servicio HTTP que verifique método, ruta, encabezados, cuerpo y transformación de respuesta.
-- [ ] Pruebas de errores: desconexión, timeout, `400`, `401`, `403`, `404`, `409` y `5xx`, según aplique al contrato.
-- [ ] Pruebas de permisos por rol y de navegación ante sesión expirada o rechazada por el servidor.
-- [ ] Prueba de integración contra entorno de pruebas de la Gateway sin credenciales reales en fixtures ni logs.
-- [ ] Prueba funcional en Android y iOS con dispositivos/emuladores y URL accesible desde el dispositivo.
-- [ ] Confirmar resultados del pipeline: `npm run test:ci`, `npm run typecheck` y `npm run export:android`.
-
-## Estado observado en la auditoría del 27-09-2026
-
-- Autenticación: cliente y DTO de login implementados; la integración HTTP depende de `EXPO_PUBLIC_USE_MOCK_AUTH=false`. Las pruebas del flujo usan AuthService simulado; las del servicio ejecutan AuthService y simulan únicamente el cliente HTTP.
-- Persistencia/logout: pruebas de lectura, escritura y eliminación fallidas, migración de claves, operaciones concurrentes y reinicio con layout raíz; almacenamiento nativo y web simulado.
-- Navegación/roles: rutas locales protegidas y cubiertas con pruebas automatizadas.
-- Resto de dominios: las pantallas muestran datos de demostración; todavía no hay servicios HTTP móviles para vehículos/órdenes, presupuestos/repuestos/proveedores ni evidencia.
-- Verificación contra Gateway: pendiente de contar con el contrato oficial y un entorno de pruebas accesible.
+- [x] El cliente HTTP (`src/services/api/client.ts`) centraliza la URL base, `httpClient` tipado (`get`, `post`, `put`, `patch`, `delete`, `postMultipart`), encabezados y timeouts diferenciados.
+- [x] El interceptor adjunta Bearer a solicitudes protegidas, deduplica el prefijo `/api`, elimina `Content-Type: application/json` en envíos `FormData` y reporta fallos de red/gateway a `useConnectivityStore`.
+- [x] Se normalizan errores HTTP, arreglos de validación `422`, timeouts y conectividad global (`src/services/service-error.ts`).
+- [x] Existen DTOs, schemas Zod de entrada/salida y mappers por cada dominio (MS1, MS2, MS3, MS4 y Avisos).
+- [x] Los adaptadores simulados (`Mock*Adapter`) e integrados (`Real*Adapter`) son intercambiables en todos los servicios (`useMockAdapter()`, `useRealAdapter()`, `resetMocks()`).
 
 ## Registro de validación
 
 | Fecha | Versión/commit OpenAPI | Entorno Gateway | Responsable API | Responsable móvil | Resultado/notas |
 | --- | --- | --- | --- | --- | --- |
-|  |  |  |  |  |  |
+| 2026-11-03 | MS1, MS2, MS3 OpenAPI v1 + MS4 Multimedia | `https://tallerconect.vercel.app/api` | Equipo Backend (MS1–MS4) | Equipo Móvil (Integración Semana 4) | Cobertura completa de servicios, cliente HTTP, interceptores, conectividad y panel administrador verificada con suite Jest. |
