@@ -105,7 +105,7 @@ export function VehicleListScreen({ role }: VehicleListScreenProps) {
   return (
     <AppScreen
       eyebrow="Vehículos"
-      title="Mis vehículos"
+      title={role === 'administrador' ? 'Vehículos registrados' : 'Mis vehículos'}
       subtitle={getRoleSubtitle(role)}
     >
       {isLoading ? (

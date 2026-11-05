@@ -23,6 +23,17 @@ import { ordersService } from '@/services/orders.service';
 import { vehiclesService } from '@/services/vehicles.service';
 import { useAuthStore } from '@/stores/authStore';
 
+type DashboardAlertTone = 'warning' | 'info' | 'success';
+
+interface DashboardAlert {
+  id: string;
+  orderId: string;
+  title: string;
+  description: string;
+  tone: DashboardAlertTone;
+  updatedAt: string;
+}
+
 export default function AdministradorScreen() {
   const router = useRouter();
   const logout = useAuthStore((state) => state.logout);
@@ -125,6 +136,73 @@ export default function AdministradorScreen() {
     [orders],
   );
 
+  // Genera alertas operativas a partir del estado actual de las órdenes.
+  const alerts = useMemo<DashboardAlert[]>(() => {
+    const nextAlerts: DashboardAlert[] = [];
+
+    orders.forEach((order) => {
+      const orderLabel = `OT ${order.id.toUpperCase()}`;
+
+      if (
+        !order.assignedMechanicId &&
+        order.status !== 'entregado' &&
+        order.status !== 'cancelado'
+      ) {
+        nextAlerts.push({
+          id: `${order.id}-sin-mecanico`,
+          orderId: order.id,
+          title: 'Orden sin mecánico asignado',
+          description: `${orderLabel} necesita un mecánico.`,
+          tone: 'warning',
+          updatedAt: order.updatedAt,
+        });
+      }
+
+      switch (order.status) {
+        case 'esperando_aprobacion_presupuesto':
+          nextAlerts.push({
+            id: `${order.id}-presupuesto`,
+            orderId: order.id,
+            title: 'Presupuesto pendiente',
+            description: `${orderLabel} espera aprobación del presupuesto.`,
+            tone: 'warning',
+            updatedAt: order.updatedAt,
+          });
+          break;
+
+        case 'esperando_repuestos':
+          nextAlerts.push({
+            id: `${order.id}-repuestos`,
+            orderId: order.id,
+            title: 'Repuestos pendientes',
+            description: `${orderLabel} está esperando repuestos.`,
+            tone: 'info',
+            updatedAt: order.updatedAt,
+          });
+          break;
+
+        case 'listo_para_entrega':
+          nextAlerts.push({
+            id: `${order.id}-entrega`,
+            orderId: order.id,
+            title: 'Vehículo listo para entrega',
+            description: `${orderLabel} puede coordinar su entrega.`,
+            tone: 'success',
+            updatedAt: order.updatedAt,
+          });
+          break;
+      }
+    });
+
+    return nextAlerts
+      .sort(
+        (a, b) =>
+          new Date(b.updatedAt).getTime() -
+          new Date(a.updatedAt).getTime(),
+      )
+      .slice(0, 6);
+  }, [orders]);
+
   const handleLogout = async () => {
     await logout();
     router.replace('/login');
@@ -199,6 +277,72 @@ export default function AdministradorScreen() {
             message={ordersError}
             onRetry={() => void loadDashboard()}
           />
+        ) : null}
+
+        {!ordersError ? (
+          <View style={styles.alertsSection}>
+            <View style={styles.sectionHeader}>
+              <Text style={styles.sectionTitle}>Alertas del taller</Text>
+              <Text style={styles.orderCount}>
+                {alerts.length} {alerts.length === 1 ? 'alerta' : 'alertas'}
+              </Text>
+            </View>
+
+            {alerts.length === 0 ? (
+              <View style={styles.noAlertsCard}>
+                <Text style={styles.noAlertsTitle}>
+                  Todo está al día
+                </Text>
+                <Text style={styles.noAlertsDescription}>
+                  No hay alertas operativas pendientes en este momento.
+                </Text>
+              </View>
+            ) : (
+              <View style={styles.alertsList}>
+                {alerts.map((alert) => {
+                  const toneColor =
+                    alert.tone === 'warning'
+                      ? colors.warning
+                      : alert.tone === 'success'
+                        ? colors.success
+                        : colors.info;
+
+                  return (
+                    <Pressable
+                      key={alert.id}
+                      style={({ pressed }) => [
+                        styles.alertCard,
+                        pressed && styles.alertCardPressed,
+                      ]}
+                      onPress={() =>
+                        router.push(`/(admin)/ordenes/${alert.orderId}`)
+                      }
+                      accessibilityRole="button"
+                      accessibilityLabel={`${alert.title}. ${alert.description}`}
+                    >
+                      <View
+                        style={[
+                          styles.alertIndicator,
+                          { backgroundColor: toneColor },
+                        ]}
+                      />
+
+                      <View style={styles.alertTextContainer}>
+                        <Text style={styles.alertTitle}>
+                          {alert.title}
+                        </Text>
+                        <Text style={styles.alertDescription}>
+                          {alert.description}
+                        </Text>
+                      </View>
+
+                      <Text style={styles.alertArrow}>›</Text>
+                    </Pressable>
+                  );
+                })}
+              </View>
+            )}
+          </View>
         ) : null}
 
         <Text style={styles.sectionTitle}>Accesos rápidos</Text>
@@ -514,6 +658,67 @@ const styles = StyleSheet.create({
     color: colors.textMuted,
     fontSize: 12,
     fontWeight: '700',
+  },
+  alertsSection: {
+    gap: spacing.md,
+  },
+  alertsList: {
+    gap: spacing.sm,
+  },
+  alertCard: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    padding: spacing.md,
+    borderRadius: radius.lg,
+    backgroundColor: colors.surface,
+    borderWidth: 1,
+    borderColor: colors.border,
+    gap: spacing.md,
+  },
+  alertCardPressed: {
+    opacity: 0.7,
+  },
+  alertIndicator: {
+    width: 9,
+    height: 9,
+    borderRadius: radius.pill,
+  },
+  alertTextContainer: {
+    flex: 1,
+    gap: spacing.xs,
+  },
+  alertTitle: {
+    color: colors.primary,
+    fontSize: 14,
+    fontWeight: '800',
+  },
+  alertDescription: {
+    color: colors.textSecondary,
+    fontSize: 12,
+    lineHeight: 18,
+  },
+  alertArrow: {
+    color: colors.textMuted,
+    fontSize: 25,
+    fontWeight: '700',
+  },
+  noAlertsCard: {
+    padding: spacing.lg,
+    borderRadius: radius.lg,
+    backgroundColor: colors.surface,
+    borderWidth: 1,
+    borderColor: colors.border,
+    gap: spacing.xs,
+  },
+  noAlertsTitle: {
+    color: colors.success,
+    fontSize: 15,
+    fontWeight: '900',
+  },
+  noAlertsDescription: {
+    color: colors.textSecondary,
+    fontSize: 13,
+    lineHeight: 19,
   },
   ordersList: {
     gap: spacing.md,
