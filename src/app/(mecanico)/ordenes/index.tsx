@@ -80,7 +80,7 @@ export default function AssignedOrdersScreen() {
 
   const openOrder = (orderId: string) => {
     router.push({
-      pathname: '/(mecanico)/ordenes/[id]',
+      pathname: '/(mecanico)/ordenes/[id]' as never,
       params: { id: orderId },
     });
   };

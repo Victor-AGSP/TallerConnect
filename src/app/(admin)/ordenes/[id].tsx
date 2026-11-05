@@ -21,7 +21,7 @@ export default function OrdenScreen() {
   );
 
   const openBudget = useCallback(() => {
-    if (id) router.push({ pathname: '/ordenes/[id]/presupuesto', params: { id } });
+    if (id) router.push({ pathname: '/ordenes/[id]/presupuesto' as never, params: { id } });
   }, [id, router]);
 
   // Evidencias visibles según el alcance que MS4 aplica a este rol.

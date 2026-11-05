@@ -19,8 +19,9 @@ let customUnauthorizedHandler: UnauthorizedSessionHandler | null = null;
 let isHandlingUnauthorized = false;
 
 /**
- * Permite registrar un manejador desacoplado para eventos HTTP 401/403
+ * Permite registrar un manejador desacoplado para eventos HTTP 401 (sesión inválida)
  * sin depender de importaciones circulares directas entre interceptores y stores.
+ * Un HTTP 403 (rol sin permiso) nunca invoca este manejador.
  */
 export function registerUnauthorizedHandler(
   handler: UnauthorizedSessionHandler | null

@@ -285,7 +285,7 @@ describe('PartsService.getSuppliers', () => {
   });
 
   it('propaga el error del servidor', async () => {
-    mockedApiClient.get.mockRejectedValueOnce(httpError(503));
+    mockedApiClient.get.mockRejectedValueOnce(httpError(500));
 
     await expect(partsService.getSuppliers()).rejects.toThrow(
       'Error interno en el servidor. Intenta nuevamente más tarde.',
@@ -342,7 +342,7 @@ describe('PartsService: paginación con desde/limite (MS3)', () => {
   });
 
   it('propaga el error de una página posterior', async () => {
-    mockedApiClient.get.mockRejectedValueOnce(httpError(503));
+    mockedApiClient.get.mockRejectedValueOnce(httpError(500));
 
     await expect(partsService.getSpareParts({ offset: 50 })).rejects.toThrow(
       'Error interno en el servidor. Intenta nuevamente más tarde.',

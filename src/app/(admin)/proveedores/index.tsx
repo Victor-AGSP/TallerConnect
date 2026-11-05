@@ -18,7 +18,7 @@ export default function ProveedoresScreen() {
   );
 
   const openSupplier = useCallback(
-    (supplierId: string) => router.push(`/proveedores/${supplierId}`),
+    (supplierId: string) => router.push(`/proveedores/${supplierId}` as never),
     [router],
   );
 

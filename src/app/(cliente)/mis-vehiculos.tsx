@@ -21,7 +21,7 @@ export default function MisVehiculosScreen() {
       title="Mis vehículos"
       subtitle="Vehículos registrados a tu nombre en el taller."
       emptyMessage="Todavía no tienes vehículos registrados en el taller."
-      onOpenVehicle={(id) => router.push(`/(cliente)/vehiculos/${id}`)}
+      onOpenVehicle={(id) => router.push(`/(cliente)/vehiculos/${id}` as never)}
       loadVehicles={loadVehicles}
     />
   );

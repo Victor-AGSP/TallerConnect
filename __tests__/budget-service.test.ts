@@ -344,7 +344,8 @@ describe('BudgetsService.getBudgetForOrder', () => {
   it.each([
     ['403 rol no permitido', httpError(403, { detail: 'Rol no permitido' }), 'Rol no permitido'],
     ['404 presupuesto ajeno', httpError(404, { detail: 'Presupuesto o versión inexistente (o ajeno)' }), 'Presupuesto o versión inexistente (o ajeno)'],
-    ['503 MS2 no disponible', httpError(503), 'Error interno en el servidor. Intenta nuevamente más tarde.'],
+    ['500 error del servidor', httpError(500), 'Error interno en el servidor. Intenta nuevamente más tarde.'],
+    ['503 MS2 no disponible', httpError(503), 'El servicio o la API Gateway no se encuentra disponible temporalmente. Intenta más tarde.'],
     ['sin conexión', { isAxiosError: true, message: 'Network Error' }, 'Backend no disponible o sin conexión a internet. Revisa tu conexión.'],
   ])('propaga el error normalizado: %s', async (_, error, message) => {
     mockedApiClient.get.mockRejectedValueOnce(error);

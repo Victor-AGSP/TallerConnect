@@ -267,7 +267,7 @@ function OrderDetailScreenContent({
           <Button
             title="Ver presupuesto"
             onPress={() => router.push({
-              pathname: role === 'cliente' ? '/mis-ordenes/[id]/presupuesto' : '/ordenes/[id]/presupuesto',
+              pathname: (role === 'cliente' ? '/mis-ordenes/[id]/presupuesto' : '/ordenes/[id]/presupuesto') as never,
               params: { id: order.id },
             })}
           />
