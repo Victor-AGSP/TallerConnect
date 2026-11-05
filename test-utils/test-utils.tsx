@@ -1,5 +1,5 @@
 import type { ComponentType, PropsWithChildren, ReactElement } from 'react';
-import { render, type RenderOptions } from '@testing-library/react-native';
+import { render, type RenderOptions, type RenderResult } from '@testing-library/react-native';
 import {
   renderRouter,
   type MockContextConfig,
@@ -25,6 +25,14 @@ export type RenderRouterWithProvidersOptions = Omit<
   RenderRouterOptions,
   'wrapper'
 > & SharedRenderOptions;
+
+export type RouterResult = RenderResult & {
+  getPathname(): string;
+  getPathnameWithParams(): string;
+  getSegments(): string[];
+  getSearchParams(): Record<string, string | string[]>;
+  getRouterState(): any;
+};
 
 function composeProviders(wrapper?: Provider): Provider {
   const Wrapper = wrapper;
@@ -56,18 +64,28 @@ export function renderWithProviders(
 }
 
 /** Renders file-system routes with Expo Router and the shared test providers. */
-export function renderRouterWithProviders(
+export async function renderRouterWithProviders(
   routes: MockContextConfig = './src/app',
   {
     wrapper,
     initialAuthState,
     ...options
   }: RenderRouterWithProvidersOptions = {},
-) {
+): Promise<RouterResult> {
   applyAuthState(initialAuthState);
 
-  return renderRouter(routes, {
+  const rawRouter = renderRouter(routes, {
     ...options,
     wrapper: composeProviders(wrapper),
+  });
+
+  const renderResult = await rawRouter;
+
+  return Object.assign(renderResult, {
+    getPathname: () => rawRouter.getPathname(),
+    getPathnameWithParams: () => rawRouter.getPathnameWithParams(),
+    getSegments: () => rawRouter.getSegments(),
+    getSearchParams: () => rawRouter.getSearchParams(),
+    getRouterState: () => rawRouter.getRouterState(),
   });
 }

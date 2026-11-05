@@ -176,7 +176,7 @@ export function deriveWorkshopNotificationsFromDomain(input: {
   for (const order of input.orders ?? []) {
     if (
       order.status === 'listo_para_entrega' ||
-      order.status === 'esperando_aprobacion'
+      order.status === 'esperando_aprobacion_presupuesto'
     ) {
       derived.push({
         id: `drv-order-${order.id}`,

@@ -299,7 +299,7 @@ export default function MecanicoScreen() {
 
         <Button
           title="Ver mis vehículos"
-          onPress={() => router.push('/(mecanico)/vehiculos')}
+          onPress={() => router.push('/(mecanico)/vehiculos' as never)}
           style={styles.logoutButton}
         />
         

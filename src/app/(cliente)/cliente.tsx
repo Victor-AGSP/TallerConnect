@@ -278,7 +278,7 @@ export default function ClienteScreen() {
             ===================================== */}
         <Button
           title="Ver mis vehículos"
-          onPress={() => router.push('/(cliente)/vehiculos')}
+          onPress={() => router.push('/(cliente)/vehiculos' as never)}
           style={styles.logoutButton}
         />
         <Button
