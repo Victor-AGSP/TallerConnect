@@ -22,6 +22,7 @@ jest.mock('expo-router', () => ({
 
 describe('Integración de servicios necesarios del administrador', () => {
   beforeEach(() => {
+    adminDashboardService.useMockAdapter();
     vehiclesService.useMockAdapter();
     vehiclesService.resetMocks();
     ordersService.useMockAdapter();
@@ -36,14 +37,22 @@ describe('Integración de servicios necesarios del administrador', () => {
     notificationsService.resetMocks();
   });
 
-  it('agrega métricas de vehículos, órdenes, presupuestos, repuestos, proveedores y avisos en adminDashboardService', async () => {
-    const data = await adminDashboardService.getDashboardData();
+  it('agrega métricas de vehículos, órdenes, presupuestos, repuestos, proveedores y avisos en adminDashboardService y getAdminSummary', async () => {
+    const [data, adminSummary] = await Promise.all([
+      adminDashboardService.getDashboardData(),
+      adminDashboardService.getAdminSummary(),
+    ]);
 
     expect(Number(data.systemSummary.registeredVehicles)).toBeGreaterThan(0);
     expect(Number(data.systemSummary.registeredProviders)).toBeGreaterThan(0);
     expect(data.activeOrderRows.length).toBeGreaterThan(0);
     expect(data.pendingApprovalRows.length).toBeGreaterThan(0);
     expect(data.notifications.length).toBeGreaterThan(0);
+
+    expect(adminSummary.orders?.total).toBeGreaterThan(0);
+    expect(adminSummary.vehicles?.total).toBeGreaterThan(0);
+    expect(adminSummary.budgets?.total).toBeGreaterThan(0);
+    expect(adminSummary.inventory?.partsBelowThreshold).toBeGreaterThan(0);
   });
 
   it('permite ejecutar acciones administrativas sobre órdenes y notificaciones', async () => {

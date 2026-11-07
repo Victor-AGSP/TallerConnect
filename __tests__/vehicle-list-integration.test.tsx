@@ -297,6 +297,6 @@ describe('listado de vehículos: acceso desde cada panel', () => {
     );
     await waitFor(() => expect(screen).toHavePathname('/vehiculos'));
     expect(mockedService.getVehicles).toHaveBeenCalledTimes(2);
-    expect(ordersService.getOrders).toHaveBeenCalledTimes(1);
+    expect(ordersService.getOrders).toHaveBeenCalledTimes(2);
   });
 });

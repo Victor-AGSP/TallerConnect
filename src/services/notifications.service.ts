@@ -1,15 +1,29 @@
 import { ENV } from '@/config/env';
+import type {
+  CancellationRequestResponseDto,
+  DailyIntakeCapacityResponseDto,
+  MechanicCapacityResponseDto,
+  StockAlertPageResponseDto,
+} from '@/dto/notice.dto';
 import {
   MarkNotificationReadResponseDto,
   NotificationQueryParamsDto,
   NotificationResponseDto,
 } from '@/dto/notification.dto';
 import {
+  mapDailyIntakeExceededNotice,
+  mapLowStockNotices,
+  mapMechanicsOverLimitNotice,
+  mapPendingCancellationNotices,
+} from '@/mappers/notice.mapper';
+import {
   deriveWorkshopNotificationsFromDomain,
   mapNotificationResponse,
   mapNotificationsResponseList,
 } from '@/mappers/notification.mapper';
+import { mockNotices } from '@/mocks/notices.mock';
 import { mockNotifications } from '@/mocks/notifications.mock';
+import type { Notice } from '@/models/notice.model';
 import {
   NotificationContractStatus,
   WorkshopNotification,
@@ -82,6 +96,7 @@ export interface NotificationServiceAdapter {
   getNotifications(
     params?: NotificationQueryParamsDto
   ): Promise<WorkshopNotification[]>;
+  getNotices(): Promise<Notice[]>;
   getUnreadCount(params?: NotificationQueryParamsDto): Promise<number>;
   markAsRead(id: string | number): Promise<WorkshopNotification>;
   markAllAsRead(): Promise<number>;
@@ -94,13 +109,16 @@ export interface NotificationServiceAdapter {
  */
 export class MockNotificationAdapter implements NotificationServiceAdapter {
   private notifications: WorkshopNotification[];
+  private notices: Notice[];
   private readonly delayMs: number;
 
   constructor(
     initialNotifications: WorkshopNotification[] = mockNotifications,
-    delayMs = 0
+    delayMs = 0,
+    initialNotices: Notice[] = mockNotices
   ) {
     this.notifications = initialNotifications.map((n) => ({ ...n }));
+    this.notices = initialNotices.map((n) => ({ ...n }));
     this.delayMs = delayMs;
   }
 
@@ -111,9 +129,11 @@ export class MockNotificationAdapter implements NotificationServiceAdapter {
   }
 
   resetMocks(
-    initialNotifications: WorkshopNotification[] = mockNotifications
+    initialNotifications: WorkshopNotification[] = mockNotifications,
+    initialNotices: Notice[] = mockNotices
   ): void {
     this.notifications = initialNotifications.map((n) => ({ ...n }));
+    this.notices = initialNotices.map((n) => ({ ...n }));
   }
 
   getContractStatus(): NotificationContractStatus {
@@ -125,6 +145,11 @@ export class MockNotificationAdapter implements NotificationServiceAdapter {
   ): Promise<WorkshopNotification[]> {
     await this.simulateDelay();
     return filterNotificationsByParams(this.notifications, params);
+  }
+
+  async getNotices(): Promise<Notice[]> {
+    await this.simulateDelay();
+    return this.notices.map((n) => ({ ...n }));
   }
 
   async getUnreadCount(params?: NotificationQueryParamsDto): Promise<number> {
@@ -176,9 +201,14 @@ export interface RealNotificationAdapterOptions {
 }
 
 /**
- * Adaptador HTTP real conectado a `/notificaciones` si el contrato está disponible,
- * con degradación elegante (derivación operativa desde órdenes, presupuestos y repuestos)
- * cuando el endpoint aún no está publicado en la API Gateway (`404` / `501` / flag deshabilitado).
+ * Adaptador HTTP real conectado a:
+ * 1) Los endpoints reales de avisos publicados en los contratos de MS2 y MS3:
+ *    - `GET /inventario/alertas` (MS3)
+ *    - `GET /ordenes/cancelaciones/pendientes` (MS2)
+ *    - `GET /ordenes/configuracion/capacidad/mecanicos` (MS2)
+ *    - `GET /ordenes/configuracion/capacidad/ingresos-diarios` (MS2)
+ * 2) El endpoint `/notificaciones` si se habilita explícitamente (`ENABLE_NOTIFICATIONS_API`),
+ *    con derivación operativa de respaldo cuando no está disponible.
  */
 export class RealNotificationAdapter implements NotificationServiceAdapter {
   private contractEnabled: boolean;
@@ -210,6 +240,70 @@ export class RealNotificationAdapter implements NotificationServiceAdapter {
       status === HTTP_STATUS.BAD_GATEWAY ||
       status === HTTP_STATUS.SERVICE_UNAVAILABLE
     );
+  }
+
+  /**
+   * Consulta los 4 endpoints reales de avisos definidos en los contratos MS2 y MS3:
+   * - `GET /inventario/alertas` (`PaginaAlertas` en MS3)
+   * - `GET /ordenes/cancelaciones/pendientes` (`SolicitudCancelacionRespuesta[]` en MS2)
+   * - `GET /ordenes/configuracion/capacidad/mecanicos` (`CapacidadMecanicoRespuesta` en MS2)
+   * - `GET /ordenes/configuracion/capacidad/ingresos-diarios` (`CupoDiarioIngresosRespuesta` en MS2)
+   */
+  async getNotices(): Promise<Notice[]> {
+    const [
+      stockAlertsResult,
+      cancellationsResult,
+      mechanicCapResult,
+      dailyIntakeResult,
+    ] = await Promise.allSettled([
+      apiClient.get<StockAlertPageResponseDto>('/inventario/alertas', {
+        skipSessionLogoutOn403: true,
+      }),
+      apiClient.get<CancellationRequestResponseDto[]>(
+        '/ordenes/cancelaciones/pendientes',
+        { skipSessionLogoutOn403: true }
+      ),
+      apiClient.get<MechanicCapacityResponseDto>(
+        '/ordenes/configuracion/capacidad/mecanicos',
+        { skipSessionLogoutOn403: true }
+      ),
+      apiClient.get<DailyIntakeCapacityResponseDto>(
+        '/ordenes/configuracion/capacidad/ingresos-diarios',
+        { skipSessionLogoutOn403: true }
+      ),
+    ]);
+
+    const notices: Notice[] = [];
+
+    if (stockAlertsResult.status === 'fulfilled') {
+      notices.push(...mapLowStockNotices(stockAlertsResult.value.data));
+    }
+
+    if (cancellationsResult.status === 'fulfilled') {
+      notices.push(
+        ...mapPendingCancellationNotices(cancellationsResult.value.data)
+      );
+    }
+
+    if (mechanicCapResult.status === 'fulfilled') {
+      const capNotice = mapMechanicsOverLimitNotice(
+        mechanicCapResult.value.data
+      );
+      if (capNotice) {
+        notices.push(capNotice);
+      }
+    }
+
+    if (dailyIntakeResult.status === 'fulfilled') {
+      const intakeNotice = mapDailyIntakeExceededNotice(
+        dailyIntakeResult.value.data
+      );
+      if (intakeNotice) {
+        notices.push(intakeNotice);
+      }
+    }
+
+    return notices;
   }
 
   private async buildDerivedFallbackNotifications(
@@ -345,8 +439,9 @@ export class RealNotificationAdapter implements NotificationServiceAdapter {
 }
 
 /**
- * Servicio de Avisos y Notificaciones con soporte para contrato dedicado (`/api/notificaciones`),
- * derivación operativa automática cuando el contrato aún no está publicado y modo Mock.
+ * Servicio de Avisos y Notificaciones con soporte para:
+ * - Avisos tipados (`Notice[]`) desde los contratos reales de MS2 y MS3 (`getNotices()`).
+ * - Contrato `/api/notificaciones` o derivación operativa (`getNotifications()`).
  */
 export class NotificationsService {
   private adapter: NotificationServiceAdapter;
@@ -380,11 +475,27 @@ export class NotificationsService {
   }
 
   resetMocks(): void {
-    this.mockAdapter.resetMocks(mockNotifications);
+    this.mockAdapter.resetMocks(mockNotifications, mockNotices);
   }
 
   getContractStatus(): NotificationContractStatus {
     return this.adapter.getContractStatus();
+  }
+
+  /**
+   * Consulta los avisos tipados (`Notice[]`) provenientes de los endpoints reales
+   * de MS2 (`/ordenes/cancelaciones/pendientes`, `/ordenes/configuracion/capacidad/mecanicos`,
+   * `/ordenes/configuracion/capacidad/ingresos-diarios`) y MS3 (`/inventario/alertas`).
+   */
+  async getNotices(): Promise<Notice[]> {
+    try {
+      return await this.adapter.getNotices();
+    } catch (error: unknown) {
+      throw normalizeNotificationServiceError(
+        error,
+        'No fue posible consultar los avisos del taller.'
+      );
+    }
   }
 
   /**

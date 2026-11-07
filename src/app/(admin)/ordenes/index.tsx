@@ -80,7 +80,7 @@ export default function AdminOrdersScreen() {
   }, []);
 
   useEffect(() => {
-    void loadData();
+    void Promise.resolve().then(() => loadData());
   }, [loadData]);
 
   const vehicleById = useMemo(

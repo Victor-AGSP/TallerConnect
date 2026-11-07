@@ -71,6 +71,20 @@ export interface RetryConfig {
 }
 
 /**
+ * Extensión de AxiosRequestConfig para soportar flags personalizados en AxiosInstance
+ * como `skipAuth`, `skipSessionLogoutOn403`, `isMultipart` y `retryConfig`.
+ */
+declare module 'axios' {
+  export interface AxiosRequestConfig {
+    skipAuth?: boolean;
+    skipSessionLogoutOn403?: boolean;
+    isMultipart?: boolean;
+    retryConfig?: RetryConfig;
+    __retryCount?: number;
+  }
+}
+
+/**
  * Configuración base tipada para solicitudes hacia la API Gateway.
  * Permite flags personalizados como `skipAuth`, `skipSessionLogoutOn403`,
  * `isMultipart` y `retryConfig`.

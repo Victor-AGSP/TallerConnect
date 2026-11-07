@@ -26,6 +26,16 @@ export type RenderRouterWithProvidersOptions = Omit<
   'wrapper'
 > & SharedRenderOptions;
 
+let activeRouterRender: Awaited<ReturnType<typeof renderRouter>> | null = null;
+
+export function getCurrentTestPathname(): string | null {
+  if (!activeRouterRender ||
+      typeof activeRouterRender.getPathname !== 'function') {
+    return null;
+  }
+  return activeRouterRender.getPathname();
+}
+
 function composeProviders(wrapper?: Provider): Provider {
   const Wrapper = wrapper;
 
@@ -56,7 +66,7 @@ export function renderWithProviders(
 }
 
 /** Renders file-system routes with Expo Router and the shared test providers. */
-export function renderRouterWithProviders(
+export async function renderRouterWithProviders(
   routes: MockContextConfig = './src/app',
   {
     wrapper,
@@ -66,8 +76,10 @@ export function renderRouterWithProviders(
 ) {
   applyAuthState(initialAuthState);
 
-  return renderRouter(routes, {
+  const result = await renderRouter(routes, {
     ...options,
     wrapper: composeProviders(wrapper),
   });
+  activeRouterRender = result;
+  return result;
 }

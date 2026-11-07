@@ -327,7 +327,7 @@ export default function MecanicoScreen() {
 
         <Button
           title="Ver vehículos asignados"
-          onPress={() => router.push('./vehiculos-asignados')}
+          onPress={() => router.push('/(mecanico)/vehiculos-asignados' as never)}
           style={styles.navButton}
         />
 

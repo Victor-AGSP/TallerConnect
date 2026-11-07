@@ -3,6 +3,12 @@ import {
   deriveWorkshopNotificationsFromDomain,
   mapNotificationResponse,
 } from '@/mappers/notification.mapper';
+import {
+  cancellationRequestPayloads,
+  dailyIntakeCapacityPayloads,
+  mechanicCapacityPayloads,
+  stockAlertPagePayload,
+} from '@/mocks/payloads/notice.payload';
 import { apiClient } from '@/services/api/client';
 import { HTTP_STATUS } from '@/services/api/types';
 import { budgetsService } from '@/services/budgets.service';
@@ -87,10 +93,17 @@ describe('NotificationsService & Notification Adapters', () => {
   });
 
   describe('MockNotificationAdapter', () => {
-    it('permite consultar, filtrar por categoría/rol/no leídas y marcar como leídas', async () => {
+    it('permite consultar avisos de contrato (getNotices), filtrar notificaciones y marcar como leídas', async () => {
       const service = new NotificationsService(new MockNotificationAdapter());
 
       expect(service.getContractStatus()).toBe('mock');
+
+      const contractNotices = await service.getNotices();
+      expect(contractNotices.length).toBeGreaterThan(0);
+      expect(contractNotices.some((n) => n.type === 'low_stock')).toBe(true);
+      expect(
+        contractNotices.some((n) => n.type === 'pending_cancellation')
+      ).toBe(true);
 
       const all = await service.getNotifications();
       expect(all).toHaveLength(4);
@@ -126,7 +139,46 @@ describe('NotificationsService & Notification Adapters', () => {
     });
   });
 
-  describe('RealNotificationAdapter (Contrato disponible vs Fallback derivado)', () => {
+  describe('RealNotificationAdapter (Endpoints MS2/MS3 y Fallback)', () => {
+    it('consume los 4 endpoints reales de avisos de MS2 y MS3 mediante getNotices()', async () => {
+      const service = new NotificationsService(new RealNotificationAdapter());
+
+      mockedApiClient.get
+        .mockResolvedValueOnce({ data: stockAlertPagePayload } as never)
+        .mockResolvedValueOnce({
+          data: Object.values(cancellationRequestPayloads),
+        } as never)
+        .mockResolvedValueOnce({
+          data: mechanicCapacityPayloads.sobreLimite,
+        } as never)
+        .mockResolvedValueOnce({
+          data: dailyIntakeCapacityPayloads.cupoExcedido,
+        } as never);
+
+      const notices = await service.getNotices();
+
+      expect(mockedApiClient.get).toHaveBeenCalledWith('/inventario/alertas', {
+        skipSessionLogoutOn403: true,
+      });
+      expect(mockedApiClient.get).toHaveBeenCalledWith(
+        '/ordenes/cancelaciones/pendientes',
+        { skipSessionLogoutOn403: true }
+      );
+      expect(mockedApiClient.get).toHaveBeenCalledWith(
+        '/ordenes/configuracion/capacidad/mecanicos',
+        { skipSessionLogoutOn403: true }
+      );
+      expect(mockedApiClient.get).toHaveBeenCalledWith(
+        '/ordenes/configuracion/capacidad/ingresos-diarios',
+        { skipSessionLogoutOn403: true }
+      );
+
+      expect(notices.some((n) => n.type === 'low_stock')).toBe(true);
+      expect(notices.some((n) => n.type === 'pending_cancellation')).toBe(true);
+      expect(notices.some((n) => n.type === 'mechanics_over_limit')).toBe(true);
+      expect(notices.some((n) => n.type === 'daily_intake_exceeded')).toBe(true);
+    });
+
     it('consume GET /notificaciones, PATCH /notificaciones/{id}/leida y POST /notificaciones/leer-todas cuando el contrato está habilitado', async () => {
       const service = new NotificationsService(
         new RealNotificationAdapter({ contractEnabled: true })

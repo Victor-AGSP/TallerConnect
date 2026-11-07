@@ -35,7 +35,7 @@ const solicitudes = [...Object.values(cancellationRequestPayloads), solicitudCon
 describe('Validación del resumen administrativo', () => {
   it('rechaza una orden con un estado_codigo fuera del catálogo', () => {
     expect(() => mapAdminOrderSummary([invalidOrderResponsePayloads.unknownStatus])).toThrow(
-      'Estado de orden desconocido: 9',
+      'La orden informa un estado que la aplicación no reconoce (código 9).',
     );
   });
 
@@ -87,7 +87,7 @@ describe('Validación de los avisos', () => {
 
   it('rechaza una solicitud con un estado_al_solicitar fuera del catálogo', () => {
     expect(() => mapPendingCancellationNotices([invalidCancellationRequestPayloads.unknownOrderStatus])).toThrow(
-      'Estado de orden desconocido: 9',
+      'La orden informa un estado que la aplicación no reconoce (código 9).',
     );
   });
 

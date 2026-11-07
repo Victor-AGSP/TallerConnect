@@ -230,10 +230,26 @@ describe('caso de uso: consultar una orden de trabajo', () => {
       if (role === 'administrador') {
         await screen.findByRole('button', { name: 'Ver vehículos registrados' });
       }
-      const dashboardRequests = role === 'administrador' ? 2 : 0;
-      expect(adapter.mock.calls.map(([config]) => `${config.method} ${config.url}`)).toEqual(
-        role === 'administrador' ? ['get /ordenes', 'get /vehiculos'] : [],
+      const expectedDashboardCalls =
+        role === 'administrador'
+          ? [
+              'get /ordenes',
+              'get /vehiculos',
+              'get /ordenes',
+              'get /presupuestos',
+              'get /repuestos',
+            ]
+          : [];
+
+      await waitFor(() =>
+        expect(
+          adapter.mock.calls.map(
+            ([config]) => `${config.method} ${config.url}`
+          )
+        ).toEqual(expectedDashboardCalls),
       );
+
+      const dashboardRequests = expectedDashboardCalls.length;
 
       await openOrder(orderPath);
 
@@ -988,8 +1004,11 @@ describe('caso de uso: consultar vehículos, repuestos y proveedores', () => {
 
     // Cada consulta pasó por el cliente HTTP real con el token de la sesión.
     expect(adapter.mock.calls.map(([config]) => `${config.method} ${config.url}`)).toEqual([
-      'get /ordenes', // Dashboard: una consulta por recurso.
+      'get /ordenes', // Panel administrativo.
       'get /vehiculos',
+      'get /ordenes', // Avisos derivados del dominio.
+      'get /presupuestos',
+      'get /repuestos',
       'get /vehiculos', // Listado solicitado al navegar.
       'get /repuestos',
       'get /proveedores',

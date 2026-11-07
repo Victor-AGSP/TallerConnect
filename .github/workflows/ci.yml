@@ -5,10 +5,14 @@ on:
     branches:
       - Victor
       - Develop
+      - main
+      - 'integracion/**'
   pull_request:
     branches:
       - Victor
       - Develop
+      - main
+      - 'integracion/**'
   workflow_dispatch:
 
 permissions:

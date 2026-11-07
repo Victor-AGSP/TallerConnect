@@ -1,3 +1,5 @@
+import { getCurrentTestPathname } from './test-utils';
+
 export {
   act,
   cleanup,
@@ -29,15 +31,7 @@ declare global {
 
 expect.extend({
   toHavePathname(_received: unknown, expected: string) {
-    const module = jest.requireActual(
-      'expo-router/build/global-state/router-store',
-    ) as {
-      store?: {
-        getRouteInfo?: () => { pathname: string };
-      };
-    };
-
-    const actual = module.store?.getRouteInfo?.()?.pathname;
+    const actual = getCurrentTestPathname();
 
     if (typeof actual !== 'string') {
       return {

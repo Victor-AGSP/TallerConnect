@@ -1,11 +1,35 @@
 import { ORDER_STATUS_LABELS, WorkOrderStatus } from '@/constants/orderStatus';
 import { ROLES } from '@/constants/roles';
+import type { UserResponseDto } from '@/dto/auth.dto';
+import type { BudgetPageResponseDto } from '@/dto/budget.dto';
+import type {
+  CancellationRequestResponseDto,
+  DailyIntakeCapacityResponseDto,
+  MechanicCapacityResponseDto,
+  StockAlertPageResponseDto,
+} from '@/dto/notice.dto';
+import type { OrderResponseDto } from '@/dto/order.dto';
+import type { VehicleResponseDto } from '@/dto/vehicle.dto';
+import {
+  buildAdminSummary,
+  mapAdminBudgetSummary,
+  mapAdminCancellationSummary,
+  mapAdminDailyIntakeSummary,
+  mapAdminInventorySummary,
+  mapAdminMechanicCapacitySummary,
+  mapAdminOrderSummary,
+  mapAdminUserSummary,
+  mapAdminVehicleSummary,
+} from '@/mappers/admin.mapper';
+import { mockAdminSummary } from '@/mocks/admin.mock';
+import type { AdminSummary } from '@/models/admin.model';
 import { BudgetSummary } from '@/models/budget.model';
 import { WorkshopNotification } from '@/models/notification.model';
 import { WorkOrder } from '@/models/order.model';
 import { Part } from '@/models/part.model';
 import { Provider } from '@/models/provider.model';
 import { Vehicle } from '@/models/vehicle.model';
+import { apiClient } from '@/services/api/client';
 import { budgetsService } from '@/services/budgets.service';
 import { notificationsService } from '@/services/notifications.service';
 import { ordersService } from '@/services/orders.service';
@@ -275,9 +299,111 @@ export function buildAdminDashboardFromDomain(input: {
 
 /**
  * Servicio agregador para el panel del Administrador que integra Vehículos,
- * Órdenes, Presupuestos, Repuestos, Proveedores y Avisos/Notificaciones.
+ * Órdenes, Presupuestos, Repuestos, Proveedores y Avisos/Notificaciones,
+ * incluyendo el resumen oficial `AdminSummary` mapeado desde los contratos MS1, MS2 y MS3.
  */
 export class AdminDashboardService {
+  private useMockSummary = process.env.EXPO_PUBLIC_USE_MOCK_AUTH === 'true';
+
+  useMockAdapter(): void {
+    this.useMockSummary = true;
+  }
+
+  useRealAdapter(): void {
+    this.useMockSummary = false;
+  }
+
+  /**
+   * Consulta los 8 endpoints de los contratos MS1, MS2 y MS3 para construir `AdminSummary`:
+   * - `GET /ordenes` (MS2)
+   * - `GET /vehiculos` (MS2)
+   * - `GET /auth/usuarios` (MS1)
+   * - `GET /presupuestos` (MS3)
+   * - `GET /inventario/alertas` (MS3)
+   * - `GET /ordenes/cancelaciones/pendientes` (MS2)
+   * - `GET /ordenes/configuracion/capacidad/mecanicos` (MS2)
+   * - `GET /ordenes/configuracion/capacidad/ingresos-diarios` (MS2)
+   */
+  async getAdminSummary(): Promise<AdminSummary> {
+    if (this.useMockSummary) {
+      return { ...mockAdminSummary };
+    }
+
+    const [
+      ordersRes,
+      vehiclesRes,
+      usersRes,
+      budgetsRes,
+      inventoryRes,
+      cancellationsRes,
+      mechanicCapRes,
+      dailyIntakeRes,
+    ] = await Promise.allSettled([
+      apiClient.get<OrderResponseDto[]>('/ordenes', {
+        skipSessionLogoutOn403: true,
+      }),
+      apiClient.get<VehicleResponseDto[]>('/vehiculos', {
+        skipSessionLogoutOn403: true,
+      }),
+      apiClient.get<UserResponseDto[]>('/auth/usuarios', {
+        skipSessionLogoutOn403: true,
+      }),
+      apiClient.get<BudgetPageResponseDto>('/presupuestos', {
+        skipSessionLogoutOn403: true,
+      }),
+      apiClient.get<StockAlertPageResponseDto>('/inventario/alertas', {
+        skipSessionLogoutOn403: true,
+      }),
+      apiClient.get<CancellationRequestResponseDto[]>(
+        '/ordenes/cancelaciones/pendientes',
+        { skipSessionLogoutOn403: true }
+      ),
+      apiClient.get<MechanicCapacityResponseDto>(
+        '/ordenes/configuracion/capacidad/mecanicos',
+        { skipSessionLogoutOn403: true }
+      ),
+      apiClient.get<DailyIntakeCapacityResponseDto>(
+        '/ordenes/configuracion/capacidad/ingresos-diarios',
+        { skipSessionLogoutOn403: true }
+      ),
+    ]);
+
+    return buildAdminSummary({
+      orders:
+        ordersRes.status === 'fulfilled'
+          ? mapAdminOrderSummary(ordersRes.value.data)
+          : null,
+      vehicles:
+        vehiclesRes.status === 'fulfilled'
+          ? mapAdminVehicleSummary(vehiclesRes.value.data)
+          : null,
+      users:
+        usersRes.status === 'fulfilled'
+          ? mapAdminUserSummary(usersRes.value.data)
+          : null,
+      budgets:
+        budgetsRes.status === 'fulfilled'
+          ? mapAdminBudgetSummary(budgetsRes.value.data.presupuestos)
+          : null,
+      inventory:
+        inventoryRes.status === 'fulfilled'
+          ? mapAdminInventorySummary(inventoryRes.value.data)
+          : null,
+      cancellations:
+        cancellationsRes.status === 'fulfilled'
+          ? mapAdminCancellationSummary(cancellationsRes.value.data)
+          : null,
+      mechanicCapacity:
+        mechanicCapRes.status === 'fulfilled'
+          ? mapAdminMechanicCapacitySummary(mechanicCapRes.value.data)
+          : null,
+      dailyIntake:
+        dailyIntakeRes.status === 'fulfilled'
+          ? mapAdminDailyIntakeSummary(dailyIntakeRes.value.data)
+          : null,
+    });
+  }
+
   async getDashboardData(): Promise<AdminDashboardData> {
     const [
       vehiclesResult,

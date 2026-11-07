@@ -96,7 +96,7 @@ export default function AdministradorScreen() {
   };
 
   useEffect(() => {
-    void loadDashboard();
+    void Promise.resolve().then(() => loadDashboard());
   }, [loadDashboard]);
 
   const metrics = useMemo(() => {

@@ -167,15 +167,19 @@ describe('vistas de órdenes: errores de servicio', () => {
     );
   });
 
-  it.each([500, 503])('informa un error %i del servidor', async (status) => {
-    mockedApiClient.get.mockRejectedValueOnce(httpError(status));
+  it.each([
+    [500, 'Error interno en el servidor. Intenta nuevamente más tarde.'],
+    [503, 'El servicio o la API Gateway no se encuentra disponible temporalmente. Intenta más tarde.'],
+  ] as const)(
+    'informa un error %i del servidor',
+    async (status, message) => {
+      mockedApiClient.get.mockRejectedValueOnce(httpError(status));
 
-    await renderOrder('/ordenes-asignadas/31');
+      await renderOrder('/ordenes-asignadas/31');
 
-    await expectErrorMessage(
-      'Error interno en el servidor. Intenta nuevamente más tarde.',
-    );
-  });
+      await expectErrorMessage(message);
+    },
+  );
 
   it('no repite la consulta por su cuenta tras un error', async () => {
     mockedApiClient.get.mockRejectedValueOnce(httpError(500));

@@ -314,7 +314,7 @@ export default function ClienteScreen() {
             ===================================== */}
         <Button
           title="Ver mis vehículos"
-          onPress={() => router.push('./mis-vehiculos')}
+          onPress={() => router.push('/(cliente)/mis-vehiculos' as never)}
           style={styles.navButton}
         />
 
