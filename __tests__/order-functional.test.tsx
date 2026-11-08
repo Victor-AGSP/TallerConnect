@@ -239,7 +239,9 @@ describe('caso de uso: consultar una orden de trabajo', () => {
               'get /presupuestos',
               'get /repuestos',
             ]
-          : [];
+          : role === 'mecanico'
+            ? ['get /ordenes']
+            : [];
 
       await waitFor(() =>
         expect(
@@ -1039,9 +1041,16 @@ describe('caso de uso: consultar vehículos, repuestos y proveedores', () => {
       await fireEvent.press(screen.getByRole('button', { name: button }));
       await waitFor(() => expect(screen.getByTestId('vehicle-card-12')).toBeTruthy());
       expect(screen).toHavePathname(path);
-      expect(adapter.mock.calls.map(([config]) => `${config.method} ${config.url}`)).toEqual([
-        request,
-      ]);
+      const expectedCalls =
+        role === 'mecanico'
+          ? ['get /ordenes', request]
+          : [request];
+
+      expect(
+        adapter.mock.calls.map(
+          ([config]) => `${config.method} ${config.url}`
+        )
+      ).toEqual(expectedCalls);
 
       await goBack();
       await waitFor(() => expect(screen).toHavePathname(home));

@@ -14,6 +14,8 @@ import { mapVehicleResponse } from '@/mappers/vehicle.mapper';
 import { orderResponsePayloads } from '@/mocks/payloads/order.payload';
 import { vehicleResponsePayloads } from '@/mocks/payloads/vehicle.payload';
 import { StatusPill } from '@/components/ui/StatusPill';
+import { useAuthStore } from '@/stores/authStore';
+import { mockAuthResponses } from '@/mocks/auth.mock';
 
 /**
  * Accesibilidad de las vistas principales de vehículo y orden.
@@ -159,64 +161,137 @@ describe('vista de vehículo y orden del cliente', () => {
   });
 });
 
-describe('vista de órdenes del mecánico', () => {
-  it('expone los títulos de la vista como encabezados', async () => {
-    await renderScreen('/mecanico');
+describe('vista real de órdenes del mecánico', () => {
+  beforeEach(() => {
+    useAuthStore.setState({
+      user: { ...mockAuthResponses.mecanico.user, id: '2' },
+    });
 
-    expect(screen.getByRole('header', { name: 'Mis órdenes' })).toBeTruthy();
-    expect(screen.getByRole('header', { name: 'OT-00124' })).toBeTruthy();
-    expect(
-      screen.getByRole('header', { name: 'Progreso de la orden' }),
-    ).toBeTruthy();
-    expect(screen.getByRole('header', { name: 'Otras órdenes' })).toBeTruthy();
+    jest.spyOn(ordersService, 'getOrders').mockResolvedValue([
+      mapOrderResponse(orderResponsePayloads.en_reparacion),
+      mapOrderResponse(orderResponsePayloads.listo_para_entrega),
+      mapOrderResponse(orderResponsePayloads.entregado),
+      mapOrderResponse(orderResponsePayloads.recibido),
+    ]);
   });
 
-  it('describe el estado de la orden y de sus etapas sin depender del color', async () => {
+  afterEach(() => {
+    jest.restoreAllMocks();
+  });
+
+  it('expone encabezados y órdenes consultadas al servicio', async () => {
     await renderScreen('/mecanico');
 
     expect(
-      screen.getByLabelText('Estado de la orden: En reparación'),
+      screen.getByRole('header', { name: 'Mis órdenes' })
     ).toBeTruthy();
+
     expect(
-      screen.getByLabelText('Etapa: Reparación. En curso. Estado: En curso'),
+      screen.getByRole('header', { name: 'Mis órdenes recientes' })
     ).toBeTruthy();
+
     expect(
-      screen.getByLabelText('Etapa: Entrega. Pendiente. Estado: Pendiente'),
+      await screen.findByRole('button', { name: 'Abrir orden 105' })
+    ).toBeTruthy();
+
+    expect(ordersService.getOrders).toHaveBeenCalledTimes(1);
+  });
+
+  it('calcula estadísticas desde órdenes asignadas', async () => {
+    await renderScreen('/mecanico');
+
+    await screen.findByRole('button', { name: 'Abrir orden 105' });
+
+    expect(
+      screen.getByLabelText('Órdenes asignadas: 3')
+    ).toBeTruthy();
+
+    expect(
+      screen.getByLabelText('Órdenes activas: 2')
+    ).toBeTruthy();
+
+    expect(
+      screen.getByLabelText('En reparación: 1')
+    ).toBeTruthy();
+
+    expect(
+      screen.getByLabelText('Listas para entrega: 1')
     ).toBeTruthy();
   });
 
-  it('agrupa cada orden del listado con su vehículo y estado', async () => {
+  it('solo muestra órdenes del mecánico autenticado', async () => {
     await renderScreen('/mecanico');
 
     expect(
-      screen.getByLabelText(
-        'Orden OT-00125. Vehículo EF-GH-34. Estado: Diagnóstico',
-      ),
+      await screen.findByRole('button', { name: 'Abrir orden 105' })
     ).toBeTruthy();
+
     expect(
-      screen.getByLabelText(
-        'Orden OT-00128. Vehículo XY-ZW-90. Estado: Finalizado',
-      ),
+      screen.getByRole('button', { name: 'Abrir orden 106' })
     ).toBeTruthy();
-  });
 
-  it('agrupa las métricas y los detalles de la orden', async () => {
-    await renderScreen('/mecanico');
-
-    expect(screen.getByLabelText('Órdenes asignadas: 5')).toBeTruthy();
-    expect(screen.getByLabelText('Trabajo: Mantención preventiva')).toBeTruthy();
-    expect(screen.getByLabelText('Órdenes completadas: 12')).toBeTruthy();
-  });
-
-  it('no anuncia como botones las tarjetas de acción que aún no tienen acción asociada', async () => {
-    await renderScreen('/mecanico');
-
-    const action = screen.getByLabelText('Acción 01: Actualizar estado');
-
-    expect(action.props.accessibilityRole).toBe('text');
     expect(
-      screen.queryByRole('button', { name: 'Acción 01: Actualizar estado' }),
+      screen.queryByRole('button', { name: 'Abrir orden 101' })
     ).toBeNull();
+
+    expect(
+      screen.queryByText('OT-00124')
+    ).toBeNull();
+
+    expect(
+      screen.queryByText('Cliente de demostración')
+    ).toBeNull();
+  });
+
+  it('mantiene accesibles los controles funcionales', async () => {
+    await renderScreen('/mecanico');
+
+    await screen.findByRole('button', { name: 'Abrir orden 105' });
+
+    for (const name of [
+      'Ver mis órdenes asignadas',
+      'Ver repuestos y proveedores',
+      'Ver vehículos asignados',
+      'Cerrar sesión',
+    ]) {
+      expect(
+        screen.getByRole('button', { name })
+      ).toBeTruthy();
+    }
+  });
+
+  it('muestra estado vacío sin inventar órdenes', async () => {
+    jest.mocked(ordersService.getOrders).mockResolvedValueOnce([]);
+
+    await renderScreen('/mecanico');
+
+    expect(
+      await screen.findByText('Sin órdenes asignadas')
+    ).toBeTruthy();
+
+    expect(
+      screen.getByLabelText('Órdenes asignadas: 0')
+    ).toBeTruthy();
+
+    expect(
+      screen.queryByRole('button', { name: 'Abrir orden 105' })
+    ).toBeNull();
+  });
+
+  it('informa errores cuando el backend falla', async () => {
+    jest.mocked(ordersService.getOrders).mockRejectedValueOnce(
+      new Error('Servicio de órdenes no disponible')
+    );
+
+    await renderScreen('/mecanico');
+
+    expect(
+      await screen.findByText('Servicio de órdenes no disponible')
+    ).toBeTruthy();
+
+    expect(
+      screen.getByRole('button', { name: 'Reintentar' })
+    ).toBeTruthy();
   });
 });
 

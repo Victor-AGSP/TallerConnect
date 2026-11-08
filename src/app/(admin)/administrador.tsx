@@ -608,14 +608,11 @@ const styles = StyleSheet.create({
     fontWeight: '700',
   },
   actions: {
-    flexDirection: 'row',
-    flexWrap: 'wrap',
     gap: spacing.md,
   },
   actionCard: {
-    flex: 1,
-    minWidth: '45%',
-    minHeight: 170,
+    width: '100%',
+    minHeight: 160,
     padding: spacing.lg,
     borderRadius: radius.lg,
     backgroundColor: colors.surface,

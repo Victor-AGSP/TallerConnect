@@ -1,7 +1,8 @@
+import { useCallback, useMemo } from 'react';
 import { useRouter } from 'expo-router';
-
 import {
-  Platform,
+  Pressable,
+  RefreshControl,
   ScrollView,
   StyleSheet,
   Text,
@@ -9,1014 +10,285 @@ import {
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
-import { Button } from '@/components/common';
-import { StatusPill } from '@/components/ui/StatusPill';
+import { Button, EmptyState, ErrorMessage, Loading } from '@/components/common';
+import { ORDER_STATUS, getOrderStatusLabel } from '@/constants/orderStatus';
+import { colors, radius, spacing } from '@/constants/theme';
+import { useDataQuery } from '@/hooks/useDataQuery';
+import { ordersService } from '@/services/orders.service';
 import { useAuthStore } from '@/stores/authStore';
-
-import {
-  colors,
-  radius,
-  spacing,
-} from '@/constants/theme';
 
 export default function MecanicoScreen() {
   const router = useRouter();
-  const logout = useAuthStore(
-  (state) => state.logout
+  const userId = useAuthStore((state) => state.user?.id);
+  const logout = useAuthStore((state) => state.logout);
+
+  const fetchOrders = useCallback(
+    () => ordersService.getOrders(),
+    [],
   );
+
+  const {
+    data,
+    errorMessage,
+    isLoading,
+    isRefreshing,
+    refresh,
+  } = useDataQuery(
+    fetchOrders,
+    'No fue posible consultar las órdenes asignadas.',
+  );
+
+  const assigned = useMemo(() => {
+    if (userId == null) return [];
+
+    return (data ?? [])
+      .filter(
+        (order) =>
+          order.assignedMechanicId != null &&
+          String(order.assignedMechanicId) === String(userId),
+      )
+      .sort(
+        (a, b) =>
+          new Date(b.updatedAt).getTime() -
+          new Date(a.updatedAt).getTime(),
+      );
+  }, [data, userId]);
+
+  const stats = useMemo(() => ({
+    total: assigned.length,
+    active: assigned.filter(
+      (order) =>
+        order.status !== ORDER_STATUS.ENTREGADO &&
+        order.status !== ORDER_STATUS.CANCELADO,
+    ).length,
+    repair: assigned.filter(
+      (order) => order.status === ORDER_STATUS.EN_REPARACION,
+    ).length,
+    ready: assigned.filter(
+      (order) => order.status === ORDER_STATUS.LISTO_PARA_ENTREGA,
+    ).length,
+  }), [assigned]);
+
+  const handleLogout = useCallback(async () => {
+    await logout();
+    router.replace('/login');
+  }, [logout, router]);
 
   return (
     <SafeAreaView style={styles.root}>
       <ScrollView
-        contentContainerStyle={styles.container}
-        showsVerticalScrollIndicator={false}
-        keyboardShouldPersistTaps="handled"
-        keyboardDismissMode={
-          Platform.OS === 'ios'
-            ? 'interactive'
-            : 'on-drag'
+        contentContainerStyle={styles.content}
+        refreshControl={
+          <RefreshControl
+            refreshing={isRefreshing}
+            onRefresh={() => { void refresh(); }}
+          />
         }
       >
-        {/* =====================================
-            DECORACIÓN
-            ===================================== */}
+        <Text style={styles.eyebrow}>TALLERCONNECT</Text>
+        <Text accessibilityRole="header" style={styles.title}>
+          Mis órdenes
+        </Text>
+        <Text style={styles.subtitle}>
+          Consulta tus órdenes reales y registra los avances del taller.
+        </Text>
 
-
-        {/* =====================================
-            ENCABEZADO
-            ===================================== */}
-
-        <View style={styles.header}>
-          <Text style={styles.eyebrow}>
-            Área de trabajo
-          </Text>
-
-          <Text
-            accessibilityRole="header"
-            style={styles.title}
-          >
-            Mis órdenes
-          </Text>
-
-          <Text style={styles.subtitle}>
-            Revisa tus órdenes asignadas y registra
-            las acciones correspondientes al servicio.
-          </Text>
-        </View>
-
-        {/* =====================================
-            RESUMEN
-            ===================================== */}
-
-        <View style={styles.stats}>
-          <Stat
-            value="5"
-            label="Órdenes asignadas"
+        {errorMessage ? (
+          <ErrorMessage
+            message={errorMessage}
+            onRetry={() => { void refresh(); }}
           />
-
-          <Stat
-            value="1"
-            label="En reparación"
-          />
-
-          <Stat
-            value="2"
-            label="En diagnóstico"
-          />
-
-          <Stat
-            value="2"
-            label="Pendientes"
-          />
-        </View>
-
-        {/* =====================================
-            ORDEN ACTUAL
-            ===================================== */}
-
-        <View style={styles.card}>
-          <View style={styles.orderHeader}>
-            <View style={styles.orderHeaderText}>
-              <Text style={styles.cardEyebrow}>
-                Orden actual
-              </Text>
-
-              <Text
-                accessibilityRole="header"
-                style={styles.orderNumber}
-              >
-                OT-00124
-              </Text>
-
-              <Text style={styles.vehicle}>
-                Vehículo · AB-CD-12
-              </Text>
+        ) : isLoading && !data ? (
+          <Loading message="Cargando órdenes asignadas..." />
+        ) : (
+          <>
+            <View style={styles.grid}>
+              <Metric label="Órdenes asignadas" value={stats.total} />
+              <Metric label="Órdenes activas" value={stats.active} />
+              <Metric label="En reparación" value={stats.repair} />
+              <Metric label="Listas para entrega" value={stats.ready} />
             </View>
 
-            <StatusPill
-              label="En reparación"
-              tone="warning"
-              accessibilityLabel="Estado de la orden: En reparación"
-            />
-          </View>
+            <Text accessibilityRole="header" style={styles.sectionTitle}>
+              Mis órdenes recientes
+            </Text>
 
-          <View style={styles.separator} />
+            {assigned.length === 0 ? (
+              <EmptyState
+                title="Sin órdenes asignadas"
+                message="No existen órdenes asociadas a tu usuario."
+              />
+            ) : (
+              assigned.slice(0, 5).map((order) => (
+                <Pressable
+                  key={order.id}
+                  accessibilityRole="button"
+                  accessibilityLabel={`Abrir orden ${order.id}`}
+                  onPress={() => router.push({
+                    pathname: '/(mecanico)/ordenes/[id]' as never,
+                    params: { id: order.id },
+                  })}
+                  style={styles.orderCard}
+                >
+                  <View style={styles.orderHeader}>
+                    <Text style={styles.orderNumber}>
+                      OT #{order.id}
+                    </Text>
+                    <Text style={styles.arrow}>›</Text>
+                  </View>
+                  <Text style={styles.info}>
+                    Estado: {getOrderStatusLabel(order.status)}
+                  </Text>
+                  <Text style={styles.info}>
+                    Vehículo ID: {order.vehicleId}
+                  </Text>
+                  <Text style={styles.link}>Ver detalle de la orden →</Text>
+                </Pressable>
+              ))
+            )}
+          </>
+        )}
 
-          <View style={styles.details}>
-            <Detail
-              label="Trabajo"
-              value="Mantención preventiva"
-            />
-
-            <Detail
-              label="Prioridad"
-              value="Normal"
-            />
-
-            <Detail
-              label="Repuestos"
-              value="3 asociados"
-            />
-
-            <Detail
-              label="Cliente"
-              value="Cliente de demostración"
-            />
-          </View>
-
-          <View style={styles.actionGrid}>
-            <ActionBox
-              code="01"
-              title="Actualizar estado"
-            />
-
-            <ActionBox
-              code="02"
-              title="Registrar información"
-            />
-
-            <ActionBox
-              code="03"
-              title="Revisar repuestos"
-            />
-
-            <ActionBox
-              code="04"
-              title="Agregar evidencia"
-            />
-          </View>
-        </View>
-
-        {/* =====================================
-            PROGRESO
-            ===================================== */}
-
-        <View style={styles.card}>
-          <Text
-            accessibilityRole="header"
-            style={styles.cardTitle}
-          >
-            Progreso de la orden
-          </Text>
-
-          <Text style={styles.cardSubtitle}>
-            Seguimiento de las etapas del trabajo.
-          </Text>
-
-          <ProgressItem
-            title="Recepción"
-            detail="Completado"
-            completed
+        <View style={styles.actions}>
+          <Button
+            title="Ver mis órdenes asignadas"
+            onPress={() =>
+              router.push('/(mecanico)/ordenes' as never)
+            }
           />
-
-          <ProgressItem
-            title="Diagnóstico"
-            detail="Completado"
-            completed
-          />
-
-          <ProgressItem
-            title="Reparación"
-            detail="En curso"
-            active
-          />
-
-          <ProgressItem
-            title="Control final"
-            detail="Pendiente"
-          />
-
-          <ProgressItem
-            title="Entrega"
-            detail="Pendiente"
-          />
-        </View>
-
-        {/* =====================================
-            ÓRDENES PENDIENTES
-            ===================================== */}
-
-        <View style={styles.card}>
-          <Text
-            accessibilityRole="header"
-            style={styles.cardTitle}
-          >
-            Otras órdenes
-          </Text>
-
-          <Text style={styles.cardSubtitle}>
-            Órdenes actualmente asociadas al mecánico.
-          </Text>
-
-          <View style={styles.list}>
-            <MiniOrder
-              code="OT-00125"
-              vehicle="EF-GH-34"
-              status="Diagnóstico"
-            />
-
-            <MiniOrder
-              code="OT-00126"
-              vehicle="IJ-KL-56"
-              status="Espera"
-            />
-
-            <MiniOrder
-              code="OT-00127"
-              vehicle="AB-CD-12"
-              status="Reparación"
-            />
-
-            <MiniOrder
-              code="OT-00128"
-              vehicle="XY-ZW-90"
-              status="Finalizado"
-            />
-          </View>
-        </View>
-
-        {/* =====================================
-            INFORMACIÓN DEL MECÁNICO
-            ===================================== */}
-
-        <View style={styles.card}>
-          <Text
-            accessibilityRole="header"
-            style={styles.cardTitle}
-          >
-            Mi actividad
-          </Text>
-
-          <Text style={styles.cardSubtitle}>
-            Resumen de actividad de demostración.
-          </Text>
-
-          <View
-            accessible
-            accessibilityLabel="Órdenes completadas: 12"
-            style={styles.activityRow}
-          >
-            <Text style={styles.activityLabel}>
-              Órdenes completadas
-            </Text>
-
-            <Text style={styles.activityValue}>
-              12
-            </Text>
-          </View>
-
-          <View
-            accessible
-            accessibilityLabel="Evidencias registradas: 24"
-            style={styles.activityRow}
-          >
-            <Text style={styles.activityLabel}>
-              Evidencias registradas
-            </Text>
-
-            <Text style={styles.activityValue}>
-              24
-            </Text>
-          </View>
-
-          <View
-            accessible
-            accessibilityLabel="Repuestos utilizados: 18"
-            style={styles.activityRow}
-          >
-            <Text style={styles.activityLabel}>
-              Repuestos utilizados
-            </Text>
-
-            <Text style={styles.activityValue}>
-              18
-            </Text>
-          </View>
-        </View>
-
-        {/* ====================================
-            CERRAR SESIÓN
-            ===================================== */}
-
-
           <Button
             title="Ver repuestos y proveedores"
-            onPress={() => router.push('/(mecanico)/inventario' as never)}
-            style={styles.logoutButton}
+            onPress={() =>
+              router.push('/(mecanico)/inventario' as never)
+            }
           />
-
-        <Button
-          title="Ver vehículos asignados"
-          onPress={() => router.push('/(mecanico)/vehiculos-asignados' as never)}
-          style={styles.navButton}
-        />
-
-        <Button
-          title="Cerrar sesión"
-          variant="outline"
-          onPress={async () => {
-          await logout();
-          router.replace('/login');
-          }}
-          style={styles.logoutButton }
-        />
+          <Button
+            title="Ver vehículos asignados"
+            onPress={() =>
+              router.push('/(mecanico)/vehiculos-asignados' as never)
+            }
+          />
+          <Button
+            title="Cerrar sesión"
+            variant="outline"
+            onPress={() => { void handleLogout(); }}
+          />
+        </View>
       </ScrollView>
     </SafeAreaView>
   );
 }
 
-/* ==========================================
-   COMPONENTES
-   ========================================== */
-
-function Stat({
-  value,
+function Metric({
   label,
+  value,
 }: {
-  value: string;
   label: string;
+  value: number;
 }) {
   return (
     <View
       accessible
       accessibilityLabel={`${label}: ${value}`}
-      style={styles.stat}
+      style={styles.metric}
     >
-      <Text style={styles.statValue}>
-        {value}
-      </Text>
-
-      <Text style={styles.statLabel}>
-        {label}
-      </Text>
+      <Text style={styles.metricValue}>{value}</Text>
+      <Text style={styles.metricLabel}>{label}</Text>
     </View>
   );
 }
-
-function Detail({
-  label,
-  value,
-}: {
-  label: string;
-  value: string;
-}) {
-  return (
-    <View
-      accessible
-      accessibilityLabel={`${label}: ${value}`}
-      style={styles.detail}
-    >
-      <Text style={styles.detailLabel}>
-        {label}
-      </Text>
-
-      <Text style={styles.detailValue}>
-        {value}
-      </Text>
-    </View>
-  );
-}
-
-function ActionBox({
-  code,
-  title,
-}: {
-  code: string;
-  title: string;
-}) {
-  // Estas tarjetas aún no tienen acción asociada: se anuncian como texto
-  // agrupado para no exponerlas como controles inexistentes.
-  return (
-    <View
-      accessible
-      accessibilityRole="text"
-      accessibilityLabel={`Acción ${code}: ${title}`}
-      style={styles.actionBox}
-    >
-      <Text style={styles.actionCode}>
-        {code}
-      </Text>
-
-      <Text style={styles.actionTitle}>
-        {title}
-      </Text>
-    </View>
-  );
-}
-
-function ProgressItem({
-  title,
-  detail,
-  completed = false,
-  active = false,
-}: {
-  title: string;
-  detail: string;
-  completed?: boolean;
-  active?: boolean;
-}) {
-  // El punto de color es la única señal visual del estado: se expone
-  // también como texto para lectores de pantalla.
-  const state = completed
-    ? 'Completado'
-    : active
-      ? 'En curso'
-      : 'Pendiente';
-
-  return (
-    <View
-      accessible
-      accessibilityLabel={`Etapa: ${title}. ${detail}. Estado: ${state}`}
-      style={styles.progressRow}
-    >
-      <View
-        style={[
-          styles.progressDot,
-          completed &&
-            styles.progressCompleted,
-          active &&
-            styles.progressActive,
-        ]}
-      />
-
-      <View style={styles.progressText}>
-        <Text style={styles.progressTitle}>
-          {title}
-        </Text>
-
-        <Text style={styles.progressDetail}>
-          {detail}
-        </Text>
-      </View>
-    </View>
-  );
-}
-
-function MiniOrder({
-  code,
-  vehicle,
-  status,
-}: {
-  code: string;
-  vehicle: string;
-  status: string;
-}) {
-  const statusColor =
-    getStatusColor(status);
-
-  return (
-    <View
-      accessible
-      accessibilityLabel={`Orden ${code}. Vehículo ${vehicle}. Estado: ${status}`}
-      style={styles.miniOrder}
-    >
-      <View style={styles.miniOrderLeft}>
-        <Text style={styles.miniOrderNumber}>
-          {code}
-        </Text>
-
-        <Text style={styles.miniOrderVehicle}>
-          {vehicle}
-        </Text>
-      </View>
-
-      <View style={styles.miniOrderRight}>
-        <View
-          style={[
-            styles.statusDot,
-            {
-              backgroundColor:
-                statusColor,
-            },
-          ]}
-        />
-
-        <Text
-          style={[
-            styles.miniOrderStatus,
-            {
-              color: statusColor,
-            },
-          ]}
-        >
-          {status.toUpperCase()}
-        </Text>
-      </View>
-    </View>
-  );
-}
-
-function getStatusColor(
-  status: string
-) {
-  const normalized =
-    status.toUpperCase();
-
-  switch (normalized) {
-    case 'DIAGNÓSTICO':
-      return colors.warning;
-
-    case 'ESPERA':
-      return colors.info;
-
-    case 'REPARACIÓN':
-      return colors.success;
-
-    case 'FINALIZADO':
-      return colors.info;
-
-    default:
-      return colors.textSecondary;
-  }
-}
-
-/* ==========================================
-   TEMA
-   ========================================== */
-const localTheme = {
-  background: colors.background,
-  surface: colors.surface,
-  surfaceSoft: colors.surfaceSoft,
-  border: colors.border,
-
-  primary: colors.primary,
-  primaryDark: colors.primary,
-
-  text: colors.text,
-  textSecondary: colors.textSecondary,
-  textMuted: colors.textSecondary,
-
-  accent: colors.accent,
-  info: colors.info,
-  success: colors.success,
-  warning: colors.warning,
-  danger: colors.danger,
-};
-
-/* ==========================================
-   ESTILOS
-   ========================================== */
 
 const styles = StyleSheet.create({
   root: {
     flex: 1,
-    backgroundColor: localTheme.background,
+    backgroundColor: colors.background,
   },
-
-  container: {
-    paddingHorizontal: spacing.lg,
+  content: {
+    padding: spacing.lg,
     paddingBottom: spacing.xxl,
+    gap: spacing.md,
   },
-
-  decorations: {
-    position: 'absolute',
-    top: 0,
-    right: 0,
-    bottom: 0,
-    left: 0,
-    overflow: 'hidden',
-  },
-
-  orbRedLarge: {
-    position: 'absolute',
-    width: 300,
-    height: 300,
-    borderRadius: 150,
-    backgroundColor: localTheme.primary,
-    top: -50,
-    right: -100,
-    opacity: 0.15,
-  },
-
-  orbDarkRed: {
-    position: 'absolute',
-    width: 200,
-    height: 200,
-    borderRadius: 100,
-    backgroundColor: localTheme.primaryDark,
-    top: 400,
-    left: -80,
-    opacity: 0.25,
-  },
-
-  crystalRed: {
-    position: 'absolute',
-    width: 80,
-    height: 80,
-    borderRadius: 16,
-    backgroundColor: localTheme.primary,
-    top: 150,
-    left: -20,
-    opacity: 0.15,
-    transform: [
-      {
-        rotate: '45deg',
-      },
-    ],
-  },
-
-  crystalGrey: {
-    position: 'absolute',
-    width: 100,
-    height: 100,
-    borderRadius: 20,
-    backgroundColor: colors.surfaceSoft,
-    bottom: 200,
-    right: -40,
-    opacity: 0.2,
-    transform: [
-      {
-        rotate: '45deg',
-      },
-    ],
-  },
-
-  ringStrong1: {
-    position: 'absolute',
-    width: 120,
-    height: 120,
-    borderRadius: 60,
-    borderWidth: 4,
-    borderColor: localTheme.primary,
-    top: 600,
-    right: -40,
-    opacity: 0.25,
-  },
-
-  ringStrong2: {
-    position: 'absolute',
-    width: 60,
-    height: 60,
-    borderRadius: 30,
-    borderWidth: 2,
-    borderColor: '#444444',
-    top: 50,
-    left: 40,
-    opacity: 0.3,
-  },
-
-  glowDot1: {
-    position: 'absolute',
-    width: 12,
-    height: 12,
-    borderRadius: 6,
-    backgroundColor: localTheme.primary,
-    top: 280,
-    left: 60,
-    opacity: 0.9,
-    shadowColor: localTheme.primary,
-    shadowOffset: {
-      width: 0,
-      height: 0,
-    },
-    shadowOpacity: 1,
-    shadowRadius: 10,
-    elevation: 4,
-  },
-
-  glowDot2: {
-    position: 'absolute',
-    width: 10,
-    height: 10,
-    borderRadius: 5,
-    backgroundColor: '#666666',
-    bottom: 100,
-    right: 70,
-    opacity: 0.5,
-  },
-
-  glowDot3: {
-    position: 'absolute',
-    width: 14,
-    height: 14,
-    borderRadius: 7,
-    backgroundColor: localTheme.primary,
-    top: 100,
-    right: 50,
-    opacity: 0.8,
-  },
-
-  header: {
-    marginTop: spacing.xl,
-    marginBottom: spacing.xl,
-  },
-
   eyebrow: {
+    fontSize: 12,
+    fontWeight: '800',
     color: colors.accent,
-    fontSize: 13,
-    fontWeight: '900',
-    textTransform: 'uppercase',
-    letterSpacing: 0.5,
-    marginBottom: 4,
   },
-
   title: {
-    color: localTheme.text,
-    fontSize: 30,
+    fontSize: 28,
     fontWeight: '900',
-    letterSpacing: -0.5,
-    marginBottom: 8,
+    color: colors.primary,
   },
-
   subtitle: {
-    color: localTheme.textSecondary,
     fontSize: 14,
-    lineHeight: 20,
+    color: colors.textSecondary,
+    lineHeight: 21,
   },
-
-  stats: {
+  grid: {
     flexDirection: 'row',
     flexWrap: 'wrap',
     gap: spacing.sm,
-    marginBottom: spacing.lg,
   },
-
-  stat: {
-    width: '48%',
-    minHeight: 105,
+  metric: {
+    width: '47%',
+    flexGrow: 1,
+    minHeight: 100,
+    padding: spacing.md,
     borderRadius: radius.lg,
-    backgroundColor: localTheme.surfaceSoft,
+    backgroundColor: colors.surface,
     borderWidth: 1,
     borderColor: colors.border,
-    padding: spacing.lg,
     justifyContent: 'center',
   },
-
-  statValue: {
-    color: localTheme.text,
-    fontSize: 28,
+  metricValue: {
+    fontSize: 27,
     fontWeight: '900',
+    color: colors.primary,
   },
-
-  statLabel: {
-    color: localTheme.textSecondary,
-    marginTop: 5,
+  metricLabel: {
     fontSize: 12,
-    lineHeight: 17,
+    color: colors.textSecondary,
+    marginTop: spacing.xs,
   },
-
-  card: {
-    backgroundColor: localTheme.surface,
+  sectionTitle: {
+    fontSize: 19,
+    fontWeight: '900',
+    color: colors.primary,
+    marginTop: spacing.sm,
+  },
+  orderCard: {
+    backgroundColor: colors.surface,
     borderRadius: radius.lg,
     borderWidth: 1,
     borderColor: colors.border,
     padding: spacing.lg,
-    marginBottom: spacing.lg,
-
-    shadowColor: colors.primary,
-    shadowOffset: {
-      width: 0,
-      height: 8,
-    },
-    shadowOpacity: 0.4,
-    shadowRadius: 12,
-    elevation: 6,
+    gap: spacing.sm,
   },
-
   orderHeader: {
     flexDirection: 'row',
     justifyContent: 'space-between',
-    alignItems: 'flex-start',
-    gap: spacing.md,
+    alignItems: 'center',
   },
-
-  orderHeaderText: {
-    flex: 1,
-  },
-
-  cardEyebrow: {
-    color: colors.accent,
-    fontSize: 11,
-    fontWeight: '900',
-    textTransform: 'uppercase',
-    letterSpacing: 0.5,
-    marginBottom: 5,
-  },
-
   orderNumber: {
-    color: localTheme.text,
-    fontSize: 22,
+    fontSize: 19,
     fontWeight: '900',
+    color: colors.primary,
   },
-
-  vehicle: {
-    marginTop: 4,
-    color: localTheme.textSecondary,
-    fontSize: 13,
-    fontWeight: '600',
-  },
-
-  separator: {
-    height: 1,
-    backgroundColor: localTheme.border,
-    marginVertical: spacing.lg,
-  },
-
-  details: {
-    gap: spacing.md,
-  },
-
-  detail: {
-    paddingBottom: spacing.sm,
-    borderBottomWidth: 1,
-    borderBottomColor: localTheme.border,
-  },
-
-  detailLabel: {
-    color: localTheme.textMuted,
-    fontSize: 10,
-    textTransform: 'uppercase',
-    fontWeight: '800',
-    letterSpacing: 0.5,
-  },
-
-  detailValue: {
-    color: localTheme.text,
-    marginTop: 4,
-    fontSize: 14,
-    fontWeight: '700',
-  },
-
-  actionGrid: {
-    flexDirection: 'row',
-    flexWrap: 'wrap',
-    gap: spacing.sm,
-    marginTop: spacing.xl,
-  },
-
-  actionBox: {
-    width: '48%',
-    minHeight: 90,
-    borderRadius: radius.md,
-    padding: spacing.md,
-    backgroundColor: localTheme.surfaceSoft,
-    borderWidth: 1,
-    borderColor: colors.border,
-    justifyContent: 'space-between',
-  },
-
-  actionCode: {
+  arrow: {
+    fontSize: 25,
     color: colors.accent,
-    fontSize: 14,
-    fontWeight: '900',
   },
-
-  actionTitle: {
-    color: localTheme.text,
+  info: {
+    fontSize: 13,
+    color: colors.textSecondary,
+  },
+  link: {
     fontSize: 13,
     fontWeight: '800',
-    lineHeight: 18,
+    color: colors.accent,
+    marginTop: spacing.sm,
   },
-
-  cardTitle: {
-    color: localTheme.text,
-    fontSize: 18,
-    fontWeight: '900',
-    marginBottom: 4,
-  },
-
-  cardSubtitle: {
-    color: localTheme.textSecondary,
-    fontSize: 13,
-    marginBottom: spacing.lg,
-  },
-
-  progressRow: {
-    flexDirection: 'row',
+  actions: {
     gap: spacing.md,
-    paddingVertical: spacing.md,
-    borderBottomWidth: 1,
-    borderBottomColor: localTheme.border,
-  },
-
-  progressDot: {
-    width: 12,
-    height: 12,
-    marginTop: 4,
-    borderRadius: 6,
-    backgroundColor: localTheme.border,
-  },
-
-  progressCompleted: {
-    backgroundColor: colors.success,
-  },
-
-  progressActive: {
-    backgroundColor: localTheme.primary,
-  },
-
-  progressText: {
-    flex: 1,
-  },
-
-  progressTitle: {
-    color: localTheme.text,
-    fontSize: 14,
-    fontWeight: '800',
-  },
-
-  progressDetail: {
-    color: localTheme.textSecondary,
-    fontSize: 12,
-    marginTop: 3,
-  },
-
-  list: {
-    gap: 0,
-  },
-
-  miniOrder: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    paddingVertical: spacing.md,
-    borderBottomWidth: 1,
-    borderBottomColor: localTheme.border,
-  },
-
-  miniOrderLeft: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: spacing.sm,
-  },
-
-  miniOrderNumber: {
-    color: localTheme.text,
-    fontSize: 15,
-    fontWeight: '900',
-  },
-
-  miniOrderVehicle: {
-    color: localTheme.textSecondary,
-    fontSize: 14,
-    fontWeight: '600',
-  },
-
-  miniOrderRight: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 6,
-  },
-
-  statusDot: {
-    width: 8,
-    height: 8,
-    borderRadius: 4,
-  },
-
-  miniOrderStatus: {
-    fontSize: 11,
-    fontWeight: '900',
-    letterSpacing: 0.3,
-  },
-
-  activityRow: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    paddingVertical: spacing.md,
-    borderBottomWidth: 1,
-    borderBottomColor: localTheme.border,
-  },
-
-  activityLabel: {
-    color: localTheme.textSecondary,
-    fontSize: 13,
-  },
-
-  activityValue: {
-    color: localTheme.text,
-    fontSize: 18,
-    fontWeight: '900',
-  },
-
-  navButton: {
-    marginTop: spacing.sm,
-  },
-
-  logoutButton: {
-    marginTop: spacing.sm,
-    marginBottom: spacing.xl,
-    borderColor: colors.border,
+    marginTop: spacing.lg,
   },
 });
