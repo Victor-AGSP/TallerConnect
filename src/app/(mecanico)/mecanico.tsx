@@ -1,300 +1,294 @@
+import { useCallback, useMemo } from 'react';
 import { useRouter } from 'expo-router';
-
 import {
+  Pressable,
+  RefreshControl,
+  ScrollView,
   StyleSheet,
   Text,
   View,
 } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 
-import { AppScreen } from '@/components/layout/AppScreen';
-import { AppButton } from '@/components/ui/AppButton';
-import { InfoCard } from '@/components/ui/InfoCard';
-import { StatusPill } from '@/components/ui/StatusPill';
-
-import {
-  colors,
-  radius,
-  spacing,
-} from '@/constants/theme';
+import { Button, EmptyState, ErrorMessage, Loading } from '@/components/common';
+import { ORDER_STATUS, getOrderStatusLabel } from '@/constants/orderStatus';
+import { colors, radius, spacing } from '@/constants/theme';
+import { useDataQuery } from '@/hooks/useDataQuery';
+import { ordersService } from '@/services/orders.service';
+import { useAuthStore } from '@/stores/authStore';
 
 export default function MecanicoScreen() {
   const router = useRouter();
+  const userId = useAuthStore((state) => state.user?.id);
+  const logout = useAuthStore((state) => state.logout);
+
+  const fetchOrders = useCallback(
+    () => ordersService.getOrders(),
+    [],
+  );
+
+  const {
+    data,
+    errorMessage,
+    isLoading,
+    isRefreshing,
+    refresh,
+  } = useDataQuery(
+    fetchOrders,
+    'No fue posible consultar las órdenes asignadas.',
+  );
+
+  const assigned = useMemo(() => {
+    if (userId == null) return [];
+
+    return (data ?? [])
+      .filter(
+        (order) =>
+          order.assignedMechanicId != null &&
+          String(order.assignedMechanicId) === String(userId),
+      )
+      .sort(
+        (a, b) =>
+          new Date(b.updatedAt).getTime() -
+          new Date(a.updatedAt).getTime(),
+      );
+  }, [data, userId]);
+
+  const stats = useMemo(() => ({
+    total: assigned.length,
+    active: assigned.filter(
+      (order) =>
+        order.status !== ORDER_STATUS.ENTREGADO &&
+        order.status !== ORDER_STATUS.CANCELADO,
+    ).length,
+    repair: assigned.filter(
+      (order) => order.status === ORDER_STATUS.EN_REPARACION,
+    ).length,
+    ready: assigned.filter(
+      (order) => order.status === ORDER_STATUS.LISTO_PARA_ENTREGA,
+    ).length,
+  }), [assigned]);
+
+  const handleLogout = useCallback(async () => {
+    await logout();
+    router.replace('/login');
+  }, [logout, router]);
 
   return (
-    <AppScreen
-      eyebrow="Área de trabajo"
-      title="Órdenes asignadas"
-      subtitle="Consulta vehículos y registra las acciones permitidas durante el servicio."
-    >
-      <InfoCard>
-        <View style={styles.orderHeader}>
-          <View style={styles.orderId}>
-            <Text style={styles.orderNumber}>
-              OT-00124
+    <SafeAreaView style={styles.root}>
+      <ScrollView
+        contentContainerStyle={styles.content}
+        refreshControl={
+          <RefreshControl
+            refreshing={isRefreshing}
+            onRefresh={() => { void refresh(); }}
+          />
+        }
+      >
+        <Text style={styles.eyebrow}>TALLERCONNECT</Text>
+        <Text accessibilityRole="header" style={styles.title}>
+          Mis órdenes
+        </Text>
+        <Text style={styles.subtitle}>
+          Consulta tus órdenes reales y registra los avances del taller.
+        </Text>
+
+        {errorMessage ? (
+          <ErrorMessage
+            message={errorMessage}
+            onRetry={() => { void refresh(); }}
+          />
+        ) : isLoading && !data ? (
+          <Loading message="Cargando órdenes asignadas..." />
+        ) : (
+          <>
+            <View style={styles.grid}>
+              <Metric label="Órdenes asignadas" value={stats.total} />
+              <Metric label="Órdenes activas" value={stats.active} />
+              <Metric label="En reparación" value={stats.repair} />
+              <Metric label="Listas para entrega" value={stats.ready} />
+            </View>
+
+            <Text accessibilityRole="header" style={styles.sectionTitle}>
+              Mis órdenes recientes
             </Text>
 
-            <Text style={styles.vehicle}>
-              Vehículo · AB-CD-12
-            </Text>
-          </View>
-
-          <StatusPill
-            label="En reparación"
-            tone="warning"
-          />
-        </View>
-
-        <View style={styles.separator} />
-
-        <View style={styles.details}>
-          <Detail
-            label="Trabajo"
-            value="Mantención preventiva"
-          />
-
-          <Detail
-            label="Prioridad"
-            value="Normal"
-          />
-
-          <Detail
-            label="Repuestos"
-            value="3 asociados"
-          />
-        </View>
+            {assigned.length === 0 ? (
+              <EmptyState
+                title="Sin órdenes asignadas"
+                message="No existen órdenes asociadas a tu usuario."
+              />
+            ) : (
+              assigned.slice(0, 5).map((order) => (
+                <Pressable
+                  key={order.id}
+                  accessibilityRole="button"
+                  accessibilityLabel={`Abrir orden ${order.id}`}
+                  onPress={() => router.push({
+                    pathname: '/(mecanico)/ordenes/[id]' as never,
+                    params: { id: order.id },
+                  })}
+                  style={styles.orderCard}
+                >
+                  <View style={styles.orderHeader}>
+                    <Text style={styles.orderNumber}>
+                      OT #{order.id}
+                    </Text>
+                    <Text style={styles.arrow}>›</Text>
+                  </View>
+                  <Text style={styles.info}>
+                    Estado: {getOrderStatusLabel(order.status)}
+                  </Text>
+                  <Text style={styles.info}>
+                    Vehículo ID: {order.vehicleId}
+                  </Text>
+                  <Text style={styles.link}>Ver detalle de la orden →</Text>
+                </Pressable>
+              ))
+            )}
+          </>
+        )}
 
         <View style={styles.actions}>
-          <AppButton
-            title="Ver detalle de la orden"
-            onPress={() => {}}
+          <Button
+            title="Ver mis órdenes asignadas"
+            onPress={() =>
+              router.push('/(mecanico)/ordenes' as never)
+            }
           />
-
-          <AppButton
-            title="Agregar evidencia"
+          <Button
+            title="Ver repuestos y proveedores"
+            onPress={() =>
+              router.push('/(mecanico)/inventario' as never)
+            }
+          />
+          <Button
+            title="Ver vehículos asignados"
+            onPress={() =>
+              router.push('/(mecanico)/vehiculos-asignados' as never)
+            }
+          />
+          <Button
+            title="Cerrar sesión"
             variant="outline"
-            onPress={() => {}}
+            onPress={() => { void handleLogout(); }}
           />
         </View>
-      </InfoCard>
-
-      <InfoCard
-        title="Acciones rápidas"
-        subtitle="Las acciones disponibles dependerán de los permisos informados por el backend."
-      >
-        <View style={styles.quickGrid}>
-          <QuickAction
-            title="Actualizar estado"
-            code="01"
-          />
-
-          <QuickAction
-            title="Registrar información"
-            code="02"
-          />
-
-          <QuickAction
-            title="Revisar repuestos"
-            code="03"
-          />
-
-          <QuickAction
-            title="Agregar evidencia"
-            code="04"
-          />
-        </View>
-      </InfoCard>
-
-      <InfoCard
-        title="Órdenes pendientes"
-        subtitle="2 órdenes adicionales asignadas."
-      >
-        <View style={styles.list}>
-          <MiniOrder
-            code="OT-00125"
-            vehicle="EF-GH-34"
-            status="Diagnóstico"
-          />
-
-          <MiniOrder
-            code="OT-00126"
-            vehicle="IJ-KL-56"
-            status="Espera"
-          />
-        </View>
-      </InfoCard>
-
-      <AppButton
-        title="Cerrar sesión"
-        variant="outline"
-        onPress={() => router.replace('/login')}
-      />
-    </AppScreen>
+      </ScrollView>
+    </SafeAreaView>
   );
 }
 
-function Detail({
+function Metric({
   label,
   value,
 }: {
   label: string;
-  value: string;
+  value: number;
 }) {
   return (
-    <View>
-      <Text style={styles.detailLabel}>
-        {label}
-      </Text>
-
-      <Text style={styles.detailValue}>
-        {value}
-      </Text>
-    </View>
-  );
-}
-
-function QuickAction({
-  title,
-  code,
-}: {
-  title: string;
-  code: string;
-}) {
-  return (
-    <View style={styles.quick}>
-      <Text style={styles.quickCode}>
-        {code}
-      </Text>
-
-      <Text style={styles.quickTitle}>
-        {title}
-      </Text>
-    </View>
-  );
-}
-
-function MiniOrder({
-  code,
-  vehicle,
-  status,
-}: {
-  code: string;
-  vehicle: string;
-  status: string;
-}) {
-  return (
-    <View style={styles.miniOrder}>
-      <View>
-        <Text style={styles.orderNumber}>
-          {code}
-        </Text>
-
-        <Text style={styles.vehicle}>
-          {vehicle}
-        </Text>
-      </View>
-
-      <Text style={styles.orderStatus}>
-        {status}
-      </Text>
+    <View
+      accessible
+      accessibilityLabel={`${label}: ${value}`}
+      style={styles.metric}
+    >
+      <Text style={styles.metricValue}>{value}</Text>
+      <Text style={styles.metricLabel}>{label}</Text>
     </View>
   );
 }
 
 const styles = StyleSheet.create({
-  orderHeader: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'flex-start',
-    gap: spacing.md,
-  },
-
-  orderId: {
+  root: {
     flex: 1,
+    backgroundColor: colors.background,
   },
-
-  orderNumber: {
-    color: colors.text,
-    fontSize: 17,
-    fontWeight: '900',
-  },
-
-  vehicle: {
-    marginTop: 3,
-    color: colors.textSecondary,
-    fontSize: 13,
-  },
-
-  separator: {
-    height: 1,
-    backgroundColor: colors.border,
-    marginVertical: spacing.lg,
-  },
-
-  details: {
+  content: {
+    padding: spacing.lg,
+    paddingBottom: spacing.xxl,
     gap: spacing.md,
   },
-
-  detailLabel: {
-    color: colors.textMuted,
-    fontSize: 11,
-    textTransform: 'uppercase',
+  eyebrow: {
+    fontSize: 12,
     fontWeight: '800',
+    color: colors.accent,
   },
-
-  detailValue: {
-    color: colors.text,
-    marginTop: 3,
-    fontWeight: '700',
+  title: {
+    fontSize: 28,
+    fontWeight: '900',
+    color: colors.primary,
   },
-
-  actions: {
-    marginTop: spacing.xl,
-    gap: spacing.sm,
+  subtitle: {
+    fontSize: 14,
+    color: colors.textSecondary,
+    lineHeight: 21,
   },
-
-  quickGrid: {
+  grid: {
     flexDirection: 'row',
     flexWrap: 'wrap',
     gap: spacing.sm,
   },
-
-  quick: {
-    width: '48%',
-    minHeight: 105,
-    borderRadius: radius.md,
+  metric: {
+    width: '47%',
+    flexGrow: 1,
+    minHeight: 100,
     padding: spacing.md,
-    backgroundColor: colors.primarySoft,
-    justifyContent: 'space-between',
+    borderRadius: radius.lg,
+    backgroundColor: colors.surface,
+    borderWidth: 1,
+    borderColor: colors.border,
+    justifyContent: 'center',
   },
-
-  quickCode: {
-    color: colors.accent,
-    fontSize: 12,
+  metricValue: {
+    fontSize: 27,
     fontWeight: '900',
-  },
-
-  quickTitle: {
     color: colors.primary,
-    fontWeight: '800',
-    lineHeight: 18,
   },
-
-  list: {
-    gap: spacing.md,
-  },
-
-  miniOrder: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    paddingBottom: spacing.md,
-    borderBottomWidth: 1,
-    borderBottomColor: colors.border,
-  },
-
-  orderStatus: {
-    color: colors.info,
+  metricLabel: {
     fontSize: 12,
+    color: colors.textSecondary,
+    marginTop: spacing.xs,
+  },
+  sectionTitle: {
+    fontSize: 19,
+    fontWeight: '900',
+    color: colors.primary,
+    marginTop: spacing.sm,
+  },
+  orderCard: {
+    backgroundColor: colors.surface,
+    borderRadius: radius.lg,
+    borderWidth: 1,
+    borderColor: colors.border,
+    padding: spacing.lg,
+    gap: spacing.sm,
+  },
+  orderHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+  },
+  orderNumber: {
+    fontSize: 19,
+    fontWeight: '900',
+    color: colors.primary,
+  },
+  arrow: {
+    fontSize: 25,
+    color: colors.accent,
+  },
+  info: {
+    fontSize: 13,
+    color: colors.textSecondary,
+  },
+  link: {
+    fontSize: 13,
     fontWeight: '800',
+    color: colors.accent,
+    marginTop: spacing.sm,
+  },
+  actions: {
+    gap: spacing.md,
+    marginTop: spacing.lg,
   },
 });

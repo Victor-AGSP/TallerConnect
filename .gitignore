@@ -98,6 +98,8 @@ pnpm-debug.log*
 .claude/
 .codex/
 .cursor/
+.agents/
+graphify-out/
 
 CLAUDE.md
 AGENTS.md

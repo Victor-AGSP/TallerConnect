@@ -1,22 +1,31 @@
-export type WorkOrderStatus =
-  | 'recibido'
-  | 'esperando_diagnostico'
-  | 'esperando_aprobacion_presupuesto'
-  | 'pausado_por_presupuesto_rechazado'
-  | 'esperando_repuestos'
-  | 'en_reparacion'
-  | 'control_calidad'
-  | 'listo_para_entrega'
-  | 'entregado'
-  | 'cancelado';
+import type { WorkOrderStatus } from '@/constants/orderStatus';
+
+export type { WorkOrderStatus };
+
+/**
+ * Representa una Orden de Trabajo (OT), la entidad central
+ * del proceso de servicio técnico vehicular.
+ * El cliente no forma parte de la orden: se obtiene a través
+ * del vehículo asociado (`vehicleId` → `Vehicle.ownerId`).
+ */
 
 export interface WorkOrder {
   id: string;
   vehicleId: string;
+  clientId?: string;
+  intakeId: string;
   status: WorkOrderStatus;
-  assignedMechanicId?: string;
-  clientId: string;
-  description?: string;
-  createdAt?: string;
-  updatedAt?: string;
+  assignedMechanicId: string | null;
+  createdById: string;
+  createdAt: string;
+  updatedAt: string;
+}
+
+/**
+ * Solicitud de cambio de estado de una orden de trabajo (`CambioEstadoSolicitud` en MS2).
+ * La observación es opcional, salvo al pasar a `cancelado`, donde el backend la exige.
+ */
+export interface OrderStatusUpdateRequest {
+  targetStatus: WorkOrderStatus;
+  observation?: string | null;
 }

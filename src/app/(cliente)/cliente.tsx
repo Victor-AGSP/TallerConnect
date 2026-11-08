@@ -1,150 +1,366 @@
 import { useRouter } from 'expo-router';
 
 import {
+  Platform,
+  ScrollView,
   StyleSheet,
   Text,
   View,
 } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 
-import { AppScreen } from '@/components/layout/AppScreen';
-import { AppButton } from '@/components/ui/AppButton';
-import { InfoCard } from '@/components/ui/InfoCard';
+import { Button, Card } from '@/components/common';
 import { StatusPill } from '@/components/ui/StatusPill';
+import { useAuthStore } from '@/stores/authStore';
 
 import {
   colors,
+  radius,
   spacing,
 } from '@/constants/theme';
 
 export default function ClienteScreen() {
   const router = useRouter();
-
+  const logout = useAuthStore(
+    (state) => state.logout
+  );
   return (
-    <AppScreen
-      eyebrow="Portal del cliente"
-      title="Hola, Cliente"
-      subtitle="Consulta el estado de tu vehículo y los antecedentes asociados al servicio."
-    >
-      <InfoCard
-        title="Vehículo en servicio"
-        subtitle="Vehículo de demostración · Patente AB-CD-12"
+    <SafeAreaView style={styles.root}>
+      <ScrollView
+        contentContainerStyle={styles.container}
+        showsVerticalScrollIndicator={false}
+        keyboardShouldPersistTaps="handled"
+        keyboardDismissMode={
+          Platform.OS === 'ios'
+            ? 'interactive'
+            : 'on-drag'
+        }
       >
-        <View style={styles.row}>
-          <View>
-            <Text style={styles.smallLabel}>
-              Estado actual
-            </Text>
+        {/* =====================================
+            DECORACIÓN DE FONDO
+            ===================================== */}
 
-            <Text style={styles.vehicle}>
-              Servicio técnico
-            </Text>
-          </View>
 
-          <StatusPill
-            label="En reparación"
-            tone="warning"
-          />
-        </View>
-      </InfoCard>
+        {/* =====================================
+            ENCABEZADO
+            ===================================== */}
 
-      <InfoCard title="Seguimiento de la orden">
-        <View style={styles.timeline}>
-          <TimelineItem
-            title="Vehículo recibido"
-            detail="Registro completado"
-            completed
-          />
+        <View style={styles.header}>
+          <Text style={styles.eyebrow}>
+            Portal del cliente
+          </Text>
 
-          <TimelineItem
-            title="Diagnóstico"
-            detail="Revisión finalizada"
-            completed
-          />
+          <Text
+            accessibilityRole="header"
+            style={styles.title}
+          >
+            Mi taller
+          </Text>
 
-          <TimelineItem
-            title="Reparación"
-            detail="Trabajo actualmente en curso"
-            active
-          />
-
-          <TimelineItem
-            title="Entrega"
-            detail="Pendiente"
-          />
-        </View>
-      </InfoCard>
-
-      <View style={styles.grid}>
-        <Metric
-          value=".000"
-          label="Presupuesto"
-        />
-
-        <Metric
-          value="3"
-          label="Repuestos"
-        />
-
-        <Metric
-          value="4"
-          label="Evidencias"
-        />
-
-        <Metric
-          value="1"
-          label="Orden activa"
-        />
-      </View>
-
-      <InfoCard
-        title="Presupuesto"
-        subtitle="Consulta la información proporcionada por el taller."
-      >
-        <View style={styles.row}>
-          <Text style={styles.amount}>.000</Text>
-          <StatusPill
-            label="Aprobado"
-            tone="success"
-          />
-        </View>
-      </InfoCard>
-
-      <InfoCard
-        title="Evidencia multimedia"
-        subtitle="Fotografías y videos asociados a la revisión o reparación aparecerán aquí."
-      >
-        <View style={styles.mediaPlaceholder}>
-          <Text style={styles.mediaIcon}>▧</Text>
-          <Text style={styles.mediaText}>
-            4 archivos disponibles
+          <Text style={styles.subtitle}>
+            Consulta el estado de tu vehículo,
+            órdenes de trabajo y la información
+            asociada al servicio.
           </Text>
         </View>
-      </InfoCard>
 
-      <AppButton
-        title="Cerrar sesión"
-        variant="outline"
-        onPress={() => router.replace('/login')}
-      />
-    </AppScreen>
+        {/* =====================================
+            VEHÍCULO EN SERVICIO
+            ===================================== */}
+
+        <Card style={styles.card}>
+          <View style={styles.cardHeader}>
+            <View style={styles.cardHeaderText}>
+              <Text
+                accessibilityRole="header"
+                style={styles.cardTitle}
+              >
+                Vehículo en servicio
+              </Text>
+
+              <Text style={styles.cardSubtitle}>
+                Información de demostración
+              </Text>
+            </View>
+
+            <StatusPill
+              label="En reparación"
+              tone="success"
+              accessibilityLabel="Estado del vehículo: En reparación"
+            />
+          </View>
+
+          <View style={styles.vehicleBox}>
+            <View
+              accessible
+              accessibilityLabel="Patente: AB-CD-12"
+            >
+              <Text style={styles.smallLabel}>
+                PATENTE
+              </Text>
+
+              <Text style={styles.vehiclePlate}>
+                AB-CD-12
+              </Text>
+            </View>
+
+            <View
+              accessible
+              accessibilityLabel="Servicio: Mantención preventiva"
+              style={styles.vehicleInfo}
+            >
+              <Text style={styles.smallLabel}>
+                SERVICIO
+              </Text>
+
+              <Text style={styles.vehicleService}>
+                Mantención preventiva
+              </Text>
+            </View>
+          </View>
+        </Card>
+
+        {/* =====================================
+            SEGUIMIENTO
+            ===================================== */}
+
+        <Card style={styles.card}>
+          <Text
+            accessibilityRole="header"
+            style={styles.cardTitle}
+          >
+            Seguimiento de la orden
+          </Text>
+
+          <Text style={styles.cardSubtitle}>
+            Estado actual del servicio.
+          </Text>
+
+          <View style={styles.timeline}>
+            <TimelineItem
+              title="Vehículo recibido"
+              detail="Registro completado"
+              completed
+            />
+
+            <TimelineItem
+              title="Diagnóstico"
+              detail="Revisión finalizada"
+              completed
+            />
+
+            <TimelineItem
+              title="Reparación"
+              detail="Trabajo actualmente en curso"
+              active
+            />
+
+            <TimelineItem
+              title="Entrega"
+              detail="Pendiente"
+            />
+          </View>
+        </Card>
+
+        {/* =====================================
+            RESUMEN
+            ===================================== */}
+
+        <View style={styles.grid}>
+          <Metric
+            value="$125.000"
+            label="Presupuesto"
+          />
+
+          <Metric
+            value="3"
+            label="Repuestos"
+          />
+
+          <Metric
+            value="4"
+            label="Evidencias"
+          />
+
+          <Metric
+            value="1"
+            label="Orden activa"
+          />
+        </View>
+
+        {/* =====================================
+            PRESUPUESTO
+            ===================================== */}
+
+        <Card style={styles.card}>
+          <Text
+            accessibilityRole="header"
+            style={styles.cardTitle}
+          >
+            Presupuesto
+          </Text>
+
+          <Text style={styles.cardSubtitle}>
+            Información proporcionada por el taller.
+          </Text>
+
+          <View style={styles.budgetRow}>
+            <View
+              accessible
+              accessibilityLabel="Total estimado: $125.000"
+            >
+              <Text style={styles.smallLabel}>
+                TOTAL ESTIMADO
+              </Text>
+
+              <Text style={styles.amount}>
+                $125.000
+              </Text>
+            </View>
+
+            <StatusPill
+              label="Aprobado"
+              tone="success"
+              accessibilityLabel="Estado del presupuesto: Aprobado"
+            />
+          </View>
+
+        </Card>
+
+
+        <Button
+          title="Ver detalle del presupuesto"
+          onPress={() => router.push('/presupuesto' as never)}
+          style={styles.logoutButton}
+        />
+
+        {/* =====================================
+            EVIDENCIA MULTIMEDIA
+            ===================================== */}
+
+        <Card style={styles.card}>
+          <Text
+            accessibilityRole="header"
+            style={styles.cardTitle}
+          >
+            Evidencia multimedia
+          </Text>
+
+          <Text style={styles.cardSubtitle}>
+            Fotografías y videos asociados al
+            servicio aparecerán aquí.
+          </Text>
+
+          <View style={styles.mediaPlaceholder}>
+            <View
+              testID="cliente-media-icon"
+              accessible={false}
+              accessibilityElementsHidden
+              importantForAccessibility="no-hide-descendants"
+              style={styles.mediaIconCircle}
+            >
+              <Text style={styles.mediaIcon}>
+                ▧
+              </Text>
+            </View>
+
+            <Text style={styles.mediaTitle}>
+              4 archivos disponibles
+            </Text>
+
+            <Text style={styles.mediaDescription}>
+              Evidencias asociadas a la orden.
+            </Text>
+          </View>
+        </Card>
+
+        {/* =====================================
+            INFORMACIÓN DE LA ORDEN
+            ===================================== */}
+
+        <Card style={styles.card}>
+          <Text
+            accessibilityRole="header"
+            style={styles.cardTitle}
+          >
+            Orden de trabajo
+          </Text>
+
+          <View style={styles.orderInfo}>
+            <InfoRow
+              label="Número"
+              value="OT-00124"
+            />
+
+            <InfoRow
+              label="Estado"
+              value="En reparación"
+            />
+
+            <InfoRow
+              label="Prioridad"
+              value="Normal"
+            />
+
+            <InfoRow
+              label="Técnico"
+              value="Mecánico asignado"
+            />
+          </View>
+        </Card>
+
+        {/* =====================================
+            CERRAR SESIÓN
+            ===================================== */}
+        <Button
+          title="Ver mis vehículos"
+          onPress={() => router.push('/(cliente)/mis-vehiculos' as never)}
+          style={styles.navButton}
+        />
+
+        <Button
+          title="Cerrar sesión"
+          variant="outline"
+          onPress={async () => {
+          await logout();
+          router.replace('/login');
+          }}
+          style={styles.logoutButton}
+        />
+      </ScrollView>
+    </SafeAreaView>
   );
 }
 
-interface TimelineItemProps {
-  title: string;
-  detail: string;
-  completed?: boolean;
-  active?: boolean;
-}
+/* ==========================================
+   COMPONENTES
+   ========================================== */
 
 function TimelineItem({
   title,
   detail,
-  completed,
-  active,
-}: TimelineItemProps) {
+  completed = false,
+  active = false,
+}: {
+  title: string;
+  detail: string;
+  completed?: boolean;
+  active?: boolean;
+}) {
+  // El punto de color es la única señal visual del estado: se expone
+  // también como texto para lectores de pantalla.
+  const state = completed
+    ? 'Completado'
+    : active
+      ? 'En curso'
+      : 'Pendiente';
+
   return (
-    <View style={styles.timelineRow}>
+    <View
+      accessible
+      accessibilityLabel={`Etapa: ${title}. ${detail}. Estado: ${state}`}
+      style={styles.timelineRow}
+    >
       <View
         style={[
           styles.timelineDot,
@@ -166,43 +382,323 @@ function TimelineItem({
   );
 }
 
-interface MetricProps {
-  value: string;
-  label: string;
-}
-
 function Metric({
   value,
   label,
-}: MetricProps) {
+}: {
+  value: string;
+  label: string;
+}) {
   return (
-    <View style={styles.metric}>
-      <Text style={styles.metricValue}>{value}</Text>
-      <Text style={styles.metricLabel}>{label}</Text>
+    <View
+      accessible
+      accessibilityLabel={`${label}: ${value}`}
+      style={styles.metric}
+    >
+      <Text style={styles.metricValue}>
+        {value}
+      </Text>
+
+      <Text style={styles.metricLabel}>
+        {label}
+      </Text>
     </View>
   );
 }
 
+function InfoRow({
+  label,
+  value,
+}: {
+  label: string;
+  value: string;
+}) {
+  return (
+    <View
+      accessible
+      accessibilityLabel={`${label}: ${value}`}
+      style={styles.infoRow}
+    >
+      <Text style={styles.infoLabel}>
+        {label}
+      </Text>
+
+      <Text style={styles.infoValue}>
+        {value}
+      </Text>
+    </View>
+  );
+}
+
+/* ==========================================
+   TEMA
+   ========================================== */
+
+const localTheme = {
+  background: colors.background,
+  surface: colors.surface,
+  surfaceSoft: colors.surfaceSoft,
+  border: colors.border,
+
+  primary: colors.primary,
+  primaryDark: colors.primary,
+
+  text: colors.text,
+  textSecondary: colors.textSecondary,
+  textMuted: colors.textSecondary,
+
+  accent: colors.accent,
+  info: colors.info,
+  success: colors.success,
+  warning: colors.warning,
+  danger: colors.danger,
+};
+
+/* ==========================================
+   ESTILOS
+   ========================================== */
+
 const styles = StyleSheet.create({
-  row: {
+  root: {
+    flex: 1,
+    backgroundColor: localTheme.background,
+  },
+
+  container: {
+    paddingHorizontal: spacing.lg,
+    paddingBottom: spacing.xxl,
+  },
+
+  decorations: {
+    position: 'absolute',
+    top: 0,
+    right: 0,
+    bottom: 0,
+    left: 0,
+    overflow: 'hidden',
+  },
+
+  orbRedLarge: {
+    position: 'absolute',
+    width: 300,
+    height: 300,
+    borderRadius: 150,
+    backgroundColor: localTheme.primary,
+    top: -50,
+    right: -100,
+    opacity: 0.15,
+  },
+
+  orbDarkRed: {
+    position: 'absolute',
+    width: 200,
+    height: 200,
+    borderRadius: 100,
+    backgroundColor: localTheme.primaryDark,
+    top: 400,
+    left: -80,
+    opacity: 0.25,
+  },
+
+  crystalRed: {
+    position: 'absolute',
+    width: 80,
+    height: 80,
+    borderRadius: 16,
+    backgroundColor: localTheme.primary,
+    top: 150,
+    left: -20,
+    opacity: 0.15,
+    transform: [
+      {
+        rotate: '45deg',
+      },
+    ],
+  },
+
+  crystalGrey: {
+    position: 'absolute',
+    width: 100,
+    height: 100,
+    borderRadius: 20,
+    backgroundColor: colors.surfaceSoft,
+    bottom: 200,
+    right: -40,
+    opacity: 0.2,
+    transform: [
+      {
+        rotate: '45deg',
+      },
+    ],
+  },
+
+  ringStrong1: {
+    position: 'absolute',
+    width: 120,
+    height: 120,
+    borderRadius: 60,
+    borderWidth: 4,
+    borderColor: localTheme.primary,
+    top: 600,
+    right: -40,
+    opacity: 0.25,
+  },
+
+  ringStrong2: {
+    position: 'absolute',
+    width: 60,
+    height: 60,
+    borderRadius: 30,
+    borderWidth: 2,
+    borderColor: '#444444',
+    top: 50,
+    left: 40,
+    opacity: 0.3,
+  },
+
+  glowDot1: {
+    position: 'absolute',
+    width: 12,
+    height: 12,
+    borderRadius: 6,
+    backgroundColor: localTheme.primary,
+    top: 280,
+    left: 60,
+    opacity: 0.9,
+    shadowColor: localTheme.primary,
+    shadowOffset: {
+      width: 0,
+      height: 0,
+    },
+    shadowOpacity: 1,
+    shadowRadius: 10,
+    elevation: 4,
+  },
+
+  glowDot2: {
+    position: 'absolute',
+    width: 10,
+    height: 10,
+    borderRadius: 5,
+    backgroundColor: '#666666',
+    bottom: 100,
+    right: 70,
+    opacity: 0.5,
+  },
+
+  glowDot3: {
+    position: 'absolute',
+    width: 14,
+    height: 14,
+    borderRadius: 7,
+    backgroundColor: localTheme.primary,
+    top: 100,
+    right: 50,
+    opacity: 0.8,
+  },
+
+  header: {
+    marginTop: spacing.xl,
+    marginBottom: spacing.xl,
+  },
+
+  eyebrow: {
+    color: colors.accent,
+    fontSize: 13,
+    fontWeight: '900',
+    textTransform: 'uppercase',
+    letterSpacing: 0.5,
+    marginBottom: 4,
+  },
+
+  title: {
+    color: localTheme.text,
+    fontSize: 30,
+    fontWeight: '900',
+    letterSpacing: -0.5,
+    marginBottom: 8,
+  },
+
+  subtitle: {
+    color: localTheme.textSecondary,
+    fontSize: 14,
+    lineHeight: 20,
+  },
+
+  card: {
+    backgroundColor: localTheme.surface,
+    borderRadius: radius.lg,
+    borderWidth: 1,
+    borderColor: colors.border,
+    padding: spacing.lg,
+    marginBottom: spacing.lg,
+
+    shadowColor: colors.primary,
+    shadowOffset: {
+      width: 0,
+      height: 8,
+    },
+    shadowOpacity: 0.4,
+    shadowRadius: 12,
+    elevation: 6,
+  },
+
+  cardHeader: {
     flexDirection: 'row',
+    alignItems: 'flex-start',
     justifyContent: 'space-between',
-    alignItems: 'center',
     gap: spacing.md,
   },
 
-  smallLabel: {
-    color: colors.textMuted,
-    fontSize: 11,
-    fontWeight: '700',
-    textTransform: 'uppercase',
+  cardHeaderText: {
+    flex: 1,
   },
 
-  vehicle: {
-    marginTop: 4,
-    color: colors.text,
+  cardTitle: {
+    color: localTheme.text,
+    fontSize: 18,
+    fontWeight: '900',
+    marginBottom: 4,
+  },
+
+  cardSubtitle: {
+    color: localTheme.textSecondary,
+    fontSize: 13,
+    marginBottom: spacing.lg,
+  },
+
+  vehicleBox: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    gap: spacing.lg,
+    paddingTop: spacing.md,
+    borderTopWidth: 1,
+    borderTopColor: localTheme.border,
+  },
+
+  vehicleInfo: {
+    flex: 1,
+  },
+
+  smallLabel: {
+    color: localTheme.textMuted,
+    fontSize: 10,
     fontWeight: '800',
-    fontSize: 16,
+    letterSpacing: 0.5,
+  },
+
+  vehiclePlate: {
+    marginTop: 5,
+    color: localTheme.text,
+    fontSize: 22,
+    fontWeight: '900',
+  },
+
+  vehicleService: {
+    marginTop: 5,
+    color: localTheme.text,
+    fontSize: 14,
+    fontWeight: '700',
   },
 
   timeline: {
@@ -219,15 +715,17 @@ const styles = StyleSheet.create({
     height: 12,
     marginTop: 4,
     borderRadius: 6,
-    backgroundColor: colors.border,
+    backgroundColor: localTheme.border,
   },
 
   timelineCompleted: {
-    backgroundColor: colors.success,
+    backgroundColor: localTheme.success,
   },
 
   timelineActive: {
-    backgroundColor: colors.accent,
+    backgroundColor: localTheme.primary,
+    borderWidth: 2,
+    borderColor: localTheme.surfaceSoft,
   },
 
   timelineText: {
@@ -235,13 +733,13 @@ const styles = StyleSheet.create({
   },
 
   timelineTitle: {
-    color: colors.text,
+    color: localTheme.text,
     fontWeight: '800',
   },
 
   timelineDetail: {
     marginTop: 2,
-    color: colors.textSecondary,
+    color: localTheme.textSecondary,
     fontSize: 13,
   },
 
@@ -249,38 +747,62 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     flexWrap: 'wrap',
     gap: spacing.sm,
+    marginBottom: spacing.lg,
   },
 
   metric: {
     width: '48%',
     minHeight: 92,
-    backgroundColor: colors.primary,
-    borderRadius: 16,
+    backgroundColor: localTheme.surfaceSoft,
+    borderRadius: radius.md,
+    borderWidth: 1,
+    borderColor: colors.border,
     padding: spacing.lg,
     justifyContent: 'center',
   },
 
   metricValue: {
-    color: '#FFFFFF',
+    color: localTheme.text,
     fontSize: 21,
     fontWeight: '900',
   },
 
   metricLabel: {
-    color: '#D7E0EA',
+    color: localTheme.textSecondary,
     marginTop: 4,
     fontSize: 12,
+    fontWeight: '600',
+  },
+
+  budgetRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    gap: spacing.md,
   },
 
   amount: {
-    color: colors.text,
-    fontSize: 24,
+    marginTop: 5,
+    color: localTheme.text,
+    fontSize: 25,
     fontWeight: '900',
   },
 
   mediaPlaceholder: {
-    minHeight: 90,
-    borderRadius: 14,
+    minHeight: 120,
+    marginTop: spacing.sm,
+    borderRadius: radius.md,
+    backgroundColor: localTheme.surfaceSoft,
+    borderWidth: 1,
+    borderColor: colors.border,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+
+  mediaIconCircle: {
+    width: 48,
+    height: 48,
+    borderRadius: 24,
     backgroundColor: colors.surfaceSoft,
     alignItems: 'center',
     justifyContent: 'center',
@@ -288,12 +810,54 @@ const styles = StyleSheet.create({
 
   mediaIcon: {
     color: colors.accent,
-    fontSize: 28,
+    fontSize: 24,
   },
 
-  mediaText: {
-    marginTop: 5,
-    color: colors.textSecondary,
+  mediaTitle: {
+    marginTop: spacing.sm,
+    color: localTheme.text,
+    fontSize: 14,
+    fontWeight: '800',
+  },
+
+  mediaDescription: {
+    marginTop: 3,
+    color: localTheme.textSecondary,
+    fontSize: 12,
+  },
+
+  orderInfo: {
+    marginTop: spacing.sm,
+    gap: 0,
+  },
+
+  infoRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    paddingVertical: spacing.md,
+    borderBottomWidth: 1,
+    borderBottomColor: localTheme.border,
+  },
+
+  infoLabel: {
+    color: localTheme.textSecondary,
     fontSize: 13,
+  },
+
+  infoValue: {
+    color: localTheme.text,
+    fontSize: 13,
+    fontWeight: '800',
+  },
+
+  navButton: {
+    marginTop: spacing.sm,
+  },
+
+  logoutButton: {
+    marginTop: spacing.sm,
+    marginBottom: spacing.xl,
+    borderColor: colors.border,
   },
 });

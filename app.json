@@ -33,7 +33,21 @@
           "imageWidth": 76
         }
       ],
-      "expo-secure-store"
+      "expo-secure-store",
+      [
+        "expo-camera",
+        {
+          "cameraPermission": "TallerConnect necesita acceso a la cámara para capturar evidencias fotográficas y en video de las órdenes de trabajo.",
+          "microphonePermission": "TallerConnect necesita acceso al micrófono para grabar videos de evidencia técnica."
+        }
+      ],
+      [
+        "expo-image-picker",
+        {
+          "photosPermission": "TallerConnect necesita acceso a tu galería para adjuntar fotos y videos de evidencia a las órdenes de trabajo.",
+          "cameraPermission": "TallerConnect necesita acceso a la cámara para tomar fotos o videos de evidencia técnica."
+        }
+      ]
     ],
     "experiments": {
       "typedRoutes": true,

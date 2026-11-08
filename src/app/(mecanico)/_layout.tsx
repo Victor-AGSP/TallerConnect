@@ -1,12 +1,5 @@
-import { Stack } from 'expo-router';
+import { RoleStack } from '@/components/layout/RoleStack';
 
 export default function MecanicoLayout() {
-  return (
-    <Stack
-      screenOptions={{
-        headerShown: false,
-        animation: 'slide_from_right',
-      }}
-    />
-  );
+  return <RoleStack role="mecanico" />;
 }

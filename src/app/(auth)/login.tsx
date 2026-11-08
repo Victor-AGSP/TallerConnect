@@ -1,5 +1,7 @@
 import { useState } from 'react';
 import { useRouter } from 'expo-router';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { Controller, useForm } from 'react-hook-form';
 
 import {
   KeyboardAvoidingView,
@@ -8,11 +10,11 @@ import {
   ScrollView,
   StyleSheet,
   Text,
-  TextInput,
   View,
 } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 
-import { AppButton } from '@/components/ui/AppButton';
+import { Button, Card, ErrorMessage, Input } from '@/components/common';
 
 import {
   colors,
@@ -20,202 +22,299 @@ import {
   spacing,
 } from '@/constants/theme';
 
+import {
+  loginSchema,
+  type LoginFormData,
+} from '@/schemas/auth.schema';
+
+import { useAuthStore } from '@/stores/authStore';
+import { StorageError } from '@/utils/storage';
+
 export default function LoginScreen() {
   const router = useRouter();
 
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
+  const login = useAuthStore(
+    (state) => state.login
+  );
 
-  const [passwordVisible, setPasswordVisible] = useState(false);
+  const isLoading = useAuthStore(
+    (state) => state.isLoading
+  );
 
-  const [emailFocused, setEmailFocused] = useState(false);
-  const [passwordFocused, setPasswordFocused] = useState(false);
+  const sessionIssue = useAuthStore(
+    (state) => state.sessionIssue
+  );
 
-  const handleLogin = () => {
-    // Temporal mientras no esté conectado el backend.
-    router.replace('/cliente');
-  };
+  const hydrateSession = useAuthStore(
+    (state) => state.hydrateSession
+  );
+
+  const logout = useAuthStore(
+    (state) => state.logout
+  );
+
+  const [passwordVisible, setPasswordVisible] =
+    useState(false);
+
+  const [loginError, setLoginError] =
+    useState<string | null>(null);
+
+  const {
+    control,
+    handleSubmit,
+    formState: { errors },
+  } = useForm<LoginFormData>({
+    resolver: zodResolver(loginSchema),
+    defaultValues: {
+      email: '',
+      password: '',
+    },
+  });
+
+  const handleLogin = handleSubmit(
+    async (credentials) => {
+      setLoginError(null);
+
+      try {
+        await login(credentials);
+
+        router.replace('/');
+      } catch (error) {
+        setLoginError(
+          error instanceof StorageError
+            ? error.message
+            : error instanceof Error
+              ? error.message
+              : 'No se pudo iniciar sesión. Verifica tus credenciales e inténtalo nuevamente.'
+        );
+      }
+    }
+  );
 
   return (
-    <KeyboardAvoidingView
-      style={styles.root}
-      behavior={Platform.OS === 'ios' ? 'padding' : undefined}
-    >
-      <ScrollView
-        contentContainerStyle={styles.container}
-        keyboardShouldPersistTaps="handled"
-        showsVerticalScrollIndicator={false}
+    <SafeAreaView style={styles.safeArea}>
+      <KeyboardAvoidingView
+        style={styles.root}
+        behavior={
+          Platform.OS === 'ios'
+            ? 'padding'
+            : 'height'
+        }
       >
-        {/* ==============================
-            DECORACIÓN DE FONDO VIBRANTE
-            ============================== */}
-
-        <View pointerEvents="none" style={styles.decorations}>
-          {/* Esferas de luz principales */}
-          <View style={styles.orbInfoLarge} />
-          <View style={styles.orbAccentLarge} />
-          
-          {/* Cristales geométricos (Cuadrados rotados) */}
-          <View style={styles.crystalAccent} />
-          <View style={styles.crystalPrimary} />
-
-          {/* Anillos notorios */}
-          <View style={styles.ringStrong1} />
-          <View style={styles.ringStrong2} />
-
-          {/* Destellos / Puntos brillantes */}
-          <View style={styles.glowDot1} />
-          <View style={styles.glowDot2} />
-          <View style={styles.glowDot3} />
-        </View>
-
-        {/* ==============================
-            ENCABEZADO
-            ============================== */}
-
-        <View style={styles.header}>
-          <View style={styles.logoWrapper}>
-            <View style={styles.logo}>
-              <Text style={styles.logoText}>
-                TC
-              </Text>
-            </View>
-          </View>
-
-          <Text style={styles.brand}>
-            TallerConnect
-          </Text>
-
-          <Text style={styles.description}>
-            Gestión del servicio técnico vehicular
-          </Text>
-
-          <Text style={styles.description}>
-            desde tu teléfono.
-          </Text>
-        </View>
-
-        {/* ==============================
-            TARJETA DE LOGIN
-            ============================== */}
-
-        <View style={styles.card}>
-          <Text style={styles.title}>
-            Bienvenido
-          </Text>
-
-          <Text style={styles.subtitle}>
-            Ingresa tus credenciales para acceder al sistema.
-          </Text>
-
-          <View style={styles.form}>
-            {/* CORREO */}
-
-            <View>
-              <Text style={styles.label}>
-                Correo electrónico
-              </Text>
-
-              <View
-                style={[
-                  styles.inputWrapper,
-                  emailFocused && styles.inputFocused,
-                ]}
-              >
-                <TextInput
-                  value={email}
-                  onChangeText={setEmail}
-                  autoCapitalize="none"
-                  autoCorrect={false}
-                  keyboardType="email-address"
-                  placeholder="usuario@correo.cl"
-                  placeholderTextColor={colors.textMuted}
-                  style={styles.input}
-                  onFocus={() => setEmailFocused(true)}
-                  onBlur={() => setEmailFocused(false)}
-                />
+        <ScrollView
+          contentContainerStyle={styles.container}
+          keyboardShouldPersistTaps="handled"
+          keyboardDismissMode={
+            Platform.OS === 'ios'
+              ? 'interactive'
+              : 'on-drag'
+          }
+          showsVerticalScrollIndicator={false}
+        >
+          <View style={styles.header}>
+            <View
+              accessible
+              accessibilityRole="image"
+              accessibilityLabel="Logo de TallerConnect"
+              style={styles.logoWrapper}
+            >
+              <View style={styles.logo}>
+                <Text style={styles.logoText}>
+                  TC
+                </Text>
               </View>
             </View>
 
-            {/* CONTRASEÑA */}
+            <Text style={styles.brand}>
+              TallerConnect
+            </Text>
 
-            <View>
-              <Text style={styles.label}>
-                Contraseña
-              </Text>
+            <Text style={styles.description}>
+              Gestión del servicio técnico vehicular
+            </Text>
 
-              <View
-                style={[
-                  styles.inputWrapper,
-                  passwordFocused && styles.inputFocused,
-                ]}
-              >
-                <TextInput
-                  value={password}
-                  onChangeText={setPassword}
-                  autoCapitalize="none"
-                  autoCorrect={false}
-                  placeholder="••••••••"
-                  placeholderTextColor={colors.textMuted}
-                  secureTextEntry={!passwordVisible}
-                  style={styles.input}
-                  onFocus={() => setPasswordFocused(true)}
-                  onBlur={() => setPasswordFocused(false)}
+            <Text style={styles.description}>
+              desde tu teléfono.
+            </Text>
+          </View>
+
+          <Card style={styles.card}>
+            <Text style={styles.title}>
+              Bienvenido
+            </Text>
+
+            <Text style={styles.subtitle}>
+              Ingresa tus credenciales para acceder
+              al sistema.
+            </Text>
+
+            <View style={styles.form}>
+              <Controller
+                control={control}
+                name="email"
+                render={({
+                  field: {
+                    onBlur,
+                    onChange,
+                    value,
+                  },
+                }) => (
+                  <Input
+                    label="Correo electrónico"
+                    value={value}
+                    onBlur={onBlur}
+                    onChangeText={onChange}
+                    autoCapitalize="none"
+                    autoCorrect={false}
+                    keyboardType="email-address"
+                    textContentType="emailAddress"
+                    autoComplete="email"
+                    returnKeyType="next"
+                    placeholder="usuario@correo.cl"
+                    placeholderTextColor={
+                      colors.textSecondary
+                    }
+                    labelStyle={styles.label}
+                    style={styles.input}
+                    focusedStyle={
+                      styles.inputFocused
+                    }
+                    error={errors.email?.message}
+                    testID="login-email"
+                  />
+                )}
+              />
+
+              <View style={styles.passwordField}>
+                <Controller
+                  control={control}
+                  name="password"
+                  render={({
+                    field: {
+                      onBlur,
+                      onChange,
+                      value,
+                    },
+                  }) => (
+                    <Input
+                      label="Contraseña"
+                      value={value}
+                      onBlur={onBlur}
+                      onChangeText={onChange}
+                      autoCapitalize="none"
+                      autoCorrect={false}
+                      secureTextEntry={
+                        !passwordVisible
+                      }
+                      textContentType="password"
+                      autoComplete="password"
+                      returnKeyType="done"
+                      placeholder="••••••••"
+                      placeholderTextColor={
+                        colors.textSecondary
+                      }
+                      labelStyle={styles.label}
+                      style={[
+                        styles.input,
+                        styles.passwordInput,
+                      ]}
+                      focusedStyle={
+                        styles.inputFocused
+                      }
+                      error={
+                        errors.password?.message
+                      }
+                      testID="login-password"
+                      onSubmitEditing={() =>
+                        void handleLogin()
+                      }
+                    />
+                  )}
                 />
 
                 <Pressable
-                  onPress={() =>
-                    setPasswordVisible(
-                      (previous) => !previous
+  testID="login-password-toggle"
+  accessibilityRole="button"
+  accessibilityLabel={
+    passwordVisible
+      ? 'Ocultar contraseña'
+      : 'Mostrar contraseña'
+  }
+  onPress={() =>
+    setPasswordVisible(
+      (previous) => !previous
+    )
+  }
+  hitSlop={10}
+  style={styles.showButton}
+>
+  <Text style={styles.showButtonText}>
+    {passwordVisible ? 'OCULTAR' : 'VER'}
+  </Text>
+</Pressable>
+              </View>
+
+              {loginError ? (
+                <ErrorMessage
+                  message={loginError}
+                />
+              ) : null}
+
+              {sessionIssue ? (
+                <ErrorMessage
+                  message={sessionIssue.message}
+                  onRetry={() =>
+                    void (
+                      sessionIssue.kind === 'restore'
+                        ? hydrateSession()
+                        : logout()
                     )
                   }
-                  hitSlop={10}
-                  style={styles.showButton}
-                >
-                  <Text style={styles.showButtonText}>
-                    {passwordVisible ? 'OCULTAR' : 'VER'}
-                  </Text>
-                </Pressable>
-              </View>
+                />
+              ) : null}
+
+              <Button
+                title="Iniciar sesión"
+                onPress={() =>
+                  void handleLogin()
+                }
+                loading={isLoading}
+                accessibilityLabel="Iniciar sesión"
+                style={styles.loginButton}
+                testID="login-submit"
+              />
             </View>
 
-            {/* BOTÓN */}
+            <View style={styles.bottomInfo}>
+              <View
+                accessible={false}
+                style={styles.statusDot}
+              />
 
-            <AppButton
-              title="Iniciar sesión"
-              onPress={handleLogin}
-              style={styles.loginButton}
-            />
-          </View>
+              <Text style={styles.bottomText}>
+                Acceso seguro al sistema
+                TallerConnect
+              </Text>
+            </View>
+          </Card>
 
-          {/* ==============================
-              INFORMACIÓN INFERIOR
-              ============================== */}
-
-          <View style={styles.bottomInfo}>
-            <View style={styles.statusDot} />
-
-            <Text style={styles.bottomText}>
-              Acceso al sistema TallerConnect
+          <View style={styles.footer}>
+            <Text style={styles.footerText}>
+              TallerConnect · Aplicación móvil
             </Text>
           </View>
-        </View>
-
-        {/* ==============================
-            FOOTER
-            ============================== */}
-
-        <View style={styles.footer}>
-          <Text style={styles.footerText}>
-            TallerConnect · Aplicación móvil
-          </Text>
-        </View>
-      </ScrollView>
-    </KeyboardAvoidingView>
+        </ScrollView>
+      </KeyboardAvoidingView>
+    </SafeAreaView>
   );
 }
 
 const styles = StyleSheet.create({
+  safeArea: {
+    flex: 1,
+    backgroundColor: colors.background,
+  },
+
   root: {
     flex: 1,
     backgroundColor: colors.background,
@@ -228,140 +327,6 @@ const styles = StyleSheet.create({
     paddingVertical: spacing.xl,
   },
 
-  /* ===================================
-     DECORACIÓN VIBRANTE
-     =================================== */
-
-  decorations: {
-    position: 'absolute',
-    top: 0,
-    right: 0,
-    bottom: 0,
-    left: 0,
-    overflow: 'hidden',
-  },
-
-  // Esferas de color intenso con opacidad media para no perderse
-  orbInfoLarge: {
-    position: 'absolute',
-    width: 280,
-    height: 280,
-    borderRadius: 140,
-    backgroundColor: colors.info, // Azul vibrante
-    top: -100,
-    right: -80,
-    opacity: 0.15,
-  },
-
-  orbAccentLarge: {
-    position: 'absolute',
-    width: 240,
-    height: 240,
-    borderRadius: 120,
-    backgroundColor: colors.accent, // Naranja fuerte
-    bottom: -80,
-    left: -70,
-    opacity: 0.18,
-  },
-
-  // Formas de cristal (Rombos)
-  crystalAccent: {
-    position: 'absolute',
-    width: 90,
-    height: 90,
-    borderRadius: 20,
-    backgroundColor: colors.warning,
-    top: 180,
-    left: -35,
-    opacity: 0.25,
-    transform: [{ rotate: '45deg' }],
-  },
-
-  crystalPrimary: {
-    position: 'absolute',
-    width: 110,
-    height: 110,
-    borderRadius: 24,
-    backgroundColor: colors.primaryLight,
-    bottom: 150,
-    right: -45,
-    opacity: 0.2,
-    transform: [{ rotate: '45deg' }],
-  },
-
-  // Anillos notorios (bordes más gruesos y colores sólidos con transparencia)
-  ringStrong1: {
-    position: 'absolute',
-    width: 130,
-    height: 130,
-    borderRadius: 65,
-    borderWidth: 6,
-    borderColor: colors.accent,
-    bottom: 60,
-    right: -30,
-    opacity: 0.25,
-  },
-
-  ringStrong2: {
-    position: 'absolute',
-    width: 80,
-    height: 80,
-    borderRadius: 40,
-    borderWidth: 4,
-    borderColor: colors.info,
-    top: 70,
-    left: 20,
-    opacity: 0.3,
-  },
-
-  // Puntos/Destellos con sombra para que resalten
-  glowDot1: {
-    position: 'absolute',
-    width: 16,
-    height: 16,
-    borderRadius: 8,
-    backgroundColor: colors.accent,
-    top: 310,
-    left: 50,
-    opacity: 0.7,
-    shadowColor: colors.accent,
-    shadowOffset: { width: 0, height: 0 },
-    shadowOpacity: 0.8,
-    shadowRadius: 10,
-    elevation: 3,
-  },
-
-  glowDot2: {
-    position: 'absolute',
-    width: 12,
-    height: 12,
-    borderRadius: 6,
-    backgroundColor: colors.info,
-    bottom: 250,
-    right: 50,
-    opacity: 0.8,
-    shadowColor: colors.info,
-    shadowOffset: { width: 0, height: 0 },
-    shadowOpacity: 0.8,
-    shadowRadius: 8,
-    elevation: 3,
-  },
-
-  glowDot3: {
-    position: 'absolute',
-    width: 14,
-    height: 14,
-    borderRadius: 7,
-    backgroundColor: colors.warning,
-    top: 120,
-    right: 70,
-    opacity: 0.6,
-  },
-
-  /* ===================================
-     HEADER
-     =================================== */
-
   header: {
     alignItems: 'center',
     marginBottom: spacing.xl,
@@ -370,34 +335,26 @@ const styles = StyleSheet.create({
   logoWrapper: {
     width: 82,
     height: 82,
-    borderRadius: 28,
+    borderRadius: radius.lg,
     alignItems: 'center',
     justifyContent: 'center',
-    backgroundColor: colors.primarySoft,
+    backgroundColor: colors.surface,
+    borderWidth: 1,
+    borderColor: colors.border,
     marginBottom: spacing.md,
   },
 
   logo: {
     width: 64,
     height: 64,
-    borderRadius: 21,
+    borderRadius: radius.md,
     backgroundColor: colors.primary,
     alignItems: 'center',
     justifyContent: 'center',
-    borderWidth: 3,
-    borderColor: colors.surface,
-    shadowColor: colors.primary,
-    shadowOffset: {
-      width: 0,
-      height: 5,
-    },
-    shadowOpacity: 0.18,
-    shadowRadius: 9,
-    elevation: 4,
   },
 
   logoText: {
-    color: '#FFFFFF',
+    color: colors.surface,
     fontSize: 22,
     fontWeight: '900',
     letterSpacing: -0.5,
@@ -417,10 +374,6 @@ const styles = StyleSheet.create({
     textAlign: 'center',
   },
 
-  /* ===================================
-     CARD
-     =================================== */
-
   card: {
     backgroundColor: colors.surface,
     borderRadius: radius.lg,
@@ -431,10 +384,10 @@ const styles = StyleSheet.create({
     shadowColor: colors.primary,
     shadowOffset: {
       width: 0,
-      height: 8,
+      height: 5,
     },
     shadowOpacity: 0.08,
-    shadowRadius: 18,
+    shadowRadius: 12,
     elevation: 4,
   },
 
@@ -446,14 +399,10 @@ const styles = StyleSheet.create({
 
   subtitle: {
     color: colors.textSecondary,
-    marginTop: 5,
-    fontSize: 12,
+    marginTop: spacing.xs,
+    fontSize: 13,
     lineHeight: 19,
   },
-
-  /* ===================================
-     FORMULARIO
-     =================================== */
 
   form: {
     marginTop: spacing.xl,
@@ -462,46 +411,43 @@ const styles = StyleSheet.create({
 
   label: {
     color: colors.text,
-    marginBottom: 7,
-    fontSize: 11,
-    fontWeight: '800',
-  },
-
-  inputWrapper: {
-    minHeight: 52,
-    flexDirection: 'row',
-    alignItems: 'center',
-
-    backgroundColor: colors.surfaceSoft,
-
-    borderWidth: 1,
-    borderColor: colors.border,
-
-    borderRadius: radius.md,
-
-    paddingHorizontal: spacing.md,
-  },
-
-  inputFocused: {
-    backgroundColor: colors.surface,
-    borderColor: colors.accent,
+    fontSize: 14,
+    fontWeight: '700',
+    marginBottom: spacing.sm,
   },
 
   input: {
-    flex: 1,
+    minHeight: 52,
+    backgroundColor: colors.surfaceSoft,
+    borderColor: colors.border,
+    borderRadius: radius.md,
     color: colors.text,
-    fontSize: 14,
-    paddingVertical: 0,
+    fontSize: 16,
+  },
+
+  passwordInput: {
+    paddingRight: 78,
+  },
+
+  inputFocused: {
+    borderColor: colors.accent,
+  },
+
+  passwordField: {
+    position: 'relative',
   },
 
   showButton: {
-    marginLeft: spacing.sm,
+    position: 'absolute',
+    top: 34,
+    right: spacing.md,
     paddingVertical: spacing.sm,
+    paddingHorizontal: spacing.xs,
   },
 
   showButtonText: {
     color: colors.accent,
-    fontSize: 9,
+    fontSize: 11,
     fontWeight: '900',
     letterSpacing: 0.3,
   },
@@ -511,10 +457,6 @@ const styles = StyleSheet.create({
     backgroundColor: colors.primary,
     borderRadius: radius.md,
   },
-
-  /* ===================================
-     INFORMACIÓN
-     =================================== */
 
   bottomInfo: {
     marginTop: spacing.xl,
@@ -528,22 +470,18 @@ const styles = StyleSheet.create({
   },
 
   statusDot: {
-    width: 7,
-    height: 7,
+    width: 8,
+    height: 8,
     borderRadius: 4,
-    backgroundColor: colors.accent,
+    backgroundColor: colors.success,
     marginRight: spacing.sm,
   },
 
   bottomText: {
-    color: colors.textMuted,
-    fontSize: 10,
+    color: colors.textSecondary,
+    fontSize: 11,
     fontWeight: '600',
   },
-
-  /* ===================================
-     FOOTER
-     =================================== */
 
   footer: {
     marginTop: spacing.lg,
@@ -551,7 +489,7 @@ const styles = StyleSheet.create({
   },
 
   footerText: {
-    color: colors.textMuted,
+    color: colors.textSecondary,
     fontSize: 10,
   },
 });
