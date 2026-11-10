@@ -6,11 +6,11 @@ import { useAuthStore } from '@/stores/authStore';
 import { ConnectivityBanner } from '@/components/common';
 
 export default function RootLayout() {
-  const hydrateSession = useAuthStore((state) => state.hydrateSession);
+  const restoreSession = useAuthStore((state) => state.restoreSession);
 
   useEffect(() => {
-    void hydrateSession();
-  }, [hydrateSession]);
+    void restoreSession();
+  }, [restoreSession]);
 
   return (
     <View style={styles.rootContainer}>
