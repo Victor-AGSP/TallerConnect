@@ -1,5 +1,6 @@
 import * as ImagePicker from 'expo-image-picker';
 import { router as appRouter } from 'expo-router';
+import { Alert } from 'react-native';
 
 import {
   act,
@@ -143,6 +144,9 @@ function pressHandlerOf(testID: string): () => void {
 
 beforeEach(() => {
   jest.resetAllMocks();
+  jest.spyOn(Alert, 'alert').mockImplementation((_title, _message, buttons) => {
+  buttons?.find((button) => button.text === 'Enviar evidencia')?.onPress?.();
+});
   resetStores();
   mockedOrders.getOrderById.mockImplementation(async (id) => order(String(id)));
   // Primer uso: el permiso aún no se ha decidido y se solicita al pulsar.

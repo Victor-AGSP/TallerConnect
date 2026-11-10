@@ -1,5 +1,6 @@
 import * as ImagePicker from 'expo-image-picker';
 import { AxiosError, type AxiosAdapter, type InternalAxiosRequestConfig } from 'axios';
+import { Alert } from 'react-native';
 
 import {
   act,
@@ -295,6 +296,9 @@ function pressHandlerOf(testID: string): () => void {
 describe('Avances del mecánico en la orden', () => {
   beforeEach(() => {
     jest.resetAllMocks();
+    jest.spyOn(Alert, 'alert').mockImplementation((_title, _message, buttons) => {
+  buttons?.find((button) => button.text === 'Confirmar')?.onPress?.();
+  });
     resetStores();
     mockedOrders.getOrderById.mockResolvedValue(order());
     mockedLog.getOrderLog.mockResolvedValue([]);

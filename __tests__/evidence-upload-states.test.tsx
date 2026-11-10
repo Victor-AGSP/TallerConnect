@@ -1,5 +1,6 @@
 import * as ImagePicker from 'expo-image-picker';
 import { router as appRouter } from 'expo-router';
+import { Alert } from 'react-native';
 import {
   AxiosError,
   CanceledError,
@@ -233,6 +234,9 @@ afterAll(() => {
 
 beforeEach(() => {
   jest.resetAllMocks();
+  jest.spyOn(Alert, 'alert').mockImplementation((_title, _message, buttons) => {
+  buttons?.find((button) => button.text === 'Enviar evidencia')?.onPress?.();
+});
   resetStores();
   postHandlers = [];
   getHandlers = [];
