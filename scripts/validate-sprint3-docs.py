@@ -15,7 +15,7 @@ errors = []
 links = cases = 0
 for path in paths:
     content = path.read_text()
-    for target in re.findall(r"\]\(([^\n]+?)\)", content):
+    for target in re.findall(r"\]\((<[^>\n]+>|[^()\n]*(?:\([^()\n]*\)[^()\n]*)*)\)", content):
         if target.startswith(("https://", "http://", "#")):
             continue
         target = unquote(target.strip("<>").split("#", 1)[0])

@@ -6,7 +6,8 @@ import { vehiclesService } from '@/services/vehicles.service';
 
 /**
  * Listado de vehículos del cliente autenticado.
- * Consulta GET /api/vehiculos/mios mediante VehiclesService.
+ * Consulta GET /api/vehiculos mediante VehiclesService.getMyVehicles.
+ * El backend determina el alcance del cliente a partir del token.
  */
 export default function MisVehiculosScreen() {
   const router = useRouter();
