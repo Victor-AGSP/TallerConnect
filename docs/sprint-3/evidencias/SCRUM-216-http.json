@@ -1,0 +1,21 @@
+{
+  "date_utc": "2026-11-11",
+  "environment": "https://tallerconect.vercel.app",
+  "kind": "REAL_ANONYMOUS_HTTP",
+  "method": "GET",
+  "authorization_sent": false,
+  "cookies_sent": false,
+  "command_template": "curl -sS --connect-timeout 10 --max-time 25 -o <archivo-local-temporal> -w '%{http_code}' 'https://tallerconect.vercel.app<RUTA>'",
+  "note": "Ejecución desde host con red autorizada; sandbox no resolvía DNS. Sin login ni modificaciones del backend. El orden_id=1 viene del documento histórico, no confirma existencia ni propiedad de la orden.",
+  "checks": [
+    {
+      "id": "NET-AUTH-ME",
+      "path": "/api/auth/me",
+      "expected": 401,
+      "http": 401,
+      "exit": 0,
+      "time_seconds": 2.710432,
+      "result": "PASS"
+    }
+  ]
+}

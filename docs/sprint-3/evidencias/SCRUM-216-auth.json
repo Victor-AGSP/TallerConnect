@@ -1,0 +1,112 @@
+{
+  "command": "npm test -- --watchman=false --testPathPatterns='auth[-.]|authStore|protected-routes|role-access-restrictions|services-session-navigation|test-utils.test' --json --outputFile=/tmp/tallerconnect-sprint3/auth-final.json",
+  "date_utc": "2026-11-11",
+  "base_commit": "872a862",
+  "branch": "Victor",
+  "node": "v26.12.1",
+  "npm": "12.2.1",
+  "kind": "AUTOMATED_MOCK",
+  "note": "Diagnóstico con corrección pendiente de SCRUM-158 en test-utils/index.ts (se elimina matcher privado, se usa el matcher público Expo). No valida cuentas reales; no es el árbol limpio del commit base.",
+  "passed": 153,
+  "failed": 0,
+  "pending": 0,
+  "suites": [
+    {
+      "path": "__tests__/services-session-navigation.test.tsx",
+      "status": "passed",
+      "passed": 5,
+      "failed": 0
+    },
+    {
+      "path": "__tests__/auth-full-flow.test.tsx",
+      "status": "passed",
+      "passed": 9,
+      "failed": 0
+    },
+    {
+      "path": "__tests__/auth-service.test.ts",
+      "status": "passed",
+      "passed": 13,
+      "failed": 0
+    },
+    {
+      "path": "__tests__/protected-routes.test.tsx",
+      "status": "passed",
+      "passed": 16,
+      "failed": 0
+    },
+    {
+      "path": "__tests__/role-access-restrictions.test.tsx",
+      "status": "passed",
+      "passed": 15,
+      "failed": 0
+    },
+    {
+      "path": "__tests__/auth-schema.test.ts",
+      "status": "passed",
+      "passed": 16,
+      "failed": 0
+    },
+    {
+      "path": "__tests__/auth-flow.test.tsx",
+      "status": "passed",
+      "passed": 1,
+      "failed": 0
+    },
+    {
+      "path": "__tests__/auth-session.test.tsx",
+      "status": "passed",
+      "passed": 9,
+      "failed": 0
+    },
+    {
+      "path": "__tests__/test-utils.test.tsx",
+      "status": "passed",
+      "passed": 4,
+      "failed": 0
+    },
+    {
+      "path": "__tests__/auth-role.test.ts",
+      "status": "passed",
+      "passed": 4,
+      "failed": 0
+    },
+    {
+      "path": "__tests__/auth-logout.test.ts",
+      "status": "passed",
+      "passed": 5,
+      "failed": 0
+    },
+    {
+      "path": "src/__tests__/auth.service.test.ts",
+      "status": "passed",
+      "passed": 4,
+      "failed": 0
+    },
+    {
+      "path": "__tests__/auth-storage.test.ts",
+      "status": "passed",
+      "passed": 10,
+      "failed": 0
+    },
+    {
+      "path": "__tests__/auth-contract.test.ts",
+      "status": "passed",
+      "passed": 22,
+      "failed": 0
+    },
+    {
+      "path": "src/__tests__/authStore.test.ts",
+      "status": "passed",
+      "passed": 6,
+      "failed": 0
+    },
+    {
+      "path": "__tests__/auth-mapper.test.ts",
+      "status": "passed",
+      "passed": 14,
+      "failed": 0
+    }
+  ],
+  "test_utils_sha256": "3864c78213cece171fab5f58d655f2e42882bc4798662c81b8452625abd647b3"
+}
