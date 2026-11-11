@@ -1,0 +1,12 @@
+2026-11-11 UTC; Victor; workspace con cambios pendientes SCRUM-158
+
+npm run typecheck — exit 2
+npm notice run tallerconnect@1.0.0 typecheck
+npm notice run tsc --noEmit
+src/services/index.ts(52,3): error TS2305: Module '"./evidence.service"' has no exported member 'getGlobalErrorMessage'.
+src/services/index.ts(53,3): error TS2305: Module '"./evidence.service"' has no exported member 'isConnectivityOrTimeoutError'.
+src/services/index.ts(54,3): error TS2305: Module '"./evidence.service"' has no exported member 'normalizeNotificationServiceError'.
+
+CI=1 npm run lint — exit 0
+0 errores; 46 advertencias existentes (array-type, imports, declaraciones no usadas).
+No se modificaron dependencias, .env ni configuración de lint.

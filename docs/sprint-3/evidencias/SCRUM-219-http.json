@@ -1,0 +1,31 @@
+{
+  "date_utc": "2026-11-11",
+  "environment": "https://tallerconect.vercel.app",
+  "kind": "REAL_ANONYMOUS_HTTP",
+  "method": "GET",
+  "authorization_sent": false,
+  "cookies_sent": false,
+  "command_template": "curl -sS --connect-timeout 10 --max-time 25 -o <archivo-local-temporal> -w '%{http_code}' 'https://tallerconect.vercel.app<RUTA>'",
+  "checks": [
+    {
+      "id": "NET-PARTS",
+      "path": "/api/repuestos",
+      "expected": 401,
+      "http": 401,
+      "time_seconds": 4.835462,
+      "result": "PASS",
+      "body_sha256": "a485c68dc7f4de3302f5c3950ccd447045d2749b8c33aa39acd76862dff6c9bf",
+      "detail": "No autenticado"
+    },
+    {
+      "id": "NET-PROVIDERS",
+      "path": "/api/proveedores",
+      "expected": 401,
+      "http": 401,
+      "time_seconds": 4.743725,
+      "result": "PASS",
+      "body_sha256": "a485c68dc7f4de3302f5c3950ccd447045d2749b8c33aa39acd76862dff6c9bf",
+      "detail": "No autenticado"
+    }
+  ]
+}

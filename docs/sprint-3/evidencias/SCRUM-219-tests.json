@@ -1,0 +1,55 @@
+{
+  "date_utc": "2026-11-11",
+  "branch": "Victor",
+  "base_commit": "872a862",
+  "kind": "AUTOMATED_MOCK",
+  "command": "npm test -- --watchman=false --runTestsByPath __tests__/admin-query-states.test.tsx __tests__/admin-notice-validation.test.ts __tests__/vehicle-list-integration.test.tsx __tests__/views-accessibility.test.tsx src/__tests__/admin-services-integration.test.tsx __tests__/protected-routes.test.tsx __tests__/parts-views-integration.test.tsx --json --outputFile=/tmp/tallerconnect-sprint3/admin.json",
+  "note": "99/99 con mocks. Incluye cuatro nuevos casos de carga/reintento y utilidad de rutas pendiente sin commit SCRUM-158. Se aisló notificationsService en prueba de navegación; se actualizaron dos expectativas al error tipado de estado desconocido.",
+  "passed": 99,
+  "failed": 0,
+  "pending": 0,
+  "suites": [
+    {
+      "path": "__tests__/parts-views-integration.test.tsx",
+      "status": "passed",
+      "passed": 29,
+      "failed": 0
+    },
+    {
+      "path": "__tests__/vehicle-list-integration.test.tsx",
+      "status": "passed",
+      "passed": 16,
+      "failed": 0
+    },
+    {
+      "path": "__tests__/admin-notice-validation.test.ts",
+      "status": "passed",
+      "passed": 15,
+      "failed": 0
+    },
+    {
+      "path": "__tests__/admin-query-states.test.tsx",
+      "status": "passed",
+      "passed": 4,
+      "failed": 0
+    },
+    {
+      "path": "__tests__/views-accessibility.test.tsx",
+      "status": "passed",
+      "passed": 16,
+      "failed": 0
+    },
+    {
+      "path": "__tests__/protected-routes.test.tsx",
+      "status": "passed",
+      "passed": 16,
+      "failed": 0
+    },
+    {
+      "path": "src/__tests__/admin-services-integration.test.tsx",
+      "status": "passed",
+      "passed": 3,
+      "failed": 0
+    }
+  ]
+}

@@ -38,46 +38,41 @@ export default function AdminOrdersScreen() {
   const [search, setSearch] = useState('');
   const [filter, setFilter] = useState<OrderFilter>('todas');
 
-  const loadData = useCallback(async (refresh = false) => {
-    if (refresh) {
-      setIsRefreshing(true);
+  const loadData = useCallback(() => Promise.allSettled([
+    ordersService.getOrders(),
+    vehiclesService.getVehicles(),
+  ]).then(([ordersResult, vehiclesResult]) => {
+    if (ordersResult.status === 'fulfilled') {
+      setOrders(ordersResult.value);
     } else {
-      setIsLoading(true);
+      setOrdersError(
+        ordersResult.reason instanceof Error
+          ? ordersResult.reason.message
+          : 'No fue posible cargar las órdenes.',
+      );
     }
 
+    if (vehiclesResult.status === 'fulfilled') {
+      setVehicles(vehiclesResult.value);
+    } else {
+      setVehiclesError(
+        vehiclesResult.reason instanceof Error
+          ? vehiclesResult.reason.message
+          : 'No fue posible cargar los vehículos.',
+      );
+    }
+  }).finally(() => {
+    setIsLoading(false);
+    setIsRefreshing(false);
+  }), []);
+
+  const reload = (refresh = false) => {
+    if (refresh) setIsRefreshing(true);
+    else setIsLoading(true);
     setOrdersError(null);
     setVehiclesError(null);
-
-    try {
-      const [ordersResult, vehiclesResult] = await Promise.allSettled([
-        ordersService.getOrders(),
-        vehiclesService.getVehicles(),
-      ]);
-
-      if (ordersResult.status === 'fulfilled') {
-        setOrders(ordersResult.value);
-      } else {
-        setOrdersError(
-          ordersResult.reason instanceof Error
-            ? ordersResult.reason.message
-            : 'No fue posible cargar las órdenes.',
-        );
-      }
-
-      if (vehiclesResult.status === 'fulfilled') {
-        setVehicles(vehiclesResult.value);
-      } else {
-        setVehiclesError(
-          vehiclesResult.reason instanceof Error
-            ? vehiclesResult.reason.message
-            : 'No fue posible cargar los vehículos.',
-        );
-      }
-    } finally {
-      setIsLoading(false);
-      setIsRefreshing(false);
-    }
-  }, []);
+    void loadData();
+  };
 
   useEffect(() => {
     void loadData();
@@ -219,7 +214,7 @@ export default function AdminOrdersScreen() {
         <ErrorMessage
           title="No se pudieron cargar las órdenes"
           message={ordersError}
-          onRetry={() => void loadData()}
+          onRetry={() => void reload()}
           retryLabel="Reintentar"
           testID="admin-orders-error"
         />
@@ -339,7 +334,7 @@ export default function AdminOrdersScreen() {
 
       <Button
         title={isRefreshing ? 'Actualizando...' : 'Actualizar información'}
-        onPress={() => void loadData(true)}
+        onPress={() => void reload(true)}
         variant="outline"
         disabled={isRefreshing}
       />
