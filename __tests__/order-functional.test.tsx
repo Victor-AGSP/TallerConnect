@@ -50,8 +50,8 @@ import { useAuthStore } from '@/stores/authStore';
  * reales. Se simulan AuthService (como en `auth-full-flow.test.tsx`), el
  * almacenamiento seguro (en memoria) y el adaptador de red de Axios.
  *
- * Ninguna vista enlaza todavía al detalle de una orden, por lo que la
- * navegación hacia él se hace por ruta, como lo haría un enlace profundo.
+ * Este flujo abre el detalle por ruta para comprobar también el enlace
+ * profundo, además de las rutas enlazadas desde el panel administrativo.
  * Desde el detalle, el presupuesto (MS3) se abre con "Ver presupuesto".
  * Las respuestas del MS3 se construyen según su contrato: no se contacta al
  * servicio desplegado ni se envían decisiones reales.
@@ -230,9 +230,11 @@ describe('caso de uso: consultar una orden de trabajo', () => {
       if (role === 'administrador') {
         await screen.findByRole('button', { name: 'Ver vehículos registrados' });
       }
-      const dashboardRequests = role === 'administrador' ? 2 : 0;
+      const dashboardRequests = role === 'administrador' ? 5 : 0;
       expect(adapter.mock.calls.map(([config]) => `${config.method} ${config.url}`)).toEqual(
-        role === 'administrador' ? ['get /ordenes', 'get /vehiculos'] : [],
+        role === 'administrador'
+          ? ['get /ordenes', 'get /vehiculos', 'get /ordenes', 'get /presupuestos', 'get /repuestos']
+          : [],
       );
 
       await openOrder(orderPath);
@@ -988,8 +990,11 @@ describe('caso de uso: consultar vehículos, repuestos y proveedores', () => {
 
     // Cada consulta pasó por el cliente HTTP real con el token de la sesión.
     expect(adapter.mock.calls.map(([config]) => `${config.method} ${config.url}`)).toEqual([
-      'get /ordenes', // Dashboard: una consulta por recurso.
+      'get /ordenes', // Consultas del panel.
       'get /vehiculos',
+      'get /ordenes', // Avisos derivados del backend simulado.
+      'get /presupuestos',
+      'get /repuestos',
       'get /vehiculos', // Listado solicitado al navegar.
       'get /repuestos',
       'get /proveedores',

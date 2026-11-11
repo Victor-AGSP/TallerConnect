@@ -1,0 +1,39 @@
+{
+  "date_utc": "2026-11-11",
+  "environment": "https://tallerconect.vercel.app",
+  "kind": "REAL_ANONYMOUS_HTTP",
+  "method": "GET",
+  "authorization_sent": false,
+  "cookies_sent": false,
+  "command_template": "curl -sS --connect-timeout 10 --max-time 25 -o <archivo-local-temporal> -w '%{http_code}' 'https://tallerconect.vercel.app<RUTA>'",
+  "checks": [
+    {
+      "id": "NET-MS4-HEALTH",
+      "path": "/ms4/health",
+      "expected": 200,
+      "http": 200,
+      "time_seconds": 2.906056,
+      "result": "PASS",
+      "body_sha256": "2ed1d2a3cbe6209b1a2d8ac5cb8aa3e7399f5f25b6152542b3aa66f417bf450b"
+    },
+    {
+      "id": "NET-MS4-DB",
+      "path": "/ms4/health/db",
+      "expected": 200,
+      "http": 200,
+      "time_seconds": 4.010821,
+      "result": "PASS",
+      "body_sha256": "fc93568e1a8bceda12334836fc4b3bec12733ac201d3569807a184e9d51dffd8"
+    },
+    {
+      "id": "NET-MS4-STORAGE",
+      "path": "/ms4/health/storage",
+      "expected": 200,
+      "http": 503,
+      "time_seconds": 3.816384,
+      "result": "FAIL",
+      "body_sha256": "b9ff98ff8f277d952e2d0868148cdcc2db80f91347ef23ab1cdc91b746dc0562",
+      "detail": "El almacenamiento de evidencias no está disponible"
+    }
+  ]
+}

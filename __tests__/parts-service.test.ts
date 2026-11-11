@@ -288,7 +288,7 @@ describe('PartsService.getSuppliers', () => {
     mockedApiClient.get.mockRejectedValueOnce(httpError(503));
 
     await expect(partsService.getSuppliers()).rejects.toThrow(
-      'Error interno en el servidor. Intenta nuevamente más tarde.',
+      'El servicio o la API Gateway no se encuentra disponible temporalmente. Intenta más tarde.',
     );
   });
 });
@@ -345,7 +345,7 @@ describe('PartsService: paginación con desde/limite (MS3)', () => {
     mockedApiClient.get.mockRejectedValueOnce(httpError(503));
 
     await expect(partsService.getSpareParts({ offset: 50 })).rejects.toThrow(
-      'Error interno en el servidor. Intenta nuevamente más tarde.',
+      'El servicio o la API Gateway no se encuentra disponible temporalmente. Intenta más tarde.',
     );
   });
 });

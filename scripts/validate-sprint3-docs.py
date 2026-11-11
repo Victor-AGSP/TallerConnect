@@ -1,5 +1,6 @@
 """Validate local evidence links and checklist completeness without network access."""
 
+import csv
 import json
 from pathlib import Path
 import re
@@ -37,6 +38,26 @@ for path in paths:
             errors.append(f"{path.name}: invalid result {cells[0]}")
         if len(cells) == 7 and cells[5] == "BLOCKED" and "No ejecutado" not in cells[4]:
             errors.append(f"{path.name}: blocked case lacks observation {cells[0]}")
+
+matrix = root / "docs/sprint-3/evidencias/SCRUM-156-matriz.csv"
+if matrix.exists():
+    with matrix.open(newline="") as source:
+        rows = list(csv.DictReader(source))
+    ids = set()
+    for row in rows:
+        case_id = row["id"]
+        if case_id in ids or not all(row.values()):
+            errors.append(f"matrix: duplicate ID or empty field {case_id}")
+        ids.add(case_id)
+        evidence = root / row["evidencia"]
+        if not evidence.is_file():
+            errors.append(f"matrix: missing evidence {case_id}")
+        elif row["tipo"] == "REAL_BLOCKED":
+            source_row = next((line for line in evidence.read_text().splitlines()
+                               if line.startswith(f"| {case_id} |")), "")
+            if not source_row or f'| {row["resultado"]} |' not in source_row:
+                errors.append(f"matrix: result disagrees with checklist {case_id}")
+    print(f"Matrix rows: {len(rows)}; unique IDs: {len(ids)}")
 
 for path in sorted((root / "docs/sprint-3/evidencias").glob("*.json")):
     try:
