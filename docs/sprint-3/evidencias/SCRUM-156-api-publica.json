@@ -1,0 +1,193 @@
+{
+  "recorded_at_utc": "2026-11-12T17:00:34.919247+00:00",
+  "kind": "REAL_PUBLIC_READ_ONLY_HTTP",
+  "environment": "production",
+  "authenticated": false,
+  "contracts": [
+    {
+      "path": "/ms1/openapi.json",
+      "http": 200,
+      "captured_at_utc": "2026-11-12T16:29:04.481773+00:00",
+      "info": {
+        "title": "SGTM — MS1: Autenticación y Usuarios",
+        "version": "0.1.0"
+      },
+      "sha256": "c62044b58feb198ec0acfa9bb310f096b0a27006e1b9af574ae59448f0e9920f",
+      "endpoints": [
+        {
+          "path": "/auth/login",
+          "method": "POST",
+          "security": [],
+          "request_content_types": [
+            "application/json"
+          ]
+        },
+        {
+          "path": "/auth/me",
+          "method": "GET",
+          "security": [
+            {
+              "HTTPBearer": []
+            }
+          ],
+          "request_content_types": []
+        },
+        {
+          "path": "/notificaciones",
+          "method": "GET",
+          "security": [
+            {
+              "HTTPBearer": []
+            }
+          ],
+          "request_content_types": []
+        }
+      ],
+      "login_request_fields": [
+        "email",
+        "password"
+      ],
+      "login_response_fields": [
+        "access_token",
+        "token_type",
+        "user"
+      ],
+      "user_fields": [
+        "id",
+        "email",
+        "full_name",
+        "roles",
+        "is_active"
+      ]
+    },
+    {
+      "path": "/ms2/openapi.json",
+      "http": 200,
+      "captured_at_utc": "2026-11-12T16:29:04.293657+00:00",
+      "info": {
+        "title": "SGTM — MS2: Vehículos y Órdenes de Trabajo",
+        "version": "0.1.0"
+      },
+      "sha256": "4ccdbff105e043fb5074918b23962bba647f675a68806be7df42f08ca14ac6c3",
+      "endpoints": [
+        {
+          "path": "/vehiculos",
+          "method": "GET",
+          "security": [
+            {
+              "HTTPBearer": []
+            }
+          ],
+          "request_content_types": []
+        },
+        {
+          "path": "/vehiculos/asignados",
+          "method": "GET",
+          "security": [
+            {
+              "HTTPBearer": []
+            }
+          ],
+          "request_content_types": []
+        },
+        {
+          "path": "/ordenes",
+          "method": "GET",
+          "security": [
+            {
+              "HTTPBearer": []
+            }
+          ],
+          "request_content_types": []
+        }
+      ]
+    },
+    {
+      "path": "/ms3/openapi.json",
+      "http": 200,
+      "captured_at_utc": "2026-11-12T16:29:04.087657+00:00",
+      "info": {
+        "title": "SGTM — MS3: Presupuestos, Repuestos y Proveedores",
+        "version": "0.1.0"
+      },
+      "sha256": "660d298e45815c82b580bd0f162c3a8ef7c8fc87197016a9bcf4999ad1cf709f",
+      "endpoints": [
+        {
+          "path": "/presupuestos",
+          "method": "GET",
+          "security": [
+            {
+              "HTTPBearer": []
+            }
+          ],
+          "request_content_types": []
+        },
+        {
+          "path": "/repuestos",
+          "method": "GET",
+          "security": [
+            {
+              "HTTPBearer": []
+            }
+          ],
+          "request_content_types": []
+        },
+        {
+          "path": "/proveedores",
+          "method": "GET",
+          "security": [
+            {
+              "HTTPBearer": []
+            }
+          ],
+          "request_content_types": []
+        }
+      ]
+    },
+    {
+      "path": "/ms4/openapi.json",
+      "http": 200,
+      "captured_at_utc": "2026-11-12T16:29:04.318082+00:00",
+      "info": {
+        "title": "SGTM — MS4: Evidencia Multimedia",
+        "version": "0.1.0"
+      },
+      "sha256": "3eff0452e696ff3f9324867bc81a59a709199f1306ca572f1a3d05271065d807",
+      "endpoints": [
+        {
+          "path": "/evidencias",
+          "method": "GET",
+          "security": [
+            {
+              "HTTPBearer": []
+            }
+          ],
+          "request_content_types": []
+        }
+      ]
+    }
+  ],
+  "health_ms4": [
+    {
+      "path": "/ms4/health/storage",
+      "http": 503,
+      "captured_at_utc": "2026-11-12T16:29:04.997867+00:00",
+      "body": {
+        "detail": "El almacenamiento de evidencias no está disponible"
+      }
+    },
+    {
+      "path": "/ms4/health/db",
+      "http": 200,
+      "captured_at_utc": "2026-11-12T16:29:05.342071+00:00",
+      "body": {
+        "status": "ok",
+        "servicio": "MS4 — Evidencia Multimedia",
+        "database": "ok"
+      }
+    }
+  ],
+  "gateway_health_evidence": "docs/sprint-3/evidencias/SCRUM-158-expo-go.json",
+  "limits": "OpenAPI público no prueba disponibilidad funcional autenticada. Sondas ejecutadas desde CLI, no desde teléfono.",
+  "ms4_diagnosis": "Almacenamiento devuelve 503 y DB devuelve 200. Respuesta genérica: no permite determinar causa raíz. No se cambia configuración de almacenamiento ni se realizan subidas."
+}

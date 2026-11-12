@@ -1,0 +1,75 @@
+{
+  "recorded_at_utc": "2026-11-12T17:00:34.919247+00:00",
+  "code_commit": "bbf7dd8",
+  "branch": "Victor",
+  "scope": "Automatización y compilación; sin ejecución física ni autenticación real",
+  "automated": {
+    "tests-final": {
+      "command": "npm test -- --silent --json",
+      "kind": "AUTOMATED_WITH_TEST_DOUBLES",
+      "passed": 1295,
+      "failed": 0,
+      "suites_passed": 78,
+      "suites_failed": 0,
+      "success": true
+    },
+    "regression-final": {
+      "command": "npm run test:regression -- --silent --json",
+      "kind": "AUTOMATED_WITH_TEST_DOUBLES",
+      "passed": 841,
+      "failed": 0,
+      "suites_passed": 41,
+      "suites_failed": 0,
+      "success": true
+    },
+    "note": "La regresión es un subconjunto; no sumar 841 a 1295."
+  },
+  "lint_comparison": {
+    "baseline_commit": "872a862",
+    "current_code_commit": "bbf7dd8",
+    "method": "Comparación archivo/regla/mensaje y multiplicidad con auditoría previa; sin líneas/columnas desplazadas por imports. Se normaliza ruleId null de directivas ESLint innecesarias al identificador de la auditoría anterior.",
+    "warnings": 46,
+    "errors": 0,
+    "new": [],
+    "removed": [],
+    "by_rule": {
+      "import/no-named-as-default-member": 26,
+      "@typescript-eslint/array-type": 15,
+      "@typescript-eslint/no-unused-vars": 3,
+      "unused-eslint-disable-directive": 1,
+      "@typescript-eslint/no-require-imports": 1
+    }
+  },
+  "typecheck_exit": 0,
+  "diff_check_exit": 0,
+  "original_cases": {
+    "total": 64,
+    "pass_ui_only": 3,
+    "fail": 0,
+    "blocked": 61
+  },
+  "authenticated_requests_executed": 0,
+  "device_observed": false,
+  "patch_dependency_recommendations": 11,
+  "observed_intermediate_failure": {
+    "passed": 1292,
+    "failed": 2,
+    "suite": "__tests__/parts-views-integration.test.tsx",
+    "resolution": "bbf7dd8: dobles completos de consultas de panel y prueba de recuperación de avisos; toda la suite pasa después."
+  },
+  "expo": {
+    "sdk": "58.0.0",
+    "manifest_android_http": 200,
+    "bundle_android_http": 200,
+    "bundle_bytes": 8763847,
+    "bundle_sha256": "3416bfc07fe47b831f2f3b8668b332590a366871e00716ab611c84fb35e07f15",
+    "connection": "LAN",
+    "mode": "Expo Go",
+    "api_url": "https://tallerconect.vercel.app/api",
+    "mock_auth": false,
+    "mock_services": false,
+    "demo": false,
+    "trace": true,
+    "bundle_env_verified": true
+  }
+}
