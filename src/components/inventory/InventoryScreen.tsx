@@ -1,5 +1,11 @@
 
 import { useMemo, useState } from 'react';
+import { SafeAreaView } from 'react-native-safe-area-context';
+import { ENV } from '@/config/env';
+import { SparePartListView } from '@/components/parts/SparePartListView';
+import { SupplierListView } from '@/components/parts/SupplierListView';
+import { SupplierDetailView } from '@/components/parts/SupplierDetailView';
+import { partsService } from '@/services/parts.service';
 import {
   StyleSheet,
   Text,
@@ -16,8 +22,11 @@ type InventoryTab = 'parts' | 'providers';
 
 
 
-const demoParts = getParts();
-const demoProviders = getProviders();
+const loadSpareParts = () => partsService.getSpareParts();
+const loadMoreSpareParts = (offset: number) => partsService.getSpareParts({ offset });
+const loadSuppliers = () => partsService.getSuppliers();
+const loadMoreSuppliers = (offset: number) => partsService.getSuppliers({ offset });
+const loadSupplier = (id: string) => partsService.getSupplierById(id);
 
 const formatCLP = (amount: number) =>
   amount.toLocaleString('es-CL', {
@@ -27,6 +36,41 @@ const formatCLP = (amount: number) =>
   });
 
 export function InventoryScreen() {
+  return ENV.USE_DEMO_DATA ? <DemoInventoryScreen /> : <RealInventoryScreen />;
+}
+
+function RealInventoryScreen() {
+  const [activeTab, setActiveTab] = useState<InventoryTab>('parts');
+  const [supplierId, setSupplierId] = useState<string | undefined>();
+  return (
+    <View style={{ flex: 1 }}>
+      <SafeAreaView edges={['top']}>
+        <View style={styles.tabs}>
+          <View style={styles.tabButton}>
+            <Button title="Repuestos" variant={activeTab === 'parts' ? 'primary' : 'outline'}
+              onPress={() => { setActiveTab('parts'); setSupplierId(undefined); }} />
+          </View>
+          <View style={styles.tabButton}>
+            <Button title="Proveedores" variant={activeTab === 'providers' ? 'primary' : 'outline'}
+              onPress={() => { setActiveTab('providers'); setSupplierId(undefined); }} />
+          </View>
+        </View>
+      </SafeAreaView>
+      {activeTab === 'parts' ? (
+        <SparePartListView eyebrow="Inventario" loadSpareParts={loadSpareParts} loadMoreSpareParts={loadMoreSpareParts} />
+      ) : supplierId ? (
+        <SupplierDetailView key={supplierId} eyebrow="Inventario" supplierId={supplierId} loadSupplier={loadSupplier} />
+      ) : (
+        <SupplierListView eyebrow="Inventario" loadSuppliers={loadSuppliers}
+          loadMoreSuppliers={loadMoreSuppliers} onSelectSupplier={setSupplierId} />
+      )}
+    </View>
+  );
+}
+
+function DemoInventoryScreen() {
+  const demoParts = useMemo(() => getParts(), []);
+  const demoProviders = useMemo(() => getProviders(), []);
   const [activeTab, setActiveTab] = useState<InventoryTab>('parts');
   const [search, setSearch] = useState('');
   const [selectedProviderId, setSelectedProviderId] = useState<string | null>(
@@ -42,7 +86,7 @@ export function InventoryScreen() {
           value.toLocaleLowerCase('es-CL').includes(normalizedSearch),
         ),
       ),
-    [normalizedSearch],
+    [normalizedSearch, demoParts],
   );
 
   const filteredProviders = useMemo(
@@ -57,7 +101,7 @@ export function InventoryScreen() {
           value.toLocaleLowerCase('es-CL').includes(normalizedSearch),
         ),
       ),
-    [normalizedSearch],
+    [normalizedSearch, demoProviders],
   );
 
   const lowStockCount = demoParts.filter(

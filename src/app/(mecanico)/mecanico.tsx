@@ -1,4 +1,6 @@
 import { useRouter } from 'expo-router';
+import { ENV } from '@/config/env';
+import { AppScreen } from '@/components/layout/AppScreen';
 
 import {
   Platform,
@@ -20,6 +22,27 @@ import {
 } from '@/constants/theme';
 
 export default function MecanicoScreen() {
+  return ENV.USE_DEMO_DATA ? <DemoMecanicoScreen /> : <RealMecanicoScreen />;
+}
+
+function RealMecanicoScreen() {
+  const router = useRouter();
+  const logout = useAuthStore((state) => state.logout);
+  return (
+    <AppScreen
+      eyebrow="Área de trabajo"
+      title="Mis órdenes"
+      subtitle="Consulta tus vehículos y órdenes asignadas, y el inventario del taller."
+    >
+      <Button title="Ver vehículos asignados" onPress={() => router.push('/(mecanico)/vehiculos-asignados')} />
+      <Button title="Ver órdenes asignadas" onPress={() => router.push('/(mecanico)/ordenes')} />
+      <Button title="Inventario" onPress={() => router.push('/(mecanico)/inventario')} />
+      <Button title="Cerrar sesión" variant="outline" onPress={() => void logout()} />
+    </AppScreen>
+  );
+}
+
+function DemoMecanicoScreen() {
   const router = useRouter();
   const logout = useAuthStore(
   (state) => state.logout

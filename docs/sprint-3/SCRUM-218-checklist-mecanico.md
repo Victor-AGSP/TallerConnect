@@ -6,7 +6,7 @@ Fecha: 11-11-2026. Checklist documental validado; **ejecución autenticada real 
 
 | Ruta / sección | Consulta efectiva | Fuente |
 | --- | --- | --- |
-| `/(mecanico)/mecanico` | Panel estático; cifras y orden demo, sin consultas reales | [Home](<../../src/app/(mecanico)/mecanico.tsx>) |
+| `/(mecanico)/mecanico` | Inicio sin cifras demo; accesos a vehículos/órdenes asignados e inventario | [Home](<../../src/app/(mecanico)/mecanico.tsx>) |
 | `/(mecanico)/ordenes` | `ordersService.getOrders()` → GET `/ordenes`; filtro UI por `assignedMechanicId === user.id` | [Listado](<../../src/app/(mecanico)/ordenes/index.tsx>), [servicio](../../src/services/orders.service.ts) |
 | `/(mecanico)/vehiculos-asignados`, `/(mecanico)/vehiculos` | `getAssignedVehicles()` → GET `/vehiculos/asignados` | [Ruta](<../../src/app/(mecanico)/vehiculos-asignados.tsx>), [lista alternativa](../../src/components/vehicles/VehicleListScreen.tsx), [adaptador](../../src/services/vehicles.service.ts) |
 | `/(mecanico)/vehiculos/[id]` | GET `/vehiculos/{id}`, luego GET `/ordenes` y filtro por vehículo | [Detalle](../../src/components/vehicles/VehicleDetailScreen.tsx) |
@@ -14,7 +14,7 @@ Fecha: 11-11-2026. Checklist documental validado; **ejecución autenticada real 
 | `/(mecanico)/ordenes-asignadas/[id]` | GET `/ordenes/{id}` y lista GET `/evidencias?orden_id={id}` | [Ruta con MS4](<../../src/app/(mecanico)/ordenes-asignadas/[id].tsx>), [lista](../../src/components/evidence/OrderEvidenceList.tsx) |
 | Historial bajo ordenes-asignadas | GET `/ordenes/{id}/bitacora` bajo demanda | [Panel](../../src/components/orders/MechanicUpdatePanel.tsx), [servicio](../../src/services/order-log.service.ts) |
 | Fotografía bajo ordenes-asignadas | GET `/evidencias/{uuid}/descarga` bajo demanda | [Servicio MS4](../../src/services/evidence.service.ts) |
-| `/(mecanico)/inventario` | `getParts/getProviders` demo, sin HTTP | [Inventario](../../src/components/inventory/InventoryScreen.tsx) |
+| `/(mecanico)/inventario` | `partsService.getSpareParts/getSuppliers/getSupplierById` → GET `/repuestos`, `/proveedores`, `/proveedores/{id}`; paginación de listas | [Inventario](../../src/components/inventory/InventoryScreen.tsx) |
 
 No hay ruta de presupuesto implementada en el grupo Mecánico. No se agrega al checklist una consulta inexistente. La ruta `ordenes` enlaza al detalle alternativo, que no tiene las mismas secciones que `ordenes-asignadas/[id]`; probar ambas por sus rutas de grupo. Un filtro del frontend por usuario no sustituye autorización HTTP. MS4 permite consultar evidencias de órdenes asignadas según el [contrato histórico](../integracion-ms4-evidencias.md); su cumplimiento real sigue pendiente.
 
@@ -42,3 +42,12 @@ Precondición: cuenta Mecánico QA con orden/vehículo asignado, otra orden no a
 [Resumen de pruebas](evidencias/SCRUM-218-tests.json): se ejecutaron las suites existentes de flujo MS4, avances del mecánico, visibilidad y autorización de órdenes, con mocks de HTTP, auth, almacenamiento y selector. Incluyen denegación por rol, listas, errores, sesión y asociación a la orden; no validan permisos nativos ni backend real. Usan la utilidad de rutas corregida sin commit en SCRUM-158. [Consulta HTTP anónima](evidencias/SCRUM-218-http.json) es solo rechazo sin token, nunca aceptación de asignación.
 
 Se cotejaron las 12 filas con funcionalidades presentes en esta rama y con las suites ejecutadas, sin incluir el inventario demo como consulta real. `python3 scripts/validate-sprint3-docs.py docs/sprint-3/SCRUM-218-checklist-mecanico.md`, revisión de secretos y `git diff --check`: [resultado](evidencias/SCRUM-218-validacion.txt). Este ticket no cambia código; TypeScript/lint mantienen los problemas previos registrados, pendientes en administración y barrel de servicios.
+
+
+## Avance técnico para Expo Go — 12-11-2026
+
+El inicio real ya no muestra actividad ni órdenes fijas del Mecánico. Conserva acceso a sus vehículos y añade acceso a la lista de órdenes implementada. El inventario compartido con Administrador consulta ahora MS3 mediante las vistas conectadas existentes: repuestos, proveedores y detalle del proveedor. Las listas conservan paginación, carga, errores/reintento y vacío; no convierten 403 en datos demo. Las funciones demo no se invocan al importar el inventario; se montan únicamente con `ENV.USE_DEMO_DATA`.
+
+[Regresión nueva](../../__tests__/mecanico-real.test.tsx): navegación real sin actividad fija, consultas de listas vacías, detalle por ID seleccionado y error HTTP sin existencias ficticias. Ejecutado `npm test -- --runTestsByPath __tests__/mecanico-real.test.tsx __tests__/views-accessibility.test.tsx __tests__/order-functional.test.tsx __tests__/vehicle-list-integration.test.tsx --silent`: 4 suites / 51 PASS / 0 FAIL. TypeScript exit 0; lint 0 errores / 46 advertencias previas; `git diff --check` sin errores. Son dobles de prueba, no sesiones ni consultas reales de usuarios.
+
+La [ejecución local actual](SCRUM-158-expo-go.md) apunta al backend desplegado etiquetado producción. Ya se conocen las identidades de prueba; falta autorización para autenticarlas en ese destino, observación del teléfono y datasets de asignación propios/ajenos. Los casos MQ mantienen BLOCKED; la autorización efectiva de los endpoints de inventario para Mecánico también debe comprobarse con su sesión real. No se crean ni alteran datos para superar un control de permisos.
