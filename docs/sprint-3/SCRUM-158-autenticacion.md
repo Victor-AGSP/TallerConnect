@@ -1,5 +1,7 @@
 # SCRUM-158 — revisión de rutas y autenticación
 
+**Actualización vigente:** las tres identidades de prueba fueron aportadas por el usuario; ya no falta identificar cuentas. Está pendiente confirmar destino QA y acceso al mecanismo seguro para comprobar activación, login y roles. Se ejecutaron formulario y rutas anónimas en Expo Web real; [diagnóstico y evidencia actuales](SCRUM-158-cuentas-y-ejecucion-web.md). Las secciones siguientes conservan el contexto y resultados históricos, sin atribuirles autenticación real.
+
 Estado: **BLOCKED para aceptación real**. Revisión y diagnóstico ejecutados el 11-11-2026 en la rama `Victor`, base `872a862`. En la continuación autorizada se registra la corrección técnica del matcher mediante un commit independiente, **sin afirmar autenticación real validada**. El baseline y el diagnóstico se conservan como evidencia histórica; la aceptación real sigue bloqueada.
 
 ## Preparación y criterios

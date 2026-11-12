@@ -1,0 +1,78 @@
+{
+  "kind": "REAL_EXPO_WEB_UI",
+  "started_at_utc": "2026-11-12T02:44:21.537Z",
+  "scope": "Tres repeticiones de formulario anónimo común y tres redirecciones de rutas sin sesión; ninguna sesión autenticada por rol.",
+  "platform": "Expo Web / Firefox real mediante WebDriver BiDi",
+  "app_url": "http://127.0.0.1:8093/login",
+  "api_url": "http://127.0.0.1:8000/api (sin backend local disponible)",
+  "mock_auth": false,
+  "mock_services": false,
+  "dotenv_loaded": false,
+  "cases": [
+    {
+      "id": "AUTH-C-03",
+      "state": "PASS",
+      "anonymous_shared_form": true,
+      "invalid_email_rejected": true,
+      "empty_fields_rejected": true,
+      "stayed_on_login": true,
+      "login_requests_observed": 0,
+      "screenshot": "SCRUM-158-formulario-web-vacio.png",
+      "screenshot_sha256": "249ca06e13d155b39f166ce888cadade4d843aef1e9f590b8356a191b18e88f2"
+    },
+    {
+      "id": "AUTH-M-03",
+      "state": "PASS",
+      "anonymous_shared_form": true,
+      "invalid_email_rejected": true,
+      "empty_fields_rejected": true,
+      "stayed_on_login": true,
+      "login_requests_observed": 0,
+      "screenshot": "SCRUM-158-formulario-web-vacio.png",
+      "screenshot_sha256": "249ca06e13d155b39f166ce888cadade4d843aef1e9f590b8356a191b18e88f2"
+    },
+    {
+      "id": "AUTH-A-03",
+      "state": "PASS",
+      "anonymous_shared_form": true,
+      "invalid_email_rejected": true,
+      "empty_fields_rejected": true,
+      "stayed_on_login": true,
+      "login_requests_observed": 0,
+      "screenshot": "SCRUM-158-formulario-web-vacio.png",
+      "screenshot_sha256": "249ca06e13d155b39f166ce888cadade4d843aef1e9f590b8356a191b18e88f2"
+    }
+  ],
+  "anonymous_routes": [
+    {
+      "requested_path": "/cliente",
+      "observed_path": "/login",
+      "no_stored_session": true,
+      "private_api_requests_observed": 0,
+      "state": "PASS"
+    },
+    {
+      "requested_path": "/mecanico",
+      "observed_path": "/login",
+      "no_stored_session": true,
+      "private_api_requests_observed": 0,
+      "state": "PASS"
+    },
+    {
+      "requested_path": "/administrador",
+      "observed_path": "/login",
+      "no_stored_session": true,
+      "private_api_requests_observed": 0,
+      "state": "PASS"
+    }
+  ],
+  "browser_version": "159.0",
+  "ended_at_utc": "2026-11-12T02:44:29.996Z",
+  "screenshot_note": "Capturas reales idénticas por hash: una sola copia sin editar. Contraseña vacía; los puntos son placeholder.",
+  "script": "scripts/qa-web-login-form.mjs",
+  "script_sha256": "49d99ea05cb2322dcee87a1ffa121bb3e27156c0789355d7903036c8a5d7c36f",
+  "command": "node scripts/qa-web-login-form.mjs",
+  "expo_command": "CI=1 EXPO_NO_DOTENV=1 EXPO_PUBLIC_APP_ENV=development EXPO_PUBLIC_API_URL=http://127.0.0.1:8000/api EXPO_PUBLIC_USE_MOCK_AUTH=false EXPO_PUBLIC_USE_MOCK_SERVICES=false EXPO_PUBLIC_ENABLE_NOTIFICATIONS_API=false npm run web -- --host localhost --port 8093",
+  "browser_command": "firefox --headless --no-remote --profile /tmp/tallerconnect-validacion-real/firefox-profile --remote-debugging-port 9237 about:blank",
+  "state_scope": "PASS de validación UI local, sin backend. No equivale a cuentas activas, credenciales válidas, autorización entre roles ni sesiones reales."
+}

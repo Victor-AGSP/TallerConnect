@@ -1,0 +1,5 @@
+PASS: ejecución UI real separada de HTTP/Jest; 3 formularios y 3 rutas anónimas; captura real deduplicada y hashes de script/evidencia verificados.
+PASS: cuentas informadas sin afirmar activación; 0 intentos autenticados; conectividad pública y acceso seguro documentados sin secretos.
+Matrix rows: 149; unique IDs: 149
+Markdown files: 2; local links: 17; checklist cases: 0
+PASS: links, required case fields and evidence counts
