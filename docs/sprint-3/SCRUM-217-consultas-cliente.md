@@ -47,3 +47,12 @@ Precondiciones: configuración QA y cuenta Cliente real; dataset de vehículo/or
 ## Validación del ticket
 
 Se cotejaron pantallas → servicios → endpoints → casos → evidencia sin duplicar archivos históricos ni crear capturas. `python3 scripts/validate-sprint3-docs.py docs/sprint-3/SCRUM-217-consultas-cliente.md` y `git diff --check`: [resultado](evidencias/SCRUM-217-validacion.txt). El JSON conserva también el fallo automatizado observado; no se declara toda la suite aprobada. TypeScript y lint continúan con fallos previos ajenos al comentario corregido. La integración real del Cliente sigue pendiente.
+
+
+## Avance técnico para Expo Go — 12-11-2026
+
+El inicio del Cliente deja de mostrar vehículo, orden e importes fijos en ejecución real. El botón conduce a la consulta existente de vehículos. La ruta histórica `presupuesto` usa ahora `budgetsService.getBudgetForOrder(id)` y la vista conectada; sin identificador muestra un estado vacío y no escoge `OT-00124`. No se habilitan decisiones de presupuesto en esa ruta de lectura. Las vistas demo solo se montan con `ENV.USE_DEMO_DATA`; sus pruebas de accesibilidad optan explícitamente por ellas.
+
+[Pruebas de regresión nuevas](../../__tests__/cliente-real.test.tsx): inicio sin datos inventados, navegación a consulta, presupuesto sin ID, respuesta vacía y error del servicio. Comando ejecutado: `npm test -- --runTestsByPath __tests__/cliente-real.test.tsx __tests__/views-accessibility.test.tsx __tests__/order-functional.test.tsx __tests__/vehicle-list-integration.test.tsx --silent`: 4 suites / 51 PASS / 0 FAIL. TypeScript exit 0; lint 0 errores / 46 advertencias previas; `git diff --check` sin errores. Son pruebas automatizadas con dobles, no consultas de una cuenta real.
+
+La [ejecución actual de Expo Go](SCRUM-158-expo-go.md) usa la API desplegada etiquetada producción, con mocks y demo desactivados. Ya existen tres identidades informadas; sigue pendiente autorizar su uso en ese destino y observar login/datasets y consultas desde el teléfono. Los casos CQ mantienen BLOCKED. Las observaciones anteriores se conservan como historial.

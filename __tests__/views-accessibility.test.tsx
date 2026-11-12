@@ -15,6 +15,12 @@ import { orderResponsePayloads } from '@/mocks/payloads/order.payload';
 import { vehicleResponsePayloads } from '@/mocks/payloads/vehicle.payload';
 import { StatusPill } from '@/components/ui/StatusPill';
 
+// Estas comprobaciones conservan explícitamente las vistas de demostración.
+jest.mock('@/config/env', () => ({
+  ...jest.requireActual('@/config/env'),
+  ENV: { ...jest.requireActual('@/config/env').ENV, USE_DEMO_DATA: true },
+}));
+
 /**
  * Accesibilidad de las vistas principales de vehículo y orden.
  *

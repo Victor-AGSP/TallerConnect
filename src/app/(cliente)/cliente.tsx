@@ -1,4 +1,6 @@
 import { useRouter } from 'expo-router';
+import { ENV } from '@/config/env';
+import { AppScreen } from '@/components/layout/AppScreen';
 
 import {
   Platform,
@@ -20,6 +22,25 @@ import {
 } from '@/constants/theme';
 
 export default function ClienteScreen() {
+  return ENV.USE_DEMO_DATA ? <DemoClienteScreen /> : <RealClienteScreen />;
+}
+
+function RealClienteScreen() {
+  const router = useRouter();
+  const logout = useAuthStore((state) => state.logout);
+  return (
+    <AppScreen
+      eyebrow="Portal del cliente"
+      title="Mi taller"
+      subtitle="Consulta tus vehículos y abre sus órdenes de trabajo para revisar el servicio y sus presupuestos."
+    >
+      <Button title="Ver mis vehículos" onPress={() => router.push('/(cliente)/mis-vehiculos')} />
+      <Button title="Cerrar sesión" variant="outline" onPress={() => void logout()} />
+    </AppScreen>
+  );
+}
+
+function DemoClienteScreen() {
   const router = useRouter();
   const logout = useAuthStore(
     (state) => state.logout

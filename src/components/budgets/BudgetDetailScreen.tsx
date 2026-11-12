@@ -1,5 +1,8 @@
 
-import { useRouter } from 'expo-router';
+import { useLocalSearchParams, useRouter } from 'expo-router';
+import { ENV } from '@/config/env';
+import { OrderBudgetView } from '@/components/orders/OrderBudgetView';
+import { budgetsService } from '@/services/budgets.service';
 import {
   StyleSheet,
   Text,
@@ -21,7 +24,24 @@ const formatCLP = (amount: number) =>
     maximumFractionDigits: 0,
   });
 
+const loadRealBudget = (orderId: string) => budgetsService.getBudgetForOrder(orderId);
+
 export function BudgetDetailScreen() {
+  return ENV.USE_DEMO_DATA ? <DemoBudgetDetailScreen /> : <RealBudgetDetailScreen />;
+}
+
+function RealBudgetDetailScreen() {
+  const { id } = useLocalSearchParams<{ id?: string | string[] }>();
+  return (
+    <OrderBudgetView
+      eyebrow="Portal del cliente"
+      orderId={Array.isArray(id) ? id[0] : id}
+      loadBudget={loadRealBudget}
+    />
+  );
+}
+
+function DemoBudgetDetailScreen() {
   const router = useRouter();
 
   const budget = getBudgetById('OT-00124');
