@@ -1,0 +1,5 @@
+PASS: mismos 64 IDs; 3 PASS de UI común/61 BLOCKED; 3 rutas adicionales sin aumentar casos; evidencia existente y snapshot histórico intacto.
+PASS: resultados de HTTP, UI real, mocks y bloqueos separados; cuentas informadas sin declarar activación ni autenticación.
+Matrix rows: 149; unique IDs: 149
+Markdown files: 12; local links: 303; checklist cases: 67
+PASS: links, required case fields and evidence counts

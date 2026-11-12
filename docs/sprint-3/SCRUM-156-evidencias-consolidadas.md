@@ -1,5 +1,7 @@
 # SCRUM-156 — evidencia consolidada de los tres roles
 
+**Estado posterior con cuentas informadas:** [consolidación actual](SCRUM-156-consolidacion-actual.md): 3 PASS de formulario anónimo en Expo Web y 61 casos BLOCKED, sin autenticación backend verificada. Este documento y su matriz de 149 filas conservan el snapshot de la primera entrega; no deben interpretarse como el resultado más reciente de AUTH-*-03.
+
 Fecha de revisión: 11-11-2026, rama `Victor`. **Consolidación documental validada; pruebas reales autenticadas pendientes**. Los siete tickets se interpretan según la solicitud del usuario: las búsquedas de GitHub Issues no devolvieron criterios ni comentarios recuperables. No se inventaron cuentas, respuestas, capturas ni permisos backend.
 
 ## Índice central
