@@ -1,5 +1,7 @@
 # Informe de cierre local — Sprint 3, Victor
 
+Este informe conserva el estado de la primera entrega. La continuación autorizada confirmó la corrección técnica en `c0b9bda` y repitió las herramientas con el árbol limpio; [seguimiento actual y dependencias de QA](SCRUM-158-seguimiento-tecnico-qa.md). Las menciones siguientes a archivos sin commit describen aquel estado histórico, no el estado posterior a la continuación.
+
 Revisión 11-11-2026 America/Santiago; herramientas finales 12-11-2026 UTC. Se prepararon **seis commits independientes**, sin push. SCRUM-158 sigue bloqueado y conserva su trabajo sin commit; no se simula un séptimo cierre real.
 
 | Ticket | Estado | Validaciones | Evidencia | Commit |

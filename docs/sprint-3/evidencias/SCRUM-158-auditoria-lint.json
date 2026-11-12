@@ -1,0 +1,374 @@
+{
+  "baseline_commit": "872a862",
+  "current_commit": "c0b9bda",
+  "method": "Copia de src, configuraciones y test-utils de 872a862 a /tmp; mismo node_modules enlazado y ESLint/config. Sin checkout ni cambio de rama. Comparación archivo/regla/mensaje/línea/columna, sin caché.",
+  "commands": [
+    "node_modules/.bin/eslint src --no-cache --format json --output-file /tmp/tallerconnect-seguimiento/lint-details.json",
+    "node_modules/.bin/eslint src --no-cache --format json --output-file /tmp/tallerconnect-seguimiento/lint-baseline.json (cwd copia temporal)"
+  ],
+  "baseline_warnings": 46,
+  "current_warnings": 46,
+  "new_warnings": [],
+  "removed_warnings": [],
+  "warnings": [
+    {
+      "path": "src/__tests__/interceptors.test.ts",
+      "rule": "import/no-named-as-default-member",
+      "message": "Caution: `axios` also has a named export `AxiosHeaders`. Check if you meant to write `import {AxiosHeaders} from 'axios'` instead.",
+      "line": 180,
+      "column": 22
+    },
+    {
+      "path": "src/__tests__/interceptors.test.ts",
+      "rule": "import/no-named-as-default-member",
+      "message": "Caution: `axios` also has a named export `create`. Check if you meant to write `import {create} from 'axios'` instead.",
+      "line": 192,
+      "column": 22
+    },
+    {
+      "path": "src/__tests__/interceptors.test.ts",
+      "rule": "@typescript-eslint/array-type",
+      "message": "Array type using 'Array<T>' is forbidden. Use 'T[]' instead.",
+      "line": 195,
+      "column": 19
+    },
+    {
+      "path": "src/__tests__/interceptors.test.ts",
+      "rule": "import/no-named-as-default-member",
+      "message": "Caution: `axios` also has a named export `AxiosHeaders`. Check if you meant to write `import {AxiosHeaders} from 'axios'` instead.",
+      "line": 199,
+      "column": 22
+    },
+    {
+      "path": "src/__tests__/interceptors.test.ts",
+      "rule": "import/no-named-as-default-member",
+      "message": "Caution: `axios` also has a named export `create`. Check if you meant to write `import {create} from 'axios'` instead.",
+      "line": 208,
+      "column": 22
+    },
+    {
+      "path": "src/__tests__/interceptors.test.ts",
+      "rule": "@typescript-eslint/array-type",
+      "message": "Array type using 'Array<T>' is forbidden. Use 'T[]' instead.",
+      "line": 211,
+      "column": 19
+    },
+    {
+      "path": "src/__tests__/interceptors.test.ts",
+      "rule": "import/no-named-as-default-member",
+      "message": "Caution: `axios` also has a named export `AxiosHeaders`. Check if you meant to write `import {AxiosHeaders} from 'axios'` instead.",
+      "line": 215,
+      "column": 22
+    },
+    {
+      "path": "src/__tests__/interceptors.test.ts",
+      "rule": "import/no-named-as-default-member",
+      "message": "Caution: `axios` also has a named export `create`. Check if you meant to write `import {create} from 'axios'` instead.",
+      "line": 224,
+      "column": 22
+    },
+    {
+      "path": "src/__tests__/interceptors.test.ts",
+      "rule": "@typescript-eslint/array-type",
+      "message": "Array type using 'Array<T>' is forbidden. Use 'T[]' instead.",
+      "line": 228,
+      "column": 19
+    },
+    {
+      "path": "src/__tests__/interceptors.test.ts",
+      "rule": "import/no-named-as-default-member",
+      "message": "Caution: `axios` also has a named export `AxiosHeaders`. Check if you meant to write `import {AxiosHeaders} from 'axios'` instead.",
+      "line": 232,
+      "column": 22
+    },
+    {
+      "path": "src/__tests__/interceptors.test.ts",
+      "rule": "import/no-named-as-default-member",
+      "message": "Caution: `axios` also has a named export `create`. Check if you meant to write `import {create} from 'axios'` instead.",
+      "line": 244,
+      "column": 22
+    },
+    {
+      "path": "src/__tests__/interceptors.test.ts",
+      "rule": "@typescript-eslint/array-type",
+      "message": "Array type using 'Array<T>' is forbidden. Use 'T[]' instead.",
+      "line": 248,
+      "column": 19
+    },
+    {
+      "path": "src/__tests__/interceptors.test.ts",
+      "rule": "import/no-named-as-default-member",
+      "message": "Caution: `axios` also has a named export `AxiosHeaders`. Check if you meant to write `import {AxiosHeaders} from 'axios'` instead.",
+      "line": 252,
+      "column": 22
+    },
+    {
+      "path": "src/__tests__/interceptors.test.ts",
+      "rule": "import/no-named-as-default-member",
+      "message": "Caution: `axios` also has a named export `create`. Check if you meant to write `import {create} from 'axios'` instead.",
+      "line": 265,
+      "column": 22
+    },
+    {
+      "path": "src/__tests__/interceptors.test.ts",
+      "rule": "@typescript-eslint/array-type",
+      "message": "Array type using 'Array<T>' is forbidden. Use 'T[]' instead.",
+      "line": 269,
+      "column": 19
+    },
+    {
+      "path": "src/__tests__/interceptors.test.ts",
+      "rule": "import/no-named-as-default-member",
+      "message": "Caution: `axios` also has a named export `AxiosHeaders`. Check if you meant to write `import {AxiosHeaders} from 'axios'` instead.",
+      "line": 273,
+      "column": 22
+    },
+    {
+      "path": "src/__tests__/interceptors.test.ts",
+      "rule": "import/no-named-as-default-member",
+      "message": "Caution: `axios` also has a named export `create`. Check if you meant to write `import {create} from 'axios'` instead.",
+      "line": 285,
+      "column": 22
+    },
+    {
+      "path": "src/__tests__/interceptors.test.ts",
+      "rule": "@typescript-eslint/array-type",
+      "message": "Array type using 'Array<T>' is forbidden. Use 'T[]' instead.",
+      "line": 289,
+      "column": 19
+    },
+    {
+      "path": "src/__tests__/interceptors.test.ts",
+      "rule": "import/no-named-as-default-member",
+      "message": "Caution: `axios` also has a named export `create`. Check if you meant to write `import {create} from 'axios'` instead.",
+      "line": 300,
+      "column": 22
+    },
+    {
+      "path": "src/__tests__/interceptors.test.ts",
+      "rule": "@typescript-eslint/array-type",
+      "message": "Array type using 'Array<T>' is forbidden. Use 'T[]' instead.",
+      "line": 304,
+      "column": 19
+    },
+    {
+      "path": "src/__tests__/interceptors.test.ts",
+      "rule": "import/no-named-as-default-member",
+      "message": "Caution: `axios` also has a named export `create`. Check if you meant to write `import {create} from 'axios'` instead.",
+      "line": 321,
+      "column": 22
+    },
+    {
+      "path": "src/__tests__/interceptors.test.ts",
+      "rule": "@typescript-eslint/array-type",
+      "message": "Array type using 'Array<T>' is forbidden. Use 'T[]' instead.",
+      "line": 325,
+      "column": 19
+    },
+    {
+      "path": "src/__tests__/interceptors.test.ts",
+      "rule": "import/no-named-as-default-member",
+      "message": "Caution: `axios` also has a named export `create`. Check if you meant to write `import {create} from 'axios'` instead.",
+      "line": 342,
+      "column": 22
+    },
+    {
+      "path": "src/__tests__/interceptors.test.ts",
+      "rule": "@typescript-eslint/array-type",
+      "message": "Array type using 'Array<T>' is forbidden. Use 'T[]' instead.",
+      "line": 346,
+      "column": 19
+    },
+    {
+      "path": "src/__tests__/interceptors.test.ts",
+      "rule": "import/no-named-as-default-member",
+      "message": "Caution: `axios` also has a named export `create`. Check if you meant to write `import {create} from 'axios'` instead.",
+      "line": 363,
+      "column": 22
+    },
+    {
+      "path": "src/__tests__/interceptors.test.ts",
+      "rule": "@typescript-eslint/array-type",
+      "message": "Array type using 'Array<T>' is forbidden. Use 'T[]' instead.",
+      "line": 367,
+      "column": 19
+    },
+    {
+      "path": "src/__tests__/interceptors.test.ts",
+      "rule": "import/no-named-as-default-member",
+      "message": "Caution: `axios` also has a named export `create`. Check if you meant to write `import {create} from 'axios'` instead.",
+      "line": 382,
+      "column": 22
+    },
+    {
+      "path": "src/__tests__/interceptors.test.ts",
+      "rule": "@typescript-eslint/array-type",
+      "message": "Array type using 'Array<T>' is forbidden. Use 'T[]' instead.",
+      "line": 386,
+      "column": 19
+    },
+    {
+      "path": "src/__tests__/interceptors.test.ts",
+      "rule": "import/no-named-as-default-member",
+      "message": "Caution: `axios` also has a named export `create`. Check if you meant to write `import {create} from 'axios'` instead.",
+      "line": 401,
+      "column": 22
+    },
+    {
+      "path": "src/__tests__/interceptors.test.ts",
+      "rule": "@typescript-eslint/array-type",
+      "message": "Array type using 'Array<T>' is forbidden. Use 'T[]' instead.",
+      "line": 405,
+      "column": 19
+    },
+    {
+      "path": "src/__tests__/interceptors.test.ts",
+      "rule": "import/no-named-as-default-member",
+      "message": "Caution: `axios` also has a named export `create`. Check if you meant to write `import {create} from 'axios'` instead.",
+      "line": 420,
+      "column": 22
+    },
+    {
+      "path": "src/__tests__/interceptors.test.ts",
+      "rule": "@typescript-eslint/array-type",
+      "message": "Array type using 'Array<T>' is forbidden. Use 'T[]' instead.",
+      "line": 424,
+      "column": 19
+    },
+    {
+      "path": "src/components/common/ConnectivityBanner.tsx",
+      "rule": "@typescript-eslint/no-unused-vars",
+      "message": "'colors' is defined but never used.",
+      "line": 10,
+      "column": 10
+    },
+    {
+      "path": "src/dto/notification.dto.ts",
+      "rule": "@typescript-eslint/no-unused-vars",
+      "message": "'NotificationPriority' is defined but never used.",
+      "line": 4,
+      "column": 3
+    },
+    {
+      "path": "src/mappers/evidence.mapper.ts",
+      "rule": "@typescript-eslint/no-unused-vars",
+      "message": "'normalizeContext' is defined but never used.",
+      "line": 23,
+      "column": 10
+    },
+    {
+      "path": "src/services/api/client.ts",
+      "rule": "import/no-named-as-default-member",
+      "message": "Caution: `axios` also has a named export `create`. Check if you meant to write `import {create} from 'axios'` instead.",
+      "line": 38,
+      "column": 20
+    },
+    {
+      "path": "src/services/api/interceptors.ts",
+      "rule": "import/no-named-as-default-member",
+      "message": "Caution: `axios` also has a named export `isAxiosError`. Check if you meant to write `import {isAxiosError} from 'axios'` instead.",
+      "line": 135,
+      "column": 7
+    },
+    {
+      "path": "src/services/api/interceptors.ts",
+      "rule": "unused-eslint-disable-directive",
+      "message": "Unused eslint-disable directive (no problems were reported from '@typescript-eslint/no-var-requires').",
+      "line": 319,
+      "column": 15
+    },
+    {
+      "path": "src/services/api/interceptors.ts",
+      "rule": "@typescript-eslint/no-require-imports",
+      "message": "A `require()` style import is forbidden.",
+      "line": 320,
+      "column": 40
+    },
+    {
+      "path": "src/services/api/types.ts",
+      "rule": "@typescript-eslint/array-type",
+      "message": "Array type using 'Array<T>' is forbidden. Use 'T[]' instead.",
+      "line": 14,
+      "column": 9
+    },
+    {
+      "path": "src/services/auth.service.ts",
+      "rule": "@typescript-eslint/array-type",
+      "message": "Array type using 'Array<T>' is forbidden. Use 'T[]' instead.",
+      "line": 50,
+      "column": 19
+    },
+    {
+      "path": "src/services/auth.service.ts",
+      "rule": "import/no-named-as-default-member",
+      "message": "Caution: `axios` also has a named export `isAxiosError`. Check if you meant to write `import {isAxiosError} from 'axios'` instead.",
+      "line": 209,
+      "column": 10
+    },
+    {
+      "path": "src/services/auth.service.ts",
+      "rule": "import/no-named-as-default-member",
+      "message": "Caution: `axios` also has a named export `isAxiosError`. Check if you meant to write `import {isAxiosError} from 'axios'` instead.",
+      "line": 222,
+      "column": 9
+    },
+    {
+      "path": "src/services/budgets.service.ts",
+      "rule": "import/no-named-as-default-member",
+      "message": "Caution: `axios` also has a named export `isAxiosError`. Check if you meant to write `import {isAxiosError} from 'axios'` instead.",
+      "line": 1118,
+      "column": 8
+    },
+    {
+      "path": "src/stores/connectivityStore.ts",
+      "rule": "import/no-named-as-default-member",
+      "message": "Caution: `axios` also has a named export `isAxiosError`. Check if you meant to write `import {isAxiosError} from 'axios'` instead.",
+      "line": 169,
+      "column": 11
+    },
+    {
+      "path": "src/stores/connectivityStore.ts",
+      "rule": "import/no-named-as-default-member",
+      "message": "Caution: `axios` also has a named export `isAxiosError`. Check if you meant to write `import {isAxiosError} from 'axios'` instead.",
+      "line": 187,
+      "column": 9
+    }
+  ],
+  "by_rule": {
+    "import/no-named-as-default-member": 26,
+    "@typescript-eslint/array-type": 15,
+    "@typescript-eslint/no-unused-vars": 3,
+    "unused-eslint-disable-directive": 1,
+    "@typescript-eslint/no-require-imports": 1
+  },
+  "by_file": {
+    "src/__tests__/interceptors.test.ts": 32,
+    "src/components/common/ConnectivityBanner.tsx": 1,
+    "src/dto/notification.dto.ts": 1,
+    "src/mappers/evidence.mapper.ts": 1,
+    "src/services/api/client.ts": 1,
+    "src/services/api/interceptors.ts": 3,
+    "src/services/api/types.ts": 1,
+    "src/services/auth.service.ts": 3,
+    "src/services/budgets.service.ts": 1,
+    "src/stores/connectivityStore.ts": 2
+  },
+  "baseline_errors": [
+    {
+      "path": "src/app/(admin)/administrador.tsx",
+      "rule": "react-hooks/set-state-in-effect",
+      "message": "Error: Calling setState synchronously within an effect can trigger cascading renders\n\nEffects are intended to synchronize state between React and external systems such as manually updating the DOM, state management libraries, or other platform APIs. In general, the body of an effect should do one or both of the following:\n* Update external systems with the latest state from React.\n* Subscribe for updates from some external system, calling setState in a callback function when external state changes.\n\nCalling setState synchronously within an effect body causes cascading renders that can hurt performance, and is not recommended. (https://react.dev/learn/you-might-not-need-an-effect).\n\n/tmp/tallerconnect-seguimiento/lint-baseline-872a862/src/app/(admin)/administrador.tsx:108:10\n  106 |\n  107 |   useEffect(() => {\n> 108 |     void loadDashboard();\n      |          ^^^^^^^^^^^^^ Avoid calling setState() directly within an effect\n  109 |   }, [loadDashboard]);\n  110 |\n  111 |   const metrics = useMemo(() => {",
+      "line": 108,
+      "column": 10
+    },
+    {
+      "path": "src/app/(admin)/ordenes/index.tsx",
+      "rule": "react-hooks/set-state-in-effect",
+      "message": "Error: Calling setState synchronously within an effect can trigger cascading renders\n\nEffects are intended to synchronize state between React and external systems such as manually updating the DOM, state management libraries, or other platform APIs. In general, the body of an effect should do one or both of the following:\n* Update external systems with the latest state from React.\n* Subscribe for updates from some external system, calling setState in a callback function when external state changes.\n\nCalling setState synchronously within an effect body causes cascading renders that can hurt performance, and is not recommended. (https://react.dev/learn/you-might-not-need-an-effect).\n\n/tmp/tallerconnect-seguimiento/lint-baseline-872a862/src/app/(admin)/ordenes/index.tsx:83:10\n  81 |\n  82 |   useEffect(() => {\n> 83 |     void loadData();\n     |          ^^^^^^^^ Avoid calling setState() directly within an effect\n  84 |   }, [loadData]);\n  85 |\n  86 |   const vehicleById = useMemo(",
+      "line": 83,
+      "column": 10
+    }
+  ],
+  "current_errors": [],
+  "scope_note": "ESLint y config-expo preexistentes instalados, pero ausentes de dependencias/lock en Victor. Valida esta instalación, no una instalación limpia de CI. Sin fixes fuera del alcance."
+}
