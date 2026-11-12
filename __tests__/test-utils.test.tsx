@@ -24,6 +24,9 @@ it('navega con Router real y consulta la ruta desde el resultado del render', as
     perfil: () => <Text>Perfil</Text>,
   });
   await router;
+  expect(screen).toHavePathname('/');
+  expect(screen).not.toHavePathname('/perfil');
+  expect(() => expect(screen).toHavePathname('/perfil')).toThrow();
   await fireEvent.press(screen.getByText('Abrir perfil'));
   await waitFor(() => expect(screen).toHavePathname('/perfil'));
   expect(screen.getByText('Perfil')).toBeTruthy();
