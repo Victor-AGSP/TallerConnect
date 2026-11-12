@@ -49,9 +49,6 @@ export {
   EvidencesService,
   EvidenceService,
   EvidenceServiceError,
-  getGlobalErrorMessage,
-  isConnectivityOrTimeoutError,
-  normalizeNotificationServiceError,
   EVIDENCE_UPLOAD_TIMEOUT_MS,
   evidenceService,
   evidencesService,
@@ -79,6 +76,9 @@ export {
   normalizePartServiceError,
   normalizeProviderServiceError,
   normalizeEvidenceServiceError,
+  getGlobalErrorMessage,
+  isConnectivityOrTimeoutError,
+  normalizeNotificationServiceError,
 } from './service-error';
 export type { ServiceErrorDomain } from './service-error';
 export { filterVehiclesByParams, MockVehicleAdapter, RealVehicleAdapter, VehiclesService, VehicleService, vehiclesService } from './vehicles.service';
