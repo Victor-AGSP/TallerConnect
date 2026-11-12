@@ -200,38 +200,28 @@ export function buildAdminDashboardFromDomain(input: {
       .filter((id): id is string => Boolean(id))
   );
 
-  const activeOrderRows: AdminOrderRowItem[] =
-    activeOrders.length > 0
-      ? activeOrders.slice(0, 6).map((order) => ({
-          id: order.id,
-          code: formatOrderCode(order.id),
-          plate:
-            vehiclePlateById.get(String(order.vehicleId)) ??
-            `VEH-${order.vehicleId}`,
-          status:
-            ORDER_STATUS_LABELS[order.status] ?? 'En proceso',
-        }))
-      : INITIAL_ADMIN_DASHBOARD_DATA.activeOrderRows;
+  const activeOrderRows: AdminOrderRowItem[] = activeOrders.slice(0, 6).map((order) => ({
+    id: order.id,
+    code: formatOrderCode(order.id),
+    plate: vehiclePlateById.get(String(order.vehicleId)) ?? `VEH-${order.vehicleId}`,
+    status: ORDER_STATUS_LABELS[order.status] ?? 'En proceso',
+  }));
 
-  const pendingApprovalRows: AdminApprovalRowItem[] =
-    pendingBudgets.length > 0
-      ? pendingBudgets.slice(0, 5).map((budget) => {
-          const matchedOrder =
-            orderById.get(String(budget.orderId)) ??
-            orderById.get(String(budget.orderId).replace(/\D/g, ''));
-          const plate = matchedOrder
-            ? vehiclePlateById.get(String(matchedOrder.vehicleId)) ??
-              `VEH-${matchedOrder.vehicleId}`
-            : 'Por asignar';
+  const pendingApprovalRows: AdminApprovalRowItem[] = pendingBudgets.slice(0, 5).map((budget) => {
+    const matchedOrder =
+      orderById.get(String(budget.orderId)) ??
+      orderById.get(String(budget.orderId).replace(/\D/g, ''));
+    const plate = matchedOrder
+      ? vehiclePlateById.get(String(matchedOrder.vehicleId)) ?? `VEH-${matchedOrder.vehicleId}`
+      : 'Por asignar';
 
-          return {
-            id: budget.id,
-            order: formatOrderCode(budget.orderId),
-            vehicle: plate,
-            amount: formatClpAmount(budget.latestVersionTotal),
-          };
-        })
-      : INITIAL_ADMIN_DASHBOARD_DATA.pendingApprovalRows;
+    return {
+      id: budget.id,
+      order: formatOrderCode(budget.orderId),
+      vehicle: plate,
+      amount: formatClpAmount(budget.latestVersionTotal),
+    };
+  });
 
   const lowStockParts = parts.filter((p) => p.belowThreshold || p.stock <= 5);
 
@@ -242,18 +232,10 @@ export function buildAdminDashboardFromDomain(input: {
 
   return {
     stats: {
-      vehiclesInService: String(
-        activeOrders.length || INITIAL_ADMIN_DASHBOARD_DATA.stats.vehiclesInService
-      ),
-      activeOrders: String(
-        activeOrders.length || INITIAL_ADMIN_DASHBOARD_DATA.stats.activeOrders
-      ),
-      activeMechanics: String(
-        uniqueMechanics.size || INITIAL_ADMIN_DASHBOARD_DATA.stats.activeMechanics
-      ),
-      pendingApprovals: String(
-        pendingCount || INITIAL_ADMIN_DASHBOARD_DATA.stats.pendingApprovals
-      ),
+      vehiclesInService: String(activeOrders.length),
+      activeOrders: String(activeOrders.length),
+      activeMechanics: String(uniqueMechanics.size),
+      pendingApprovals: String(pendingCount),
     },
     statusSummary: {
       diagnosis: String(diagnosisOrders.length),
@@ -279,14 +261,7 @@ export function buildAdminDashboardFromDomain(input: {
  */
 export class AdminDashboardService {
   async getDashboardData(): Promise<AdminDashboardData> {
-    const [
-      vehiclesResult,
-      ordersResult,
-      budgetsResult,
-      partsResult,
-      providersResult,
-      notificationsResult,
-    ] = await Promise.allSettled([
+    const [vehicles, orders, budgets, parts, providers, notifications] = await Promise.all([
       vehiclesService.getVehicles(),
       ordersService.getOrders(),
       budgetsService.getBudgets(),
@@ -294,34 +269,6 @@ export class AdminDashboardService {
       providersService.getProviders(),
       notificationsService.getNotifications({ role: ROLES.ADMINISTRADOR }),
     ]);
-
-    const vehicles =
-      vehiclesResult.status === 'fulfilled' ? vehiclesResult.value : [];
-    const orders =
-      ordersResult.status === 'fulfilled' ? ordersResult.value : [];
-    const budgets =
-      budgetsResult.status === 'fulfilled' ? budgetsResult.value : [];
-    const parts =
-      partsResult.status === 'fulfilled' ? partsResult.value : [];
-    const providers =
-      providersResult.status === 'fulfilled' ? providersResult.value : [];
-    const notifications =
-      notificationsResult.status === 'fulfilled'
-        ? notificationsResult.value
-        : [];
-
-    if (
-      vehicles.length === 0 &&
-      orders.length === 0 &&
-      budgets.length === 0 &&
-      parts.length === 0 &&
-      providers.length === 0
-    ) {
-      return {
-        ...INITIAL_ADMIN_DASHBOARD_DATA,
-        notifications,
-      };
-    }
 
     return buildAdminDashboardFromDomain({
       vehicles,

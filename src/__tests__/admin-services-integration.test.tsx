@@ -36,6 +36,8 @@ describe('Integración de servicios necesarios del administrador', () => {
     notificationsService.resetMocks();
   });
 
+  afterEach(() => jest.restoreAllMocks());
+
   it('agrega métricas de vehículos, órdenes, presupuestos, repuestos, proveedores y avisos en adminDashboardService', async () => {
     const data = await adminDashboardService.getDashboardData();
 
@@ -44,6 +46,26 @@ describe('Integración de servicios necesarios del administrador', () => {
     expect(data.activeOrderRows.length).toBeGreaterThan(0);
     expect(data.pendingApprovalRows.length).toBeGreaterThan(0);
     expect(data.notifications.length).toBeGreaterThan(0);
+  });
+
+  it('conserva cero y listas vacías cuando todos los recursos están vacíos', async () => {
+    jest.spyOn(vehiclesService, 'getVehicles').mockResolvedValue([]);
+    jest.spyOn(ordersService, 'getOrders').mockResolvedValue([]);
+    jest.spyOn(budgetsService, 'getBudgets').mockResolvedValue([]);
+    jest.spyOn(partsService, 'getParts').mockResolvedValue([]);
+    jest.spyOn(providersService, 'getProviders').mockResolvedValue([]);
+    jest.spyOn(notificationsService, 'getNotifications').mockResolvedValue([]);
+    const data = await adminDashboardService.getDashboardData();
+    expect(Object.values(data.stats)).toEqual(['0', '0', '0', '0']);
+    expect(data.activeOrderRows).toEqual([]);
+    expect(data.pendingApprovalRows).toEqual([]);
+    expect(data.notifications).toEqual([]);
+  });
+
+  it('propaga un error de consulta en lugar de presentarlo como métricas válidas', async () => {
+    const failure = new Error('MS2 no disponible');
+    jest.spyOn(vehiclesService, 'getVehicles').mockRejectedValue(failure);
+    await expect(adminDashboardService.getDashboardData()).rejects.toBe(failure);
   });
 
   it('permite ejecutar acciones administrativas sobre órdenes y notificaciones', async () => {
