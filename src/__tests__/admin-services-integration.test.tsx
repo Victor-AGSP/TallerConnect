@@ -1,5 +1,5 @@
 import React from 'react';
-import { renderWithProviders, screen, waitFor } from '../../test-utils';
+import { fireEvent, renderWithProviders, screen, waitFor } from '../../test-utils';
 
 import AdministradorScreen from '@/app/(admin)/administrador';
 import {
@@ -66,6 +66,18 @@ describe('Integración de servicios necesarios del administrador', () => {
     const failure = new Error('MS2 no disponible');
     jest.spyOn(vehiclesService, 'getVehicles').mockRejectedValue(failure);
     await expect(adminDashboardService.getDashboardData()).rejects.toBe(failure);
+  });
+
+  it('muestra un fallo de avisos y permite recuperar la consulta sin datos ficticios', async () => {
+    const query = jest.spyOn(notificationsService, 'getNotifications')
+      .mockRejectedValueOnce(new Error('Avisos no disponibles'))
+      .mockResolvedValue([]);
+    await renderWithProviders(<AdministradorScreen />);
+    await screen.findByTestId('admin-notifications-error');
+    expect(screen.queryByText('Avisos del taller')).toBeNull();
+    await fireEvent.press(screen.getByRole('button', { name: 'Reintentar' }));
+    await waitFor(() => expect(screen.queryByTestId('admin-notifications-error')).toBeNull());
+    expect(query).toHaveBeenCalledTimes(2);
   });
 
   it('permite ejecutar acciones administrativas sobre órdenes y notificaciones', async () => {

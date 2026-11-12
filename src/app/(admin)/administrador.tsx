@@ -43,6 +43,7 @@ export default function AdministradorScreen() {
   const [notifications, setNotifications] = useState<WorkshopNotification[]>(
     [],
   );
+  const [notificationsError, setNotificationsError] = useState<string | null>(null);
   const [ordersError, setOrdersError] = useState<string | null>(null);
   const [vehiclesError, setVehiclesError] = useState<string | null>(null);
   const [isRefreshing, setIsRefreshing] = useState(false);
@@ -75,6 +76,13 @@ export default function AdministradorScreen() {
 
     if (notificationsResult.status === 'fulfilled') {
       setNotifications(notificationsResult.value);
+    } else {
+      setNotifications([]);
+      setNotificationsError(
+        notificationsResult.reason instanceof Error
+          ? notificationsResult.reason.message
+          : 'No fue posible cargar los avisos.',
+      );
     }
   }).finally(() => {
     setIsLoading(false);
@@ -88,6 +96,7 @@ export default function AdministradorScreen() {
       setIsLoading(true);
     }
 
+    setNotificationsError(null);
     setOrdersError(null);
     setVehiclesError(null);
 
@@ -385,6 +394,14 @@ export default function AdministradorScreen() {
             onPress={() => router.push('/(admin)/proveedores')}
           />
         </View>
+
+        {notificationsError ? (
+          <ErrorMessage
+            testID="admin-notifications-error"
+            message={notificationsError}
+            onRetry={() => reload(true)}
+          />
+        ) : null}
 
         {notifications.length > 0 ? (
           <View style={styles.ordersList}>
