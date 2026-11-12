@@ -1,12 +1,14 @@
 # SCRUM-216 — checklist de autenticación real por rol
 
+**Resultado actual posterior:** [ejecución real de UI web](SCRUM-216-ejecucion-web.md): 3 PASS del formulario anónimo compartido y 24 BLOCKED; ninguna cuenta autenticada verificada. Las tres identidades fueron aportadas por el usuario. La tabla de casos original que sigue es el snapshot previo, conservado para trazabilidad con la primera matriz, no el resultado más reciente de AUTH-*-03.
+
 Fecha: 11-11-2026. **Checklist documental validado; ejecución real por rol BLOCKED**. Fuente de criterios: solicitud del usuario; las búsquedas de GitHub Issues no devolvieron tickets del repositorio. Este documento es autosuficiente aunque SCRUM-158 siga pendiente y sin commit.
 
 ## Entorno y dependencias
 
 La configuración local inspeccionada apunta a `https://tallerconect.vercel.app/api`, etiquetada producción, con mocks de auth y servicios deshabilitados. No se modificó. Para ejecutar en QA, definir URL accesible al dispositivo, `EXPO_PUBLIC_USE_MOCK_AUTH=false` y `EXPO_PUBLIC_USE_MOCK_SERVICES=false` en la sesión local y reiniciar Expo. No usar cuentas demo del README contra el backend.
 
-B-ACCOUNTS: faltan cuentas backend de prueba de los tres roles, dataset propio/ajeno autorizado y entorno QA identificado. B-DEVICE: falta ejecución Expo en dispositivo o navegador instrumentado para comprobar navegación y almacenamiento. B-ERRORS: los casos de red/timeout/expiración requieren controles del entorno QA. No se han proporcionado secretos ni se han enviado credenciales. Un BLOCKED no equivale a PASS ni a FAIL funcional.
+B-ACCOUNTS es el identificador histórico de la dependencia: las tres identidades de prueba ya están informadas, y queda pendiente confirmar QA, acceder al mecanismo seguro de contraseñas y verificar activación/roles/dataset propio y ajeno. B-DEVICE: el formulario y rutas anónimas ya se ejecutaron en Expo Web/Firefox; sesiones y navegación autenticada y plataformas nativas siguen pendientes. B-ERRORS: los casos de red/timeout/expiración requieren controles del entorno QA. No se han proporcionado secretos en el chat ni se han enviado credenciales. Un BLOCKED no equivale a PASS ni a FAIL funcional.
 
 ## Evidencia y vínculo con SCRUM-158
 

@@ -1,0 +1,4 @@
+PASS: 3 IDs existentes actualizados por evidencia UI, sin añadir casos; 24 pendientes; snapshot original identificado como histórico.
+Matrix rows: 149; unique IDs: 149
+Markdown files: 2; local links: 22; checklist cases: 30
+PASS: links, required case fields and evidence counts
