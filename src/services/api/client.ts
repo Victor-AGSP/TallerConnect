@@ -5,6 +5,7 @@ import {
   attachErrorInterceptor,
 } from './interceptors';
 import { attachRetryInterceptor } from './retry';
+import { attachHttpTraceInterceptor } from './trace';
 import { ApiRequestConfig, RetryConfig } from './types';
 
 /**
@@ -47,6 +48,7 @@ export function createApiClient(options?: CreateApiClientOptions): AxiosInstance
   });
 
   attachAuthTokenInterceptor(instance);
+  if (ENV.HTTP_TRACE) attachHttpTraceInterceptor(instance);
   attachRetryInterceptor(instance, retryConfig);
   attachErrorInterceptor(instance);
 

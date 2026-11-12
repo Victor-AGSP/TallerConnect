@@ -1,3 +1,4 @@
+import { isMockModeEnabled } from '@/config/env';
 import { apiClient } from '@/services/api/client';
 import { HTTP_STATUS } from '@/services/api/types';
 import {
@@ -21,7 +22,7 @@ import { mockUserByRole } from '@/mocks/users.mock';
 
 export { ServiceError, normalizeVehicleServiceError };
 
-const USE_MOCKS = process.env.EXPO_PUBLIC_USE_MOCK_AUTH === 'true';
+const USE_MOCKS = isMockModeEnabled();
 
 /** `maxLength` de `marca` y `modelo` en `VehiculoCrear` (MS2). */
 const VEHICLE_TEXT_MAX_LENGTH = 60;

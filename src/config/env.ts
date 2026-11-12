@@ -217,6 +217,12 @@ export const ENV = {
    */
   USE_MOCK_SERVICES: isMockModeEnabled(),
 
+  /** Las vistas de demostración requieren ambos permisos explícitos. */
+  USE_DEMO_DATA: isMockModeEnabled() && process.env.EXPO_PUBLIC_DEMO_WORKFLOW === 'true',
+
+  /** Traza optativa de método, destino y estado, sin cuerpos ni cabeceras. */
+  HTTP_TRACE: process.env.EXPO_PUBLIC_HTTP_TRACE === 'true',
+
   /**
    * Indica si el contrato HTTP de avisos/notificaciones está habilitado en la Gateway.
    */

@@ -1,4 +1,4 @@
-import { ENV } from '@/config/env';
+import { ENV, isMockModeEnabled } from '@/config/env';
 import {
   MarkNotificationReadResponseDto,
   NotificationQueryParamsDto,
@@ -26,7 +26,7 @@ import {
 
 export { ServiceError, normalizeNotificationServiceError };
 
-const USE_MOCKS = process.env.EXPO_PUBLIC_USE_MOCK_AUTH === 'true';
+const USE_MOCKS = isMockModeEnabled();
 
 /**
  * Filtra y pagina localmente una lista de notificaciones según NotificationQueryParamsDto.

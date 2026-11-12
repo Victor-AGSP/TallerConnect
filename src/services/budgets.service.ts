@@ -1,3 +1,4 @@
+import { isMockModeEnabled } from '@/config/env';
 import { apiClient } from '@/services/api/client';
 import { HTTP_STATUS } from '@/services/api/types';
 import {
@@ -34,7 +35,7 @@ import { INVALID_BUDGET_RESPONSE, mapBudgetDetailResponse as mapLegacyBudgetDeta
 
 export { ServiceError, normalizeBudgetServiceError };
 
-const USE_MOCKS = process.env.EXPO_PUBLIC_USE_MOCK_AUTH === 'true';
+const USE_MOCKS = isMockModeEnabled();
 
 /**
  * Construye el objeto de query params oficiales de MS3 para `GET /presupuestos`.
