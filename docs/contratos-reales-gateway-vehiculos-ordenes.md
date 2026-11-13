@@ -88,3 +88,58 @@ La prueba `__tests__/vehicle-gateway-response.test.ts` comprueba que el ejemplo 
 El mismo catálogo identifica los estados en otros campos del contrato: `estado_anterior` y `estado_nuevo` de `HistorialEstadoRespuesta`, `estado_al_solicitar` de `SolicitudCancelacionRespuesta` y `estado_aplicado` de las respuestas de envío y decisión de presupuesto.
 
 La prueba `__tests__/order-status-equivalence.test.ts` comprueba que la app reconoce exactamente los códigos del catálogo y que solo `pausado_por_presupuesto_rechazado` y `control_calidad` quedan sin código.
+
+## Contraste de DTO y mappers con la Gateway
+
+Las respuestas reales de `GET /api/vehiculos` y `GET /api/ordenes` se compararon con cada capa de la app: el DTO, el esquema Zod, el mapper y el modelo. La columna "Contrato" usa los esquemas `VehiculoRespuesta` y `OrdenRespuesta` de `/ms2/openapi.json`.
+
+### Vehículos
+
+`mapVehicleResponse` no usa `vehicleResponseDtoSchema`: valida la respuesta por su cuenta y acepta, además del contrato, nombres de campos de un formato anterior.
+
+| Campo | Contrato | `VehicleResponseDto` | `vehicleResponseDtoSchema` | `mapVehicleResponse` | `Vehicle` |
+|---|---|---|---|---|---|
+| `vehiculo_id` | Obligatorio, no nulo | `number` | Entero obligatorio | Obligatorio; acepta también `id` y valores de texto | `id: string` |
+| `cliente_id` | Obligatorio, no nulo | `number` | Entero obligatorio | Opcional; acepta también `client_id`, `clientId`, `owner_id` y `ownerId` | `ownerId?: string` |
+| `patente` | Obligatorio, no nulo | `string` | Texto obligatorio | Texto no vacío; acepta también `patent`, `license_plate` y `plate` | `plate: string` |
+| `marca` | Obligatorio, no nulo | `string` | Texto obligatorio | Texto; acepta también `brand` | `brand: string` |
+| `modelo` | Obligatorio, no nulo | `string` | Texto obligatorio | Texto; acepta también `model` | `model: string` |
+| `anio` | Obligatorio, admite `null` | `number \| null` | Entero o `null`, obligatorio | Si falta, se asigna `null`, salvo que venga `cliente_id` | `year: number \| null` |
+| `kilometraje` | Obligatorio, admite `null` | `number \| null` | Entero o `null`, obligatorio | Si falta, se asigna `null`, salvo que venga `cliente_id` | `mileage: number \| null` |
+
+El DTO y el esquema coinciden con el contrato. Las diferencias están en el mapper, que acepta respuestas que el esquema rechaza, y en el modelo, donde `ownerId` es opcional aunque `cliente_id` es obligatorio en el contrato.
+
+### Órdenes
+
+`mapOrderResponse` valida la respuesta con `orderResponseDtoSchema` antes de mapearla.
+
+| Campo | Contrato | `OrderResponseDto` | `orderResponseDtoSchema` | `mapOrderResponse` | `WorkOrder` |
+|---|---|---|---|---|---|
+| `orden_id` | Obligatorio, no nulo | `number` | Entero obligatorio | Se convierte a texto | `id: string` |
+| `vehiculo_id` | Obligatorio, no nulo | `number` | Entero obligatorio | Se convierte a texto | `vehicleId: string` |
+| `ingreso_id` | Obligatorio, no nulo | `number` | Entero obligatorio | Se convierte a texto | `intakeId: string` |
+| `estado_codigo` | Obligatorio, no nulo | `number` | Entero obligatorio | Se convierte con `mapOrderStatus`; rechaza códigos fuera del catálogo | `status: WorkOrderStatus` |
+| `mecanico_actual_id` | Obligatorio, admite `null` | `number \| null` | Entero o `null`, obligatorio | Se convierte a texto; `null` se conserva | `assignedMechanicId: string \| null` |
+| `creado_por_id` | Obligatorio, no nulo | `number` | Entero obligatorio | Se convierte a texto | `createdById: string` |
+| `creado_en` | Obligatorio, no nulo, `date-time` | `string` | Fecha ISO con zona horaria, obligatoria | Se conserva | `createdAt: string` |
+| `actualizado_en` | Obligatorio, no nulo, `date-time` | `string` | Fecha ISO con zona horaria, obligatoria | Se conserva | `updatedAt: string` |
+| `devuelto_en` | Obligatorio, admite `null`, `date-time` | No existe | No existe; se descarta | No existe | No existe |
+| `devuelto_por_id` | Obligatorio, admite `null` | No existe | No existe; se descarta | No existe | No existe |
+| — | No existe | No existe | No existe | No se asigna | `clientId?: string` |
+
+Los ocho campos que la app conoce coinciden con el contrato en tipo y nulabilidad. `devuelto_en` y `devuelto_por_id` registran la devolución física de una orden cancelada; la app no los tiene en ninguna capa. `clientId` existe solo en el modelo y el mapper no lo asigna, porque `OrdenRespuesta` no tiene un campo equivalente. Según la documentación de `WorkOrder`, el cliente de una orden se obtiene a través de su vehículo (`vehicleId` → `Vehicle.ownerId`).
+
+### Casos incompatibles
+
+| Caso | Respuesta | Contrato | Comportamiento actual | Efecto |
+|---|---|---|---|---|
+| O1 | Orden con `devuelto_en` y `devuelto_por_id` con valor | Válida | El esquema los descarta sin error | La app pierde la fecha y el responsable de la devolución |
+| O2 | Orden sin `devuelto_en` ni `devuelto_por_id` | Fuera de contrato | El esquema la acepta | Una respuesta incompleta no se detecta |
+| V1 | Vehículo sin `cliente_id` ni `anio` | Fuera de contrato | El mapper la acepta con `anio` en `null`; el esquema la rechaza | Un dato faltante se muestra como desconocido |
+| V2 | Vehículo con `cliente_id` y sin `anio` | Fuera de contrato | El mapper la rechaza | La misma ausencia se trata distinto que en V1 |
+| V3 | Vehículo solo con nombres del formato anterior (`id`, `plate`, `brand`, `model`, `year`, `mileage`) | Fuera de contrato | El mapper la acepta; el esquema la rechaza | Se aceptan respuestas que no son de MS2 |
+| V4 | Vehículo con `vehiculo_id` de texto | Fuera de contrato | El mapper la acepta; el esquema la rechaza | Un tipo incorrecto no se detecta |
+
+O1 aparece en las respuestas reales: la orden cancelada y devuelta trae ambos campos con valor. Las respuestas reales de vehículos son compatibles; V1 a V4 son respuestas fuera de contrato construidas a partir del ejemplo anonimizado.
+
+La prueba `__tests__/gateway-contract-contrast.test.ts` reproduce los seis casos con las fixtures `src/mocks/gateway/vehicles.gateway.ts` y `src/mocks/gateway/orders.gateway.ts`. En las órdenes, los identificadores y las fechas se reemplazaron por valores ficticios que conservan su formato y las relaciones entre registros; los códigos de estado y los valores nulos se conservan.
