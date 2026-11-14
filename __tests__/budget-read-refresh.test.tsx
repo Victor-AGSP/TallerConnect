@@ -2,7 +2,7 @@ import { cleanup, fireEvent, renderWithProviders, waitFor } from '../test-utils'
 import { OrderBudgetView } from '@/components/orders/OrderBudgetView';
 import { apiClient } from '@/services/api/client';
 import { budgetsService, RealBudgetAdapter } from '@/services/budgets.service';
-import { budgetDetail, budgetPage } from './fixtures/sprint3-budget';
+import { budgetDetail, budgetPage } from '../test-utils/fixtures/sprint3-budget';
 
 jest.mock('@/services/api/client', () => ({ apiClient: { get: jest.fn() } }));
 const get = jest.mocked(apiClient.get);
