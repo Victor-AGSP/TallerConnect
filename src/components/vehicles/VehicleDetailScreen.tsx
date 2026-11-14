@@ -104,6 +104,7 @@ function VehicleDetailScreenContent({
 
   const [vehicle, setVehicle] = useState<Vehicle | null>(null);
   const [orders, setOrders] = useState<WorkOrder[]>([]);
+  const [ordersError, setOrdersError] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [isRefreshing, setIsRefreshing] = useState(false);
@@ -111,12 +112,13 @@ function VehicleDetailScreenContent({
   const loadData = useCallback(() => vehiclesService.getVehicleById(vehicleId)
     .then(async (vehicleResult) => {
       setVehicle(vehicleResult);
+      setOrdersError(null);
       try {
         const ordersResult = await ordersService.getOrders();
         setOrders(ordersResult.filter((order) => String(order.vehicleId) === String(vehicleResult.id)));
       } catch (ordersError: unknown) {
-        console.error('[VehicleDetail] No se pudieron cargar las órdenes:', ordersError);
         setOrders([]);
+        setOrdersError(ordersError instanceof Error ? ordersError.message : 'No fue posible cargar las órdenes.');
       }
     })
     .catch((error: unknown) => {
@@ -258,8 +260,10 @@ function VehicleDetailScreenContent({
           <Text style={styles.sectionTitle}>Órdenes de trabajo</Text>
 
           <Text style={styles.sectionSubtitle}>
-            {orders.length === 0
-              ? 'No hay órdenes asociadas o no se pudieron cargar.'
+            {ordersError
+              ? 'No se pudieron consultar las órdenes.'
+              : orders.length === 0
+              ? 'No hay órdenes asociadas.'
               : `${orders.length} ${
                   orders.length === 1
                     ? 'orden asociada'
@@ -268,7 +272,14 @@ function VehicleDetailScreenContent({
           </Text>
         </View>
 
-        {orders.length === 0 ? (
+        {ordersError ? (
+          <ErrorMessage
+            title="No se pudieron cargar las órdenes"
+            message={ordersError}
+            onRetry={() => reload(true)}
+            testID="vehicle-detail-orders-error"
+          />
+        ) : orders.length === 0 ? (
           <EmptyState
             title="Sin órdenes de trabajo"
             message="Este vehículo no tiene órdenes visibles para tu cuenta."
