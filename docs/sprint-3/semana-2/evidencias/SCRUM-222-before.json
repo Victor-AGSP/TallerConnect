@@ -1,0 +1,36 @@
+{
+  "startTime": 1794670926681,
+  "numTotalTestSuites": 1,
+  "numPassedTestSuites": 0,
+  "numFailedTestSuites": 1,
+  "numPassedTests": 3,
+  "numFailedTests": 1,
+  "numPendingTests": 0,
+  "success": false,
+  "environment": "Jest; dobles controlados; sin backend ni dispositivo",
+  "suites": [
+    {
+      "file": "__tests__/budget-demo-empty.test.tsx",
+      "status": "failed",
+      "tests": [
+        {
+          "name": "DEMO: ausencia de presupuesto muestra vacío explícito sin total ficticio y permite navegar",
+          "status": "failed",
+          "failure": "Error: Unable to find an element with testID: demo-budget-empty\n\n\u001b[36m<RNCSafeAreaProvider>\u001b[39m\n  \u001b[36m<RNCSafeAreaProvider>\u001b[39m\n    \u001b[36m<RNCSafeAreaView>\u001b[39m\n      \u001b[36m<RNCSafeAreaView>\u001b[39m\n        \u001b[36m<View>\u001b[39m\n          \u001b[36m<RCTScrollView>\u001b[39m\n            \u001b[36m<View>\u001b[39m\n              \u001b[36m<View>\u001b[39m\n                \u001b[36m<Text>\u001b[39m\n                  \u001b[0mPortal del cliente\u001b[0m\n                \u001b[36m</Text>\u001b[39m\n                \u001b[36m<Text\u001b[39m\n                  \u001b[33maccessibilityRole\u001b[39m=\u001b[32m\"header\"\u001b[39m\n                \u001b[36m>\u001b[39m\n                  \u001b[0mDetalle del presupuesto\u001b[0m\n                \u001b[36m</Text>\u001b[39m\n                \u001b[36m<Text>\u001b[39m\n                  \u001b[0mRevisa los trabajos y repuestos considerados para tu vehículo.\u001b[0m\n                \u001b[36m</Text>\u001b[39m\n              \u001b[36m</View>\u001b[39m\n              \u001b[36m<View>\u001b[39m\n                \u001b[36m<View>\u001b[39m\n                  \u001b[36m<View>\u001b[39m\n                    \u001b[36m<View>\u001b[39m\n                      \u001b[36m<View>\u001b[39m\n                        \u001b[36m<Text>\u001b[39m\n                          \u001b[0mORDEN DE TRABAJO\u001b[0m\n                        \u001b[36m</Text>\u001b[39m\n                        \u001b[36m<Text>\u001b[39m\n                          \u001b[0mSin orden\u001b[0m\n                        \u001b[36m</Text>\u001b[39m\n                      \u001b[36m</View>\u001b[39m\n                      \u001b[36m<View>\u001b[39m\n                        \u001b[36m<Text>\u001b[39m\n                          \u001b[0mSin estado\u001b[0m\n                        \u001b[36m</Text>\u001b[39m\n                      \u001b[36m</View>\u001b[39m\n                    \u001b[36m</View>\u001b[39m\n                    \u001b[36m<View />\u001b[39m\n                    \u001b[36m<View>\u001b[39m\n                      \u001b[36m<Text>\u001b[39m\n                        \u001b[0mFecha\u001b[0m\n                      \u001b[36m</Text>\u001b[39m\n                      \u001b[36m<Text>\u001b[39m\n                        \u001b[0mNo disponible\u001b[0m\n                      \u001b[36m</Text>\u001b[39m\n                    \u001b[36m</View>\u001b[39m\n                    \u001b[36m<View>\u001b[39m\n                      \u001b[36m<Text>\u001b[39m\n                        \u001b[0mVersión\u001b[0m\n                      \u001b[36m</Text>\u001b[39m\n                      \u001b[36m<Text>\u001b[39m\n                        \u001b[0m—\u001b[0m\n                      \u001b[36m</Text>\u001b[39m\n                    \u001b[36m</View>\u001b[39m\n                    \u001b[36m<View>\u001b[39m\n                      \u001b[36m<Text>\u001b[39m\n                        \u001b[0mVehículo\u001b[0m\n                      \u001b[36m</Text>\u001b[39m\n                      \u001b[36m<Text>\u001b[39m\n                        \u001b[0mNo disponible\u001b[0m\n                      \u001b[36m</Text>\u001b[39m\n                    \u001b[36m</View>\u001b[39m\n                  \u001b[36m</View>\u001b[39m\n                \u001b[36m</View>\u001b[39m\n                \u001b[36m<Text>\u001b[39m\n                  \u001b[0mDetalle de los trabajos\u001b[0m\n                \u001b[36m</Text>\u001b[39m\n                \u001b[36m<View>\u001b[39m\n                  \u001b[36m<View>\u001b[39m\n                    \u001b[36m<Text>\u001b[39m\n                      \u001b[0mNo hay trabajos disponibles para este presupuesto.\u001b[0m\n                    \u001b[36m</Text>\u001b[39m\n                  \u001b[36m</View>\u001b[39m\n                \u001b[36m</View>\u001b[39m\n                \u001b[36m<View>\u001b[39m\n                  \u001b[36m<View>\u001b[39m\n                    \u001b[36m<Text>\u001b[39m\n                      \u001b[0mTOTAL DEL PRESUPUESTO\u001b[0m\n                    \u001b[36m</Text>\u001b[39m\n                    \u001b[36m<Text>\u001b[39m\n                      \u001b[0m$0\u001b[0m\n                    \u001b[36m</Text>\u001b[39m\n                    \u001b[36m<Text>\u001b[39m\n                      \u001b[0mInformación de demostración obtenida desde BudgetService. Los datos todavía no se guardan ni se consultan en el backend.\u001b[0m\n                    \u001b[36m</Text>\u001b[39m\n                  \u001b[36m</View>\u001b[39m\n                \u001b[36m</View>\u001b[39m\n                \u001b[36m<View\u001b[39m\n                  \u001b[33maccessibilityLabel\u001b[39m=\u001b[32m\"Volver al inicio\"\u001b[39m\n                  \u001b[33maccessibilityRole\u001b[39m=\u001b[32m\"button\"\u001b[39m\n                  \u001b[33maccessibilityState\u001b[39m=\u001b[32m{\n                    {\n                      \"busy\": false,\n                      \"disabled\": false,\n                    }\n                  }\u001b[39m\n                  \u001b[33maccessible\u001b[39m=\u001b[32m{true}\u001b[39m\n                \u001b[36m>\u001b[39m\n                  \u001b[36m<Text>\u001b[39m\n                    \u001b[0mVolver al inicio\u001b[0m\n                  \u001b[36m</Text>\u001b[39m\n                \u001b[36m</View>\u001b[39m\n              \u001b[36m</View>\u001b[39m\n            \u001b[36m</View>\u001b[39m\n          \u001b[36m</RCTScrollView>\u001b[39m\n        \u001b[36m</View>\u001b[39m\n      \u001b[36m</RNCSafeAreaView>\u001b[39m\n    \u001b[36m</RNCSafeAreaView>\u001b[39m\n  \u001b[36m</RNCSafeAreaProvider>\u001b[39m\n\u001b[36m</RNCSafeAreaProvider>\u001b[39m\n"
+        },
+        {
+          "name": "modo real con lista vacía no consulta ni muestra el presupuesto demo",
+          "status": "passed"
+        },
+        {
+          "name": "un error HTTP real simulado se presenta como error, nunca como vacío demo",
+          "status": "passed"
+        },
+        {
+          "name": "una carga pendiente permanece en loading hasta resolver la lista vacía",
+          "status": "passed"
+        }
+      ]
+    }
+  ]
+}

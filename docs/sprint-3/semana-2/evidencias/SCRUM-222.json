@@ -1,0 +1,225 @@
+{
+  "startTime": 1794670896063,
+  "numTotalTestSuites": 4,
+  "numPassedTestSuites": 4,
+  "numFailedTestSuites": 0,
+  "numPassedTests": 47,
+  "numFailedTests": 0,
+  "numPendingTests": 0,
+  "success": true,
+  "environment": "Jest; dobles controlados; sin backend ni dispositivo",
+  "suites": [
+    {
+      "file": "__tests__/budget-demo-empty.test.tsx",
+      "status": "passed",
+      "tests": [
+        {
+          "name": "DEMO: ausencia de presupuesto muestra vacío explícito sin total ficticio y permite navegar",
+          "status": "passed"
+        },
+        {
+          "name": "modo real con lista vacía no consulta ni muestra el presupuesto demo",
+          "status": "passed"
+        },
+        {
+          "name": "un error HTTP real simulado se presenta como error, nunca como vacío demo",
+          "status": "passed"
+        },
+        {
+          "name": "una carga pendiente permanece en loading hasta resolver la lista vacía",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "file": "__tests__/budget-views-integration.test.tsx",
+      "status": "passed",
+      "tests": [
+        {
+          "name": "Orden → presupuesto el cliente abre el presupuesto desde el detalle de la orden",
+          "status": "passed"
+        },
+        {
+          "name": "Orden → presupuesto el administrador abre el presupuesto desde el detalle de la orden",
+          "status": "passed"
+        },
+        {
+          "name": "Orden → presupuesto el mecánico no tiene acceso al presupuesto desde la orden",
+          "status": "passed"
+        },
+        {
+          "name": "Representación del presupuesto muestra total, estado, ítems con repuesto/proveedor e importes",
+          "status": "passed"
+        },
+        {
+          "name": "Representación del presupuesto el administrador no puede decidir el presupuesto",
+          "status": "passed"
+        },
+        {
+          "name": "Representación del presupuesto muestra la decisión registrada de una versión aprobada",
+          "status": "passed"
+        },
+        {
+          "name": "Representación del presupuesto indica la versión vigente cuando hay una modificación pendiente",
+          "status": "passed"
+        },
+        {
+          "name": "Representación del presupuesto muestra el estado vacío si la orden no tiene presupuesto",
+          "status": "passed"
+        },
+        {
+          "name": "Representación del presupuesto muestra el error de carga y se recupera con el reintento",
+          "status": "passed"
+        },
+        {
+          "name": "Decisión del cliente aprueba tras confirmar, muestra el efecto y recarga el presupuesto",
+          "status": "passed"
+        },
+        {
+          "name": "Decisión del cliente informa los repuestos faltantes al aprobar sin stock suficiente",
+          "status": "passed"
+        },
+        {
+          "name": "Decisión del cliente exige el motivo antes de rechazar",
+          "status": "passed"
+        },
+        {
+          "name": "Decisión del cliente el primer rechazo advierte y confirma la cancelación del servicio",
+          "status": "passed"
+        },
+        {
+          "name": "Decisión del cliente rechazar una modificación no pide cancelar el servicio",
+          "status": "passed"
+        },
+        {
+          "name": "Decisión del cliente permite volver sin enviar la decisión",
+          "status": "passed"
+        },
+        {
+          "name": "Decisión del cliente muestra el error del MS3 y conserva el formulario",
+          "status": "passed"
+        },
+        {
+          "name": "Decisión del cliente ante una aplicación pendiente reintenta sin volver a decidir",
+          "status": "passed"
+        },
+        {
+          "name": "Restricciones de acceso por rol el rol cliente no accede a /ordenes/31/presupuesto ni consulta el MS3",
+          "status": "passed"
+        },
+        {
+          "name": "Restricciones de acceso por rol el rol mecanico no accede a /ordenes/31/presupuesto ni consulta el MS3",
+          "status": "passed"
+        },
+        {
+          "name": "Restricciones de acceso por rol el rol administrador no accede a /mis-ordenes/31/presupuesto ni consulta el MS3",
+          "status": "passed"
+        },
+        {
+          "name": "Restricciones de acceso por rol el rol mecanico no accede a /mis-ordenes/31/presupuesto ni consulta el MS3",
+          "status": "passed"
+        },
+        {
+          "name": "Restricciones de acceso por rol el rol cliente accede a /mis-ordenes/31/presupuesto a través de su layout",
+          "status": "passed"
+        },
+        {
+          "name": "Restricciones de acceso por rol el rol administrador accede a /ordenes/31/presupuesto a través de su layout",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "file": "__tests__/views-accessibility.test.tsx",
+      "status": "passed",
+      "tests": [
+        {
+          "name": "StatusPill se anuncia como texto usando su etiqueta visible",
+          "status": "passed"
+        },
+        {
+          "name": "StatusPill permite describir el estado con una etiqueta explícita",
+          "status": "passed"
+        },
+        {
+          "name": "vista de vehículo y orden del cliente expone el título principal y los títulos de tarjeta como encabezados",
+          "status": "passed"
+        },
+        {
+          "name": "vista de vehículo y orden del cliente describe el estado del vehículo y del presupuesto sin depender del color",
+          "status": "passed"
+        },
+        {
+          "name": "vista de vehículo y orden del cliente comunica el estado de cada etapa del seguimiento como texto",
+          "status": "passed"
+        },
+        {
+          "name": "vista de vehículo y orden del cliente agrupa los datos del vehículo y de la orden en una sola etiqueta",
+          "status": "passed"
+        },
+        {
+          "name": "vista de vehículo y orden del cliente oculta el icono decorativo de evidencias a los lectores de pantalla",
+          "status": "passed"
+        },
+        {
+          "name": "vista de vehículo y orden del cliente mantiene el cierre de sesión como control accesible y enfocable",
+          "status": "passed"
+        },
+        {
+          "name": "vista de órdenes del mecánico expone los títulos de la vista como encabezados",
+          "status": "passed"
+        },
+        {
+          "name": "vista de órdenes del mecánico describe el estado de la orden y de sus etapas sin depender del color",
+          "status": "passed"
+        },
+        {
+          "name": "vista de órdenes del mecánico agrupa cada orden del listado con su vehículo y estado",
+          "status": "passed"
+        },
+        {
+          "name": "vista de órdenes del mecánico agrupa las métricas y los detalles de la orden",
+          "status": "passed"
+        },
+        {
+          "name": "vista de órdenes del mecánico no anuncia como botones las tarjetas de acción que aún no tienen acción asociada",
+          "status": "passed"
+        },
+        {
+          "name": "vista de vehículos y órdenes del administrador expone los títulos de la vista como encabezados",
+          "status": "passed"
+        },
+        {
+          "name": "vista de vehículos y órdenes del administrador agrupa cada orden con su patente y estado",
+          "status": "passed"
+        },
+        {
+          "name": "vista de vehículos y órdenes del administrador agrupa el resumen por estado, los mecánicos y las aprobaciones pendientes",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "file": "__tests__/cliente-real.test.tsx",
+      "status": "passed",
+      "tests": [
+        {
+          "name": "Consulta del cliente sin demostración ofrece la consulta real de vehículos sin inventar una orden o presupuesto",
+          "status": "passed"
+        },
+        {
+          "name": "Consulta del cliente sin demostración no consulta ni selecciona una orden fija si falta su identificador",
+          "status": "passed"
+        },
+        {
+          "name": "Consulta del cliente sin demostración consulta el servicio para la orden solicitada y conserva el resultado vacío",
+          "status": "passed"
+        },
+        {
+          "name": "Consulta del cliente sin demostración muestra el error de consulta sin sustituirlo por presupuesto demo",
+          "status": "passed"
+        }
+      ]
+    }
+  ]
+}
