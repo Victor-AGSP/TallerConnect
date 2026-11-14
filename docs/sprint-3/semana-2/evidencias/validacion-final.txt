@@ -1,0 +1,153 @@
+Validación final 2026-11-14, Victor
+Suite completa exit 0: 83 suites / 1320 PASS / 0 FAIL
+Regresión exit 0: 46 suites / 866 PASS / 0 FAIL (subconjunto)
+TypeScript exit 0
+Lint exit 0: 0 errores, 46 advertencias preexistentes
+Exportación Android exit 0; ejecución en dispositivo no observada
+git fsck --full --no-reflogs: exit 0; dangling informativos, sin eliminar
+git diff a1fd1fe --check: exit 0
+Matriz de defectos: 7 filas completas, IDs únicos y evidencias existentes; 6 corregidos, 1 abierto
+
+Archivo de salida: final-suite.log
+npm notice run tallerconnect@1.0.0 test
+npm notice run jest --runInBand --json --outputFile=/tmp/tallerconnect-s3s2/final-suite.json
+
+Test Suites: 83 passed, 83 total
+Tests:       1320 passed, 1320 total
+Snapshots:   0 total
+Time:        19.135 s
+Ran all test suites.
+Test results written to: ../../../../../tmp/tallerconnect-s3s2/final-suite.json
+
+Archivo de salida: final-regression.log
+npm notice run tallerconnect@1.0.0 test:regression
+npm notice run jest --runInBand --config jest.regression.config.cjs --json --outputFile=/tmp/tallerconnect-s3s2/final-regression.json
+
+Test Suites: 46 passed, 46 total
+Tests:       866 passed, 866 total
+Snapshots:   0 total
+Time:        14.528 s
+Ran all test suites.
+Test results written to: ../../../../../tmp/tallerconnect-s3s2/final-regression.json
+
+Archivo de salida: final-typecheck.log
+npm notice run tallerconnect@1.0.0 typecheck
+npm notice run tsc --noEmit
+
+Archivo de salida: final-lint.log
+npm notice run tallerconnect@1.0.0 lint
+npm notice run expo lint
+env: load .env.local .env
+env: export EXPO_PUBLIC_API_URL EXPO_PUBLIC_APP_ENV EXPO_PUBLIC_DEMO_WORKFLOW EXPO_PUBLIC_ENABLE_NOTIFICATIONS_API EXPO_PUBLIC_USE_MOCK_AUTH EXPO_PUBLIC_USE_MOCK_SERVICES EXPO_PUBLIC_HTTP_TRACE
+npm notice run tallerconnect@1.0.0 npx
+npm notice run 'eslint' /home/victor/Documents/Proyectos/TallerConnect/src --fix=false --cache=true --cache-location=/home/victor/Documents/Proyectos/TallerConnect/.expo/cache/eslint/
+
+/home/victor/Documents/Proyectos/TallerConnect/src/__tests__/interceptors.test.ts
+  180:22  warning  Caution: `axios` also has a named export `AxiosHeaders`. Check if you meant to write `import {AxiosHeaders} from 'axios'` instead  import/no-named-as-default-member
+  192:22  warning  Caution: `axios` also has a named export `create`. Check if you meant to write `import {create} from 'axios'` instead              import/no-named-as-default-member
+  195:19  warning  Array type using 'Array<T>' is forbidden. Use 'T[]' instead                                                                        @typescript-eslint/array-type
+  199:22  warning  Caution: `axios` also has a named export `AxiosHeaders`. Check if you meant to write `import {AxiosHeaders} from 'axios'` instead  import/no-named-as-default-member
+  208:22  warning  Caution: `axios` also has a named export `create`. Check if you meant to write `import {create} from 'axios'` instead              import/no-named-as-default-member
+  211:19  warning  Array type using 'Array<T>' is forbidden. Use 'T[]' instead                                                                        @typescript-eslint/array-type
+  215:22  warning  Caution: `axios` also has a named export `AxiosHeaders`. Check if you meant to write `import {AxiosHeaders} from 'axios'` instead  import/no-named-as-default-member
+  224:22  warning  Caution: `axios` also has a named export `create`. Check if you meant to write `import {create} from 'axios'` instead              import/no-named-as-default-member
+  228:19  warning  Array type using 'Array<T>' is forbidden. Use 'T[]' instead                                                                        @typescript-eslint/array-type
+  232:22  warning  Caution: `axios` also has a named export `AxiosHeaders`. Check if you meant to write `import {AxiosHeaders} from 'axios'` instead  import/no-named-as-default-member
+  244:22  warning  Caution: `axios` also has a named export `create`. Check if you meant to write `import {create} from 'axios'` instead              import/no-named-as-default-member
+  248:19  warning  Array type using 'Array<T>' is forbidden. Use 'T[]' instead                                                                        @typescript-eslint/array-type
+  252:22  warning  Caution: `axios` also has a named export `AxiosHeaders`. Check if you meant to write `import {AxiosHeaders} from 'axios'` instead  import/no-named-as-default-member
+  265:22  warning  Caution: `axios` also has a named export `create`. Check if you meant to write `import {create} from 'axios'` instead              import/no-named-as-default-member
+  269:19  warning  Array type using 'Array<T>' is forbidden. Use 'T[]' instead                                                                        @typescript-eslint/array-type
+  273:22  warning  Caution: `axios` also has a named export `AxiosHeaders`. Check if you meant to write `import {AxiosHeaders} from 'axios'` instead  import/no-named-as-default-member
+  285:22  warning  Caution: `axios` also has a named export `create`. Check if you meant to write `import {create} from 'axios'` instead              import/no-named-as-default-member
+  289:19  warning  Array type using 'Array<T>' is forbidden. Use 'T[]' instead                                                                        @typescript-eslint/array-type
+  300:22  warning  Caution: `axios` also has a named export `create`. Check if you meant to write `import {create} from 'axios'` instead              import/no-named-as-default-member
+  304:19  warning  Array type using 'Array<T>' is forbidden. Use 'T[]' instead                                                                        @typescript-eslint/array-type
+  321:22  warning  Caution: `axios` also has a named export `create`. Check if you meant to write `import {create} from 'axios'` instead              import/no-named-as-default-member
+  325:19  warning  Array type using 'Array<T>' is forbidden. Use 'T[]' instead                                                                        @typescript-eslint/array-type
+  342:22  warning  Caution: `axios` also has a named export `create`. Check if you meant to write `import {create} from 'axios'` instead              import/no-named-as-default-member
+  346:19  warning  Array type using 'Array<T>' is forbidden. Use 'T[]' instead                                                                        @typescript-eslint/array-type
+  363:22  warning  Caution: `axios` also has a named export `create`. Check if you meant to write `import {create} from 'axios'` instead              import/no-named-as-default-member
+  367:19  warning  Array type using 'Array<T>' is forbidden. Use 'T[]' instead                                                                        @typescript-eslint/array-type
+  382:22  warning  Caution: `axios` also has a named export `create`. Check if you meant to write `import {create} from 'axios'` instead              import/no-named-as-default-member
+  386:19  warning  Array type using 'Array<T>' is forbidden. Use 'T[]' instead                                                                        @typescript-eslint/array-type
+  401:22  warning  Caution: `axios` also has a named export `create`. Check if you meant to write `import {create} from 'axios'` instead              import/no-named-as-default-member
+  405:19  warning  Array type using 'Array<T>' is forbidden. Use 'T[]' instead                                                                        @typescript-eslint/array-type
+  420:22  warning  Caution: `axios` also has a named export `create`. Check if you meant to write `import {create} from 'axios'` instead              import/no-named-as-default-member
+  424:19  warning  Array type using 'Array<T>' is forbidden. Use 'T[]' instead                                                                        @typescript-eslint/array-type
+
+/home/victor/Documents/Proyectos/TallerConnect/src/components/common/ConnectivityBanner.tsx
+  10:10  warning  'colors' is defined but never used  @typescript-eslint/no-unused-vars
+
+/home/victor/Documents/Proyectos/TallerConnect/src/dto/notification.dto.ts
+  4:3  warning  'NotificationPriority' is defined but never used  @typescript-eslint/no-unused-vars
+
+/home/victor/Documents/Proyectos/TallerConnect/src/mappers/evidence.mapper.ts
+  23:10  warning  'normalizeContext' is defined but never used  @typescript-eslint/no-unused-vars
+
+/home/victor/Documents/Proyectos/TallerConnect/src/services/api/client.ts
+  39:20  warning  Caution: `axios` also has a named export `create`. Check if you meant to write `import {create} from 'axios'` instead  import/no-named-as-default-member
+
+/home/victor/Documents/Proyectos/TallerConnect/src/services/api/interceptors.ts
+  135:7   warning  Caution: `axios` also has a named export `isAxiosError`. Check if you meant to write `import {isAxiosError} from 'axios'` instead  import/no-named-as-default-member
+  319:15  warning  Unused eslint-disable directive (no problems were reported from '@typescript-eslint/no-var-requires')
+  320:40  warning  A `require()` style import is forbidden                                                                                            @typescript-eslint/no-require-imports
+
+/home/victor/Documents/Proyectos/TallerConnect/src/services/api/types.ts
+  14:9  warning  Array type using 'Array<T>' is forbidden. Use 'T[]' instead  @typescript-eslint/array-type
+
+/home/victor/Documents/Proyectos/TallerConnect/src/services/auth.service.ts
+   50:19  warning  Array type using 'Array<T>' is forbidden. Use 'T[]' instead                                                                        @typescript-eslint/array-type
+  209:10  warning  Caution: `axios` also has a named export `isAxiosError`. Check if you meant to write `import {isAxiosError} from 'axios'` instead  import/no-named-as-default-member
+  222:9   warning  Caution: `axios` also has a named export `isAxiosError`. Check if you meant to write `import {isAxiosError} from 'axios'` instead  import/no-named-as-default-member
+
+/home/victor/Documents/Proyectos/TallerConnect/src/services/budgets.service.ts
+  1123:8  warning  Caution: `axios` also has a named export `isAxiosError`. Check if you meant to write `import {isAxiosError} from 'axios'` instead  import/no-named-as-default-member
+
+/home/victor/Documents/Proyectos/TallerConnect/src/stores/connectivityStore.ts
+  169:11  warning  Caution: `axios` also has a named export `isAxiosError`. Check if you meant to write `import {isAxiosError} from 'axios'` instead  import/no-named-as-default-member
+  187:9   warning  Caution: `axios` also has a named export `isAxiosError`. Check if you meant to write `import {isAxiosError} from 'axios'` instead  import/no-named-as-default-member
+
+✖ 46 problems (0 errors, 46 warnings)
+  0 errors and 16 warnings potentially fixable with the `--fix` option.
+
+
+Archivo de salida: final-android.log
+npm notice run tallerconnect@1.0.0 export:android
+npm notice run expo export --platform android --output-dir /tmp/tallerconnect-s3s2/android-final --max-workers 2
+env: load .env.local .env
+env: export EXPO_PUBLIC_API_URL EXPO_PUBLIC_APP_ENV EXPO_PUBLIC_DEMO_WORKFLOW EXPO_PUBLIC_ENABLE_NOTIFICATIONS_API EXPO_PUBLIC_USE_MOCK_AUTH EXPO_PUBLIC_USE_MOCK_SERVICES EXPO_PUBLIC_HTTP_TRACE
+Using src/app as the root directory for Expo Router.
+React Compiler enabled
+Starting Metro Bundler
+
+| (node:37) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+| (Use `node --trace-warnings ...` to show where the warning was created)
+| (node:37) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+| (Use `node --trace-warnings ...` to show where the warning was created)
+Android Bundled 17097ms node_modules/expo-router/entry.js (1569 modules)
+
+› Assets (27):
+node_modules/@expo-google-fonts/material-symbols/400Regular/MaterialSymbols_400Regular.ttf (973KB)
+node_modules/expo-router/assets/arrow_down.png (9.5KB)
+node_modules/expo-router/assets/arrow_right.xml (307B)
+node_modules/expo-router/assets/checkmark.xml (312B)
+node_modules/expo-router/assets/error.png (469B)
+node_modules/expo-router/assets/file.png (138B)
+node_modules/expo-router/assets/forward.png (188B)
+node_modules/expo-router/assets/pkg.png (364B)
+node_modules/expo-router/assets/react-navigation/elements/back-icon-mask.png (653B)
+node_modules/expo-router/assets/react-navigation/elements/back-icon.png (4 variations | 152B)
+node_modules/expo-router/assets/react-navigation/elements/clear-icon.png (4 variations | 425B)
+node_modules/expo-router/assets/react-navigation/elements/close-icon.png (4 variations | 235B)
+node_modules/expo-router/assets/react-navigation/elements/search-icon.png (4 variations | 599B)
+node_modules/expo-router/assets/sitemap.png (465B)
+node_modules/expo-router/assets/unmatched.png (4.8KB)
+
+› android bundles (1):
+_expo/static/js/android/entry-deab11649c98cb347c709c03cae042d6.hbc (4.6MB)
+
+› Files (1):
+metadata.json (1.9KB)
+
+Exported: /tmp/tallerconnect-s3s2/android-final
