@@ -1,0 +1,305 @@
+{
+  "startTime": 1794670377167,
+  "numTotalTestSuites": 6,
+  "numPassedTestSuites": 6,
+  "numFailedTestSuites": 0,
+  "numPassedTests": 64,
+  "numFailedTests": 0,
+  "numPendingTests": 0,
+  "success": true,
+  "environment": "Jest; dobles controlados; sin backend ni dispositivo",
+  "suites": [
+    {
+      "file": "__tests__/order-query-isolation.test.tsx",
+      "status": "passed",
+      "tests": [
+        {
+          "name": "retira incluso el título de la orden anterior mientras cambia el ID",
+          "status": "passed"
+        },
+        {
+          "name": "consulta el nuevo ID aunque siga pendiente el anterior y descarta su respuesta tardía",
+          "status": "passed"
+        },
+        {
+          "name": "retira la información privada al quitar el identificador",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "file": "__tests__/manual-refresh-retry.test.tsx",
+      "status": "passed",
+      "tests": [
+        {
+          "name": "reintento ante errores de consulta no reintenta por su cuenta: una consulta fallida se realiza una sola vez",
+          "status": "passed"
+        },
+        {
+          "name": "reintento ante errores de consulta el listado de vehículos ofrece reintentar y recupera los datos",
+          "status": "passed"
+        },
+        {
+          "name": "reintento ante errores de consulta el detalle de la orden ofrece reintentar y recupera los datos",
+          "status": "passed"
+        },
+        {
+          "name": "reintento ante errores de consulta vuelve a mostrar el error si el reintento también falla",
+          "status": "passed"
+        },
+        {
+          "name": "actualización manual actualizar vuelve a consultar sin ocultar los datos ya cargados",
+          "status": "passed"
+        },
+        {
+          "name": "actualización manual el detalle de la orden admite actualización manual",
+          "status": "passed"
+        },
+        {
+          "name": "actualización manual permite actualizar desde el estado vacío del listado",
+          "status": "passed"
+        },
+        {
+          "name": "prevención de peticiones duplicadas deshabilita el control de actualización mientras la consulta está en curso",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "file": "__tests__/order-role-access.test.tsx",
+      "status": "passed",
+      "tests": [
+        {
+          "name": "vistas de órdenes: acceso autorizado el rol cliente consulta su detalle con el token de la sesión",
+          "status": "passed"
+        },
+        {
+          "name": "vistas de órdenes: acceso autorizado el rol mecanico consulta su detalle con el token de la sesión",
+          "status": "passed"
+        },
+        {
+          "name": "vistas de órdenes: acceso autorizado el rol administrador consulta su detalle con el token de la sesión",
+          "status": "passed"
+        },
+        {
+          "name": "vistas de órdenes: protección visual por rol el rol cliente no accede al detalle de órdenes de administrador ni consulta al backend",
+          "status": "passed"
+        },
+        {
+          "name": "vistas de órdenes: protección visual por rol el rol cliente no accede al detalle de órdenes de mecanico ni consulta al backend",
+          "status": "passed"
+        },
+        {
+          "name": "vistas de órdenes: protección visual por rol el rol mecanico no accede al detalle de órdenes de administrador ni consulta al backend",
+          "status": "passed"
+        },
+        {
+          "name": "vistas de órdenes: protección visual por rol el rol mecanico no accede al detalle de órdenes de cliente ni consulta al backend",
+          "status": "passed"
+        },
+        {
+          "name": "vistas de órdenes: protección visual por rol el rol administrador no accede al detalle de órdenes de cliente ni consulta al backend",
+          "status": "passed"
+        },
+        {
+          "name": "vistas de órdenes: protección visual por rol el rol administrador no accede al detalle de órdenes de mecanico ni consulta al backend",
+          "status": "passed"
+        },
+        {
+          "name": "vistas de órdenes: protección visual por rol sin sesión, /mis-ordenes/31 redirige al login sin consultar al backend",
+          "status": "passed"
+        },
+        {
+          "name": "vistas de órdenes: protección visual por rol sin sesión, /ordenes-asignadas/31 redirige al login sin consultar al backend",
+          "status": "passed"
+        },
+        {
+          "name": "vistas de órdenes: protección visual por rol sin sesión, /ordenes/31 redirige al login sin consultar al backend",
+          "status": "passed"
+        },
+        {
+          "name": "vistas de órdenes: protección visual por rol no consulta la orden hasta que termina la recuperación de la sesión",
+          "status": "passed"
+        },
+        {
+          "name": "vistas de órdenes: autorización del backend un 401 del backend cierra la sesión y devuelve al login",
+          "status": "passed"
+        },
+        {
+          "name": "vistas de órdenes: autorización del backend una orden no visible para el usuario (404) muestra el error sin cerrar la sesión",
+          "status": "passed"
+        },
+        {
+          "name": "vistas de órdenes: autorización del backend un 403 del backend muestra el error de permisos sin cerrar la sesión (cliente)",
+          "status": "passed"
+        },
+        {
+          "name": "vistas de órdenes: autorización del backend un 403 del backend muestra el error de permisos sin cerrar la sesión (mecanico)",
+          "status": "passed"
+        },
+        {
+          "name": "vistas de órdenes: autorización del backend un 403 del backend muestra el error de permisos sin cerrar la sesión (administrador)",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "file": "__tests__/protected-routes.test.tsx",
+      "status": "passed",
+      "tests": [
+        {
+          "name": "rutas protegidas por sesión y rol redirige de /administrador al login si no hay una sesión autenticada",
+          "status": "passed"
+        },
+        {
+          "name": "rutas protegidas por sesión y rol redirige de /cliente al login si no hay una sesión autenticada",
+          "status": "passed"
+        },
+        {
+          "name": "rutas protegidas por sesión y rol redirige de /mecanico al login si no hay una sesión autenticada",
+          "status": "passed"
+        },
+        {
+          "name": "rutas protegidas por sesión y rol permite que el rol administrador acceda a su ruta",
+          "status": "passed"
+        },
+        {
+          "name": "rutas protegidas por sesión y rol permite que el rol cliente acceda a su ruta",
+          "status": "passed"
+        },
+        {
+          "name": "rutas protegidas por sesión y rol permite que el rol mecanico acceda a su ruta",
+          "status": "passed"
+        },
+        {
+          "name": "rutas protegidas por sesión y rol redirige al rol cliente a su propia ruta al intentar entrar a /administrador",
+          "status": "passed"
+        },
+        {
+          "name": "rutas protegidas por sesión y rol redirige al rol cliente a su propia ruta al intentar entrar a /mecanico",
+          "status": "passed"
+        },
+        {
+          "name": "rutas protegidas por sesión y rol redirige al rol mecanico a su propia ruta al intentar entrar a /administrador",
+          "status": "passed"
+        },
+        {
+          "name": "rutas protegidas por sesión y rol redirige al rol mecanico a su propia ruta al intentar entrar a /cliente",
+          "status": "passed"
+        },
+        {
+          "name": "rutas protegidas por sesión y rol redirige al rol administrador a su propia ruta al intentar entrar a /cliente",
+          "status": "passed"
+        },
+        {
+          "name": "rutas protegidas por sesión y rol redirige al rol administrador a su propia ruta al intentar entrar a /mecanico",
+          "status": "passed"
+        },
+        {
+          "name": "rutas protegidas por sesión y rol revalida la ruta abierta cuando la sesión cambia de cliente a mecanico",
+          "status": "passed"
+        },
+        {
+          "name": "rutas protegidas por sesión y rol revalida la ruta abierta cuando la sesión cambia de mecanico a administrador",
+          "status": "passed"
+        },
+        {
+          "name": "rutas protegidas por sesión y rol revalida la ruta abierta cuando la sesión cambia de administrador a cliente",
+          "status": "passed"
+        },
+        {
+          "name": "rutas protegidas por sesión y rol espera a que termine la recuperación de sesión antes de decidir la ruta",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "file": "__tests__/auth-session.test.tsx",
+      "status": "passed",
+      "tests": [
+        {
+          "name": "persistencia y recuperación de sesión no autentica si login no puede persistir la sesión",
+          "status": "passed"
+        },
+        {
+          "name": "persistencia y recuperación de sesión no autentica si setAuth no puede persistir la sesión",
+          "status": "passed"
+        },
+        {
+          "name": "persistencia y recuperación de sesión migra la sesión antigua y conserva las claves que usa Gateway",
+          "status": "passed"
+        },
+        {
+          "name": "persistencia y recuperación de sesión un fallo de lectura termina la carga sin borrar los datos recuperables",
+          "status": "passed"
+        },
+        {
+          "name": "persistencia y recuperación de sesión guarda en SecureStore la sesión devuelta por el login",
+          "status": "passed"
+        },
+        {
+          "name": "persistencia y recuperación de sesión recupera usuario, token y rol desde SecureStore",
+          "status": "passed"
+        },
+        {
+          "name": "persistencia y recuperación de sesión descarta una sesión malformada y termina la carga",
+          "status": "passed"
+        },
+        {
+          "name": "persistencia y recuperación de sesión elimina la sesión guardada al cerrar sesión",
+          "status": "passed"
+        },
+        {
+          "name": "persistencia y recuperación de sesión espera la recuperación antes de redirigir al inicio del rol guardado",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "file": "__tests__/use-data-query.test.ts",
+      "status": "passed",
+      "tests": [
+        {
+          "name": "useDataQuery: carga inicial no realiza ninguna petición si no hay consulta",
+          "status": "passed"
+        },
+        {
+          "name": "useDataQuery: carga inicial expone los datos devueltos por la consulta",
+          "status": "passed"
+        },
+        {
+          "name": "useDataQuery: carga inicial expone el mensaje del error propagado por la consulta",
+          "status": "passed"
+        },
+        {
+          "name": "useDataQuery: carga inicial recurre al mensaje propio si el error no aporta ninguno",
+          "status": "passed"
+        },
+        {
+          "name": "useDataQuery: carga inicial no reintenta por su cuenta ante un error",
+          "status": "passed"
+        },
+        {
+          "name": "useDataQuery: actualización manual vuelve a consultar sin volver al estado de carga inicial",
+          "status": "passed"
+        },
+        {
+          "name": "useDataQuery: actualización manual sirve como reintento tras un error",
+          "status": "passed"
+        },
+        {
+          "name": "useDataQuery: actualización manual no consulta nada si no hay consulta configurada",
+          "status": "passed"
+        },
+        {
+          "name": "useDataQuery: prevención de peticiones duplicadas descarta las consultas solicitadas mientras una sigue en curso",
+          "status": "passed"
+        },
+        {
+          "name": "useDataQuery: prevención de peticiones duplicadas vuelve a aceptar consultas cuando la anterior termina",
+          "status": "passed"
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,23 @@
+{
+  "timestamp": "2026-11-14T15:34:10.729678+00:00",
+  "environment": "production",
+  "authentication": "none",
+  "authenticatedRequests": 0,
+  "mutations": 0,
+  "bodyStored": false,
+  "sandboxAttempt": "DNS no resuelve (curl exit 6); repetido con acceso de red autorizado",
+  "requests": [
+    {
+      "method": "GET",
+      "path": "/api/ordenes",
+      "httpStatus": 504,
+      "result": "FAIL disponibilidad; autorización no evaluable"
+    },
+    {
+      "method": "GET",
+      "path": "/api/presupuestos",
+      "httpStatus": 401,
+      "result": "PASS rechazo anónimo"
+    }
+  ]
+}
