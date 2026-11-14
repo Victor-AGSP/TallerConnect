@@ -732,12 +732,16 @@ export class RealBudgetAdapter implements BudgetServiceAdapter {
   async getBudgetByOrderId(orderId: string | number): Promise<Budget | null> {
     const page = await this.getBudgetsPage({ orden_id: orderId });
     const match = page.items.find(
-      (b) => b.orderId === String(orderId) || page.items.length === 1
+      (b) => b.orderId === String(orderId)
     );
     if (!match) {
       return null;
     }
-    return this.getBudgetById(match.id);
+    const detail = await this.getBudgetById(match.id);
+    if (detail.orderId !== String(orderId) || detail.id !== match.id) {
+      throw new Error('El presupuesto recibido no corresponde a la orden solicitada.');
+    }
+    return detail;
   }
 
   async getBudgetVersion(
@@ -1166,6 +1170,9 @@ class LegacyBudgetService {
       const detail = await apiClient.get<BudgetDetailResponseDto>(
         `/presupuestos/${summary.presupuesto_id}`,
       );
+      if (detail.data?.orden_id !== ordenId || detail.data?.presupuesto_id !== summary.presupuesto_id) {
+        throw new Error('El presupuesto recibido no corresponde a la orden solicitada.');
+      }
       return mapLegacyBudgetDetailResponse(detail.data);
     } catch (error: unknown) {
       const normalized = normalizeApiError(error);
