@@ -8,12 +8,12 @@ export function formatPlate(plate: string): string {
 }
 
 export function formatMileage(mileage?: number | null): string {
-  if (mileage == null) return 'Sin kilometraje';
+  if (mileage == null || !Number.isFinite(mileage)) return 'Sin kilometraje';
   return `${mileage.toLocaleString('es-CL')} km`;
 }
 
 export function formatVehicleYear(year?: number | null): string {
-  if (year == null) return 'Sin año';
+  if (year == null || !Number.isFinite(year)) return 'Sin año';
   return String(year);
 }
 

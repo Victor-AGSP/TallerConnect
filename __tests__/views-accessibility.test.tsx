@@ -74,12 +74,26 @@ describe('StatusPill', () => {
 });
 
 describe('vista de vehículo y orden del cliente', () => {
+  beforeEach(() => {
+    jest.spyOn(ordersService, 'getOrders').mockResolvedValue([
+      mapOrderResponse(orderResponsePayloads.en_reparacion),
+      mapOrderResponse(orderResponsePayloads.esperando_aprobacion_presupuesto),
+    ]);
+    jest.spyOn(vehiclesService, 'getMyVehicles').mockResolvedValue([
+      mapVehicleResponse(vehicleResponsePayloads.completo),
+    ]);
+  });
+
+  afterEach(() => {
+    jest.restoreAllMocks();
+  });
+
   it('expone el título principal y los títulos de tarjeta como encabezados', async () => {
     await renderScreen('/cliente');
 
     expect(screen.getByRole('header', { name: 'Mi taller' })).toBeTruthy();
     expect(
-      screen.getByRole('header', { name: 'Vehículo en servicio' }),
+      await screen.findByRole('header', { name: 'Vehículo en servicio' }),
     ).toBeTruthy();
     expect(
       screen.getByRole('header', { name: 'Seguimiento de la orden' }),
@@ -87,16 +101,16 @@ describe('vista de vehículo y orden del cliente', () => {
     expect(
       screen.getByRole('header', { name: 'Orden de trabajo' }),
     ).toBeTruthy();
+    expect(
+      screen.getByRole('header', { name: 'Mis órdenes recientes' }),
+    ).toBeTruthy();
   });
 
-  it('describe el estado del vehículo y del presupuesto sin depender del color', async () => {
+  it('describe el estado del vehículo real sin depender del color', async () => {
     await renderScreen('/cliente');
 
     expect(
-      screen.getByLabelText('Estado del vehículo: En reparación'),
-    ).toBeTruthy();
-    expect(
-      screen.getByLabelText('Estado del presupuesto: Aprobado'),
+      await screen.findByLabelText('Estado del vehículo: En reparación'),
     ).toBeTruthy();
   });
 
@@ -104,7 +118,7 @@ describe('vista de vehículo y orden del cliente', () => {
     await renderScreen('/cliente');
 
     expect(
-      screen.getByLabelText(
+      await screen.findByLabelText(
         'Etapa: Vehículo recibido. Registro completado. Estado: Completado',
       ),
     ).toBeTruthy();
@@ -118,35 +132,50 @@ describe('vista de vehículo y orden del cliente', () => {
     ).toBeTruthy();
   });
 
-  it('agrupa los datos del vehículo y de la orden en una sola etiqueta', async () => {
+  it('agrupa los datos reales del vehículo, métricas y orden sin cifras fijas de demostración', async () => {
     await renderScreen('/cliente');
 
-    expect(screen.getByLabelText('Patente: AB-CD-12')).toBeTruthy();
+    expect(await screen.findByLabelText('Patente: ABCD12')).toBeTruthy();
     expect(
-      screen.getByLabelText('Servicio: Mantención preventiva'),
+      screen.getByLabelText('Vehículo: Toyota Corolla'),
     ).toBeTruthy();
-    expect(screen.getByLabelText('Total estimado: $125.000')).toBeTruthy();
-    expect(screen.getByLabelText('Presupuesto: $125.000')).toBeTruthy();
-    expect(screen.getByLabelText('Número: OT-00124')).toBeTruthy();
-    expect(screen.getByLabelText('Técnico: Mecánico asignado')).toBeTruthy();
+    expect(screen.getByLabelText('Órdenes registradas: 2')).toBeTruthy();
+    expect(screen.getByLabelText('Órdenes activas: 2')).toBeTruthy();
+    expect(screen.getByLabelText('Por aprobar: 1')).toBeTruthy();
+    expect(screen.getByLabelText('Vehículos registrados: 1')).toBeTruthy();
+    expect(screen.getByLabelText('Número: OT #105')).toBeTruthy();
+    expect(screen.getByLabelText('Técnico: Mecánico #2')).toBeTruthy();
+
+    expect(screen.queryByText('Información de demostración')).toBeNull();
+    expect(screen.queryByText('AB-CD-12')).toBeNull();
+    expect(screen.queryByText('$125.000')).toBeNull();
+    expect(screen.queryByText('OT-00124')).toBeNull();
   });
 
-  it('oculta el icono decorativo de evidencias a los lectores de pantalla', async () => {
+  it('muestra estado vacío cuando el cliente no tiene órdenes registradas', async () => {
+    jest.mocked(ordersService.getOrders).mockResolvedValueOnce([]);
+
     await renderScreen('/cliente');
 
-    // Queda fuera del árbol de accesibilidad: solo es alcanzable
-    // incluyendo explícitamente los elementos ocultos.
-    expect(screen.queryByTestId('cliente-media-icon')).toBeNull();
+    expect(
+      await screen.findByText('Sin órdenes registradas'),
+    ).toBeTruthy();
+    expect(screen.getByLabelText('Órdenes registradas: 0')).toBeTruthy();
+  });
 
-    const decoration = screen.getByTestId('cliente-media-icon', {
-      includeHiddenElements: true,
-    });
+  it('informa errores cuando falla la carga del resumen del cliente', async () => {
+    jest
+      .mocked(ordersService.getOrders)
+      .mockRejectedValueOnce(new Error('Servicio de órdenes no disponible'));
 
-    expect(decoration.props.accessible).toBe(false);
-    expect(decoration.props.accessibilityElementsHidden).toBe(true);
-    expect(decoration.props.importantForAccessibility).toBe(
-      'no-hide-descendants',
-    );
+    await renderScreen('/cliente');
+
+    expect(
+      await screen.findByText('Servicio de órdenes no disponible'),
+    ).toBeTruthy();
+    expect(
+      screen.getByRole('button', { name: 'Reintentar' }),
+    ).toBeTruthy();
   });
 
   it('mantiene el cierre de sesión como control accesible y enfocable', async () => {

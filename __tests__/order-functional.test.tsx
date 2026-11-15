@@ -241,7 +241,7 @@ describe('caso de uso: consultar una orden de trabajo', () => {
             ]
           : role === 'mecanico'
             ? ['get /ordenes']
-            : [];
+            : ['get /ordenes', 'get /vehiculos'];
 
       await waitFor(() =>
         expect(
@@ -303,11 +303,17 @@ describe('caso de uso: consultar una orden de trabajo', () => {
   it('el cliente recupera la orden reintentando tras agotarse los reintentos automáticos', async () => {
     jest.spyOn(console, 'warn').mockImplementation(() => {});
     // Petición inicial y los dos reintentos automáticos de GET (retry.ts).
-    adapter
-      .mockImplementationOnce(timeout)
-      .mockImplementationOnce(timeout)
-      .mockImplementationOnce(timeout)
-      .mockImplementationOnce((config) => ok(config, CONTRACT_ORDER));
+    let detailTimeouts = 3;
+    adapter.mockImplementation((config) => {
+      if (config.url === '/ordenes/31') {
+        return detailTimeouts-- > 0
+          ? timeout(config)
+          : ok(config, CONTRACT_ORDER);
+      }
+      if (config.url === '/ordenes') return ok(config, [CONTRACT_ORDER]);
+      if (config.url === '/vehiculos') return ok(config, [CONTRACT_VEHICLE]);
+      return fail(config, 404, { detail: `No simulado: ${config.method} ${config.url}` });
+    });
 
     const router = renderRouterWithProviders(routes, {
       initialUrl: '/login',
@@ -333,7 +339,7 @@ describe('caso de uso: consultar una orden de trabajo', () => {
         ),
       ).toBeTruthy(),
     );
-    expect(adapter).toHaveBeenCalledTimes(3);
+    expect(requestsTo('get', '/ordenes/31')).toHaveLength(3);
 
     await fireEvent.press(screen.getByRole('button', { name: 'Reintentar' }));
 
@@ -341,7 +347,7 @@ describe('caso de uso: consultar una orden de trabajo', () => {
       expect(screen.getByTestId('order-detail-31')).toBeTruthy(),
     );
     expect(screen.queryByTestId('order-detail-error')).toBeNull();
-    expect(adapter).toHaveBeenCalledTimes(4);
+    expect(requestsTo('get', '/ordenes/31')).toHaveLength(4);
     expect(useAuthStore.getState().isAuthenticated).toBe(true);
   });
 });
@@ -466,6 +472,8 @@ function backend({
   adapter.mockImplementation((config) => {
     const key = `${config.method} ${config.url}`;
 
+    if (key === 'get /ordenes') return ok(config, [CONTRACT_ORDER]);
+    if (key === 'get /vehiculos') return ok(config, [CONTRACT_VEHICLE]);
     if (key === 'get /ordenes/31') {
       return ok(config, {
         ...CONTRACT_ORDER,
@@ -1044,7 +1052,7 @@ describe('caso de uso: consultar vehículos, repuestos y proveedores', () => {
       const expectedCalls =
         role === 'mecanico'
           ? ['get /ordenes', request]
-          : [request];
+          : ['get /ordenes', 'get /vehiculos', request];
 
       expect(
         adapter.mock.calls.map(

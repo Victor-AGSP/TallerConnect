@@ -186,19 +186,22 @@ function OrderDetailScreenContent({
         >
           {vehicle ? (
             <View style={styles.vehicleInfo}>
-              <InfoRow label="Patente" value={vehicle.plate} />
+              <InfoRow
+                label="Patente"
+                value={vehicle.plate?.trim() || 'Sin patente'}
+              />
               <InfoRow
                 label="Marca"
-                value={vehicle.brand || 'Sin información'}
+                value={vehicle.brand?.trim() || 'Sin información'}
               />
               <InfoRow
                 label="Modelo"
-                value={vehicle.model || 'Sin información'}
+                value={vehicle.model?.trim() || 'Sin información'}
               />
               <InfoRow
                 label="Año"
                 value={
-                  vehicle.year !== null
+                  vehicle.year !== null && Number.isFinite(vehicle.year)
                     ? String(vehicle.year)
                     : 'Sin información'
                 }
@@ -299,7 +302,13 @@ function InfoRow({ label, value }: InfoRowProps) {
   return (
     <View style={styles.infoRow}>
       <Text style={styles.infoLabel}>{label}</Text>
-      <Text style={styles.infoValue}>{value}</Text>
+      <Text
+        style={styles.infoValue}
+        numberOfLines={3}
+        ellipsizeMode="tail"
+      >
+        {value || 'Sin información'}
+      </Text>
     </View>
   );
 }

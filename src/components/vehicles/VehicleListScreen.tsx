@@ -168,7 +168,13 @@ function VehicleCard({ vehicle, onPress }: VehicleCardProps) {
       <View style={styles.cardHeader}>
         <View style={styles.vehicleIdentity}>
           <Text style={styles.plateLabel}>PATENTE</Text>
-          <Text style={styles.plate}>{vehicle.plate}</Text>
+          <Text
+            style={styles.plate}
+            numberOfLines={1}
+            ellipsizeMode="tail"
+          >
+            {vehicle.plate?.trim() || 'Sin patente'}
+          </Text>
         </View>
 
         <View style={styles.vehicleBadge}>
@@ -181,16 +187,16 @@ function VehicleCard({ vehicle, onPress }: VehicleCardProps) {
       <View style={styles.infoGrid}>
         <InfoItem
           label="Marca"
-          value={vehicle.brand || 'Sin información'}
+          value={vehicle.brand?.trim() || 'Sin información'}
         />
         <InfoItem
           label="Modelo"
-          value={vehicle.model || 'Sin información'}
+          value={vehicle.model?.trim() || 'Sin información'}
         />
         <InfoItem
           label="Año"
           value={
-            vehicle.year !== null
+            vehicle.year !== null && Number.isFinite(vehicle.year)
               ? String(vehicle.year)
               : 'Sin información'
           }
@@ -198,7 +204,7 @@ function VehicleCard({ vehicle, onPress }: VehicleCardProps) {
         <InfoItem
           label="Kilometraje"
           value={
-            vehicle.mileage !== null
+            vehicle.mileage !== null && Number.isFinite(vehicle.mileage)
               ? `${vehicle.mileage.toLocaleString('es-CL')} km`
               : 'Sin información'
           }

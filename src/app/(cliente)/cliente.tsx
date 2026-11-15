@@ -1,7 +1,9 @@
+import { useCallback, useMemo } from 'react';
 import { useRouter } from 'expo-router';
-
 import {
   Platform,
+  Pressable,
+  RefreshControl,
   ScrollView,
   StyleSheet,
   Text,
@@ -9,21 +11,208 @@ import {
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
-import { Button, Card } from '@/components/common';
-import { StatusPill } from '@/components/ui/StatusPill';
-import { useAuthStore } from '@/stores/authStore';
-
 import {
-  colors,
-  radius,
-  spacing,
-} from '@/constants/theme';
+  Button,
+  Card,
+  EmptyState,
+  ErrorMessage,
+  Loading,
+} from '@/components/common';
+import { StatusPill, type StatusTone } from '@/components/ui/StatusPill';
+import {
+  ORDER_STATUS,
+  getOrderStatusLabel,
+  type WorkOrderStatus,
+} from '@/constants/orderStatus';
+import { colors, radius, spacing } from '@/constants/theme';
+import { useDataQuery } from '@/hooks/useDataQuery';
+import type { WorkOrder } from '@/models/order.model';
+import type { Vehicle } from '@/models/vehicle.model';
+import { ordersService } from '@/services/orders.service';
+import { vehiclesService } from '@/services/vehicles.service';
+import { useAuthStore } from '@/stores/authStore';
+import { formatDate } from '@/utils/formatters';
+
+interface ClientDashboardData {
+  orders: WorkOrder[];
+  vehicles: Vehicle[];
+}
+
+function getOrderStatusTone(status: WorkOrderStatus): StatusTone {
+  switch (status) {
+    case ORDER_STATUS.LISTO_PARA_ENTREGA:
+    case ORDER_STATUS.ENTREGADO:
+      return 'success';
+    case ORDER_STATUS.ESPERANDO_APROBACION_PRESUPUESTO:
+    case ORDER_STATUS.ESPERANDO_REPUESTOS:
+      return 'warning';
+    case ORDER_STATUS.PAUSADO_POR_PRESUPUESTO_RECHAZADO:
+    case ORDER_STATUS.CANCELADO:
+      return 'danger';
+    case ORDER_STATUS.EN_REPARACION:
+    case ORDER_STATUS.CONTROL_CALIDAD:
+    case ORDER_STATUS.ESPERANDO_DIAGNOSTICO:
+    default:
+      return 'info';
+  }
+}
+
+interface TimelineStage {
+  title: string;
+  detail: string;
+  completed?: boolean;
+  active?: boolean;
+}
+
+function buildOrderTimeline(status: WorkOrderStatus): TimelineStage[] {
+  switch (status) {
+    case ORDER_STATUS.RECIBIDO:
+      return [
+        { title: 'Vehículo recibido', detail: 'Ingreso registrado en taller', active: true },
+        { title: 'Diagnóstico', detail: 'Pendiente de revisión' },
+        { title: 'Reparación', detail: 'Pendiente' },
+        { title: 'Entrega', detail: 'Pendiente' },
+      ];
+    case ORDER_STATUS.ESPERANDO_DIAGNOSTICO:
+    case ORDER_STATUS.ESPERANDO_APROBACION_PRESUPUESTO:
+    case ORDER_STATUS.PAUSADO_POR_PRESUPUESTO_RECHAZADO:
+      return [
+        { title: 'Vehículo recibido', detail: 'Registro completado', completed: true },
+        {
+          title: 'Diagnóstico',
+          detail:
+            status === ORDER_STATUS.ESPERANDO_APROBACION_PRESUPUESTO
+              ? 'Esperando aprobación del presupuesto'
+              : status === ORDER_STATUS.PAUSADO_POR_PRESUPUESTO_RECHAZADO
+                ? 'Presupuesto rechazado'
+                : 'Diagnóstico en curso',
+          active: true,
+        },
+        { title: 'Reparación', detail: 'Pendiente' },
+        { title: 'Entrega', detail: 'Pendiente' },
+      ];
+    case ORDER_STATUS.ESPERANDO_REPUESTOS:
+    case ORDER_STATUS.EN_REPARACION:
+    case ORDER_STATUS.CONTROL_CALIDAD:
+      return [
+        { title: 'Vehículo recibido', detail: 'Registro completado', completed: true },
+        { title: 'Diagnóstico', detail: 'Revisión finalizada', completed: true },
+        {
+          title: 'Reparación',
+          detail:
+            status === ORDER_STATUS.ESPERANDO_REPUESTOS
+              ? 'Esperando repuestos'
+              : 'Trabajo actualmente en curso',
+          active: true,
+        },
+        { title: 'Entrega', detail: 'Pendiente' },
+      ];
+    case ORDER_STATUS.LISTO_PARA_ENTREGA:
+      return [
+        { title: 'Vehículo recibido', detail: 'Registro completado', completed: true },
+        { title: 'Diagnóstico', detail: 'Revisión finalizada', completed: true },
+        { title: 'Reparación', detail: 'Trabajo finalizado', completed: true },
+        { title: 'Entrega', detail: 'Vehículo listo para retiro', active: true },
+      ];
+    case ORDER_STATUS.ENTREGADO:
+      return [
+        { title: 'Vehículo recibido', detail: 'Registro completado', completed: true },
+        { title: 'Diagnóstico', detail: 'Revisión finalizada', completed: true },
+        { title: 'Reparación', detail: 'Trabajo finalizado', completed: true },
+        { title: 'Entrega', detail: 'Vehículo entregado', completed: true },
+      ];
+    case ORDER_STATUS.CANCELADO:
+      return [
+        { title: 'Vehículo recibido', detail: 'Registro completado', completed: true },
+        { title: 'Diagnóstico', detail: 'Orden cancelada' },
+        { title: 'Reparación', detail: 'Cancelada' },
+        { title: 'Entrega', detail: 'Cancelada' },
+      ];
+    default:
+      return [
+        { title: 'Vehículo recibido', detail: 'Registro completado', completed: true },
+        { title: 'Diagnóstico', detail: 'En evaluación', active: true },
+        { title: 'Reparación', detail: 'Pendiente' },
+        { title: 'Entrega', detail: 'Pendiente' },
+      ];
+  }
+}
 
 export default function ClienteScreen() {
   const router = useRouter();
-  const logout = useAuthStore(
-    (state) => state.logout
+  const logout = useAuthStore((state) => state.logout);
+
+  const fetchClientSummary = useCallback(async (): Promise<ClientDashboardData> => {
+    const [ordersResult, vehiclesResult] = await Promise.all([
+      ordersService.getOrders(),
+      Promise.resolve(vehiclesService.getMyVehicles?.())
+        .then((list) => (Array.isArray(list) ? list : []))
+        .catch(() => [] as Vehicle[]),
+    ]);
+
+    const sortedOrders = [...(Array.isArray(ordersResult) ? ordersResult : [])].sort(
+      (a, b) =>
+        new Date(b.updatedAt).getTime() - new Date(a.updatedAt).getTime(),
+    );
+
+    return {
+      orders: sortedOrders,
+      vehicles: vehiclesResult,
+    };
+  }, []);
+
+  const {
+    data,
+    errorMessage,
+    isLoading,
+    isRefreshing,
+    refresh,
+  } = useDataQuery(
+    fetchClientSummary,
+    'No fue posible consultar el resumen de tu taller.',
   );
+
+  const orders = useMemo(() => data?.orders ?? [], [data]);
+  const vehicles = useMemo(() => data?.vehicles ?? [], [data]);
+
+  const vehicleById = useMemo(
+    () => new Map(vehicles.map((vehicle) => [String(vehicle.id), vehicle])),
+    [vehicles],
+  );
+
+  const activeOrders = useMemo(
+    () =>
+      orders.filter(
+        (order) =>
+          order.status !== ORDER_STATUS.ENTREGADO &&
+          order.status !== ORDER_STATUS.CANCELADO,
+      ),
+    [orders],
+  );
+
+  const stats = useMemo(
+    () => ({
+      totalOrders: orders.length,
+      activeOrders: activeOrders.length,
+      awaitingApproval: orders.filter(
+        (order) =>
+          order.status === ORDER_STATUS.ESPERANDO_APROBACION_PRESUPUESTO,
+      ).length,
+      vehicles: vehicles.length,
+    }),
+    [activeOrders.length, orders, vehicles.length],
+  );
+
+  const featuredOrder = activeOrders[0] ?? orders[0] ?? null;
+  const featuredVehicle = featuredOrder
+    ? vehicleById.get(String(featuredOrder.vehicleId))
+    : undefined;
+
+  const handleLogout = useCallback(async () => {
+    await logout();
+    router.replace('/login');
+  }, [logout, router]);
+
   return (
     <SafeAreaView style={styles.root}>
       <ScrollView
@@ -31,287 +220,250 @@ export default function ClienteScreen() {
         showsVerticalScrollIndicator={false}
         keyboardShouldPersistTaps="handled"
         keyboardDismissMode={
-          Platform.OS === 'ios'
-            ? 'interactive'
-            : 'on-drag'
+          Platform.OS === 'ios' ? 'interactive' : 'on-drag'
+        }
+        refreshControl={
+          <RefreshControl
+            refreshing={isRefreshing}
+            onRefresh={() => {
+              void refresh();
+            }}
+          />
         }
       >
-        {/* =====================================
-            DECORACIÓN DE FONDO
-            ===================================== */}
-
-
-        {/* =====================================
-            ENCABEZADO
-            ===================================== */}
-
         <View style={styles.header}>
-          <Text style={styles.eyebrow}>
-            Portal del cliente
-          </Text>
+          <Text style={styles.eyebrow}>Portal del cliente</Text>
 
-          <Text
-            accessibilityRole="header"
-            style={styles.title}
-          >
+          <Text accessibilityRole="header" style={styles.title}>
             Mi taller
           </Text>
 
           <Text style={styles.subtitle}>
-            Consulta el estado de tu vehículo,
-            órdenes de trabajo y la información
-            asociada al servicio.
+            Consulta el estado de tu vehículo, órdenes de trabajo y la
+            información asociada al servicio.
           </Text>
         </View>
 
-        {/* =====================================
-            VEHÍCULO EN SERVICIO
-            ===================================== */}
-
-        <Card style={styles.card}>
-          <View style={styles.cardHeader}>
-            <View style={styles.cardHeaderText}>
-              <Text
-                accessibilityRole="header"
-                style={styles.cardTitle}
-              >
-                Vehículo en servicio
-              </Text>
-
-              <Text style={styles.cardSubtitle}>
-                Información de demostración
-              </Text>
-            </View>
-
-            <StatusPill
-              label="En reparación"
-              tone="success"
-              accessibilityLabel="Estado del vehículo: En reparación"
-            />
-          </View>
-
-          <View style={styles.vehicleBox}>
-            <View
-              accessible
-              accessibilityLabel="Patente: AB-CD-12"
-            >
-              <Text style={styles.smallLabel}>
-                PATENTE
-              </Text>
-
-              <Text style={styles.vehiclePlate}>
-                AB-CD-12
-              </Text>
-            </View>
-
-            <View
-              accessible
-              accessibilityLabel="Servicio: Mantención preventiva"
-              style={styles.vehicleInfo}
-            >
-              <Text style={styles.smallLabel}>
-                SERVICIO
-              </Text>
-
-              <Text style={styles.vehicleService}>
-                Mantención preventiva
-              </Text>
-            </View>
-          </View>
-        </Card>
-
-        {/* =====================================
-            SEGUIMIENTO
-            ===================================== */}
-
-        <Card style={styles.card}>
-          <Text
-            accessibilityRole="header"
-            style={styles.cardTitle}
-          >
-            Seguimiento de la orden
-          </Text>
-
-          <Text style={styles.cardSubtitle}>
-            Estado actual del servicio.
-          </Text>
-
-          <View style={styles.timeline}>
-            <TimelineItem
-              title="Vehículo recibido"
-              detail="Registro completado"
-              completed
-            />
-
-            <TimelineItem
-              title="Diagnóstico"
-              detail="Revisión finalizada"
-              completed
-            />
-
-            <TimelineItem
-              title="Reparación"
-              detail="Trabajo actualmente en curso"
-              active
-            />
-
-            <TimelineItem
-              title="Entrega"
-              detail="Pendiente"
-            />
-          </View>
-        </Card>
-
-        {/* =====================================
-            RESUMEN
-            ===================================== */}
-
-        <View style={styles.grid}>
-          <Metric
-            value="$125.000"
-            label="Presupuesto"
+        {errorMessage ? (
+          <ErrorMessage
+            testID="cliente-summary-error"
+            message={errorMessage}
+            onRetry={() => {
+              void refresh();
+            }}
           />
-
-          <Metric
-            value="3"
-            label="Repuestos"
+        ) : isLoading && !data ? (
+          <Loading
+            testID="cliente-summary-loading"
+            message="Cargando resumen de tu taller..."
           />
-
-          <Metric
-            value="4"
-            label="Evidencias"
-          />
-
-          <Metric
-            value="1"
-            label="Orden activa"
-          />
-        </View>
-
-        {/* =====================================
-            PRESUPUESTO
-            ===================================== */}
-
-        <Card style={styles.card}>
-          <Text
-            accessibilityRole="header"
-            style={styles.cardTitle}
-          >
-            Presupuesto
-          </Text>
-
-          <Text style={styles.cardSubtitle}>
-            Información proporcionada por el taller.
-          </Text>
-
-          <View style={styles.budgetRow}>
-            <View
-              accessible
-              accessibilityLabel="Total estimado: $125.000"
-            >
-              <Text style={styles.smallLabel}>
-                TOTAL ESTIMADO
-              </Text>
-
-              <Text style={styles.amount}>
-                $125.000
-              </Text>
+        ) : (
+          <>
+            <View style={styles.grid} testID="cliente-summary-metrics">
+              <Metric
+                label="Órdenes registradas"
+                value={String(stats.totalOrders)}
+              />
+              <Metric
+                label="Órdenes activas"
+                value={String(stats.activeOrders)}
+              />
+              <Metric
+                label="Por aprobar"
+                value={String(stats.awaitingApproval)}
+              />
+              <Metric
+                label="Vehículos registrados"
+                value={String(stats.vehicles)}
+              />
             </View>
 
-            <StatusPill
-              label="Aprobado"
-              tone="success"
-              accessibilityLabel="Estado del presupuesto: Aprobado"
-            />
-          </View>
+            {featuredOrder ? (
+              <>
+                <Card style={styles.card}>
+                  <View style={styles.cardHeader}>
+                    <View style={styles.cardHeaderText}>
+                      <Text
+                        accessibilityRole="header"
+                        style={styles.cardTitle}
+                      >
+                        Vehículo en servicio
+                      </Text>
 
-        </Card>
+                      <Text style={styles.cardSubtitle}>
+                        Orden OT #{featuredOrder.id}
+                      </Text>
+                    </View>
 
+                    <StatusPill
+                      label={getOrderStatusLabel(featuredOrder.status)}
+                      tone={getOrderStatusTone(featuredOrder.status)}
+                      accessibilityLabel={`Estado del vehículo: ${getOrderStatusLabel(featuredOrder.status)}`}
+                    />
+                  </View>
 
-        <Button
-          title="Ver detalle del presupuesto"
-          onPress={() => router.push('/presupuesto' as never)}
-          style={styles.logoutButton}
-        />
+                  <View style={styles.vehicleBox}>
+                    <View
+                      accessible
+                      accessibilityLabel={`Patente: ${featuredVehicle?.plate?.trim() || `Vehículo #${featuredOrder.vehicleId}`}`}
+                    >
+                      <Text style={styles.smallLabel}>PATENTE</Text>
 
-        {/* =====================================
-            EVIDENCIA MULTIMEDIA
-            ===================================== */}
+                      <Text
+                        style={styles.vehiclePlate}
+                        numberOfLines={1}
+                        ellipsizeMode="tail"
+                      >
+                        {featuredVehicle?.plate?.trim() ||
+                          `#${featuredOrder.vehicleId}`}
+                      </Text>
+                    </View>
 
-        <Card style={styles.card}>
-          <Text
-            accessibilityRole="header"
-            style={styles.cardTitle}
-          >
-            Evidencia multimedia
-          </Text>
+                    <View
+                      accessible
+                      accessibilityLabel={`Vehículo: ${
+                        [
+                          featuredVehicle?.brand?.trim(),
+                          featuredVehicle?.model?.trim(),
+                        ]
+                          .filter(Boolean)
+                          .join(' ') || 'Sin marca ni modelo registrados'
+                      }`}
+                      style={styles.vehicleInfo}
+                    >
+                      <Text style={styles.smallLabel}>VEHÍCULO</Text>
 
-          <Text style={styles.cardSubtitle}>
-            Fotografías y videos asociados al
-            servicio aparecerán aquí.
-          </Text>
+                      <Text
+                        style={styles.vehicleService}
+                        numberOfLines={2}
+                        ellipsizeMode="tail"
+                      >
+                        {[
+                          featuredVehicle?.brand?.trim(),
+                          featuredVehicle?.model?.trim(),
+                        ]
+                          .filter(Boolean)
+                          .join(' ') || 'Sin marca ni modelo registrados'}
+                      </Text>
+                    </View>
+                  </View>
+                </Card>
 
-          <View style={styles.mediaPlaceholder}>
-            <View
-              testID="cliente-media-icon"
-              accessible={false}
-              accessibilityElementsHidden
-              importantForAccessibility="no-hide-descendants"
-              style={styles.mediaIconCircle}
-            >
-              <Text style={styles.mediaIcon}>
-                ▧
-              </Text>
-            </View>
+                <Card style={styles.card}>
+                  <Text
+                    accessibilityRole="header"
+                    style={styles.cardTitle}
+                  >
+                    Seguimiento de la orden
+                  </Text>
 
-            <Text style={styles.mediaTitle}>
-              4 archivos disponibles
+                  <Text style={styles.cardSubtitle}>
+                    Estado actual del servicio.
+                  </Text>
+
+                  <View style={styles.timeline}>
+                    {buildOrderTimeline(featuredOrder.status).map((stage) => (
+                      <TimelineItem
+                        key={stage.title}
+                        title={stage.title}
+                        detail={stage.detail}
+                        completed={stage.completed}
+                        active={stage.active}
+                      />
+                    ))}
+                  </View>
+                </Card>
+
+                <Card style={styles.card}>
+                  <Text
+                    accessibilityRole="header"
+                    style={styles.cardTitle}
+                  >
+                    Orden de trabajo
+                  </Text>
+
+                  <View style={styles.orderInfo}>
+                    <InfoRow
+                      label="Número"
+                      value={`OT #${featuredOrder.id}`}
+                    />
+                    <InfoRow
+                      label="Estado"
+                      value={getOrderStatusLabel(featuredOrder.status)}
+                    />
+                    <InfoRow
+                      label="Última actualización"
+                      value={formatDate(featuredOrder.updatedAt)}
+                    />
+                    <InfoRow
+                      label="Técnico"
+                      value={
+                        featuredOrder.assignedMechanicId
+                          ? `Mecánico #${featuredOrder.assignedMechanicId}`
+                          : 'Sin mecánico asignado'
+                      }
+                    />
+                  </View>
+                </Card>
+              </>
+            ) : null}
+
+            <Text accessibilityRole="header" style={styles.sectionTitle}>
+              Mis órdenes recientes
             </Text>
 
-            <Text style={styles.mediaDescription}>
-              Evidencias asociadas a la orden.
-            </Text>
-          </View>
-        </Card>
+            {orders.length === 0 ? (
+              <EmptyState
+                testID="cliente-orders-empty"
+                title="Sin órdenes registradas"
+                message="No existen órdenes de trabajo asociadas a tu cuenta."
+              />
+            ) : (
+              orders.slice(0, 5).map((order) => {
+                const vehicle = vehicleById.get(String(order.vehicleId));
+                const vehicleLabel = vehicle?.plate?.trim()
+                  ? `Patente ${vehicle.plate.trim()}`
+                  : `Vehículo #${order.vehicleId}`;
 
-        {/* =====================================
-            INFORMACIÓN DE LA ORDEN
-            ===================================== */}
+                return (
+                  <Pressable
+                    key={order.id}
+                    accessibilityRole="button"
+                    accessibilityLabel={`Abrir orden ${order.id}`}
+                    onPress={() =>
+                      router.push({
+                        pathname: '/(cliente)/mis-ordenes/[id]' as never,
+                        params: { id: order.id },
+                      })
+                    }
+                    style={styles.orderCard}
+                  >
+                    <View style={styles.orderHeader}>
+                      <Text style={styles.orderNumber}>OT #{order.id}</Text>
+                      <Text style={styles.arrow}>›</Text>
+                    </View>
+                    <Text
+                      style={styles.info}
+                      numberOfLines={2}
+                      ellipsizeMode="tail"
+                    >
+                      Estado: {getOrderStatusLabel(order.status)}
+                    </Text>
+                    <Text
+                      style={styles.info}
+                      numberOfLines={1}
+                      ellipsizeMode="tail"
+                    >
+                      {vehicleLabel}
+                    </Text>
+                    <Text style={styles.link}>Ver detalle de la orden →</Text>
+                  </Pressable>
+                );
+              })
+            )}
+          </>
+        )}
 
-        <Card style={styles.card}>
-          <Text
-            accessibilityRole="header"
-            style={styles.cardTitle}
-          >
-            Orden de trabajo
-          </Text>
-
-          <View style={styles.orderInfo}>
-            <InfoRow
-              label="Número"
-              value="OT-00124"
-            />
-
-            <InfoRow
-              label="Estado"
-              value="En reparación"
-            />
-
-            <InfoRow
-              label="Prioridad"
-              value="Normal"
-            />
-
-            <InfoRow
-              label="Técnico"
-              value="Mecánico asignado"
-            />
-          </View>
-        </Card>
-
-        {/* =====================================
-            CERRAR SESIÓN
-            ===================================== */}
         <Button
           title="Ver mis vehículos"
           onPress={() => router.push('/(cliente)/mis-vehiculos' as never)}
@@ -321,9 +473,8 @@ export default function ClienteScreen() {
         <Button
           title="Cerrar sesión"
           variant="outline"
-          onPress={async () => {
-          await logout();
-          router.replace('/login');
+          onPress={() => {
+            void handleLogout();
           }}
           style={styles.logoutButton}
         />
@@ -347,8 +498,6 @@ function TimelineItem({
   completed?: boolean;
   active?: boolean;
 }) {
-  // El punto de color es la única señal visual del estado: se expone
-  // también como texto para lectores de pantalla.
   const state = completed
     ? 'Completado'
     : active
@@ -370,11 +519,11 @@ function TimelineItem({
       />
 
       <View style={styles.timelineText}>
-        <Text style={styles.timelineTitle}>
+        <Text style={styles.timelineTitle} numberOfLines={2}>
           {title}
         </Text>
 
-        <Text style={styles.timelineDetail}>
+        <Text style={styles.timelineDetail} numberOfLines={2}>
           {detail}
         </Text>
       </View>
@@ -395,11 +544,11 @@ function Metric({
       accessibilityLabel={`${label}: ${value}`}
       style={styles.metric}
     >
-      <Text style={styles.metricValue}>
+      <Text style={styles.metricValue} numberOfLines={1}>
         {value}
       </Text>
 
-      <Text style={styles.metricLabel}>
+      <Text style={styles.metricLabel} numberOfLines={2}>
         {label}
       </Text>
     </View>
@@ -419,11 +568,9 @@ function InfoRow({
       accessibilityLabel={`${label}: ${value}`}
       style={styles.infoRow}
     >
-      <Text style={styles.infoLabel}>
-        {label}
-      </Text>
+      <Text style={styles.infoLabel}>{label}</Text>
 
-      <Text style={styles.infoValue}>
+      <Text style={styles.infoValue} numberOfLines={2} ellipsizeMode="tail">
         {value}
       </Text>
     </View>
@@ -431,7 +578,7 @@ function InfoRow({
 }
 
 /* ==========================================
-   TEMA
+   TEMA Y ESTILOS
    ========================================== */
 
 const localTheme = {
@@ -439,422 +586,239 @@ const localTheme = {
   surface: colors.surface,
   surfaceSoft: colors.surfaceSoft,
   border: colors.border,
-
   primary: colors.primary,
-  primaryDark: colors.primary,
-
   text: colors.text,
   textSecondary: colors.textSecondary,
   textMuted: colors.textSecondary,
-
   accent: colors.accent,
-  info: colors.info,
   success: colors.success,
   warning: colors.warning,
-  danger: colors.danger,
 };
-
-/* ==========================================
-   ESTILOS
-   ========================================== */
 
 const styles = StyleSheet.create({
   root: {
     flex: 1,
     backgroundColor: localTheme.background,
   },
-
   container: {
-    paddingHorizontal: spacing.lg,
+    padding: spacing.lg,
     paddingBottom: spacing.xxl,
+    gap: spacing.lg,
   },
-
-  decorations: {
-    position: 'absolute',
-    top: 0,
-    right: 0,
-    bottom: 0,
-    left: 0,
-    overflow: 'hidden',
-  },
-
-  orbRedLarge: {
-    position: 'absolute',
-    width: 300,
-    height: 300,
-    borderRadius: 150,
-    backgroundColor: localTheme.primary,
-    top: -50,
-    right: -100,
-    opacity: 0.15,
-  },
-
-  orbDarkRed: {
-    position: 'absolute',
-    width: 200,
-    height: 200,
-    borderRadius: 100,
-    backgroundColor: localTheme.primaryDark,
-    top: 400,
-    left: -80,
-    opacity: 0.25,
-  },
-
-  crystalRed: {
-    position: 'absolute',
-    width: 80,
-    height: 80,
-    borderRadius: 16,
-    backgroundColor: localTheme.primary,
-    top: 150,
-    left: -20,
-    opacity: 0.15,
-    transform: [
-      {
-        rotate: '45deg',
-      },
-    ],
-  },
-
-  crystalGrey: {
-    position: 'absolute',
-    width: 100,
-    height: 100,
-    borderRadius: 20,
-    backgroundColor: colors.surfaceSoft,
-    bottom: 200,
-    right: -40,
-    opacity: 0.2,
-    transform: [
-      {
-        rotate: '45deg',
-      },
-    ],
-  },
-
-  ringStrong1: {
-    position: 'absolute',
-    width: 120,
-    height: 120,
-    borderRadius: 60,
-    borderWidth: 4,
-    borderColor: localTheme.primary,
-    top: 600,
-    right: -40,
-    opacity: 0.25,
-  },
-
-  ringStrong2: {
-    position: 'absolute',
-    width: 60,
-    height: 60,
-    borderRadius: 30,
-    borderWidth: 2,
-    borderColor: '#444444',
-    top: 50,
-    left: 40,
-    opacity: 0.3,
-  },
-
-  glowDot1: {
-    position: 'absolute',
-    width: 12,
-    height: 12,
-    borderRadius: 6,
-    backgroundColor: localTheme.primary,
-    top: 280,
-    left: 60,
-    opacity: 0.9,
-    shadowColor: localTheme.primary,
-    shadowOffset: {
-      width: 0,
-      height: 0,
-    },
-    shadowOpacity: 1,
-    shadowRadius: 10,
-    elevation: 4,
-  },
-
-  glowDot2: {
-    position: 'absolute',
-    width: 10,
-    height: 10,
-    borderRadius: 5,
-    backgroundColor: '#666666',
-    bottom: 100,
-    right: 70,
-    opacity: 0.5,
-  },
-
-  glowDot3: {
-    position: 'absolute',
-    width: 14,
-    height: 14,
-    borderRadius: 7,
-    backgroundColor: localTheme.primary,
-    top: 100,
-    right: 50,
-    opacity: 0.8,
-  },
-
   header: {
-    marginTop: spacing.xl,
-    marginBottom: spacing.xl,
+    marginTop: spacing.xs,
   },
-
   eyebrow: {
-    color: colors.accent,
-    fontSize: 13,
-    fontWeight: '900',
+    fontSize: 12,
+    fontWeight: '800',
+    letterSpacing: 1.5,
+    color: localTheme.accent,
     textTransform: 'uppercase',
-    letterSpacing: 0.5,
     marginBottom: 4,
   },
-
   title: {
-    color: localTheme.text,
-    fontSize: 30,
+    fontSize: 32,
     fontWeight: '900',
+    color: localTheme.text,
     letterSpacing: -0.5,
-    marginBottom: 8,
   },
-
   subtitle: {
-    color: localTheme.textSecondary,
     fontSize: 14,
-    lineHeight: 20,
+    color: localTheme.textSecondary,
+    marginTop: 6,
+    lineHeight: 21,
   },
-
+  sectionTitle: {
+    fontSize: 19,
+    fontWeight: '900',
+    color: localTheme.primary,
+    marginTop: spacing.xs,
+  },
   card: {
-    backgroundColor: localTheme.surface,
-    borderRadius: radius.lg,
-    borderWidth: 1,
-    borderColor: colors.border,
     padding: spacing.lg,
-    marginBottom: spacing.lg,
-
-    shadowColor: colors.primary,
-    shadowOffset: {
-      width: 0,
-      height: 8,
-    },
-    shadowOpacity: 0.4,
-    shadowRadius: 12,
-    elevation: 6,
+    borderRadius: radius.lg,
+    backgroundColor: localTheme.surface,
+    borderWidth: 1,
+    borderColor: localTheme.border,
   },
-
   cardHeader: {
     flexDirection: 'row',
-    alignItems: 'flex-start',
     justifyContent: 'space-between',
-    gap: spacing.md,
+    alignItems: 'center',
+    marginBottom: spacing.md,
+    gap: spacing.sm,
   },
-
   cardHeaderText: {
     flex: 1,
   },
-
   cardTitle: {
     color: localTheme.text,
     fontSize: 18,
     fontWeight: '900',
-    marginBottom: 4,
   },
-
   cardSubtitle: {
     color: localTheme.textSecondary,
     fontSize: 13,
-    marginBottom: spacing.lg,
+    marginTop: 4,
   },
-
   vehicleBox: {
+    marginTop: spacing.sm,
+    padding: spacing.md,
+    borderRadius: radius.md,
+    backgroundColor: localTheme.surfaceSoft,
+    borderWidth: 1,
+    borderColor: localTheme.border,
     flexDirection: 'row',
     justifyContent: 'space-between',
-    gap: spacing.lg,
-    paddingTop: spacing.md,
-    borderTopWidth: 1,
-    borderTopColor: localTheme.border,
+    alignItems: 'center',
+    gap: spacing.md,
   },
-
   vehicleInfo: {
     flex: 1,
+    alignItems: 'flex-end',
   },
-
   smallLabel: {
     color: localTheme.textMuted,
     fontSize: 10,
     fontWeight: '800',
-    letterSpacing: 0.5,
+    letterSpacing: 1,
   },
-
   vehiclePlate: {
-    marginTop: 5,
-    color: localTheme.text,
+    color: localTheme.primary,
     fontSize: 22,
     fontWeight: '900',
+    marginTop: 4,
+    letterSpacing: 1.2,
   },
-
   vehicleService: {
-    marginTop: 5,
     color: localTheme.text,
     fontSize: 14,
-    fontWeight: '700',
+    fontWeight: '800',
+    marginTop: 4,
+    textAlign: 'right',
   },
-
   timeline: {
-    gap: spacing.lg,
-  },
-
-  timelineRow: {
-    flexDirection: 'row',
+    marginTop: spacing.lg,
     gap: spacing.md,
   },
-
+  timelineRow: {
+    flexDirection: 'row',
+    alignItems: 'flex-start',
+    gap: spacing.md,
+  },
   timelineDot: {
     width: 12,
     height: 12,
-    marginTop: 4,
     borderRadius: 6,
     backgroundColor: localTheme.border,
+    marginTop: 4,
   },
-
   timelineCompleted: {
     backgroundColor: localTheme.success,
   },
-
   timelineActive: {
-    backgroundColor: localTheme.primary,
-    borderWidth: 2,
-    borderColor: localTheme.surfaceSoft,
+    backgroundColor: localTheme.warning,
   },
-
   timelineText: {
     flex: 1,
   },
-
   timelineTitle: {
     color: localTheme.text,
     fontWeight: '800',
+    fontSize: 14,
   },
-
   timelineDetail: {
-    marginTop: 2,
     color: localTheme.textSecondary,
-    fontSize: 13,
+    fontSize: 12,
+    marginTop: 2,
   },
-
   grid: {
     flexDirection: 'row',
     flexWrap: 'wrap',
-    gap: spacing.sm,
-    marginBottom: spacing.lg,
-  },
-
-  metric: {
-    width: '48%',
-    minHeight: 92,
-    backgroundColor: localTheme.surfaceSoft,
-    borderRadius: radius.md,
-    borderWidth: 1,
-    borderColor: colors.border,
-    padding: spacing.lg,
-    justifyContent: 'center',
-  },
-
-  metricValue: {
-    color: localTheme.text,
-    fontSize: 21,
-    fontWeight: '900',
-  },
-
-  metricLabel: {
-    color: localTheme.textSecondary,
-    marginTop: 4,
-    fontSize: 12,
-    fontWeight: '600',
-  },
-
-  budgetRow: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
     gap: spacing.md,
   },
-
-  amount: {
-    marginTop: 5,
-    color: localTheme.text,
-    fontSize: 25,
+  metric: {
+    width: '47%',
+    flexGrow: 1,
+    minHeight: 96,
+    padding: spacing.md,
+    borderRadius: radius.lg,
+    backgroundColor: localTheme.surface,
+    borderWidth: 1,
+    borderColor: localTheme.border,
+    justifyContent: 'center',
+  },
+  metricValue: {
+    color: localTheme.primary,
+    fontSize: 22,
     fontWeight: '900',
   },
-
-  mediaPlaceholder: {
-    minHeight: 120,
-    marginTop: spacing.sm,
-    borderRadius: radius.md,
-    backgroundColor: localTheme.surfaceSoft,
-    borderWidth: 1,
-    borderColor: colors.border,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-
-  mediaIconCircle: {
-    width: 48,
-    height: 48,
-    borderRadius: 24,
-    backgroundColor: colors.surfaceSoft,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-
-  mediaIcon: {
-    color: colors.accent,
-    fontSize: 24,
-  },
-
-  mediaTitle: {
-    marginTop: spacing.sm,
-    color: localTheme.text,
-    fontSize: 14,
-    fontWeight: '800',
-  },
-
-  mediaDescription: {
-    marginTop: 3,
+  metricLabel: {
     color: localTheme.textSecondary,
     fontSize: 12,
+    marginTop: 6,
+    fontWeight: '600',
   },
-
   orderInfo: {
-    marginTop: spacing.sm,
-    gap: 0,
+    marginTop: spacing.lg,
+    gap: spacing.md,
   },
-
   infoRow: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    paddingVertical: spacing.md,
+    gap: spacing.md,
+    paddingBottom: spacing.md,
     borderBottomWidth: 1,
     borderBottomColor: localTheme.border,
   },
-
   infoLabel: {
     color: localTheme.textSecondary,
     fontSize: 13,
   },
-
   infoValue: {
+    flex: 1,
+    textAlign: 'right',
     color: localTheme.text,
+    fontWeight: '800',
+    fontSize: 13,
+  },
+  orderCard: {
+    padding: spacing.md,
+    borderRadius: radius.lg,
+    backgroundColor: localTheme.surface,
+    borderWidth: 1,
+    borderColor: localTheme.border,
+    gap: spacing.xs,
+  },
+  orderHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+  },
+  orderNumber: {
+    fontSize: 17,
+    fontWeight: '900',
+    color: localTheme.primary,
+  },
+  arrow: {
+    fontSize: 20,
+    fontWeight: '900',
+    color: localTheme.accent,
+  },
+  info: {
+    fontSize: 13,
+    color: localTheme.textSecondary,
+  },
+  link: {
+    marginTop: spacing.xs,
     fontSize: 13,
     fontWeight: '800',
+    color: localTheme.accent,
   },
-
   navButton: {
-    marginTop: spacing.sm,
+    marginTop: spacing.xs,
   },
-
   logoutButton: {
     marginTop: spacing.sm,
     marginBottom: spacing.xl,

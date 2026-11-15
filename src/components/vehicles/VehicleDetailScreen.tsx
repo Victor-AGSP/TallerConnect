@@ -92,6 +92,9 @@ function getStatusLabel(status: WorkOrder['status']): string {
   return labels[status] ?? status;
 }
 
+export const VEHICLE_ORDERS_ERROR_MESSAGE =
+  'No fue posible cargar las órdenes de trabajo asociadas a este vehículo.';
+
 export function VehicleDetailScreen(props: VehicleDetailScreenProps) {
   return <VehicleDetailScreenContent key={props.vehicleId} {...props} />;
 }
@@ -106,26 +109,53 @@ function VehicleDetailScreenContent({
   const [orders, setOrders] = useState<WorkOrder[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
+  const [ordersErrorMessage, setOrdersErrorMessage] = useState<string | null>(
+    null,
+  );
   const [isRefreshing, setIsRefreshing] = useState(false);
 
-  const loadData = useCallback(() => vehiclesService.getVehicleById(vehicleId)
-    .then(async (vehicleResult) => {
-      setVehicle(vehicleResult);
-      try {
-        const ordersResult = await ordersService.getOrders();
-        setOrders(ordersResult.filter((order) => String(order.vehicleId) === String(vehicleResult.id)));
-      } catch (ordersError: unknown) {
-        console.error('[VehicleDetail] No se pudieron cargar las órdenes:', ordersError);
-        setOrders([]);
-      }
-    })
-    .catch((error: unknown) => {
-      setErrorMessage(error instanceof Error ? error.message : 'No fue posible cargar el detalle del vehículo.');
-    })
-    .finally(() => {
-      setIsLoading(false);
-      setIsRefreshing(false);
-    }), [vehicleId]);
+  const loadData = useCallback(
+    () =>
+      vehiclesService
+        .getVehicleById(vehicleId)
+        .then(async (vehicleResult) => {
+          setVehicle(vehicleResult);
+          setOrdersErrorMessage(null);
+          try {
+            const ordersResult = await ordersService.getOrders();
+            setOrders(
+              ordersResult.filter(
+                (order) =>
+                  String(order.vehicleId) === String(vehicleResult.id),
+              ),
+            );
+          } catch (ordersError: unknown) {
+            console.error(
+              '[VehicleDetail] No se pudieron cargar las órdenes:',
+              ordersError,
+            );
+            setOrders([]);
+            setOrdersErrorMessage(
+              ordersError instanceof Error &&
+                ordersError.message.trim().length > 0
+                ? ordersError.message
+                : VEHICLE_ORDERS_ERROR_MESSAGE,
+            );
+          }
+        })
+        .catch((error: unknown) => {
+          setErrorMessage(
+            error instanceof Error && error.message.trim().length > 0
+              ? error.message
+              : 'No fue posible cargar el detalle del vehículo.',
+          );
+        })
+        .finally(() => {
+          setIsLoading(false);
+          setIsRefreshing(false);
+        }),
+    [vehicleId],
+  );
 
   const reload = (refresh = false) => {
     if (refresh) {
@@ -134,6 +164,7 @@ function VehicleDetailScreenContent({
       setIsLoading(true);
     }
     setErrorMessage(null);
+    setOrdersErrorMessage(null);
     void loadData();
   };
 
@@ -201,7 +232,13 @@ function VehicleDetailScreenContent({
           <View style={styles.header}>
             <View style={styles.identity}>
               <Text style={styles.label}>PATENTE</Text>
-              <Text style={styles.plate}>{vehicle.plate}</Text>
+              <Text
+                style={styles.plate}
+                numberOfLines={1}
+                ellipsizeMode="tail"
+              >
+                {vehicle.plate?.trim() || 'Sin patente'}
+              </Text>
             </View>
 
             <View style={styles.badge}>
@@ -214,18 +251,18 @@ function VehicleDetailScreenContent({
           <View style={styles.infoGrid}>
             <InfoItem
               label="Marca"
-              value={vehicle.brand || 'Sin información'}
+              value={vehicle.brand?.trim() || 'Sin información'}
             />
 
             <InfoItem
               label="Modelo"
-              value={vehicle.model || 'Sin información'}
+              value={vehicle.model?.trim() || 'Sin información'}
             />
 
             <InfoItem
               label="Año"
               value={
-                vehicle.year !== null
+                vehicle.year !== null && Number.isFinite(vehicle.year)
                   ? String(vehicle.year)
                   : 'Sin información'
               }
@@ -234,13 +271,16 @@ function VehicleDetailScreenContent({
             <InfoItem
               label="Kilometraje"
               value={
-                vehicle.mileage !== null
+                vehicle.mileage !== null && Number.isFinite(vehicle.mileage)
                   ? `${vehicle.mileage.toLocaleString('es-CL')} km`
                   : 'Sin información'
               }
             />
 
-            <InfoItem label="Identificador" value={vehicle.id} />
+            <InfoItem
+              label="Identificador"
+              value={String(vehicle.id || 'Sin información')}
+            />
           </View>
         </Card>
 
@@ -258,17 +298,29 @@ function VehicleDetailScreenContent({
           <Text style={styles.sectionTitle}>Órdenes de trabajo</Text>
 
           <Text style={styles.sectionSubtitle}>
-            {orders.length === 0
-              ? 'No hay órdenes asociadas o no se pudieron cargar.'
-              : `${orders.length} ${
-                  orders.length === 1
-                    ? 'orden asociada'
-                    : 'órdenes asociadas'
-                }`}
+            {ordersErrorMessage
+              ? 'No se pudieron consultar las órdenes asociadas a este vehículo.'
+              : orders.length === 0
+                ? 'Este vehículo no registra órdenes de trabajo asociadas.'
+                : `${orders.length} ${
+                    orders.length === 1
+                      ? 'orden asociada'
+                      : 'órdenes asociadas'
+                  }`}
           </Text>
         </View>
 
-        {orders.length === 0 ? (
+        {ordersErrorMessage ? (
+          <ErrorMessage
+            title="No se pudieron cargar las órdenes"
+            message={ordersErrorMessage}
+            onRetry={() => {
+              void reload(true);
+            }}
+            retryLabel="Reintentar órdenes"
+            testID="vehicle-detail-orders-error"
+          />
+        ) : orders.length === 0 ? (
           <EmptyState
             title="Sin órdenes de trabajo"
             message="Este vehículo no tiene órdenes visibles para tu cuenta."
@@ -280,11 +332,21 @@ function VehicleDetailScreenContent({
               <View style={styles.orderHeader}>
                 <View style={styles.orderIdentity}>
                   <Text style={styles.orderLabel}>ORDEN DE TRABAJO</Text>
-                  <Text style={styles.orderId}>#{order.id}</Text>
+                  <Text
+                    style={styles.orderId}
+                    numberOfLines={1}
+                    ellipsizeMode="tail"
+                  >
+                    #{order.id}
+                  </Text>
                 </View>
 
                 <View style={styles.statusBadge}>
-                  <Text style={styles.statusText}>
+                  <Text
+                    style={styles.statusText}
+                    numberOfLines={2}
+                    ellipsizeMode="tail"
+                  >
                     {getStatusLabel(order.status)}
                   </Text>
                 </View>
@@ -335,7 +397,13 @@ function InfoItem({ label, value }: InfoItemProps) {
   return (
     <View style={styles.infoItem}>
       <Text style={styles.infoLabel}>{label}</Text>
-      <Text style={styles.infoValue}>{value}</Text>
+      <Text
+        style={styles.infoValue}
+        numberOfLines={2}
+        ellipsizeMode="tail"
+      >
+        {value || 'Sin información'}
+      </Text>
     </View>
   );
 }

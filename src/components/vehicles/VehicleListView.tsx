@@ -103,10 +103,10 @@ export function VehicleListView({
 }
 
 function VehicleCard({ vehicle }: { vehicle: Vehicle }) {
-  const plate = formatPlate(vehicle.plate);
+  const plate = formatPlate(vehicle.plate) || 'Sin patente';
   const year = formatVehicleYear(vehicle.year);
   const mileage = formatMileage(vehicle.mileage);
-  const description = [vehicle.brand, vehicle.model]
+  const description = [vehicle.brand?.trim(), vehicle.model?.trim()]
     .filter(Boolean)
     .join(' ');
 
@@ -118,16 +118,32 @@ function VehicleCard({ vehicle }: { vehicle: Vehicle }) {
         description || 'Marca y modelo no registrados'
       }. Año: ${year}. Kilometraje: ${mileage}`}
     >
-      <Text style={styles.plate}>{plate}</Text>
+      <Text
+        style={styles.plate}
+        numberOfLines={1}
+        ellipsizeMode="tail"
+      >
+        {plate}
+      </Text>
 
       {description ? (
-        <Text style={styles.description}>{description}</Text>
+        <Text
+          style={styles.description}
+          numberOfLines={2}
+          ellipsizeMode="tail"
+        >
+          {description}
+        </Text>
       ) : null}
 
       <View style={styles.specs}>
-        <Text style={styles.spec}>{year}</Text>
+        <Text style={styles.spec} numberOfLines={1}>
+          {year}
+        </Text>
         <Text style={styles.specSeparator}>·</Text>
-        <Text style={styles.spec}>{mileage}</Text>
+        <Text style={styles.spec} numberOfLines={1}>
+          {mileage}
+        </Text>
       </View>
     </Card>
   );
