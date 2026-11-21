@@ -21,7 +21,7 @@ export default function VehiculosAsignadosScreen() {
       title="Vehículos asignados"
       subtitle="Vehículos sobre los que tienes trabajo asignado."
       emptyMessage="No tienes vehículos asignados en este momento."
-      onOpenVehicle={(id) => router.push(`/(mecanico)/vehiculos/${id}`)}
+      onOpenVehicle={(id) => router.push(`/(mecanico)/vehiculos/${id}` as never)}
       loadVehicles={loadVehicles}
     />
   );

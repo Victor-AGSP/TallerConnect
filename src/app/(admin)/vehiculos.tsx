@@ -18,7 +18,7 @@ export default function VehiculosScreen() {
       title="Vehículos registrados"
       subtitle="Catálogo completo de vehículos del taller."
       emptyMessage="Todavía no hay vehículos registrados en el sistema."
-      onOpenVehicle={(id) => router.push(`/(admin)/vehiculos/${id}`)}
+      onOpenVehicle={(id) => router.push(`/(admin)/vehiculos/${id}` as never)}
       loadVehicles={loadVehicles}
     />
   );

@@ -1,108 +1,244 @@
 @startuml TallerConnect
-title TallerConnect: Arquitectura de Microservicios y Cliente Móvil\nDiagrama de Componentes UML
+title TallerConnect: Arquitectura de Microservicios y Cliente Móvil\nDiagrama de Componentes UML 2.0 (Componentes Compuestos, Puertos e Interfaces)
 
 skinparam shadowing false
 skinparam componentStyle rectangle
 skinparam packageStyle rectangle
+skinparam linetype ortho
 skinparam ArrowColor #1F4E79
+
 skinparam interface {
     BackgroundColor #FFFFFF
     BorderColor #1F4E79
 }
+
 skinparam component {
     BackgroundColor #F7F9FC
     BorderColor #1F4E79
 }
+
 skinparam database {
     BackgroundColor #EDF2F8
     BorderColor #1F4E79
 }
 
-' Actores que interactúan con el sistema
+skinparam port {
+    BackgroundColor #FFFFFF
+    BorderColor #1F4E79
+}
+
+' ===================================================================
+' ACTORES
+' ===================================================================
 actor Cliente
-actor Mecánico
+actor "Mecánico" as Mecanico
 actor Administrador
 
-' Capa 1: Presentación
+' ===================================================================
+' CAPA 1: PRESENTACIÓN
+' ===================================================================
 package "Capa de Presentación" {
     component "Aplicación Web\nReact (Integra II)" as Web
-    component "Aplicación Móvil\n(Integra IV)" as Mobile
+
+    component "Aplicación Móvil\nTallerConnect (Integra IV)" as Mobile {
+        portout " " as p_mob_out
+
+        component "UI Screens &\nNavigation (Expo Router)" as Mob_UI
+        component "State Store &\nSession (Zustand)" as Mob_State
+        component "API Client &\nInterceptors Layer" as Mob_Http
+
+        Mob_UI -(0- Mob_State : <<ensamblado>>
+        Mob_State -(0- Mob_Http : <<ensamblado>>
+        Mob_Http --> p_mob_out : <<delegación>>
+    }
 }
 
-' Interfaz unificada expuesta por la API Gateway (Lollipop)
-interface "API Gateway\n(HTTPS / JSON)" as I_Gateway
+' ===================================================================
+' CAPA 2: INTEGRACIÓN (API GATEWAY)
+' ===================================================================
+interface "API Gateway\nUnified HTTPS / JSON" as I_Gateway
 
-' Capa 2: Integración y ruteo
 package "Capa de Integración" {
-    component "API Gateway\n(Punto Único de Entrada)" as Gateway
+    component "API Gateway\n(Punto Único de Entrada)" as Gateway {
+        portin " " as p_gw_in
+        portout " " as p_gw_auth
+        portout " " as p_gw_orders
+        portout " " as p_gw_budgets
+        portout " " as p_gw_media
+
+        component "Reverse Proxy\nRouter" as GW_Router
+        component "Auth & JWT\nValidator" as GW_AuthFilter
+        component "RateLimiter &\nErrorNormalizer" as GW_ErrorFilter
+
+        p_gw_in --> GW_Router : <<delegación>>
+        GW_Router -(0- GW_AuthFilter : <<ensamblado>>
+        GW_Router -(0- GW_ErrorFilter : <<ensamblado>>
+
+        GW_Router --> p_gw_auth : <<delegación>>
+        GW_Router --> p_gw_orders : <<delegación>>
+        GW_Router --> p_gw_budgets : <<delegación>>
+        GW_Router --> p_gw_media : <<delegación>>
+    }
 }
 
-' Capa 3: Microservicios (Estructura oficial de 4 servicios)
+' ===================================================================
+' INTERFACES EXPUESTAS POR LOS MICROSERVICIOS (CONTRATOS OFICIALES)
+' ===================================================================
+interface "Auth & Users API\n(/auth/login, /registro, /usuarios)" as I_Auth
+interface "Vehicles & Orders API\n(/vehiculos, /ordenes, estados)" as I_Vehicles
+interface "Capacity & Notices API\n(/capacidad/*, /cancelaciones/pendientes)" as I_Capacity
+interface "Budgets & Parts API\n(/presupuestos, /repuestos, /proveedores)" as I_Budgets
+interface "Stock Alerts API\n(/inventario/alertas)" as I_Stock
+interface "Media Upload & Retrieval API\n(/evidencias multipart/form-data)" as I_Media
+
+' ===================================================================
+' CAPA 3: MICROSERVICIOS (ESTRUCTURA DE COMPONENTE COMPUESTO UML 2)
+' ===================================================================
 package "Capa de Microservicios" {
-    component "MS Autenticación\ny Usuarios" as MS_Auth
-    component "MS Vehículos y\nÓrdenes de Trabajo" as MS_Vehicles
-    component "MS Presupuestos, Repuestos\ny Proveedores" as MS_Budgets
-    component "MS Evidencia\nMultimedia" as MS_Media
+
+    ' ---------------------------------------------------------------
+    ' MS 1: Autenticación y Usuarios
+    ' ---------------------------------------------------------------
+    component "MS 1: Autenticación y Usuarios" as MS_Auth {
+        portin " " as p_auth_in
+        portout " " as p_auth_db
+
+        component "AuthController\n(REST Endpoints)" as C_Auth
+        component "AuthService &\nTokenManager (JWT)" as S_Auth
+        component "UserRepository\n(DAO / ORM)" as R_Auth
+
+        p_auth_in --> C_Auth : <<delegación>>
+        C_Auth -(0- S_Auth : <<ensamblado>>
+        S_Auth -(0- R_Auth : <<ensamblado>>
+        R_Auth --> p_auth_db : <<delegación>>
+    }
+
+    ' ---------------------------------------------------------------
+    ' MS 2: Vehículos y Órdenes de Trabajo
+    ' ---------------------------------------------------------------
+    component "MS 2: Vehículos y Órdenes de Trabajo" as MS_Vehicles {
+        portin " " as p_veh_in
+        portin " " as p_cap_in
+        portout " " as p_veh_db
+
+        component "Vehicles & Orders\nController" as C_Orders
+        component "OrderWorkflowEngine\n(Máquina de Estados)" as S_Workflow
+        component "WorkshopCapacityService\n(Cupos & Mecánicos)" as S_Capacity
+        component "VehiclesOrdersRepository\n(DAO / ORM)" as R_Orders
+
+        p_veh_in --> C_Orders : <<delegación>>
+        p_cap_in --> S_Capacity : <<delegación>>
+        C_Orders -(0- S_Workflow : <<ensamblado>>
+        C_Orders -(0- S_Capacity : <<ensamblado>>
+        S_Workflow -(0- R_Orders : <<ensamblado>>
+        S_Capacity -(0- R_Orders : <<ensamblado>>
+        R_Orders --> p_veh_db : <<delegación>>
+    }
+
+    ' ---------------------------------------------------------------
+    ' MS 3: Presupuestos, Repuestos y Proveedores
+    ' ---------------------------------------------------------------
+    component "MS 3: Presupuestos, Repuestos y Proveedores" as MS_Budgets {
+        portin " " as p_bud_in
+        portin " " as p_stock_in
+        portout " " as p_bud_db
+
+        component "Budgets & Parts\nController" as C_Budgets
+        component "BudgetCalculationEngine\n(Mano de Obra & Repuestos)" as S_Budgets
+        component "StockAlertService\n(Alertas de Inventario)" as S_Stock
+        component "BudgetsPartsRepository\n(DAO / ORM)" as R_Budgets
+
+        p_bud_in --> C_Budgets : <<delegación>>
+        p_stock_in --> S_Stock : <<delegación>>
+        C_Budgets -(0- S_Budgets : <<ensamblado>>
+        C_Budgets -(0- S_Stock : <<ensamblado>>
+        S_Budgets -(0- R_Budgets : <<ensamblado>>
+        S_Stock -(0- R_Budgets : <<ensamblado>>
+        R_Budgets --> p_bud_db : <<delegación>>
+    }
+
+    ' ---------------------------------------------------------------
+    ' MS 4: Evidencia Multimedia
+    ' ---------------------------------------------------------------
+    component "MS 4: Evidencia Multimedia" as MS_Media {
+        portin " " as p_med_in
+        portout " " as p_med_fs
+        portout " " as p_med_db
+
+        component "MediaUploadController\n(Multipart / Form-Data)" as C_Media
+        component "FileStorageService\n(MIME, UUID & Hash)" as S_Storage
+        component "MediaMetadataRepository\n(DAO / ORM)" as R_Media
+
+        p_med_in --> C_Media : <<delegación>>
+        C_Media -(0- S_Storage : <<ensamblado>>
+        C_Media -(0- R_Media : <<ensamblado>>
+        S_Storage --> p_med_fs : <<delegación>>
+        R_Media --> p_med_db : <<delegación>>
+    }
 }
 
-' Interfaces expuestas por cada microservicio (Lollipops)
-interface "Auth & Users API" as I_Auth
-interface "Vehicles & Orders API" as I_Vehicles
-interface "Budgets, Parts & Stock API" as I_Budgets
-interface "Media API" as I_Media
-
-' Capa 4: Persistencia Desacoplada (Bases de datos independientes)
-package "Capa de Persistencia" {
-    database "BD Usuarios\n(Credentials/Roles)" as DB_Auth
-    database "BD Vehículos\ny Órdenes" as DB_Vehicles
-    database "BD Presupuestos\ny Repuestos" as DB_Budgets
-    database "Almacenamiento\nMultimedia (S3/Local)" as DB_Media
+' ===================================================================
+' CAPA 4: PERSISTENCIA Y ALMACENAMIENTO AISLADO
+' ===================================================================
+package "Capa de Persistencia y Almacenamiento" {
+    database "BD Usuarios\n(Credentials & Roles)" as DB_Auth
+    database "BD Vehículos\ny Órdenes de Trabajo" as DB_Vehicles
+    database "BD Presupuestos,\nRepuestos y Stock" as DB_Budgets
+    database "BD Metadatos\nde Evidencias" as DB_MediaMeta
+    database "Almacenamiento Multimedia\n(S3 / FileSystem Local)" as DB_MediaStorage
 }
 
-' --- RELACIONES Y ENSAMBLADOS (Simbología Correcta) ---
+' ===================================================================
+' RELACIONES Y ENSAMBLADOS ENTRE CAPAS
+' ===================================================================
 
-' Actores acceden a la presentación
-Cliente -down-> Web
-Cliente -down-> Mobile
-Mecánico -down-> Mobile
-Mecánico -down-> Web
-Administrador -down-> Web
+' Actores hacia Capa de Presentación
+Cliente --> Mobile
+Cliente --> Web
+Mecanico --> Mobile
+Mecanico --> Web
+Administrador --> Web
+Administrador --> Mobile
 
-' La API Gateway expone su interfaz expuesta (Lollipop)
-Gateway -up- I_Gateway
-
-' Las aplicaciones de presentación se acoplan a la interfaz del Gateway (Sockets)
+' Presentación hacia API Gateway a través de la Interfaz Unificada (Lollipop)
+I_Gateway -- p_gw_in
 Web ..( I_Gateway : consume
-Mobile ..( I_Gateway : consume
+p_mob_out ..( I_Gateway : consume
 
-' Cada Microservicio expone su interfaz correspondiente
-MS_Auth -up- I_Auth
-MS_Vehicles -up- I_Vehicles
-MS_Budgets -up- I_Budgets
-MS_Media -up- I_Media
+' Acoplamiento de Interfaces Provistas a los Puertos de Entrada de los Microservicios
+I_Auth -- p_auth_in
+I_Vehicles -- p_veh_in
+I_Capacity -- p_cap_in
+I_Budgets -- p_bud_in
+I_Stock -- p_stock_in
+I_Media -- p_med_in
 
-' El API Gateway se acopla a las interfaces de los microservicios tras bambalinas
-Gateway ..( I_Auth : rutea
-Gateway ..( I_Vehicles : rutea
-Gateway ..( I_Budgets : rutea
-Gateway ..( I_Media : rutea
+' API Gateway rutea a las Interfaces Provistas de cada Microservicio (Sockets)
+p_gw_auth ..( I_Auth : rutea
+p_gw_orders ..( I_Vehicles : rutea
+p_gw_orders ..( I_Capacity : rutea
+p_gw_budgets ..( I_Budgets : rutea
+p_gw_budgets ..( I_Stock : rutea
+p_gw_media ..( I_Media : rutea
 
-' Persistencia aislada para cada microservicio
-MS_Auth -down-> DB_Auth
-MS_Vehicles -down-> DB_Vehicles
-MS_Budgets -down-> DB_Budgets
-MS_Media -down-> DB_Media
+' Puertos de Salida de los Microservicios hacia sus Bases de Datos independientes
+p_auth_db --> DB_Auth : Conexión SQL / ORM
+p_veh_db --> DB_Vehicles : Conexión SQL / ORM
+p_bud_db --> DB_Budgets : Conexión SQL / ORM
+p_med_db --> DB_MediaMeta : Conexión SQL / ORM
+p_med_fs --> DB_MediaStorage : Driver Filesystem / S3
 
-' Notas aclaratorias para el informe de sistematización
-note right of Mobile
-  Foco de desarrollo de Integración IV.
-  Se conecta de manera exclusiva consumiendo
-  los contratos de la API Gateway.
-end note
-
-note bottom of MS_Budgets
-  Centraliza la lógica de presupuestos,
-  repuestos, proveedores e inventario.
-end note
+' ===================================================================
+' LEYENDA FORMAL UML 2.0 (GUÍA VISUAL PARADIGM)
+' ===================================================================
+legend right
+    |= Simbología UML 2.0 |= Definición y Rol en TallerConnect |=
+    | <#FFFFFF,#1F4E79> **<<component>>** | Componente compuesto (encapsula controladores, servicios y repositorios). |
+    | <#FFFFFF,#1F4E79> **[ ] Port** | Puerto perimetral formal; aísla la estructura interna del entorno exterior. |
+    | <#FFFFFF,#1F4E79> **—○ Provided Interface** | Interfaz Provista (Lollipop): Contrato de operaciones/APIs expuesto. |
+    | <#FFFFFF,#1F4E79> **—( Required Interface** | Interfaz Requerida (Socket): Contrato/dependencia demandada por el consumidor. |
+    | <#FFFFFF,#1F4E79> **--> Conector Delegación** | Línea que transfiere la llamada desde un puerto perimetral al subcomponente interno. |
+    | <#FFFFFF,#1F4E79> **-(0- Conector Ensamblado**| Ball-and-Socket: Acoplamiento directo entre subcomponentes internos. |
+endlegend
 
 @enduml

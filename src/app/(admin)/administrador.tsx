@@ -335,7 +335,7 @@ export default function AdministradorScreen() {
                         pressed && styles.alertCardPressed,
                       ]}
                       onPress={() =>
-                        router.push(`/(admin)/ordenes/${alert.orderId}`)
+                        router.push(`/(admin)/ordenes/${alert.orderId}` as never)
                       }
                       accessibilityRole="button"
                       accessibilityLabel={`${alert.title}. ${alert.description}`}
@@ -385,13 +385,13 @@ export default function AdministradorScreen() {
             title="Ver repuestos"
             description="Consultar el catálogo y sus existencias"
             icon="🔧"
-            onPress={() => router.push('/(admin)/repuestos')}
+            onPress={() => router.push('/(admin)/repuestos' as never)}
           />
           <ActionCard
             title="Ver proveedores"
             description="Consultar los proveedores registrados"
             icon="🏭"
-            onPress={() => router.push('/(admin)/proveedores')}
+            onPress={() => router.push('/(admin)/proveedores' as never)}
           />
         </View>
 

@@ -70,15 +70,15 @@ export type { ProviderServiceAdapter, Provider } from './providers.service';
 export {
   ServiceError,
   extractValidationDetail,
+  getGlobalErrorMessage,
+  isConnectivityOrTimeoutError,
+  normalizeNotificationServiceError,
   normalizeVehicleServiceError,
   normalizeOrderServiceError,
   normalizeBudgetServiceError,
   normalizePartServiceError,
   normalizeProviderServiceError,
   normalizeEvidenceServiceError,
-  getGlobalErrorMessage,
-  isConnectivityOrTimeoutError,
-  normalizeNotificationServiceError,
 } from './service-error';
 export type { ServiceErrorDomain } from './service-error';
 export { filterVehiclesByParams, MockVehicleAdapter, RealVehicleAdapter, VehiclesService, VehicleService, vehiclesService } from './vehicles.service';
