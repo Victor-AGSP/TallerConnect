@@ -143,3 +143,28 @@ Los ocho campos que la app conoce coinciden con el contrato en tipo y nulabilida
 O1 aparece en las respuestas reales: la orden cancelada y devuelta trae ambos campos con valor. Las respuestas reales de vehículos son compatibles; V1 a V4 son respuestas fuera de contrato construidas a partir del ejemplo anonimizado.
 
 La prueba `__tests__/gateway-contract-contrast.test.ts` reproduce los seis casos con las fixtures `src/mocks/gateway/vehicles.gateway.ts` y `src/mocks/gateway/orders.gateway.ts`. En las órdenes, los identificadores y las fechas se reemplazaron por valores ficticios que conservan su formato y las relaciones entre registros; los códigos de estado y los valores nulos se conservan.
+
+## Cliente en el detalle de la orden
+
+Las rutas de detalle `(admin)/ordenes/[id]`, `(cliente)/mis-ordenes/[id]` y `(mecanico)/ordenes-asignadas/[id]` usan `OrderDetailView`, que muestra la fila "Cliente" con `clientId` o, si no tiene valor, "No disponible". Como `OrdenRespuesta` no tiene un campo de cliente, `mapOrderResponse` nunca asigna `clientId` y la fila muestra siempre "No disponible".
+
+### Campo faltante
+
+| Dato | En `OrdenRespuesta` | Dónde lo entrega el contrato | Cómo se obtiene |
+|---|---|---|---|
+| Identificador del cliente | No existe | `cliente_id` de `VehiculoRespuesta` (MS2): entero, obligatorio y no nulo | Con el `vehiculo_id` de la orden, mediante `GET /api/vehiculos/{vehiculo_id}` |
+| Nombre del cliente | No existe | `full_name` de `UsuarioRespuesta` (MS1) | Requiere confirmar que `cliente_id` de MS2 corresponde al `id` de usuario de MS1 |
+
+- Las respuestas reales de vehículos revisadas, de los tres roles, traen `cliente_id` en todos los registros.
+- En las fixtures anonimizadas, la orden `201` tiene `vehiculo_id: 101`, y ese vehículo tiene `cliente_id: 501`.
+
+### Responsable
+
+- No se requiere agregar un campo de cliente a `OrdenRespuesta`: el identificador ya está disponible a través del vehículo de la orden.
+- El dato debe proveerlo la app móvil al construir el detalle: la vista o su ruta deben consultar el vehículo de la orden con `vehiclesService.getVehicleById` y tomar su `ownerId`. El mapper de órdenes no puede asignarlo, porque solo recibe `OrdenRespuesta`.
+- `OrderDetailScreen` ya consulta el vehículo de la orden y muestra su `ownerId` como "ID del cliente" cuando el rol es administrador, pero solo la usan las rutas `(cliente)/ordenes/[id]` y `(mecanico)/ordenes/[id]`, por lo que esa fila no se muestra en ninguna ruta.
+
+### Sin confirmar
+
+- `GET /api/vehiculos/{vehiculo_id}` está declarado para usuarios autenticados según la visibilidad de cada rol, pero no se consultó con la cuenta de administrador. `GET /api/vehiculos`, que también entrega `cliente_id`, responde `200` a ese rol.
+- El contrato no aclara si `cliente_id` es el `id` de usuario de MS1 o el de un perfil de cliente propio de MS2, por lo que buscarlo en la lista de `GET /api/auth/usuarios` no garantiza obtener el nombre del cliente.
