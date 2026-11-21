@@ -9,15 +9,19 @@ import type {
 import type { BudgetDecision, BudgetSummary } from '@/models/budget.model';
 import type { ManagedBudget as Budget, ManagedBudgetItem as BudgetItem, ManagedBudgetVersion as BudgetVersion } from '@/models/budget-management.model';
 import type { PaginatedList } from '@/models/pagination.model';
+import { DECIMAL_TEXT_PATTERN } from '@/schemas/budget-dto.schema';
 
 /**
  * Convierte un monto o cantidad recibido como texto decimal (ej. "15000.00") a número.
- * Lanza un error si el valor no representa un número válido.
+ * Lanza un error si el valor no tiene el formato decimal del contrato.
  */
 function parseDecimal(value: string, field: string): number {
-  const text = String(value).trim();
-  const parsed = Number(text);
-  if (text === '' || !Number.isFinite(parsed)) {
+  const parsed = Number(value);
+  if (
+    typeof value !== 'string' ||
+    !DECIMAL_TEXT_PATTERN.test(value) ||
+    !Number.isFinite(parsed)
+  ) {
     throw new Error(`Valor decimal inválido en ${field}: ${value}`);
   }
   return parsed;

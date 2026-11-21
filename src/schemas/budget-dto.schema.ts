@@ -10,7 +10,9 @@ import type {
 /**
  * Monto o cantidad que el contrato entrega como texto decimal no negativo (ej. "15000.00").
  */
-const decimalString = z.string().regex(/^\d+(\.\d+)?$/, 'Debe ser un decimal no negativo en texto');
+export const DECIMAL_TEXT_PATTERN = /^\d+(\.\d+)?$/;
+
+const decimalString = z.string().regex(DECIMAL_TEXT_PATTERN, 'Debe ser un decimal no negativo en texto');
 
 const budgetVersionStatusSchema = z.enum(['borrador', 'enviada', 'aprobada', 'rechazada']);
 
