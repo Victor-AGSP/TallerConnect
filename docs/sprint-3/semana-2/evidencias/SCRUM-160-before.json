@@ -1,0 +1,56 @@
+{
+  "startTime": 1794670654272,
+  "numTotalTestSuites": 1,
+  "numPassedTestSuites": 0,
+  "numFailedTestSuites": 1,
+  "numPassedTests": 3,
+  "numFailedTests": 5,
+  "numPendingTests": 0,
+  "success": false,
+  "environment": "Jest; dobles controlados; sin backend ni dispositivo",
+  "suites": [
+    {
+      "file": "__tests__/budget-read-refresh.test.tsx",
+      "status": "failed",
+      "tests": [
+        {
+          "name": "vista Cliente: integridad de relación no selecciona el único presupuesto si es de otra orden",
+          "status": "passed"
+        },
+        {
+          "name": "vista Cliente: integridad de relación rechaza detalle que no coincide con orden/presupuesto solicitado: {\"presupuesto_id\":5,\"orden_id\":32,\"creado_en\":\"2026-11-14T10:00:00Z\",\"cantidad_versiones\":1,\"ultima_version\":1,\"estado_ultima_version\":\"enviada\",\"total_ultima_version\":\"125000.00\",\"version_vigente\":null,\"versiones\":[{\"numero\":1,\"estado\":\"enviada\",\"es_modificacion\":false,\"creado_por_id\":99,\"creado_en\":\"2026-11-14T10:00:00Z\",\"enviado_en\":\"2026-11-14T11:00:00Z\",\"bloqueada_en\":\"2026-11-14T11:00:00Z\",\"total\":\"125000.00\",\"decision\":null,\"items\":[{\"item_id\":11,\"tipo\":\"mano_de_obra\",\"descripcion\":\"Trabajo QA local\",\"cantidad\":\"1\",\"precio_unitario\":\"125000.00\",\"subtotal\":\"125000.00\",\"repuesto_id\":null}]}]}",
+          "status": "failed",
+          "failure": "Error: expect(received).rejects.toThrow()\n\nReceived promise resolved instead of rejected\nResolved to value: {\"createdAt\": \"2026-11-14T10:00:00Z\", \"currentVersion\": null, \"id\": \"5\", \"latestStatus\": \"enviada\", \"latestTotal\": \"125000.00\", \"latestVersion\": 1, \"orderId\": \"32\", \"versions\": [{\"createdAt\": \"2026-11-14T10:00:00Z\", \"createdById\": \"99\", \"decision\": null, \"isModification\": false, \"items\": [{\"description\": \"Trabajo QA local\", \"id\": \"11\", \"partId\": null, \"partName\": null, \"quantity\": \"1\", \"subtotal\": \"125000.00\", \"supplierName\": null, \"type\": \"mano_de_obra\", \"unitPrice\": \"125000.00\"}], \"lockedAt\": \"2026-11-14T11:00:00Z\", \"number\": 1, \"sentAt\": \"2026-11-14T11:00:00Z\", \"status\": \"enviada\", \"total\": \"125000.00\"}]}\n"
+        },
+        {
+          "name": "vista Cliente: integridad de relación rechaza detalle que no coincide con orden/presupuesto solicitado: {\"presupuesto_id\":6,\"orden_id\":31,\"creado_en\":\"2026-11-14T10:00:00Z\",\"cantidad_versiones\":1,\"ultima_version\":1,\"estado_ultima_version\":\"enviada\",\"total_ultima_version\":\"125000.00\",\"version_vigente\":null,\"versiones\":[{\"numero\":1,\"estado\":\"enviada\",\"es_modificacion\":false,\"creado_por_id\":99,\"creado_en\":\"2026-11-14T10:00:00Z\",\"enviado_en\":\"2026-11-14T11:00:00Z\",\"bloqueada_en\":\"2026-11-14T11:00:00Z\",\"total\":\"125000.00\",\"decision\":null,\"items\":[{\"item_id\":11,\"tipo\":\"mano_de_obra\",\"descripcion\":\"Trabajo QA local\",\"cantidad\":\"1\",\"precio_unitario\":\"125000.00\",\"subtotal\":\"125000.00\",\"repuesto_id\":null}]}]}",
+          "status": "failed",
+          "failure": "Error: expect(received).rejects.toThrow()\n\nReceived promise resolved instead of rejected\nResolved to value: {\"createdAt\": \"2026-11-14T10:00:00Z\", \"currentVersion\": null, \"id\": \"6\", \"latestStatus\": \"enviada\", \"latestTotal\": \"125000.00\", \"latestVersion\": 1, \"orderId\": \"31\", \"versions\": [{\"createdAt\": \"2026-11-14T10:00:00Z\", \"createdById\": \"99\", \"decision\": null, \"isModification\": false, \"items\": [{\"description\": \"Trabajo QA local\", \"id\": \"11\", \"partId\": null, \"partName\": null, \"quantity\": \"1\", \"subtotal\": \"125000.00\", \"supplierName\": null, \"type\": \"mano_de_obra\", \"unitPrice\": \"125000.00\"}], \"lockedAt\": \"2026-11-14T11:00:00Z\", \"number\": 1, \"sentAt\": \"2026-11-14T11:00:00Z\", \"status\": \"enviada\", \"total\": \"125000.00\"}]}\n"
+        },
+        {
+          "name": "adaptador de administración: integridad de relación no selecciona el único presupuesto si es de otra orden",
+          "status": "failed",
+          "failure": "Error: expect(received).toBeNull()\n\nReceived: {\"createdAt\": \"2026-11-14T10:00:00Z\", \"currentVersion\": null, \"id\": \"5\", \"latestVersion\": 1, \"latestVersionStatus\": \"enviada\", \"latestVersionTotal\": 125000, \"orderId\": \"32\", \"versionCount\": 1, \"versions\": [{\"createdAt\": \"2026-11-14T10:00:00Z\", \"createdById\": \"99\", \"decision\": null, \"isModification\": false, \"items\": [{\"description\": \"Trabajo QA local\", \"id\": \"11\", \"partId\": null, \"partName\": null, \"providerName\": null, \"quantity\": 1, \"subtotal\": 125000, \"type\": \"mano_de_obra\", \"unitPrice\": 125000}], \"lockedAt\": \"2026-11-14T11:00:00Z\", \"number\": 1, \"sentAt\": \"2026-11-14T11:00:00Z\", \"status\": \"enviada\", \"total\": 125000}]}\n"
+        },
+        {
+          "name": "adaptador de administración: integridad de relación rechaza detalle que no coincide con orden/presupuesto solicitado: {\"presupuesto_id\":5,\"orden_id\":32,\"creado_en\":\"2026-11-14T10:00:00Z\",\"cantidad_versiones\":1,\"ultima_version\":1,\"estado_ultima_version\":\"enviada\",\"total_ultima_version\":\"125000.00\",\"version_vigente\":null,\"versiones\":[{\"numero\":1,\"estado\":\"enviada\",\"es_modificacion\":false,\"creado_por_id\":99,\"creado_en\":\"2026-11-14T10:00:00Z\",\"enviado_en\":\"2026-11-14T11:00:00Z\",\"bloqueada_en\":\"2026-11-14T11:00:00Z\",\"total\":\"125000.00\",\"decision\":null,\"items\":[{\"item_id\":11,\"tipo\":\"mano_de_obra\",\"descripcion\":\"Trabajo QA local\",\"cantidad\":\"1\",\"precio_unitario\":\"125000.00\",\"subtotal\":\"125000.00\",\"repuesto_id\":null}]}]}",
+          "status": "failed",
+          "failure": "Error: expect(received).rejects.toThrow()\n\nReceived promise resolved instead of rejected\nResolved to value: {\"createdAt\": \"2026-11-14T10:00:00Z\", \"currentVersion\": null, \"id\": \"5\", \"latestVersion\": 1, \"latestVersionStatus\": \"enviada\", \"latestVersionTotal\": 125000, \"orderId\": \"32\", \"versionCount\": 1, \"versions\": [{\"createdAt\": \"2026-11-14T10:00:00Z\", \"createdById\": \"99\", \"decision\": null, \"isModification\": false, \"items\": [{\"description\": \"Trabajo QA local\", \"id\": \"11\", \"partId\": null, \"partName\": null, \"providerName\": null, \"quantity\": 1, \"subtotal\": 125000, \"type\": \"mano_de_obra\", \"unitPrice\": 125000}], \"lockedAt\": \"2026-11-14T11:00:00Z\", \"number\": 1, \"sentAt\": \"2026-11-14T11:00:00Z\", \"status\": \"enviada\", \"total\": 125000}]}\n"
+        },
+        {
+          "name": "adaptador de administración: integridad de relación rechaza detalle que no coincide con orden/presupuesto solicitado: {\"presupuesto_id\":6,\"orden_id\":31,\"creado_en\":\"2026-11-14T10:00:00Z\",\"cantidad_versiones\":1,\"ultima_version\":1,\"estado_ultima_version\":\"enviada\",\"total_ultima_version\":\"125000.00\",\"version_vigente\":null,\"versiones\":[{\"numero\":1,\"estado\":\"enviada\",\"es_modificacion\":false,\"creado_por_id\":99,\"creado_en\":\"2026-11-14T10:00:00Z\",\"enviado_en\":\"2026-11-14T11:00:00Z\",\"bloqueada_en\":\"2026-11-14T11:00:00Z\",\"total\":\"125000.00\",\"decision\":null,\"items\":[{\"item_id\":11,\"tipo\":\"mano_de_obra\",\"descripcion\":\"Trabajo QA local\",\"cantidad\":\"1\",\"precio_unitario\":\"125000.00\",\"subtotal\":\"125000.00\",\"repuesto_id\":null}]}]}",
+          "status": "failed",
+          "failure": "Error: expect(received).rejects.toThrow()\n\nReceived promise resolved instead of rejected\nResolved to value: {\"createdAt\": \"2026-11-14T10:00:00Z\", \"currentVersion\": null, \"id\": \"6\", \"latestVersion\": 1, \"latestVersionStatus\": \"enviada\", \"latestVersionTotal\": 125000, \"orderId\": \"31\", \"versionCount\": 1, \"versions\": [{\"createdAt\": \"2026-11-14T10:00:00Z\", \"createdById\": \"99\", \"decision\": null, \"isModification\": false, \"items\": [{\"description\": \"Trabajo QA local\", \"id\": \"11\", \"partId\": null, \"partName\": null, \"providerName\": null, \"quantity\": 1, \"subtotal\": 125000, \"type\": \"mano_de_obra\", \"unitPrice\": 125000}], \"lockedAt\": \"2026-11-14T11:00:00Z\", \"number\": 1, \"sentAt\": \"2026-11-14T11:00:00Z\", \"status\": \"enviada\", \"total\": 125000}]}\n"
+        },
+        {
+          "name": "refresh y reapertura hacen nuevas lecturas y sustituyen los datos sin caché persistente",
+          "status": "passed"
+        },
+        {
+          "name": "el refresh fallido muestra error, retira datos y permite volver a consultar",
+          "status": "passed"
+        }
+      ]
+    }
+  ]
+}

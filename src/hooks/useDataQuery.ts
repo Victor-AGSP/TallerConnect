@@ -38,7 +38,8 @@ export function useDataQuery<T>(
   const [isRefreshing, setIsRefreshing] = useState(false);
 
   const isMountedRef = useRef(true);
-  const isQueryingRef = useRef(false);
+  const requestRef = useRef<{ query: () => Promise<T> } | null>(null);
+  const [dataQuery, setDataQuery] = useState(() => query);
 
   // Se reafirma el montaje en cada ciclo del efecto: si React desmonta y
   // vuelve a montar el componente, la referencia debe volver a ser válida
@@ -56,13 +57,17 @@ export function useDataQuery<T>(
       if (!query) return;
 
       // Evita peticiones duplicadas mientras una consulta sigue en curso.
-      if (isQueryingRef.current) return;
-      isQueryingRef.current = true;
+      if (requestRef.current?.query === query) return;
+      const request = { query };
+      requestRef.current = request;
 
       if (mode === 'refresh') {
         setIsRefreshing(true);
       } else {
+        setData(null);
+        setDataQuery(() => query);
         setIsLoading(true);
+        setIsRefreshing(false);
       }
 
       setErrorMessage(null);
@@ -70,11 +75,11 @@ export function useDataQuery<T>(
       try {
         const result = await query();
 
-        if (!isMountedRef.current) return;
+        if (!isMountedRef.current || requestRef.current !== request) return;
 
         setData(result);
       } catch (error: unknown) {
-        if (!isMountedRef.current) return;
+        if (!isMountedRef.current || requestRef.current !== request) return;
 
         setData(null);
         setErrorMessage(
@@ -83,11 +88,12 @@ export function useDataQuery<T>(
             : fallbackErrorMessage,
         );
       } finally {
-        isQueryingRef.current = false;
-
-        if (isMountedRef.current) {
-          setIsLoading(false);
-          setIsRefreshing(false);
+        if (requestRef.current === request) {
+          requestRef.current = null;
+          if (isMountedRef.current) {
+            setIsLoading(false);
+            setIsRefreshing(false);
+          }
         }
       }
     },
@@ -97,9 +103,21 @@ export function useDataQuery<T>(
   useEffect(() => {
     // eslint-disable-next-line react-hooks/set-state-in-effect -- La consulta inicial controla su estado de carga.
     void run('initial');
+    return () => {
+      // Una respuesta de otra ruta o de un montaje anterior ya no es vigente.
+      requestRef.current = null;
+    };
   }, [run]);
 
   const refresh = useCallback(() => run('refresh'), [run]);
 
-  return { data, errorMessage, isLoading, isRefreshing, refresh };
+  // Oculta datos anteriores desde el primer render, antes de ejecutar efectos.
+  const sameQuery = dataQuery === query;
+  return {
+    data: sameQuery ? data : null,
+    errorMessage: sameQuery ? errorMessage : null,
+    isLoading: sameQuery ? isLoading : Boolean(query),
+    isRefreshing: sameQuery && isRefreshing,
+    refresh,
+  };
 }

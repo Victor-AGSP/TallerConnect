@@ -1,0 +1,32 @@
+{
+  "consulted_date_utc": "2026-11-11",
+  "url": "https://tallerconect.vercel.app/ms4/openapi.json",
+  "http_observed": 200,
+  "body_sha256": "3eff0452e696ff3f9324867bc81a59a709199f1306ca572f1a3d05271065d807",
+  "info": {
+    "title": "SGTM — MS4: Evidencia Multimedia",
+    "version": "0.1.0"
+  },
+  "paths": {
+    "/evidencias": [
+      "post",
+      "get"
+    ],
+    "/evidencias/{evidencia_id}": [
+      "get"
+    ],
+    "/evidencias/{evidencia_id}/descarga": [
+      "get"
+    ],
+    "/health": [
+      "get"
+    ],
+    "/health/db": [
+      "get"
+    ],
+    "/health/storage": [
+      "get"
+    ]
+  },
+  "note": "Metadatos mínimos de contrato consultado; no prueba ejecución de operaciones ni autorización por rol."
+}

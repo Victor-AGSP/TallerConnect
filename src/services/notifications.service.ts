@@ -1,4 +1,4 @@
-import { ENV } from '@/config/env';
+import { ENV, isMockModeEnabled } from '@/config/env';
 import {
   MarkNotificationReadResponseDto,
   NotificationQueryParamsDto,
@@ -26,7 +26,7 @@ import {
 
 export { ServiceError, normalizeNotificationServiceError };
 
-const USE_MOCKS = process.env.EXPO_PUBLIC_USE_MOCK_AUTH === 'true';
+const USE_MOCKS = isMockModeEnabled();
 
 /**
  * Filtra y pagina localmente una lista de notificaciones según NotificationQueryParamsDto.
@@ -206,9 +206,7 @@ export class RealNotificationAdapter implements NotificationServiceAdapter {
   private isContractUnavailableStatus(status: number | null): boolean {
     return (
       status === HTTP_STATUS.NOT_FOUND ||
-      status === 501 ||
-      status === HTTP_STATUS.BAD_GATEWAY ||
-      status === HTTP_STATUS.SERVICE_UNAVAILABLE
+      status === 501
     );
   }
 
@@ -216,40 +214,22 @@ export class RealNotificationAdapter implements NotificationServiceAdapter {
     params?: NotificationQueryParamsDto
   ): Promise<WorkshopNotification[]> {
     this.contractStatus = 'unavailable_fallback';
-    try {
-      const [orders, budgets, parts] = await Promise.all([
-        ordersService.getOrders().catch(() => []),
-        budgetsService.getBudgets().catch(() => []),
-        partsService.getParts().catch(() => []),
-      ]);
+    const [orders, budgets, parts] = await Promise.all([
+      ordersService.getOrders(),
+      budgetsService.getBudgets(),
+      partsService.getParts(),
+    ]);
 
-      const derived = deriveWorkshopNotificationsFromDomain({
-        orders,
-        budgets,
-        parts,
-      }).map((item) => ({
-        ...item,
-        read: item.read || this.readFallbackIds.has(item.id),
-      }));
+    const derived = deriveWorkshopNotificationsFromDomain({
+      orders,
+      budgets,
+      parts,
+    }).map((item) => ({
+      ...item,
+      read: item.read || this.readFallbackIds.has(item.id),
+    }));
 
-      const baseList =
-        derived.length > 0
-          ? derived
-          : mockNotifications.map((item) => ({
-              ...item,
-              read: item.read || this.readFallbackIds.has(item.id),
-            }));
-
-      return filterNotificationsByParams(baseList, params);
-    } catch {
-      return filterNotificationsByParams(
-        mockNotifications.map((item) => ({
-          ...item,
-          read: item.read || this.readFallbackIds.has(item.id),
-        })),
-        params
-      );
-    }
+    return filterNotificationsByParams(derived, params);
   }
 
   async getNotifications(

@@ -1,0 +1,528 @@
+{
+  "kind": "AUTOMATED_MOCK",
+  "branch": "Victor",
+  "tested_commit": "c0b9bda6aee96cc3828ea8ed301813b0f6138d31",
+  "started_at_utc": "2026-11-12T00:17:13.091000+00:00",
+  "passed": 1259,
+  "failed": 0,
+  "pending": 0,
+  "suites": [
+    {
+      "path": "__tests__/order-functional.test.tsx",
+      "status": "passed",
+      "passed": 15,
+      "failed": 0
+    },
+    {
+      "path": "__tests__/auth-full-flow.test.tsx",
+      "status": "passed",
+      "passed": 9,
+      "failed": 0
+    },
+    {
+      "path": "__tests__/evidence-functional.test.tsx",
+      "status": "passed",
+      "passed": 16,
+      "failed": 0
+    },
+    {
+      "path": "__tests__/services-public-exports.test.ts",
+      "status": "passed",
+      "passed": 6,
+      "failed": 0
+    },
+    {
+      "path": "__tests__/manual-refresh-retry.test.tsx",
+      "status": "passed",
+      "passed": 8,
+      "failed": 0
+    },
+    {
+      "path": "__tests__/auth-service.test.ts",
+      "status": "passed",
+      "passed": 13,
+      "failed": 0
+    },
+    {
+      "path": "__tests__/evidence-role-visibility.test.tsx",
+      "status": "passed",
+      "passed": 27,
+      "failed": 0
+    },
+    {
+      "path": "__tests__/evidence-upload-states.test.tsx",
+      "status": "passed",
+      "passed": 24,
+      "failed": 0
+    },
+    {
+      "path": "__tests__/parts-views-integration.test.tsx",
+      "status": "passed",
+      "passed": 29,
+      "failed": 0
+    },
+    {
+      "path": "__tests__/budget-views-integration.test.tsx",
+      "status": "passed",
+      "passed": 23,
+      "failed": 0
+    },
+    {
+      "path": "__tests__/protected-routes.test.tsx",
+      "status": "passed",
+      "passed": 16,
+      "failed": 0
+    },
+    {
+      "path": "__tests__/order-role-access.test.tsx",
+      "status": "passed",
+      "passed": 18,
+      "failed": 0
+    },
+    {
+      "path": "__tests__/evidence-mechanic-updates.test.tsx",
+      "status": "passed",
+      "passed": 22,
+      "failed": 0
+    },
+    {
+      "path": "__tests__/evidence-permissions.test.tsx",
+      "status": "passed",
+      "passed": 20,
+      "failed": 0
+    },
+    {
+      "path": "__tests__/order-flow-regression.test.tsx",
+      "status": "passed",
+      "passed": 32,
+      "failed": 0
+    },
+    {
+      "path": "__tests__/test-utils.test.tsx",
+      "status": "passed",
+      "passed": 4,
+      "failed": 0
+    },
+    {
+      "path": "__tests__/evidence-capture.test.tsx",
+      "status": "passed",
+      "passed": 15,
+      "failed": 0
+    },
+    {
+      "path": "__tests__/order-detail-integration.test.tsx",
+      "status": "passed",
+      "passed": 12,
+      "failed": 0
+    },
+    {
+      "path": "__tests__/budget-flow-integration.test.tsx",
+      "status": "passed",
+      "passed": 4,
+      "failed": 0
+    },
+    {
+      "path": "src/__tests__/admin-services-integration.test.tsx",
+      "status": "passed",
+      "passed": 3,
+      "failed": 0
+    },
+    {
+      "path": "__tests__/vehicle-list-integration.test.tsx",
+      "status": "passed",
+      "passed": 16,
+      "failed": 0
+    },
+    {
+      "path": "__tests__/views-accessibility.test.tsx",
+      "status": "passed",
+      "passed": 16,
+      "failed": 0
+    },
+    {
+      "path": "__tests__/views-services-integration.test.tsx",
+      "status": "passed",
+      "passed": 16,
+      "failed": 0
+    },
+    {
+      "path": "__tests__/order-view-states.test.tsx",
+      "status": "passed",
+      "passed": 27,
+      "failed": 0
+    },
+    {
+      "path": "__tests__/role-access-restrictions.test.tsx",
+      "status": "passed",
+      "passed": 15,
+      "failed": 0
+    },
+    {
+      "path": "__tests__/order-contract-compatibility.test.tsx",
+      "status": "passed",
+      "passed": 28,
+      "failed": 0
+    },
+    {
+      "path": "__tests__/services-session-navigation.test.tsx",
+      "status": "passed",
+      "passed": 5,
+      "failed": 0
+    },
+    {
+      "path": "__tests__/common-components.test.tsx",
+      "status": "passed",
+      "passed": 22,
+      "failed": 0
+    },
+    {
+      "path": "__tests__/admin-query-states.test.tsx",
+      "status": "passed",
+      "passed": 4,
+      "failed": 0
+    },
+    {
+      "path": "__tests__/auth-flow.test.tsx",
+      "status": "passed",
+      "passed": 1,
+      "failed": 0
+    },
+    {
+      "path": "__tests__/connectivity-banner.test.tsx",
+      "status": "passed",
+      "passed": 5,
+      "failed": 0
+    },
+    {
+      "path": "__tests__/auth-session.test.tsx",
+      "status": "passed",
+      "passed": 9,
+      "failed": 0
+    },
+    {
+      "path": "__tests__/order-request-serialization.test.ts",
+      "status": "passed",
+      "passed": 22,
+      "failed": 0
+    },
+    {
+      "path": "__tests__/use-data-query.test.ts",
+      "status": "passed",
+      "passed": 10,
+      "failed": 0
+    },
+    {
+      "path": "src/__tests__/login.test.tsx",
+      "status": "passed",
+      "passed": 4,
+      "failed": 0
+    },
+    {
+      "path": "__tests__/auth-role.test.ts",
+      "status": "passed",
+      "passed": 4,
+      "failed": 0
+    },
+    {
+      "path": "__tests__/services-response-scenarios.test.ts",
+      "status": "passed",
+      "passed": 30,
+      "failed": 0
+    },
+    {
+      "path": "src/__tests__/providers.service.test.ts",
+      "status": "passed",
+      "passed": 8,
+      "failed": 0
+    },
+    {
+      "path": "__tests__/auth-logout.test.ts",
+      "status": "passed",
+      "passed": 5,
+      "failed": 0
+    },
+    {
+      "path": "src/__tests__/parts.service.test.ts",
+      "status": "passed",
+      "passed": 8,
+      "failed": 0
+    },
+    {
+      "path": "src/__tests__/services-contract-coverage.test.ts",
+      "status": "passed",
+      "passed": 4,
+      "failed": 0
+    },
+    {
+      "path": "__tests__/budget-service.test.ts",
+      "status": "passed",
+      "passed": 46,
+      "failed": 0
+    },
+    {
+      "path": "src/__tests__/notifications.service.test.ts",
+      "status": "passed",
+      "passed": 6,
+      "failed": 0
+    },
+    {
+      "path": "src/__tests__/budgets.service.test.ts",
+      "status": "passed",
+      "passed": 11,
+      "failed": 0
+    },
+    {
+      "path": "src/__tests__/http-client.test.ts",
+      "status": "passed",
+      "passed": 5,
+      "failed": 0
+    },
+    {
+      "path": "__tests__/evidence-request-serialization.test.ts",
+      "status": "passed",
+      "passed": 16,
+      "failed": 0
+    },
+    {
+      "path": "src/__tests__/orders.service.test.ts",
+      "status": "passed",
+      "passed": 13,
+      "failed": 0
+    },
+    {
+      "path": "src/__tests__/evidence.service.test.ts",
+      "status": "passed",
+      "passed": 16,
+      "failed": 0
+    },
+    {
+      "path": "__tests__/parts-service.test.ts",
+      "status": "passed",
+      "passed": 40,
+      "failed": 0
+    },
+    {
+      "path": "__tests__/evidence-service.test.ts",
+      "status": "passed",
+      "passed": 19,
+      "failed": 0
+    },
+    {
+      "path": "src/__tests__/vehicles.service.test.ts",
+      "status": "passed",
+      "passed": 18,
+      "failed": 0
+    },
+    {
+      "path": "__tests__/services-mock-adapter-integration.test.ts",
+      "status": "passed",
+      "passed": 3,
+      "failed": 0
+    },
+    {
+      "path": "__tests__/auth-schema.test.ts",
+      "status": "passed",
+      "passed": 16,
+      "failed": 0
+    },
+    {
+      "path": "__tests__/evidence-file-validation.test.ts",
+      "status": "passed",
+      "passed": 42,
+      "failed": 0
+    },
+    {
+      "path": "__tests__/budget-schema.test.ts",
+      "status": "passed",
+      "passed": 73,
+      "failed": 0
+    },
+    {
+      "path": "__tests__/env-config.test.ts",
+      "status": "passed",
+      "passed": 14,
+      "failed": 0
+    },
+    {
+      "path": "__tests__/microservices-audit.test.ts",
+      "status": "passed",
+      "passed": 3,
+      "failed": 0
+    },
+    {
+      "path": "src/__tests__/auth.service.test.ts",
+      "status": "passed",
+      "passed": 4,
+      "failed": 0
+    },
+    {
+      "path": "__tests__/notice-schema.test.ts",
+      "status": "passed",
+      "passed": 75,
+      "failed": 0
+    },
+    {
+      "path": "__tests__/budget-mapper.test.ts",
+      "status": "passed",
+      "passed": 22,
+      "failed": 0
+    },
+    {
+      "path": "__tests__/retry-policy.test.ts",
+      "status": "passed",
+      "passed": 13,
+      "failed": 0
+    },
+    {
+      "path": "__tests__/part-provider-schema.test.ts",
+      "status": "passed",
+      "passed": 43,
+      "failed": 0
+    },
+    {
+      "path": "src/__tests__/interceptors.test.ts",
+      "status": "passed",
+      "passed": 20,
+      "failed": 0
+    },
+    {
+      "path": "__tests__/admin-notice-validation.test.ts",
+      "status": "passed",
+      "passed": 15,
+      "failed": 0
+    },
+    {
+      "path": "__tests__/vehicle-schema.test.ts",
+      "status": "passed",
+      "passed": 25,
+      "failed": 0
+    },
+    {
+      "path": "__tests__/order-schema.test.ts",
+      "status": "passed",
+      "passed": 40,
+      "failed": 0
+    },
+    {
+      "path": "__tests__/connectivity-store.test.ts",
+      "status": "passed",
+      "passed": 11,
+      "failed": 0
+    },
+    {
+      "path": "__tests__/environment.test.tsx",
+      "status": "passed",
+      "passed": 1,
+      "failed": 0
+    },
+    {
+      "path": "src/__tests__/authStore.test.ts",
+      "status": "passed",
+      "passed": 6,
+      "failed": 0
+    },
+    {
+      "path": "__tests__/auth-contract.test.ts",
+      "status": "passed",
+      "passed": 22,
+      "failed": 0
+    },
+    {
+      "path": "__tests__/auth-mapper.test.ts",
+      "status": "passed",
+      "passed": 14,
+      "failed": 0
+    },
+    {
+      "path": "__tests__/auth-storage.test.ts",
+      "status": "passed",
+      "passed": 10,
+      "failed": 0
+    },
+    {
+      "path": "__tests__/part-provider-mapper.test.ts",
+      "status": "passed",
+      "passed": 18,
+      "failed": 0
+    },
+    {
+      "path": "src/__tests__/routes.test.ts",
+      "status": "passed",
+      "passed": 4,
+      "failed": 0
+    }
+  ],
+  "clean_tree": {
+    "commit": "c0b9bda6aee96cc3828ea8ed301813b0f6138d31",
+    "branch": "Victor",
+    "status_porcelain": "",
+    "recorded_at_utc": "2026-11-12T00:16:51.975825+00:00",
+    "clean_after_validation": true,
+    "checked_after_utc": "2026-11-12T00:18:38.192915+00:00"
+  },
+  "command": "npm test -- --watchman=false --json --outputFile=/tmp/tallerconnect-seguimiento/full-committed.json",
+  "regression": {
+    "command": "npm run test:regression -- --watchman=false --json --outputFile=/tmp/tallerconnect-seguimiento/regression-committed.json",
+    "passed": 841,
+    "failed": 0,
+    "suites": 41,
+    "started_at_utc": "2026-11-12T00:17:13.127000+00:00",
+    "is_subset": true
+  },
+  "other_tools": [
+    {
+      "command": "npm run typecheck",
+      "exit_code": 0
+    },
+    {
+      "command": "CI=1 npm run lint",
+      "exit_code": 0,
+      "errors": 0,
+      "warnings": 46
+    },
+    {
+      "command": "CI=1 npm run export:android -- --max-workers 2",
+      "exit_code": 0
+    }
+  ],
+  "runtime": {
+    "node": "v26.12.1",
+    "npm": "12.2.1"
+  },
+  "dependencies": {
+    "expo-router": {
+      "installed": "58.0.30",
+      "lock": "58.0.28"
+    },
+    "jest-expo": {
+      "installed": "58.0.14",
+      "lock": "58.0.13"
+    },
+    "@testing-library/react-native": {
+      "installed": "14.1.0",
+      "lock": "14.1.0"
+    },
+    "eslint": {
+      "installed": "9.39.5",
+      "lock": null
+    },
+    "eslint-config-expo": {
+      "installed": "58.0.4",
+      "lock": null
+    }
+  },
+  "scope": "Ejecución sobre commit técnico c0b9bda, con árbol limpio antes/después. Mocks de auth/HTTP/nativos según suite; no autenticación real. No se ejecutó npm ci. Documentación posterior no altera el código probado.",
+  "code_sha256": {
+    "test-utils/index.ts": "3864c78213cece171fab5f58d655f2e42882bc4798662c81b8452625abd647b3",
+    "__tests__/test-utils.test.tsx": "a4bab3869a9a327ee8a337f292159cad1097bfda1bf6d928f18bccb61137c172",
+    "package.json": "c4bf7f94ff66d34abc067e7ffdd21a6a86fc0e4c66ec4004b5ec1b0e9816e851",
+    "package-lock.json": "51468904b85d9cc6378e28c35e09b22d9146e6d1b7f6c71a201f9df7ac36fa77"
+  },
+  "android_bundles": [
+    {
+      "name": "entry-9ee7ac1a79c3e242387dac7c464ddaa1.hbc",
+      "bytes": 4555933,
+      "sha256": "0d10a832a226fd814b3c050d39434650d9e0e32ca167c66b6cd725c28e6e8b56"
+    }
+  ]
+}

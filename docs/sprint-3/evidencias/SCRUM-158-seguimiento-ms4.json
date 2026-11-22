@@ -1,0 +1,154 @@
+{
+  "kind": "REAL_ANONYMOUS_HTTP",
+  "environment": "https://tallerconect.vercel.app",
+  "method": "GET",
+  "authorization_sent": false,
+  "cookies_sent": false,
+  "date_utc": "2026-11-12",
+  "checks": [
+    {
+      "id": "FOLLOWUP-HEALTH",
+      "path": "/ms4/health",
+      "expected": 200,
+      "http": 200,
+      "result": "PASS",
+      "curl_exit_code": 0,
+      "ssl_verify_result": 0,
+      "seconds": 2.663841,
+      "body_sha256": "2ed1d2a3cbe6209b1a2d8ac5cb8aa3e7399f5f25b6152542b3aa66f417bf450b",
+      "response_headers_allowlist": {
+        "age": "0",
+        "cache-control": "public, max-age=0, must-revalidate",
+        "content-type": "application/json",
+        "date": "Thu, 12 Nov 2026 00:17:41 GMT",
+        "x-vercel-cache": "MISS",
+        "x-vercel-id": "gru1::iad1::2ggvb-1794442659159-573b82f3fff9"
+      },
+      "body_allowlist": {
+        "status": "ok",
+        "servicio": "MS4 — Evidencia Multimedia"
+      }
+    },
+    {
+      "id": "FOLLOWUP-DB",
+      "path": "/ms4/health/db",
+      "expected": 200,
+      "http": 200,
+      "result": "PASS",
+      "curl_exit_code": 0,
+      "ssl_verify_result": 0,
+      "seconds": 3.381818,
+      "body_sha256": "fc93568e1a8bceda12334836fc4b3bec12733ac201d3569807a184e9d51dffd8",
+      "response_headers_allowlist": {
+        "age": "0",
+        "cache-control": "public, max-age=0, must-revalidate",
+        "content-type": "application/json",
+        "date": "Thu, 12 Nov 2026 00:17:41 GMT",
+        "x-vercel-cache": "MISS",
+        "x-vercel-id": "gru1::iad1::hz8qm-1794442659159-66fc4bf0b689"
+      },
+      "body_allowlist": {
+        "status": "ok",
+        "servicio": "MS4 — Evidencia Multimedia",
+        "database": "ok"
+      }
+    },
+    {
+      "id": "FOLLOWUP-STORAGE",
+      "path": "/ms4/health/storage",
+      "expected": 200,
+      "http": 503,
+      "result": "FAIL",
+      "curl_exit_code": 0,
+      "ssl_verify_result": 0,
+      "seconds": 2.971394,
+      "body_sha256": "b9ff98ff8f277d952e2d0868148cdcc2db80f91347ef23ab1cdc91b746dc0562",
+      "response_headers_allowlist": {
+        "age": "0",
+        "cache-control": "public, max-age=0, must-revalidate",
+        "content-type": "application/json",
+        "date": "Thu, 12 Nov 2026 00:17:41 GMT",
+        "x-vercel-cache": "MISS",
+        "x-vercel-id": "gru1::iad1::hx6v9-1794442659158-c10628233a87"
+      },
+      "body_allowlist": {
+        "detail": "El almacenamiento de evidencias no está disponible"
+      }
+    },
+    {
+      "id": "FOLLOWUP-OPENAPI",
+      "path": "/ms4/openapi.json",
+      "expected": 200,
+      "http": 200,
+      "result": "PASS",
+      "curl_exit_code": 0,
+      "ssl_verify_result": 0,
+      "seconds": 2.68174,
+      "body_sha256": "3eff0452e696ff3f9324867bc81a59a709199f1306ca572f1a3d05271065d807",
+      "response_headers_allowlist": {
+        "age": "0",
+        "cache-control": "public, max-age=0, must-revalidate",
+        "content-type": "application/json",
+        "date": "Thu, 12 Nov 2026 00:17:41 GMT",
+        "x-vercel-cache": "MISS",
+        "x-vercel-id": "gru1::iad1::ql842-1794442659159-424ddcb64de3"
+      }
+    },
+    {
+      "id": "FOLLOWUP-AUTH",
+      "path": "/api/auth/me",
+      "expected": 401,
+      "http": 401,
+      "result": "PASS",
+      "curl_exit_code": 0,
+      "ssl_verify_result": 0,
+      "seconds": 6.249184,
+      "body_sha256": "a485c68dc7f4de3302f5c3950ccd447045d2749b8c33aa39acd76862dff6c9bf",
+      "response_headers_allowlist": {
+        "age": "0",
+        "cache-control": "public, max-age=0, must-revalidate",
+        "content-type": "application/json",
+        "date": "Thu, 12 Nov 2026 00:17:41 GMT",
+        "x-vercel-cache": "MISS",
+        "x-vercel-id": "gru1:gru1:iad1::iad1::iad1::bgkmp-1794442659159-ca265261d85f"
+      },
+      "body_allowlist": {
+        "detail": "No autenticado"
+      }
+    },
+    {
+      "id": "FOLLOWUP-STORAGE-RECHECK",
+      "path": "/ms4/health/storage",
+      "expected": 200,
+      "http": 503,
+      "result": "FAIL",
+      "curl_exit_code": 0,
+      "ssl_verify_result": 0,
+      "seconds": 3.508149,
+      "body_sha256": "b9ff98ff8f277d952e2d0868148cdcc2db80f91347ef23ab1cdc91b746dc0562",
+      "response_headers_allowlist": {
+        "age": "0",
+        "cache-control": "public, max-age=0, must-revalidate",
+        "content-type": "application/json",
+        "date": "Thu, 12 Nov 2026 00:19:05 GMT",
+        "x-vercel-cache": "MISS",
+        "x-vercel-id": "gru1::iad1::ddkzq-1794442742528-4a8bf66375ae"
+      },
+      "body_allowlist": {
+        "detail": "El almacenamiento de evidencias no está disponible"
+      }
+    }
+  ],
+  "storage_contract": {
+    "url": "https://tallerconect.vercel.app/ms4/openapi.json",
+    "sha256": "3eff0452e696ff3f9324867bc81a59a709199f1306ca572f1a3d05271065d807",
+    "info": {
+      "title": "SGTM — MS4: Evidencia Multimedia",
+      "version": "0.1.0"
+    },
+    "observed_description": "El health comprueba existencia/acceso al bucket con el usuario del microservicio. La respuesta de fallo es genérica y oculta deliberadamente endpoint, claves y nombre de bucket."
+  },
+  "root_cause": "No determinada: no hay fuente, configuración privada ni logs operativos de MS4 en este repositorio frontend. Dos respuestas 503 no distinguen credenciales, conectividad, bucket o permisos.",
+  "commands": "curl -sS --connect-timeout 10 --max-time 25 -D <headers-temporales> -o <cuerpo-temporal> -w '%{http_code}' https://tallerconect.vercel.app<RUTA>",
+  "scope": "Sondas públicas de solo lectura; no se probaron subidas ni listados/descargas autenticados; sin escaneo de rutas de diagnóstico no publicadas."
+}

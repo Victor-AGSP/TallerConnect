@@ -85,10 +85,13 @@ Esta matriz documenta, para cada endpoint publicado por los microservicios a tra
 
 | Método y endpoint | Servicio / Método | DTO de solicitud | DTO de respuesta | Mapper / Schema | Modelo | Estado |
 |---|---|---|---|---|---|---|
-| `GET /api/ordenes/{orden_id}/evidencias` (y fallback `GET /api/evidencias`) | `evidenceService.getEvidencesByOrderId()` (`evidence.service.ts`) | `EvidenceQueryParamsDto` | `EvidenceResponseDto[]` | `mapEvidencesResponseList` / `evidenceResponseDtoSchema` | `TechnicalEvidence[]` | **Alineado** |
-| `GET /api/evidencias/{evidencia_id}` | `evidenceService.getEvidenceById()` | — | `EvidenceResponseDto` | `mapEvidenceResponse` / `evidenceResponseDtoSchema` | `TechnicalEvidence` | **Alineado** |
-| `POST /api/evidencias` (`multipart/form-data`) | `evidenceService.uploadEvidence()` | `UploadEvidenceRequestDto` (`FormData` vía `buildEvidenceFormData`) | `EvidenceResponseDto` | `mapEvidenceResponse` / `evidenceResponseDtoSchema` | `TechnicalEvidence` | **Alineado** |
-| `DELETE /api/evidencias/{evidencia_id}` | `evidenceService.deleteEvidence()` | — | `204 No Content` | — | `void` | **Alineado** |
+| `GET /api/evidencias?orden_id={orden_id}` | `evidenceService.listEvidence()` (vistas) / `getEvidencesByOrder()` (adaptador) | `EvidenceQueryParamsDto` | `EvidenceResponseDto[]` | `mapEvidenceListResponse` / `evidenceListResponseDtoSchema` | `Evidence[]` | **Contrato y código revisados; real autenticado pendiente** |
+| `GET /api/evidencias/{evidencia_id}` | `evidenceService.getEvidenceById()` | — | `EvidenceResponseDto` | `mapEvidenceResponse` / `evidenceResponseDtoSchema` | `Evidence` | **Contrato y código revisados** |
+| `GET /api/evidencias/{evidencia_id}/descarga` | `evidenceService.getDownloadUrl()` (vistas) / `getEvidenceDownloadUrl()` (adaptador) | — | `EvidenceDownloadUrlResponseDto` | `mapEvidenceDownloadResponse` / `evidenceDownloadResponseDtoSchema` | URL temporal, expiración | **Contrato y código revisados; real autenticado pendiente** |
+| `POST /api/evidencias` (`multipart/form-data`) | `evidenceService.uploadEvidence()` | `UploadEvidenceRequestDto` / `FormData` | `EvidenceResponseDto` | `mapEvidenceResponse` / `evidenceResponseDtoSchema` | `Evidence` | **Contrato y código revisados; subida real pendiente** |
+| Referencia histórica: `DELETE /api/evidencias/{evidencia_id}` | No hay `deleteEvidence()` implementado ni operación DELETE en el contrato consultado | — | — | — | — | **Referencia previa sin respaldo; no usar como prueba** |
+
+Corrección SCRUM-157 (11-11-2026): el contrato MS4 0.1.0 consultado no publica `/ordenes/{id}/evidencias`, ni DELETE; no hay fallback de listado a esa ruta. Se conserva la referencia histórica de eliminación identificada como no respaldada. [Metadatos del contrato consultado](sprint-3/evidencias/SCRUM-157-ms4-contrato.json) y [registro de incidencia](sprint-3/SCRUM-157-incidencias-ms4.md).
 
 ---
 
@@ -109,7 +112,7 @@ Esta matriz documenta, para cada endpoint publicado por los microservicios a tra
 | **MS1 — Autenticación** | `POST /auth/login`, `GET /auth/me` | `AuthService` | **100 % Alineado** |
 | **MS2 — Vehículos y Órdenes** | `GET/POST/PATCH /vehiculos`, `GET/POST /ordenes`, `PATCH /ordenes/{id}/estado`, `PUT /ordenes/{id}/mecanico`, `GET /ordenes/{id}/historial` | `VehiclesService`, `OrdersService` | **100 % Alineado** |
 | **MS3 — Presupuestos, Repuestos y Proveedores** | `GET/POST/PATCH /presupuestos`, `POST /presupuestos/{id}/aprobar`, `GET/POST/PATCH /repuestos`, `POST /repuestos/{id}/ajustar-stock`, `GET/POST/PATCH/DELETE /proveedores` | `BudgetsService`, `PartsService`, `ProvidersService` | **100 % Alineado** |
-| **MS4 — Evidencia Multimedia** | `GET /ordenes/{id}/evidencias`, `GET/POST/DELETE /evidencias` (`multipart/form-data`) | `EvidenceService` | **100 % Alineado** |
+| **MS4 — Evidencia Multimedia** | `GET /evidencias?orden_id=`, `GET /evidencias/{id}`, `GET /evidencias/{id}/descarga`, `POST /evidencias` (`multipart/form-data`) | `EvidenceService` | **Contrato revisado; integración autenticada pendiente, storage 503** |
 | **Avisos / Notificaciones** | `GET/PATCH/POST /notificaciones` con fallback derivado de órdenes, presupuestos y stock | `NotificationsService` | **Cubierto con Fallback** |
 
 ---

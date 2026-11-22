@@ -10,7 +10,7 @@ import {
   View,
 } from 'react-native';
 
-import { EmptyState, ErrorMessage } from '@/components/common';
+import { EmptyState, ErrorMessage, Loading } from '@/components/common';
 import { StatusPill } from '@/components/ui/StatusPill';
 import { ORDER_STATUS_LABELS } from '@/constants/orderStatus';
 import { ROLES } from '@/constants/roles';
@@ -43,56 +43,64 @@ export default function AdministradorScreen() {
   const [notifications, setNotifications] = useState<WorkshopNotification[]>(
     [],
   );
+  const [notificationsError, setNotificationsError] = useState<string | null>(null);
   const [ordersError, setOrdersError] = useState<string | null>(null);
   const [vehiclesError, setVehiclesError] = useState<string | null>(null);
   const [isRefreshing, setIsRefreshing] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
 
-  const loadDashboard = useCallback(async (refresh = false) => {
-    if (refresh) {
-      setIsRefreshing(true);
+  const loadDashboard = useCallback(() => Promise.allSettled([
+    ordersService.getOrders(),
+    vehiclesService.getVehicles(),
+    notificationsService.getNotifications({ role: ROLES.ADMINISTRADOR }),
+  ]).then(([ordersResult, vehiclesResult, notificationsResult]) => {
+    if (ordersResult.status === 'fulfilled') {
+      setOrders(ordersResult.value);
+    } else {
+      setOrdersError(
+        ordersResult.reason instanceof Error
+          ? ordersResult.reason.message
+          : 'No fue posible cargar las órdenes.',
+      );
     }
 
+    if (vehiclesResult.status === 'fulfilled') {
+      setVehicles(vehiclesResult.value);
+    } else {
+      setVehiclesError(
+        vehiclesResult.reason instanceof Error
+          ? vehiclesResult.reason.message
+          : 'No fue posible cargar los vehículos.',
+      );
+    }
+
+    if (notificationsResult.status === 'fulfilled') {
+      setNotifications(notificationsResult.value);
+    } else {
+      setNotifications([]);
+      setNotificationsError(
+        notificationsResult.reason instanceof Error
+          ? notificationsResult.reason.message
+          : 'No fue posible cargar los avisos.',
+      );
+    }
+  }).finally(() => {
+    setIsLoading(false);
+    setIsRefreshing(false);
+  }), []);
+
+  const reload = (refresh = false) => {
+    if (refresh) {
+      setIsRefreshing(true);
+    } else {
+      setIsLoading(true);
+    }
+
+    setNotificationsError(null);
     setOrdersError(null);
     setVehiclesError(null);
 
-    try {
-      const [ordersResult, vehiclesResult, notificationsResult] =
-        await Promise.allSettled([
-          ordersService.getOrders(),
-          vehiclesService.getVehicles(),
-          notificationsService.getNotifications({ role: ROLES.ADMINISTRADOR }),
-        ]);
-
-      if (ordersResult.status === 'fulfilled') {
-        setOrders(ordersResult.value);
-      } else {
-        setOrdersError(
-          ordersResult.reason instanceof Error
-            ? ordersResult.reason.message
-            : 'No fue posible cargar las órdenes.',
-        );
-      }
-
-      if (vehiclesResult.status === 'fulfilled') {
-        setVehicles(vehiclesResult.value);
-      } else {
-        setVehiclesError(
-          vehiclesResult.reason instanceof Error
-            ? vehiclesResult.reason.message
-            : 'No fue posible cargar los vehículos.',
-        );
-      }
-
-      if (notificationsResult.status === 'fulfilled') {
-        setNotifications(notificationsResult.value);
-      }
-    } finally {
-      setIsRefreshing(false);
-    }
-  }, []);
-
-  const reload = (refresh = false) => {
-    void loadDashboard(refresh);
+    void loadDashboard();
   };
 
   useEffect(() => {
@@ -211,6 +219,14 @@ export default function AdministradorScreen() {
     await logout();
     router.replace('/login');
   };
+
+  if (isLoading) {
+    return (
+      <SafeAreaView style={styles.safeArea}>
+        <Loading testID="admin-dashboard-loading" message="Cargando panel..." />
+      </SafeAreaView>
+    );
+  }
 
   return (
     <SafeAreaView style={styles.safeArea}>
@@ -378,6 +394,14 @@ export default function AdministradorScreen() {
             onPress={() => router.push('/(admin)/proveedores' as never)}
           />
         </View>
+
+        {notificationsError ? (
+          <ErrorMessage
+            testID="admin-notifications-error"
+            message={notificationsError}
+            onRetry={() => reload(true)}
+          />
+        ) : null}
 
         {notifications.length > 0 ? (
           <View style={styles.ordersList}>

@@ -18,6 +18,7 @@ import MecanicoScreen from '@/app/(mecanico)/mecanico';
 import VehiculosAsignadosScreen from '@/app/(mecanico)/vehiculos-asignados';
 import { vehiclesService } from '@/services/vehicles.service';
 import { ordersService } from '@/services/orders.service';
+import { notificationsService } from '@/services/notifications.service';
 import type { Vehicle } from '@/models/vehicle.model';
 
 jest.mock('@/services/vehicles.service', () => ({
@@ -259,6 +260,8 @@ describe('listado de vehículos: acceso desde cada panel', () => {
    */
   it('cada panel ofrece un control que abre su propio listado', async () => {
     jest.spyOn(ordersService, 'getOrders').mockResolvedValue([]);
+    // Esta prueba comprueba navegación; los avisos derivados tienen su propia cobertura.
+    const notices = jest.spyOn(notificationsService, 'getNotifications').mockResolvedValue([]);
     mockedService.getMyVehicles.mockResolvedValue([]);
     mockedService.getAssignedVehicles.mockResolvedValue([]);
     mockedService.getVehicles.mockResolvedValue([]);
@@ -298,5 +301,6 @@ describe('listado de vehículos: acceso desde cada panel', () => {
     await waitFor(() => expect(screen).toHavePathname('/vehiculos'));
     expect(mockedService.getVehicles).toHaveBeenCalledTimes(2);
     expect(ordersService.getOrders).toHaveBeenCalledTimes(1);
+    notices.mockRestore();
   });
 });

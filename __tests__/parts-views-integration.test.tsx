@@ -21,6 +21,9 @@ import type { UserRole } from '@/constants/roles';
 import { mockUserByRole } from '@/mocks/users.mock';
 import type { SparePart, SupplierDetail } from '@/models/parts.model';
 import { partsService } from '@/services/parts.service';
+import { ordersService } from '@/services/orders.service';
+import { vehiclesService } from '@/services/vehicles.service';
+import { notificationsService } from '@/services/notifications.service';
 
 jest.mock('@/services/parts.service', () => ({
   partsService: {
@@ -489,6 +492,14 @@ describe('Proveedores (administrador)', () => {
 });
 
 describe('Navegación desde el panel del administrador', () => {
+  beforeEach(() => {
+    // Este bloque verifica navegación; las consultas del panel tienen su propia regresión.
+    jest.spyOn(ordersService, 'getOrders').mockResolvedValue([]);
+    jest.spyOn(vehiclesService, 'getVehicles').mockResolvedValue([]);
+    jest.spyOn(notificationsService, 'getNotifications').mockResolvedValue([]);
+  });
+  afterEach(() => jest.restoreAllMocks());
+
   it.each([
     ['Ver repuestos', '/repuestos', 'spare-part-list-empty'],
     ['Ver proveedores', '/proveedores', 'supplier-list-empty'],

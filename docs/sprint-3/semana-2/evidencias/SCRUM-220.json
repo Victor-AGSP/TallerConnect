@@ -1,0 +1,327 @@
+{
+  "startTime": 1794670555312,
+  "numTotalTestSuites": 5,
+  "numPassedTestSuites": 5,
+  "numFailedTestSuites": 0,
+  "numPassedTests": 71,
+  "numFailedTests": 0,
+  "numPendingTests": 0,
+  "success": true,
+  "environment": "Jest; dobles controlados; sin backend ni dispositivo",
+  "suites": [
+    {
+      "file": "__tests__/order-client-scope.test.tsx",
+      "status": "passed",
+      "tests": [
+        {
+          "name": "lista solo órdenes del vehículo consultado y abre el detalle propio aunque otro usuario lo creó",
+          "status": "passed"
+        },
+        {
+          "name": "el detalle directo ajeno rechazado no muestra datos ni consulta el vehículo",
+          "status": "passed"
+        },
+        {
+          "name": "distingue una lista vacía válida sin registros demo",
+          "status": "passed"
+        },
+        {
+          "name": "HTTP 401 de órdenes muestra error recuperable, sin declararlo vacío",
+          "status": "passed"
+        },
+        {
+          "name": "HTTP 403 de órdenes muestra error recuperable, sin declararlo vacío",
+          "status": "passed"
+        },
+        {
+          "name": "HTTP 503 de órdenes muestra error recuperable, sin declararlo vacío",
+          "status": "passed"
+        },
+        {
+          "name": "refresh sustituye el listado y reabrir consulta nuevamente el servicio",
+          "status": "passed"
+        },
+        {
+          "name": "un refresh denegado retira las órdenes anteriores",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "file": "__tests__/order-functional.test.tsx",
+      "status": "passed",
+      "tests": [
+        {
+          "name": "caso de uso: consultar una orden de trabajo el rol cliente inicia sesión, consulta y actualiza una orden, vuelve al panel y cierra la sesión",
+          "status": "passed"
+        },
+        {
+          "name": "caso de uso: consultar una orden de trabajo el rol mecanico inicia sesión, consulta y actualiza una orden, vuelve al panel y cierra la sesión",
+          "status": "passed"
+        },
+        {
+          "name": "caso de uso: consultar una orden de trabajo el rol administrador inicia sesión, consulta y actualiza una orden, vuelve al panel y cierra la sesión",
+          "status": "passed"
+        },
+        {
+          "name": "caso de uso: consultar una orden de trabajo el cliente recupera la orden reintentando tras agotarse los reintentos automáticos",
+          "status": "passed"
+        },
+        {
+          "name": "caso de uso: decidir el presupuesto de una orden el cliente aprueba el presupuesto tras confirmar y la orden refleja la decisión",
+          "status": "passed"
+        },
+        {
+          "name": "caso de uso: decidir el presupuesto de una orden el rechazo exige motivo, advierte la cancelación y puede deshacerse antes de confirmar",
+          "status": "passed"
+        },
+        {
+          "name": "caso de uso: decidir el presupuesto de una orden un error del MS3 no se reintenta automáticamente y el cliente puede volver a intentarlo",
+          "status": "passed"
+        },
+        {
+          "name": "caso de uso: decidir el presupuesto de una orden una aplicación pendiente se reintenta sin duplicar la decisión",
+          "status": "passed"
+        },
+        {
+          "name": "caso de uso: decidir el presupuesto de una orden una decisión registrada no puede volver a enviarse",
+          "status": "passed"
+        },
+        {
+          "name": "caso de uso: decidir el presupuesto de una orden una doble pulsación de confirmar con la decisión en curso envía una sola decisión",
+          "status": "passed"
+        },
+        {
+          "name": "caso de uso: decidir el presupuesto de una orden una doble pulsación de reintentar la aplicación envía un solo reintento",
+          "status": "passed"
+        },
+        {
+          "name": "caso de uso: decidir el presupuesto de una orden el presupuesto se recupera con el reintento manual tras agotarse los reintentos automáticos",
+          "status": "passed"
+        },
+        {
+          "name": "caso de uso: consultar vehículos, repuestos y proveedores el administrador recorre vehículos, repuestos y proveedores desde su panel y cierra la sesión",
+          "status": "passed"
+        },
+        {
+          "name": "caso de uso: consultar vehículos, repuestos y proveedores el rol cliente consulta sus vehículos desde el panel",
+          "status": "passed"
+        },
+        {
+          "name": "caso de uso: consultar vehículos, repuestos y proveedores el rol mecanico consulta sus vehículos desde el panel",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "file": "__tests__/vehicle-list-integration.test.tsx",
+      "status": "passed",
+      "tests": [
+        {
+          "name": "listado de vehículos: consulta al servicio el listado de cliente permite abrir el detalle",
+          "status": "passed"
+        },
+        {
+          "name": "listado de vehículos: consulta al servicio el listado de mecánico permite abrir el detalle",
+          "status": "passed"
+        },
+        {
+          "name": "listado de vehículos: consulta al servicio el listado de administración permite abrir el detalle",
+          "status": "passed"
+        },
+        {
+          "name": "listado de vehículos: consulta al servicio la vista de cliente consulta getMyVehicles y representa los vehículos recibidos",
+          "status": "passed"
+        },
+        {
+          "name": "listado de vehículos: consulta al servicio la vista de mecánico consulta getAssignedVehicles y representa los vehículos recibidos",
+          "status": "passed"
+        },
+        {
+          "name": "listado de vehículos: consulta al servicio la vista de administración consulta getVehicles y representa los vehículos recibidos",
+          "status": "passed"
+        },
+        {
+          "name": "listado de vehículos: consulta al servicio no consulta el endpoint de otro rol",
+          "status": "passed"
+        },
+        {
+          "name": "listado de vehículos: estado de carga muestra el indicador de carga mientras el servicio responde",
+          "status": "passed"
+        },
+        {
+          "name": "listado de vehículos: resultados vacíos la vista de cliente informa cuando no hay vehículos",
+          "status": "passed"
+        },
+        {
+          "name": "listado de vehículos: resultados vacíos la vista de mecánico informa cuando no hay vehículos",
+          "status": "passed"
+        },
+        {
+          "name": "listado de vehículos: resultados vacíos la vista de administración informa cuando no hay vehículos",
+          "status": "passed"
+        },
+        {
+          "name": "listado de vehículos: errores la vista de cliente muestra el mensaje de error propagado por el servicio",
+          "status": "passed"
+        },
+        {
+          "name": "listado de vehículos: errores la vista de mecánico muestra el mensaje de error propagado por el servicio",
+          "status": "passed"
+        },
+        {
+          "name": "listado de vehículos: errores la vista de administración muestra el mensaje de error propagado por el servicio",
+          "status": "passed"
+        },
+        {
+          "name": "listado de vehículos: errores usa un mensaje propio si el error no aporta ninguno",
+          "status": "passed"
+        },
+        {
+          "name": "listado de vehículos: acceso desde cada panel cada panel ofrece un control que abre su propio listado",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "file": "__tests__/order-contract-compatibility.test.tsx",
+      "status": "passed",
+      "tests": [
+        {
+          "name": "contrato OrdenRespuesta → mapper → modelo transforma todos los campos obligatorios del contrato",
+          "status": "passed"
+        },
+        {
+          "name": "contrato OrdenRespuesta → mapper → modelo conserva un mecánico nulo del contrato como orden sin asignar",
+          "status": "passed"
+        },
+        {
+          "name": "contrato OrdenRespuesta → mapper → modelo el código 1 coincide con el catálogo oficial (recibido)",
+          "status": "passed"
+        },
+        {
+          "name": "contrato OrdenRespuesta → mapper → modelo el código 2 coincide con el catálogo oficial (esperando_diagnostico)",
+          "status": "passed"
+        },
+        {
+          "name": "contrato OrdenRespuesta → mapper → modelo el código 4 coincide con el catálogo oficial (esperando_repuestos)",
+          "status": "passed"
+        },
+        {
+          "name": "contrato OrdenRespuesta → mapper → modelo el código 6 coincide con el catálogo oficial (listo_para_entrega)",
+          "status": "passed"
+        },
+        {
+          "name": "contrato OrdenRespuesta → mapper → modelo el código 7 coincide con el catálogo oficial (entregado)",
+          "status": "passed"
+        },
+        {
+          "name": "contrato OrdenRespuesta → mapper → modelo el código 3 corresponde a esperando_aprobacion_presupuesto",
+          "status": "passed"
+        },
+        {
+          "name": "contrato OrdenRespuesta → mapper → modelo el código 5 corresponde a en_reparacion",
+          "status": "passed"
+        },
+        {
+          "name": "contrato OrdenRespuesta → mapper → modelo el código 8 corresponde a cancelado",
+          "status": "passed"
+        },
+        {
+          "name": "contrato OrdenRespuesta → mapper → modelo el código 1 se convierte en estado_destino sin pérdida (ida y vuelta)",
+          "status": "passed"
+        },
+        {
+          "name": "contrato OrdenRespuesta → mapper → modelo el código 2 se convierte en estado_destino sin pérdida (ida y vuelta)",
+          "status": "passed"
+        },
+        {
+          "name": "contrato OrdenRespuesta → mapper → modelo el código 3 se convierte en estado_destino sin pérdida (ida y vuelta)",
+          "status": "passed"
+        },
+        {
+          "name": "contrato OrdenRespuesta → mapper → modelo el código 4 se convierte en estado_destino sin pérdida (ida y vuelta)",
+          "status": "passed"
+        },
+        {
+          "name": "contrato OrdenRespuesta → mapper → modelo el código 5 se convierte en estado_destino sin pérdida (ida y vuelta)",
+          "status": "passed"
+        },
+        {
+          "name": "contrato OrdenRespuesta → mapper → modelo el código 6 se convierte en estado_destino sin pérdida (ida y vuelta)",
+          "status": "passed"
+        },
+        {
+          "name": "contrato OrdenRespuesta → mapper → modelo el código 7 se convierte en estado_destino sin pérdida (ida y vuelta)",
+          "status": "passed"
+        },
+        {
+          "name": "contrato OrdenRespuesta → mapper → modelo el código 8 se convierte en estado_destino sin pérdida (ida y vuelta)",
+          "status": "passed"
+        },
+        {
+          "name": "contrato OrdenRespuesta → mapper → modelo el código 0, fuera del catálogo, se rechaza",
+          "status": "passed"
+        },
+        {
+          "name": "contrato OrdenRespuesta → mapper → modelo el código 9, fuera del catálogo, se rechaza",
+          "status": "passed"
+        },
+        {
+          "name": "contrato OrdenRespuesta → mapper → modelo el código -1, fuera del catálogo, se rechaza",
+          "status": "passed"
+        },
+        {
+          "name": "contrato OrdenRespuesta → servicio getOrderById consulta la ruta oficial y devuelve el modelo",
+          "status": "passed"
+        },
+        {
+          "name": "contrato OrdenRespuesta → servicio getOrders transforma una lista con el formato del contrato",
+          "status": "passed"
+        },
+        {
+          "name": "contrato OrdenRespuesta → servicio updateOrderStatus utiliza el contrato oficial MS2",
+          "status": "passed"
+        },
+        {
+          "name": "contrato OrdenRespuesta → vistas de detalle la vista de cliente representa el ejemplo oficial del contrato",
+          "status": "passed"
+        },
+        {
+          "name": "contrato OrdenRespuesta → vistas de detalle la vista de mecánico representa el ejemplo oficial del contrato",
+          "status": "passed"
+        },
+        {
+          "name": "contrato OrdenRespuesta → vistas de detalle la vista de administración representa el ejemplo oficial del contrato",
+          "status": "passed"
+        },
+        {
+          "name": "contrato OrdenRespuesta → vistas de detalle muestra una orden recién recibida sin mecánico asignado",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "file": "__tests__/cliente-real.test.tsx",
+      "status": "passed",
+      "tests": [
+        {
+          "name": "Consulta del cliente sin demostración ofrece la consulta real de vehículos sin inventar una orden o presupuesto",
+          "status": "passed"
+        },
+        {
+          "name": "Consulta del cliente sin demostración no consulta ni selecciona una orden fija si falta su identificador",
+          "status": "passed"
+        },
+        {
+          "name": "Consulta del cliente sin demostración consulta el servicio para la orden solicitada y conserva el resultado vacío",
+          "status": "passed"
+        },
+        {
+          "name": "Consulta del cliente sin demostración muestra el error de consulta sin sustituirlo por presupuesto demo",
+          "status": "passed"
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,33 @@
+{
+  ".env": {
+    "EXPO_PUBLIC_APP_ENV": "production",
+    "EXPO_PUBLIC_API_URL": "https://tallerconect.vercel.app/api",
+    "EXPO_PUBLIC_USE_MOCK_AUTH": "false",
+    "EXPO_PUBLIC_USE_MOCK_SERVICES": "false",
+    "EXPO_PUBLIC_DEMO_WORKFLOW": "false"
+  },
+  ".env.local": {
+    "EXPO_PUBLIC_API_URL": "https://tallerconect.vercel.app/api",
+    "EXPO_PUBLIC_APP_ENV": "production",
+    "EXPO_PUBLIC_USE_MOCK_AUTH": "false",
+    "EXPO_PUBLIC_USE_MOCK_SERVICES": "false",
+    "EXPO_PUBLIC_DEMO_WORKFLOW": "false"
+  },
+  "androidExport": {
+    "bundleCount": 1,
+    "bundleBytes": 4567916,
+    "sha256": "779f01a6a19f1fbf0b78a7f86e055999d38b8069a866918a6d7e9295f17ba150",
+    "metadataExists": true,
+    "deviceObserved": false
+  },
+  "adbAvailable": false,
+  "recordedAt": "2026-11-14T15:46:36.985507+00:00",
+  "git": {
+    "base": "a1fd1fef58caae2ad46723d1ec36576aa3338572",
+    "main": "6bf6fd1aefd9560cdd04c7f1cdf989aae5bcd6a1",
+    "Develop": "6a020ffe4b4f17a28e2aa51af8c4b21e8d0d3b31",
+    "fsckExit": 0,
+    "danglingObjects": "informativos; no eliminados",
+    "pushPerformed": false
+  }
+}

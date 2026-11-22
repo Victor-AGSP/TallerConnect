@@ -1,0 +1,37 @@
+{
+  "date_utc": "2026-11-11",
+  "branch": "Victor",
+  "base_commit": "872a862",
+  "kind": "AUTOMATED_MOCK",
+  "command": "npm test -- --watchman=false --runTestsByPath __tests__/evidence-functional.test.tsx __tests__/evidence-mechanic-updates.test.tsx __tests__/evidence-role-visibility.test.tsx __tests__/order-role-access.test.tsx --json --outputFile=/tmp/tallerconnect-sprint3/mechanic.json",
+  "note": "83/83 con mocks; utilidad test-utils/index.ts corregida pendiente sin commit de SCRUM-158; no backend ni permisos nativos reales.",
+  "passed": 83,
+  "failed": 0,
+  "pending": 0,
+  "suites": [
+    {
+      "path": "__tests__/evidence-functional.test.tsx",
+      "status": "passed",
+      "passed": 16,
+      "failed": 0
+    },
+    {
+      "path": "__tests__/order-role-access.test.tsx",
+      "status": "passed",
+      "passed": 18,
+      "failed": 0
+    },
+    {
+      "path": "__tests__/evidence-role-visibility.test.tsx",
+      "status": "passed",
+      "passed": 27,
+      "failed": 0
+    },
+    {
+      "path": "__tests__/evidence-mechanic-updates.test.tsx",
+      "status": "passed",
+      "passed": 22,
+      "failed": 0
+    }
+  ]
+}

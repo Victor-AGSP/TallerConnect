@@ -173,7 +173,9 @@ describe('vistas de órdenes: errores de servicio', () => {
     await renderOrder('/ordenes-asignadas/31');
 
     await expectErrorMessage(
-      'Error interno en el servidor. Intenta nuevamente más tarde.',
+      status === 503
+        ? 'El servicio o la API Gateway no se encuentra disponible temporalmente. Intenta más tarde.'
+        : 'Error interno en el servidor. Intenta nuevamente más tarde.',
     );
   });
 

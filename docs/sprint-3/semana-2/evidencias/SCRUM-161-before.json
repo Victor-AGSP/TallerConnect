@@ -1,0 +1,28 @@
+{
+  "startTime": 1794670927786,
+  "numTotalTestSuites": 1,
+  "numPassedTestSuites": 0,
+  "numFailedTestSuites": 1,
+  "numPassedTests": 1,
+  "numFailedTests": 1,
+  "numPendingTests": 0,
+  "success": false,
+  "environment": "Jest; dobles controlados; sin backend ni dispositivo",
+  "suites": [
+    {
+      "file": "__tests__/budget-order-transition.test.tsx",
+      "status": "failed",
+      "tests": [
+        {
+          "name": "no conserva el resultado de una decisión de otra orden al navegar",
+          "status": "failed",
+          "failure": "Error: expect(received).toBeNull()\n\nReceived: <View accessibilityLiveRegion=\"polite\" style={[{\"backgroundColor\": \"#FFFFFF\", \"borderColor\": \"#94A3B8\", \"borderRadius\": 22, \"borderWidth\": 1, \"elevation\": 2, \"padding\": 16, \"shadowColor\": \"#000000\", \"shadowOffset\": {\"height\": 4, \"width\": 0}, \"shadowOpacity\": 0.05, \"shadowRadius\": 10}, undefined]} testID=\"order-budget-decision-result\"><View><Text style={{\"color\": \"#0F172A\", \"fontSize\": 14, \"fontWeight\": \"700\"}}>Presupuesto aprobado. La orden pasa a reparación.</Text></View></View>\n"
+        },
+        {
+          "name": "el cambio de orden inicia su lectura aunque la anterior no haya terminado",
+          "status": "passed"
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,3 @@
+Matrix rows: 149; unique IDs: 149
+Markdown files: 5; local links: 175; checklist cases: 64
+PASS: links, required case fields and evidence counts

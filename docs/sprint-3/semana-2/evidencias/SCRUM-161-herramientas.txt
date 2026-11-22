@@ -1,0 +1,78 @@
+TypeScript y lint: exit 0; git diff --check exit 0
+npm notice run tallerconnect@1.0.0 typecheck
+npm notice run tsc --noEmit
+npm notice run tallerconnect@1.0.0 lint
+npm notice run expo lint
+env: load .env.local .env
+env: export EXPO_PUBLIC_API_URL EXPO_PUBLIC_APP_ENV EXPO_PUBLIC_DEMO_WORKFLOW EXPO_PUBLIC_ENABLE_NOTIFICATIONS_API EXPO_PUBLIC_USE_MOCK_AUTH EXPO_PUBLIC_USE_MOCK_SERVICES EXPO_PUBLIC_HTTP_TRACE
+npm notice run tallerconnect@1.0.0 npx
+npm notice run 'eslint' /home/victor/Documents/Proyectos/TallerConnect/src --fix=false --cache=true --cache-location=/home/victor/Documents/Proyectos/TallerConnect/.expo/cache/eslint/
+
+/home/victor/Documents/Proyectos/TallerConnect/src/__tests__/interceptors.test.ts
+  180:22  warning  Caution: `axios` also has a named export `AxiosHeaders`. Check if you meant to write `import {AxiosHeaders} from 'axios'` instead  import/no-named-as-default-member
+  192:22  warning  Caution: `axios` also has a named export `create`. Check if you meant to write `import {create} from 'axios'` instead              import/no-named-as-default-member
+  195:19  warning  Array type using 'Array<T>' is forbidden. Use 'T[]' instead                                                                        @typescript-eslint/array-type
+  199:22  warning  Caution: `axios` also has a named export `AxiosHeaders`. Check if you meant to write `import {AxiosHeaders} from 'axios'` instead  import/no-named-as-default-member
+  208:22  warning  Caution: `axios` also has a named export `create`. Check if you meant to write `import {create} from 'axios'` instead              import/no-named-as-default-member
+  211:19  warning  Array type using 'Array<T>' is forbidden. Use 'T[]' instead                                                                        @typescript-eslint/array-type
+  215:22  warning  Caution: `axios` also has a named export `AxiosHeaders`. Check if you meant to write `import {AxiosHeaders} from 'axios'` instead  import/no-named-as-default-member
+  224:22  warning  Caution: `axios` also has a named export `create`. Check if you meant to write `import {create} from 'axios'` instead              import/no-named-as-default-member
+  228:19  warning  Array type using 'Array<T>' is forbidden. Use 'T[]' instead                                                                        @typescript-eslint/array-type
+  232:22  warning  Caution: `axios` also has a named export `AxiosHeaders`. Check if you meant to write `import {AxiosHeaders} from 'axios'` instead  import/no-named-as-default-member
+  244:22  warning  Caution: `axios` also has a named export `create`. Check if you meant to write `import {create} from 'axios'` instead              import/no-named-as-default-member
+  248:19  warning  Array type using 'Array<T>' is forbidden. Use 'T[]' instead                                                                        @typescript-eslint/array-type
+  252:22  warning  Caution: `axios` also has a named export `AxiosHeaders`. Check if you meant to write `import {AxiosHeaders} from 'axios'` instead  import/no-named-as-default-member
+  265:22  warning  Caution: `axios` also has a named export `create`. Check if you meant to write `import {create} from 'axios'` instead              import/no-named-as-default-member
+  269:19  warning  Array type using 'Array<T>' is forbidden. Use 'T[]' instead                                                                        @typescript-eslint/array-type
+  273:22  warning  Caution: `axios` also has a named export `AxiosHeaders`. Check if you meant to write `import {AxiosHeaders} from 'axios'` instead  import/no-named-as-default-member
+  285:22  warning  Caution: `axios` also has a named export `create`. Check if you meant to write `import {create} from 'axios'` instead              import/no-named-as-default-member
+  289:19  warning  Array type using 'Array<T>' is forbidden. Use 'T[]' instead                                                                        @typescript-eslint/array-type
+  300:22  warning  Caution: `axios` also has a named export `create`. Check if you meant to write `import {create} from 'axios'` instead              import/no-named-as-default-member
+  304:19  warning  Array type using 'Array<T>' is forbidden. Use 'T[]' instead                                                                        @typescript-eslint/array-type
+  321:22  warning  Caution: `axios` also has a named export `create`. Check if you meant to write `import {create} from 'axios'` instead              import/no-named-as-default-member
+  325:19  warning  Array type using 'Array<T>' is forbidden. Use 'T[]' instead                                                                        @typescript-eslint/array-type
+  342:22  warning  Caution: `axios` also has a named export `create`. Check if you meant to write `import {create} from 'axios'` instead              import/no-named-as-default-member
+  346:19  warning  Array type using 'Array<T>' is forbidden. Use 'T[]' instead                                                                        @typescript-eslint/array-type
+  363:22  warning  Caution: `axios` also has a named export `create`. Check if you meant to write `import {create} from 'axios'` instead              import/no-named-as-default-member
+  367:19  warning  Array type using 'Array<T>' is forbidden. Use 'T[]' instead                                                                        @typescript-eslint/array-type
+  382:22  warning  Caution: `axios` also has a named export `create`. Check if you meant to write `import {create} from 'axios'` instead              import/no-named-as-default-member
+  386:19  warning  Array type using 'Array<T>' is forbidden. Use 'T[]' instead                                                                        @typescript-eslint/array-type
+  401:22  warning  Caution: `axios` also has a named export `create`. Check if you meant to write `import {create} from 'axios'` instead              import/no-named-as-default-member
+  405:19  warning  Array type using 'Array<T>' is forbidden. Use 'T[]' instead                                                                        @typescript-eslint/array-type
+  420:22  warning  Caution: `axios` also has a named export `create`. Check if you meant to write `import {create} from 'axios'` instead              import/no-named-as-default-member
+  424:19  warning  Array type using 'Array<T>' is forbidden. Use 'T[]' instead                                                                        @typescript-eslint/array-type
+
+/home/victor/Documents/Proyectos/TallerConnect/src/components/common/ConnectivityBanner.tsx
+  10:10  warning  'colors' is defined but never used  @typescript-eslint/no-unused-vars
+
+/home/victor/Documents/Proyectos/TallerConnect/src/dto/notification.dto.ts
+  4:3  warning  'NotificationPriority' is defined but never used  @typescript-eslint/no-unused-vars
+
+/home/victor/Documents/Proyectos/TallerConnect/src/mappers/evidence.mapper.ts
+  23:10  warning  'normalizeContext' is defined but never used  @typescript-eslint/no-unused-vars
+
+/home/victor/Documents/Proyectos/TallerConnect/src/services/api/client.ts
+  39:20  warning  Caution: `axios` also has a named export `create`. Check if you meant to write `import {create} from 'axios'` instead  import/no-named-as-default-member
+
+/home/victor/Documents/Proyectos/TallerConnect/src/services/api/interceptors.ts
+  135:7   warning  Caution: `axios` also has a named export `isAxiosError`. Check if you meant to write `import {isAxiosError} from 'axios'` instead  import/no-named-as-default-member
+  319:15  warning  Unused eslint-disable directive (no problems were reported from '@typescript-eslint/no-var-requires')
+  320:40  warning  A `require()` style import is forbidden                                                                                            @typescript-eslint/no-require-imports
+
+/home/victor/Documents/Proyectos/TallerConnect/src/services/api/types.ts
+  14:9  warning  Array type using 'Array<T>' is forbidden. Use 'T[]' instead  @typescript-eslint/array-type
+
+/home/victor/Documents/Proyectos/TallerConnect/src/services/auth.service.ts
+   50:19  warning  Array type using 'Array<T>' is forbidden. Use 'T[]' instead                                                                        @typescript-eslint/array-type
+  209:10  warning  Caution: `axios` also has a named export `isAxiosError`. Check if you meant to write `import {isAxiosError} from 'axios'` instead  import/no-named-as-default-member
+  222:9   warning  Caution: `axios` also has a named export `isAxiosError`. Check if you meant to write `import {isAxiosError} from 'axios'` instead  import/no-named-as-default-member
+
+/home/victor/Documents/Proyectos/TallerConnect/src/services/budgets.service.ts
+  1123:8  warning  Caution: `axios` also has a named export `isAxiosError`. Check if you meant to write `import {isAxiosError} from 'axios'` instead  import/no-named-as-default-member
+
+/home/victor/Documents/Proyectos/TallerConnect/src/stores/connectivityStore.ts
+  169:11  warning  Caution: `axios` also has a named export `isAxiosError`. Check if you meant to write `import {isAxiosError} from 'axios'` instead  import/no-named-as-default-member
+  187:9   warning  Caution: `axios` also has a named export `isAxiosError`. Check if you meant to write `import {isAxiosError} from 'axios'` instead  import/no-named-as-default-member
+
+✖ 46 problems (0 errors, 46 warnings)
+  0 errors and 16 warnings potentially fixable with the `--fix` option.

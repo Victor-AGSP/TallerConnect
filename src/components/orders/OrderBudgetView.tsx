@@ -92,7 +92,12 @@ function formatQuantity(quantity: string): string {
  * ítems, importes y estado. El cliente puede además aprobar o rechazar la
  * versión enviada.
  */
-export function OrderBudgetView({
+export function OrderBudgetView(props: OrderBudgetViewProps) {
+  // Una nueva orden inicia también un nuevo estado local de decisiones.
+  return <OrderBudgetViewContent key={props.orderId ?? ''} {...props} />;
+}
+
+function OrderBudgetViewContent({
   eyebrow,
   orderId,
   loadBudget,

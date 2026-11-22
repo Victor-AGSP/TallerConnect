@@ -1,0 +1,2 @@
+Markdown files: 1; local links: 14; checklist cases: 27
+PASS: links, required case fields and evidence counts

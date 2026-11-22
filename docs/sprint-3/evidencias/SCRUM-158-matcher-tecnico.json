@@ -1,0 +1,145 @@
+{
+  "kind": "AUTOMATED_MOCK",
+  "branch": "Victor",
+  "base_commit": "07a23a2",
+  "started_at_utc": "2026-11-12T00:15:46.887000+00:00",
+  "command": "npm test -- --watchman=false --testPathPatterns='auth[-.]|authStore|protected-routes|role-access-restrictions|services-session-navigation|test-utils.test' --json --outputFile=/tmp/tallerconnect-seguimiento/matcher.json",
+  "passed": 153,
+  "failed": 0,
+  "pending": 0,
+  "suites": [
+    {
+      "path": "__tests__/auth-full-flow.test.tsx",
+      "status": "passed",
+      "passed": 9,
+      "failed": 0
+    },
+    {
+      "path": "__tests__/auth-service.test.ts",
+      "status": "passed",
+      "passed": 13,
+      "failed": 0
+    },
+    {
+      "path": "__tests__/protected-routes.test.tsx",
+      "status": "passed",
+      "passed": 16,
+      "failed": 0
+    },
+    {
+      "path": "__tests__/role-access-restrictions.test.tsx",
+      "status": "passed",
+      "passed": 15,
+      "failed": 0
+    },
+    {
+      "path": "__tests__/auth-session.test.tsx",
+      "status": "passed",
+      "passed": 9,
+      "failed": 0
+    },
+    {
+      "path": "__tests__/services-session-navigation.test.tsx",
+      "status": "passed",
+      "passed": 5,
+      "failed": 0
+    },
+    {
+      "path": "__tests__/auth-flow.test.tsx",
+      "status": "passed",
+      "passed": 1,
+      "failed": 0
+    },
+    {
+      "path": "__tests__/test-utils.test.tsx",
+      "status": "passed",
+      "passed": 4,
+      "failed": 0
+    },
+    {
+      "path": "__tests__/auth-role.test.ts",
+      "status": "passed",
+      "passed": 4,
+      "failed": 0
+    },
+    {
+      "path": "__tests__/auth-logout.test.ts",
+      "status": "passed",
+      "passed": 5,
+      "failed": 0
+    },
+    {
+      "path": "src/__tests__/auth.service.test.ts",
+      "status": "passed",
+      "passed": 4,
+      "failed": 0
+    },
+    {
+      "path": "__tests__/auth-schema.test.ts",
+      "status": "passed",
+      "passed": 16,
+      "failed": 0
+    },
+    {
+      "path": "src/__tests__/authStore.test.ts",
+      "status": "passed",
+      "passed": 6,
+      "failed": 0
+    },
+    {
+      "path": "__tests__/auth-contract.test.ts",
+      "status": "passed",
+      "passed": 22,
+      "failed": 0
+    },
+    {
+      "path": "__tests__/auth-mapper.test.ts",
+      "status": "passed",
+      "passed": 14,
+      "failed": 0
+    },
+    {
+      "path": "__tests__/auth-storage.test.ts",
+      "status": "passed",
+      "passed": 10,
+      "failed": 0
+    }
+  ],
+  "scope": "Corrección técnica del matcher público de Expo Router. NO valida autenticación real ni levanta BLOCKED. Auth, HTTP y almacenamiento simulados según suite.",
+  "tool_checks": {
+    "typecheck": {
+      "command": "npm run typecheck",
+      "exit_code": 0
+    },
+    "lint": {
+      "command": "CI=1 npm run lint",
+      "exit_code": 0,
+      "errors": 0,
+      "warnings": 46
+    }
+  },
+  "dependencies": {
+    "expo-router": {
+      "installed": "58.0.30",
+      "lock": "58.0.28"
+    },
+    "jest-expo": {
+      "installed": "58.0.14",
+      "lock": "58.0.13"
+    },
+    "@testing-library/react-native": {
+      "installed": "14.1.0",
+      "lock": "14.1.0"
+    },
+    "eslint": {
+      "installed": "9.39.5",
+      "lock": null
+    },
+    "eslint-config-expo": {
+      "installed": "58.0.4",
+      "lock": null
+    }
+  },
+  "test_utils_sha256": "3864c78213cece171fab5f58d655f2e42882bc4798662c81b8452625abd647b3",
+  "regression_assertions": "Ruta inicial correcta, negación de ruta distinta y aserción incorrecta que debe lanzar error; después navegación a /perfil."
+}

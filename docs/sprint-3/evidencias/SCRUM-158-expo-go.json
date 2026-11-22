@@ -1,0 +1,70 @@
+{
+  "timestamp_utc": "2026-11-12T16:23:11.826334+00:00",
+  "ticket": "SCRUM-158",
+  "scope": "Preparación técnica Expo Go y HTTP público; sin autenticación real ni observación de teléfono",
+  "backend": "https://tallerconect.vercel.app/api",
+  "environment": "production",
+  "public_probes": [
+    {
+      "method": "GET",
+      "path": "/api/health",
+      "http": 200,
+      "body": {
+        "status": "ok",
+        "servicio": "gateway"
+      }
+    },
+    {
+      "method": "GET",
+      "path": "/api/health/servicios",
+      "http": 503,
+      "body": {
+        "status": "degradado",
+        "gateway": "ok",
+        "servicios": {
+          "ms1_auth": {
+            "estado": "tiempo_agotado"
+          },
+          "ms2_taller": {
+            "estado": "tiempo_agotado"
+          },
+          "ms3_presupuestos": {
+            "estado": "tiempo_agotado"
+          },
+          "ms4_evidencias": {
+            "estado": "tiempo_agotado"
+          }
+        }
+      }
+    }
+  ],
+  "expo": {
+    "sdk": "58.0.0",
+    "manifest_android_http": 200,
+    "android_bundle_http": 200,
+    "android_bundle_bytes": 8756892,
+    "physical_device": "NOT_OBSERVED",
+    "connection": "LAN"
+  },
+  "automated": {
+    "command": "npm test -- --silent --json",
+    "suites_passed": 76,
+    "passed": 1278,
+    "failed": 0,
+    "typecheck_exit": 0,
+    "lint_errors": 0,
+    "lint_warnings": 46,
+    "kind": "AUTOMATED_WITH_TEST_DOUBLES"
+  },
+  "original_cases": {
+    "total": 64,
+    "pass_ui_only": 3,
+    "fail": 0,
+    "blocked": 61
+  },
+  "authenticated_requests_executed": 0,
+  "expo_install_check": {
+    "exit": 1,
+    "observation": "11 recomendaciones de actualización patch; dependencias sin modificar"
+  }
+}

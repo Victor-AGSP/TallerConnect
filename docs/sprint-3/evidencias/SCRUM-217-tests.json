@@ -1,0 +1,43 @@
+{
+  "date_utc": "2026-11-11",
+  "branch": "Victor",
+  "base_commit": "872a862",
+  "kind": "AUTOMATED_MOCK",
+  "command": "npm test -- --watchman=false --runTestsByPath __tests__/vehicle-list-integration.test.tsx __tests__/order-detail-integration.test.tsx __tests__/budget-views-integration.test.tsx __tests__/evidence-role-visibility.test.tsx __tests__/manual-refresh-retry.test.tsx --json --outputFile=/tmp/tallerconnect-sprint3/client.json",
+  "note": "85 PASS, 1 FAIL: vehicle-list-integration, navegación desde panel administrador espera una llamada de órdenes pero recibe dos (avisos derivados también consultan órdenes). Usa corrección pendiente sin commit de test-utils/index.ts de SCRUM-158. Sin backend real.",
+  "passed": 85,
+  "failed": 1,
+  "pending": 0,
+  "suites": [
+    {
+      "path": "__tests__/evidence-role-visibility.test.tsx",
+      "status": "passed",
+      "passed": 27,
+      "failed": 0
+    },
+    {
+      "path": "__tests__/budget-views-integration.test.tsx",
+      "status": "passed",
+      "passed": 23,
+      "failed": 0
+    },
+    {
+      "path": "__tests__/vehicle-list-integration.test.tsx",
+      "status": "failed",
+      "passed": 15,
+      "failed": 1
+    },
+    {
+      "path": "__tests__/manual-refresh-retry.test.tsx",
+      "status": "passed",
+      "passed": 8,
+      "failed": 0
+    },
+    {
+      "path": "__tests__/order-detail-integration.test.tsx",
+      "status": "passed",
+      "passed": 12,
+      "failed": 0
+    }
+  ]
+}

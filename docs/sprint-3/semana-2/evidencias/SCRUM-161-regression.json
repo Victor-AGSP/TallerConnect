@@ -1,0 +1,3753 @@
+{
+  "startTime": 1794670973508,
+  "numTotalTestSuites": 46,
+  "numPassedTestSuites": 46,
+  "numFailedTestSuites": 0,
+  "numPassedTests": 866,
+  "numFailedTests": 0,
+  "numPendingTests": 0,
+  "success": true,
+  "environment": "Jest; dobles controlados; sin backend ni dispositivo",
+  "suites": [
+    {
+      "file": "__tests__/order-client-scope.test.tsx",
+      "status": "passed",
+      "tests": [
+        {
+          "name": "lista solo órdenes del vehículo consultado y abre el detalle propio aunque otro usuario lo creó",
+          "status": "passed"
+        },
+        {
+          "name": "el detalle directo ajeno rechazado no muestra datos ni consulta el vehículo",
+          "status": "passed"
+        },
+        {
+          "name": "distingue una lista vacía válida sin registros demo",
+          "status": "passed"
+        },
+        {
+          "name": "HTTP 401 de órdenes muestra error recuperable, sin declararlo vacío",
+          "status": "passed"
+        },
+        {
+          "name": "HTTP 403 de órdenes muestra error recuperable, sin declararlo vacío",
+          "status": "passed"
+        },
+        {
+          "name": "HTTP 503 de órdenes muestra error recuperable, sin declararlo vacío",
+          "status": "passed"
+        },
+        {
+          "name": "refresh sustituye el listado y reabrir consulta nuevamente el servicio",
+          "status": "passed"
+        },
+        {
+          "name": "un refresh denegado retira las órdenes anteriores",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "file": "__tests__/budget-read-refresh.test.tsx",
+      "status": "passed",
+      "tests": [
+        {
+          "name": "vista Cliente: integridad de relación no selecciona el único presupuesto si es de otra orden",
+          "status": "passed"
+        },
+        {
+          "name": "vista Cliente: integridad de relación rechaza detalle que no coincide con orden/presupuesto solicitado: {\"presupuesto_id\":5,\"orden_id\":32,\"creado_en\":\"2026-11-14T10:00:00Z\",\"cantidad_versiones\":1,\"ultima_version\":1,\"estado_ultima_version\":\"enviada\",\"total_ultima_version\":\"125000.00\",\"version_vigente\":null,\"versiones\":[{\"numero\":1,\"estado\":\"enviada\",\"es_modificacion\":false,\"creado_por_id\":99,\"creado_en\":\"2026-11-14T10:00:00Z\",\"enviado_en\":\"2026-11-14T11:00:00Z\",\"bloqueada_en\":\"2026-11-14T11:00:00Z\",\"total\":\"125000.00\",\"decision\":null,\"items\":[{\"item_id\":11,\"tipo\":\"mano_de_obra\",\"descripcion\":\"Trabajo QA local\",\"cantidad\":\"1\",\"precio_unitario\":\"125000.00\",\"subtotal\":\"125000.00\",\"repuesto_id\":null}]}]}",
+          "status": "passed"
+        },
+        {
+          "name": "vista Cliente: integridad de relación rechaza detalle que no coincide con orden/presupuesto solicitado: {\"presupuesto_id\":6,\"orden_id\":31,\"creado_en\":\"2026-11-14T10:00:00Z\",\"cantidad_versiones\":1,\"ultima_version\":1,\"estado_ultima_version\":\"enviada\",\"total_ultima_version\":\"125000.00\",\"version_vigente\":null,\"versiones\":[{\"numero\":1,\"estado\":\"enviada\",\"es_modificacion\":false,\"creado_por_id\":99,\"creado_en\":\"2026-11-14T10:00:00Z\",\"enviado_en\":\"2026-11-14T11:00:00Z\",\"bloqueada_en\":\"2026-11-14T11:00:00Z\",\"total\":\"125000.00\",\"decision\":null,\"items\":[{\"item_id\":11,\"tipo\":\"mano_de_obra\",\"descripcion\":\"Trabajo QA local\",\"cantidad\":\"1\",\"precio_unitario\":\"125000.00\",\"subtotal\":\"125000.00\",\"repuesto_id\":null}]}]}",
+          "status": "passed"
+        },
+        {
+          "name": "adaptador de administración: integridad de relación no selecciona el único presupuesto si es de otra orden",
+          "status": "passed"
+        },
+        {
+          "name": "adaptador de administración: integridad de relación rechaza detalle que no coincide con orden/presupuesto solicitado: {\"presupuesto_id\":5,\"orden_id\":32,\"creado_en\":\"2026-11-14T10:00:00Z\",\"cantidad_versiones\":1,\"ultima_version\":1,\"estado_ultima_version\":\"enviada\",\"total_ultima_version\":\"125000.00\",\"version_vigente\":null,\"versiones\":[{\"numero\":1,\"estado\":\"enviada\",\"es_modificacion\":false,\"creado_por_id\":99,\"creado_en\":\"2026-11-14T10:00:00Z\",\"enviado_en\":\"2026-11-14T11:00:00Z\",\"bloqueada_en\":\"2026-11-14T11:00:00Z\",\"total\":\"125000.00\",\"decision\":null,\"items\":[{\"item_id\":11,\"tipo\":\"mano_de_obra\",\"descripcion\":\"Trabajo QA local\",\"cantidad\":\"1\",\"precio_unitario\":\"125000.00\",\"subtotal\":\"125000.00\",\"repuesto_id\":null}]}]}",
+          "status": "passed"
+        },
+        {
+          "name": "adaptador de administración: integridad de relación rechaza detalle que no coincide con orden/presupuesto solicitado: {\"presupuesto_id\":6,\"orden_id\":31,\"creado_en\":\"2026-11-14T10:00:00Z\",\"cantidad_versiones\":1,\"ultima_version\":1,\"estado_ultima_version\":\"enviada\",\"total_ultima_version\":\"125000.00\",\"version_vigente\":null,\"versiones\":[{\"numero\":1,\"estado\":\"enviada\",\"es_modificacion\":false,\"creado_por_id\":99,\"creado_en\":\"2026-11-14T10:00:00Z\",\"enviado_en\":\"2026-11-14T11:00:00Z\",\"bloqueada_en\":\"2026-11-14T11:00:00Z\",\"total\":\"125000.00\",\"decision\":null,\"items\":[{\"item_id\":11,\"tipo\":\"mano_de_obra\",\"descripcion\":\"Trabajo QA local\",\"cantidad\":\"1\",\"precio_unitario\":\"125000.00\",\"subtotal\":\"125000.00\",\"repuesto_id\":null}]}]}",
+          "status": "passed"
+        },
+        {
+          "name": "refresh y reapertura hacen nuevas lecturas y sustituyen los datos sin caché persistente",
+          "status": "passed"
+        },
+        {
+          "name": "el refresh fallido muestra error, retira datos y permite volver a consultar",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "file": "__tests__/budget-demo-empty.test.tsx",
+      "status": "passed",
+      "tests": [
+        {
+          "name": "DEMO: ausencia de presupuesto muestra vacío explícito sin total ficticio y permite navegar",
+          "status": "passed"
+        },
+        {
+          "name": "modo real con lista vacía no consulta ni muestra el presupuesto demo",
+          "status": "passed"
+        },
+        {
+          "name": "un error HTTP real simulado se presenta como error, nunca como vacío demo",
+          "status": "passed"
+        },
+        {
+          "name": "una carga pendiente permanece en loading hasta resolver la lista vacía",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "file": "__tests__/budget-order-transition.test.tsx",
+      "status": "passed",
+      "tests": [
+        {
+          "name": "no conserva el resultado de una decisión de otra orden al navegar",
+          "status": "passed"
+        },
+        {
+          "name": "el cambio de orden inicia su lectura aunque la anterior no haya terminado",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "file": "__tests__/order-query-isolation.test.tsx",
+      "status": "passed",
+      "tests": [
+        {
+          "name": "retira incluso el título de la orden anterior mientras cambia el ID",
+          "status": "passed"
+        },
+        {
+          "name": "consulta el nuevo ID aunque siga pendiente el anterior y descarta su respuesta tardía",
+          "status": "passed"
+        },
+        {
+          "name": "retira la información privada al quitar el identificador",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "file": "__tests__/parts-views-integration.test.tsx",
+      "status": "passed",
+      "tests": [
+        {
+          "name": "Repuestos (administrador) muestra la carga y luego los repuestos con proveedor, stock y umbral",
+          "status": "passed"
+        },
+        {
+          "name": "Repuestos (administrador) indica cuando el servidor tiene más repuestos que los recibidos",
+          "status": "passed"
+        },
+        {
+          "name": "Repuestos (administrador) muestra el estado vacío y permite actualizar",
+          "status": "passed"
+        },
+        {
+          "name": "Repuestos (administrador) muestra el error del servicio y se recupera con el reintento",
+          "status": "passed"
+        },
+        {
+          "name": "Repuestos (administrador) actualiza manualmente los datos ya cargados",
+          "status": "passed"
+        },
+        {
+          "name": "Repuestos: carga incremental (desde/limite) carga la página siguiente desde la cantidad mostrada y oculta el botón al completar",
+          "status": "passed"
+        },
+        {
+          "name": "Repuestos: carga incremental (desde/limite) no muestra el botón cuando la primera página ya trae todos los registros",
+          "status": "passed"
+        },
+        {
+          "name": "Repuestos: carga incremental (desde/limite) descarta los repuestos repetidos y se detiene si la página no trae nuevos",
+          "status": "passed"
+        },
+        {
+          "name": "Repuestos: carga incremental (desde/limite) conserva lo cargado ante un error de paginación y permite reintentar",
+          "status": "passed"
+        },
+        {
+          "name": "Repuestos: carga incremental (desde/limite) una actualización descarta las páginas posteriores y vuelve a la primera",
+          "status": "passed"
+        },
+        {
+          "name": "Repuestos: carga incremental (desde/limite) descarta una página posterior que llega después de una actualización",
+          "status": "passed"
+        },
+        {
+          "name": "Proveedores: carga incremental (desde/limite) carga la página siguiente de proveedores",
+          "status": "passed"
+        },
+        {
+          "name": "Proveedores: carga incremental (desde/limite) informa el error de paginación sin perder el listado",
+          "status": "passed"
+        },
+        {
+          "name": "Proveedores (administrador) lista los proveedores y abre el detalle con sus repuestos",
+          "status": "passed"
+        },
+        {
+          "name": "Proveedores (administrador) muestra el estado vacío del listado",
+          "status": "passed"
+        },
+        {
+          "name": "Proveedores (administrador) muestra el error del listado y se recupera con el reintento",
+          "status": "passed"
+        },
+        {
+          "name": "Proveedores (administrador) muestra un proveedor sin repuestos",
+          "status": "passed"
+        },
+        {
+          "name": "Proveedores (administrador) muestra el 404 de un proveedor inexistente con reintento",
+          "status": "passed"
+        },
+        {
+          "name": "Navegación desde el panel del administrador \"Ver repuestos\" abre /repuestos",
+          "status": "passed"
+        },
+        {
+          "name": "Navegación desde el panel del administrador \"Ver proveedores\" abre /proveedores",
+          "status": "passed"
+        },
+        {
+          "name": "Restricciones de acceso por rol el administrador accede a /repuestos a través de su layout",
+          "status": "passed"
+        },
+        {
+          "name": "Restricciones de acceso por rol el administrador accede a /proveedores a través de su layout",
+          "status": "passed"
+        },
+        {
+          "name": "Restricciones de acceso por rol el administrador accede a /proveedores/3 a través de su layout",
+          "status": "passed"
+        },
+        {
+          "name": "Restricciones de acceso por rol el rol cliente no accede a /repuestos ni consulta el MS3",
+          "status": "passed"
+        },
+        {
+          "name": "Restricciones de acceso por rol el rol cliente no accede a /proveedores ni consulta el MS3",
+          "status": "passed"
+        },
+        {
+          "name": "Restricciones de acceso por rol el rol cliente no accede a /proveedores/3 ni consulta el MS3",
+          "status": "passed"
+        },
+        {
+          "name": "Restricciones de acceso por rol el rol mecanico no accede a /repuestos ni consulta el MS3",
+          "status": "passed"
+        },
+        {
+          "name": "Restricciones de acceso por rol el rol mecanico no accede a /proveedores ni consulta el MS3",
+          "status": "passed"
+        },
+        {
+          "name": "Restricciones de acceso por rol el rol mecanico no accede a /proveedores/3 ni consulta el MS3",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "file": "__tests__/order-functional.test.tsx",
+      "status": "passed",
+      "tests": [
+        {
+          "name": "caso de uso: consultar una orden de trabajo el rol cliente inicia sesión, consulta y actualiza una orden, vuelve al panel y cierra la sesión",
+          "status": "passed"
+        },
+        {
+          "name": "caso de uso: consultar una orden de trabajo el rol mecanico inicia sesión, consulta y actualiza una orden, vuelve al panel y cierra la sesión",
+          "status": "passed"
+        },
+        {
+          "name": "caso de uso: consultar una orden de trabajo el rol administrador inicia sesión, consulta y actualiza una orden, vuelve al panel y cierra la sesión",
+          "status": "passed"
+        },
+        {
+          "name": "caso de uso: consultar una orden de trabajo el cliente recupera la orden reintentando tras agotarse los reintentos automáticos",
+          "status": "passed"
+        },
+        {
+          "name": "caso de uso: decidir el presupuesto de una orden el cliente aprueba el presupuesto tras confirmar y la orden refleja la decisión",
+          "status": "passed"
+        },
+        {
+          "name": "caso de uso: decidir el presupuesto de una orden el rechazo exige motivo, advierte la cancelación y puede deshacerse antes de confirmar",
+          "status": "passed"
+        },
+        {
+          "name": "caso de uso: decidir el presupuesto de una orden un error del MS3 no se reintenta automáticamente y el cliente puede volver a intentarlo",
+          "status": "passed"
+        },
+        {
+          "name": "caso de uso: decidir el presupuesto de una orden una aplicación pendiente se reintenta sin duplicar la decisión",
+          "status": "passed"
+        },
+        {
+          "name": "caso de uso: decidir el presupuesto de una orden una decisión registrada no puede volver a enviarse",
+          "status": "passed"
+        },
+        {
+          "name": "caso de uso: decidir el presupuesto de una orden una doble pulsación de confirmar con la decisión en curso envía una sola decisión",
+          "status": "passed"
+        },
+        {
+          "name": "caso de uso: decidir el presupuesto de una orden una doble pulsación de reintentar la aplicación envía un solo reintento",
+          "status": "passed"
+        },
+        {
+          "name": "caso de uso: decidir el presupuesto de una orden el presupuesto se recupera con el reintento manual tras agotarse los reintentos automáticos",
+          "status": "passed"
+        },
+        {
+          "name": "caso de uso: consultar vehículos, repuestos y proveedores el administrador recorre vehículos, repuestos y proveedores desde su panel y cierra la sesión",
+          "status": "passed"
+        },
+        {
+          "name": "caso de uso: consultar vehículos, repuestos y proveedores el rol cliente consulta sus vehículos desde el panel",
+          "status": "passed"
+        },
+        {
+          "name": "caso de uso: consultar vehículos, repuestos y proveedores el rol mecanico consulta sus vehículos desde el panel",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "file": "__tests__/evidence-functional.test.tsx",
+      "status": "passed",
+      "tests": [
+        {
+          "name": "Flujo principal del mecánico login → orden → avance con foto → evidencia → consulta → otra orden → logout",
+          "status": "passed"
+        },
+        {
+          "name": "Flujos alternativos cámara rechazada: no la abre, ofrece la galería y el envío sigue funcionando",
+          "status": "passed"
+        },
+        {
+          "name": "Flujos alternativos galería cancelada: sin selección, sin errores y sin solicitudes",
+          "status": "passed"
+        },
+        {
+          "name": "Flujos alternativos imagen inválida: se rechaza antes de enviar",
+          "status": "passed"
+        },
+        {
+          "name": "Flujos alternativos archivo demasiado grande: se rechaza antes de enviar",
+          "status": "passed"
+        },
+        {
+          "name": "Flujos alternativos falta de conectividad: resultado incierto; el reintento encuentra la foto y no duplica",
+          "status": "passed"
+        },
+        {
+          "name": "Flujos alternativos timeout sin guardar: el reintento comprueba y reenvía una sola vez",
+          "status": "passed"
+        },
+        {
+          "name": "Flujos alternativos error de subida (503): reintento seguro sin consulta previa",
+          "status": "passed"
+        },
+        {
+          "name": "Flujos alternativos doble pulsación: una sola evidencia",
+          "status": "passed"
+        },
+        {
+          "name": "Flujos alternativos permiso de rol rechazado (403): informa sin cerrar la sesión ni subir la foto",
+          "status": "passed"
+        },
+        {
+          "name": "Flujos alternativos orden no asignada (404 de MS4): informa sin reintento",
+          "status": "passed"
+        },
+        {
+          "name": "Flujos alternativos orden inexistente: no muestra secciones ni consulta evidencias",
+          "status": "passed"
+        },
+        {
+          "name": "Flujos alternativos orden entregada: no ofrece fotografías",
+          "status": "passed"
+        },
+        {
+          "name": "Flujos alternativos cambio de orden durante el envío: la respuesta tardía no aparece en la nueva",
+          "status": "passed"
+        },
+        {
+          "name": "Flujos alternativos sesión expirada (401 al subir): cierra la sesión y vuelve al login",
+          "status": "passed"
+        },
+        {
+          "name": "Flujos alternativos error inesperado del backend al consultar evidencias: se informa y se recupera",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "file": "__tests__/manual-refresh-retry.test.tsx",
+      "status": "passed",
+      "tests": [
+        {
+          "name": "reintento ante errores de consulta no reintenta por su cuenta: una consulta fallida se realiza una sola vez",
+          "status": "passed"
+        },
+        {
+          "name": "reintento ante errores de consulta el listado de vehículos ofrece reintentar y recupera los datos",
+          "status": "passed"
+        },
+        {
+          "name": "reintento ante errores de consulta el detalle de la orden ofrece reintentar y recupera los datos",
+          "status": "passed"
+        },
+        {
+          "name": "reintento ante errores de consulta vuelve a mostrar el error si el reintento también falla",
+          "status": "passed"
+        },
+        {
+          "name": "actualización manual actualizar vuelve a consultar sin ocultar los datos ya cargados",
+          "status": "passed"
+        },
+        {
+          "name": "actualización manual el detalle de la orden admite actualización manual",
+          "status": "passed"
+        },
+        {
+          "name": "actualización manual permite actualizar desde el estado vacío del listado",
+          "status": "passed"
+        },
+        {
+          "name": "prevención de peticiones duplicadas deshabilita el control de actualización mientras la consulta está en curso",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "file": "__tests__/auth-full-flow.test.tsx",
+      "status": "passed",
+      "tests": [
+        {
+          "name": "flujo completo de Login → rol → Logout autentica al rol cliente, abre su panel y cierra la sesión",
+          "status": "passed"
+        },
+        {
+          "name": "flujo completo de Login → rol → Logout autentica al rol mecanico, abre su panel y cierra la sesión",
+          "status": "passed"
+        },
+        {
+          "name": "flujo completo de Login → rol → Logout autentica al rol administrador, abre su panel y cierra la sesión",
+          "status": "passed"
+        },
+        {
+          "name": "permite reintentar una limpieza fallida desde el logout de cliente",
+          "status": "passed"
+        },
+        {
+          "name": "permite reintentar una limpieza fallida desde el logout de mecanico",
+          "status": "passed"
+        },
+        {
+          "name": "permite reintentar una limpieza fallida desde el logout de administrador",
+          "status": "passed"
+        },
+        {
+          "name": "recupera cliente al arrancar y no recupera la sesión después de Logout y reinicio",
+          "status": "passed"
+        },
+        {
+          "name": "recupera mecanico al arrancar y no recupera la sesión después de Logout y reinicio",
+          "status": "passed"
+        },
+        {
+          "name": "recupera administrador al arrancar y no recupera la sesión después de Logout y reinicio",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "file": "__tests__/auth-service.test.ts",
+      "status": "passed",
+      "tests": [
+        {
+          "name": "integra la respuesta HTTP del rol cliente",
+          "status": "passed"
+        },
+        {
+          "name": "integra la respuesta HTTP del rol mecanico",
+          "status": "passed"
+        },
+        {
+          "name": "integra la respuesta HTTP del rol administrador",
+          "status": "passed"
+        },
+        {
+          "name": "rechaza una respuesta HTTP con rol desconocido",
+          "status": "passed"
+        },
+        {
+          "name": "rechaza una respuesta HTTP con roles vacíos",
+          "status": "passed"
+        },
+        {
+          "name": "rechaza una respuesta HTTP con usuario inactivo",
+          "status": "passed"
+        },
+        {
+          "name": "rechaza una respuesta HTTP con id ausente",
+          "status": "passed"
+        },
+        {
+          "name": "rechaza una respuesta HTTP con id nulo",
+          "status": "passed"
+        },
+        {
+          "name": "rechaza una respuesta HTTP con token vacío",
+          "status": "passed"
+        },
+        {
+          "name": "propaga un error HTTP para que el store y la pantalla gestionen el fallo",
+          "status": "passed"
+        },
+        {
+          "name": "el modo demo resuelve cliente@demo.local sin llamar a HTTP",
+          "status": "passed"
+        },
+        {
+          "name": "el modo demo resuelve mecanico@demo.local sin llamar a HTTP",
+          "status": "passed"
+        },
+        {
+          "name": "el modo demo resuelve admin@demo.local sin llamar a HTTP",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "file": "__tests__/evidence-role-visibility.test.tsx",
+      "status": "passed",
+      "tests": [
+        {
+          "name": "Visualización de evidencias por rol la nueva ruta de cliente conserva evidencias y sus acciones por rol",
+          "status": "passed"
+        },
+        {
+          "name": "Visualización de evidencias por rol la nueva ruta de mecanico conserva evidencias y sus acciones por rol",
+          "status": "passed"
+        },
+        {
+          "name": "Visualización de evidencias por rol abrir la orden como cliente no consulta evidencias hasta que se piden",
+          "status": "passed"
+        },
+        {
+          "name": "Visualización de evidencias por rol abrir la orden como mecanico no consulta evidencias hasta que se piden",
+          "status": "passed"
+        },
+        {
+          "name": "Visualización de evidencias por rol abrir la orden como administrador no consulta evidencias hasta que se piden",
+          "status": "passed"
+        },
+        {
+          "name": "Visualización de evidencias por rol mecánico asignado: ve las evidencias con su visibilidad y estado",
+          "status": "passed"
+        },
+        {
+          "name": "Visualización de evidencias por rol mecánico no asignado: el 404 de MS4 se informa sin mostrar evidencias",
+          "status": "passed"
+        },
+        {
+          "name": "Visualización de evidencias por rol cliente propietario: ve solo las visibles y sin datos internos",
+          "status": "passed"
+        },
+        {
+          "name": "Visualización de evidencias por rol cliente ajeno: el 404 de MS4 se informa",
+          "status": "passed"
+        },
+        {
+          "name": "Visualización de evidencias por rol administrador: ve también las eliminadas con su estado",
+          "status": "passed"
+        },
+        {
+          "name": "Visualización de evidencias por rol sin sesión la ruta redirige al login y no consulta evidencias",
+          "status": "passed"
+        },
+        {
+          "name": "Visualización de evidencias por rol cliente no accede a /ordenes-asignadas/31: la guarda redirige sin solicitudes",
+          "status": "passed"
+        },
+        {
+          "name": "Visualización de evidencias por rol cliente no accede a /(admin)/ordenes/31: la guarda redirige sin solicitudes",
+          "status": "passed"
+        },
+        {
+          "name": "Visualización de evidencias por rol mecanico no accede a /mis-ordenes/31: la guarda redirige sin solicitudes",
+          "status": "passed"
+        },
+        {
+          "name": "Visualización de evidencias por rol sesión expirada: el 401 cierra la sesión",
+          "status": "passed"
+        },
+        {
+          "name": "Visualización de evidencias por rol un 403 se informa sin cerrar la sesión",
+          "status": "passed"
+        },
+        {
+          "name": "Visualización de evidencias por rol una lista vacía se muestra como tal",
+          "status": "passed"
+        },
+        {
+          "name": "Visualización de evidencias por rol una respuesta fuera de contrato no muestra nada y permite reintentar",
+          "status": "passed"
+        },
+        {
+          "name": "Visualización de evidencias por rol una respuesta con evidencias de otra orden no muestra nada y permite reintentar",
+          "status": "passed"
+        },
+        {
+          "name": "Visualización de evidencias por rol actualiza la lista a petición",
+          "status": "passed"
+        },
+        {
+          "name": "Visualización de evidencias por rol al cambiar de orden no conserva evidencias ni fotografías de la anterior",
+          "status": "passed"
+        },
+        {
+          "name": "Fotografías con URL prefirmada pide la URL al ver la fotografía y la muestra sin caché",
+          "status": "passed"
+        },
+        {
+          "name": "Fotografías con URL prefirmada no muestra en línea archivos que no son fotografías",
+          "status": "passed"
+        },
+        {
+          "name": "Fotografías con URL prefirmada reutiliza la URL vigente y pide otra cuando caducó",
+          "status": "passed"
+        },
+        {
+          "name": "Fotografías con URL prefirmada una imagen inaccesible se informa y puede reintentarse con una URL nueva",
+          "status": "passed"
+        },
+        {
+          "name": "Fotografías con URL prefirmada una URL caducada que falla al mostrarse se renueva automáticamente una vez",
+          "status": "passed"
+        },
+        {
+          "name": "Fotografías con URL prefirmada una evidencia fuera de alcance (404) en la descarga se informa",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "file": "__tests__/evidence-upload-states.test.tsx",
+      "status": "passed",
+      "tests": [
+        {
+          "name": "Estados del envío de evidencia sin fotografía no ofrece enviar; con fotografía ofrece enviar sin subir nada",
+          "status": "passed"
+        },
+        {
+          "name": "Estados del envío de evidencia muestra el envío pendiente y solo informa éxito tras la confirmación válida",
+          "status": "passed"
+        },
+        {
+          "name": "Estados del envío de evidencia muestra el progreso real solo cuando la plataforma informa el total",
+          "status": "passed"
+        },
+        {
+          "name": "Estados del envío de evidencia una doble pulsación produce un solo POST",
+          "status": "passed"
+        },
+        {
+          "name": "Estados del envío de evidencia un rechazo 400 se informa sin ofrecer reintentar la misma fotografía",
+          "status": "passed"
+        },
+        {
+          "name": "Estados del envío de evidencia un rechazo 404 se informa sin ofrecer reintentar la misma fotografía",
+          "status": "passed"
+        },
+        {
+          "name": "Estados del envío de evidencia un rechazo 409 se informa sin ofrecer reintentar la misma fotografía",
+          "status": "passed"
+        },
+        {
+          "name": "Estados del envío de evidencia un rechazo 413 se informa sin ofrecer reintentar la misma fotografía",
+          "status": "passed"
+        },
+        {
+          "name": "Estados del envío de evidencia un rechazo 415 se informa sin ofrecer reintentar la misma fotografía",
+          "status": "passed"
+        },
+        {
+          "name": "Estados del envío de evidencia un rechazo 422 se informa sin ofrecer reintentar la misma fotografía",
+          "status": "passed"
+        },
+        {
+          "name": "Estados del envío de evidencia tras un 503 (sin nada guardado) reintenta reenviando la fotografía",
+          "status": "passed"
+        },
+        {
+          "name": "Estados del envío de evidencia tras un 429 (sin nada guardado) reintenta reenviando la fotografía",
+          "status": "passed"
+        },
+        {
+          "name": "Estados del envío de evidencia un timeout deja el resultado incierto y no permite reenviar sin comprobar",
+          "status": "passed"
+        },
+        {
+          "name": "Estados del envío de evidencia al reintentar tras un timeout encuentra la fotografía ya guardada y no la duplica",
+          "status": "passed"
+        },
+        {
+          "name": "Estados del envío de evidencia al reintentar tras un timeout reenvía solo si el servidor no la tiene",
+          "status": "passed"
+        },
+        {
+          "name": "Estados del envío de evidencia si no puede comprobar el servidor tras un resultado incierto no reenvía",
+          "status": "passed"
+        },
+        {
+          "name": "Estados del envío de evidencia trata 500 como resultado incierto",
+          "status": "passed"
+        },
+        {
+          "name": "Estados del envío de evidencia trata 502 como resultado incierto",
+          "status": "passed"
+        },
+        {
+          "name": "Estados del envío de evidencia trata una respuesta 201 inválida como resultado incierto",
+          "status": "passed"
+        },
+        {
+          "name": "Estados del envío de evidencia permite cancelar el envío y comprueba antes de reintentar",
+          "status": "passed"
+        },
+        {
+          "name": "Estados del envío de evidencia un 401 cierra la sesión y no ofrece reintento",
+          "status": "passed"
+        },
+        {
+          "name": "Estados del envío de evidencia un 403 informa el permiso sin cerrar la sesión",
+          "status": "passed"
+        },
+        {
+          "name": "Estados del envío de evidencia reemplazar la fotografía tras un rechazo permite enviar la nueva",
+          "status": "passed"
+        },
+        {
+          "name": "Estados del envío de evidencia una respuesta tardía de otra orden no aparece en la orden actual",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "file": "__tests__/protected-routes.test.tsx",
+      "status": "passed",
+      "tests": [
+        {
+          "name": "rutas protegidas por sesión y rol redirige de /administrador al login si no hay una sesión autenticada",
+          "status": "passed"
+        },
+        {
+          "name": "rutas protegidas por sesión y rol redirige de /cliente al login si no hay una sesión autenticada",
+          "status": "passed"
+        },
+        {
+          "name": "rutas protegidas por sesión y rol redirige de /mecanico al login si no hay una sesión autenticada",
+          "status": "passed"
+        },
+        {
+          "name": "rutas protegidas por sesión y rol permite que el rol administrador acceda a su ruta",
+          "status": "passed"
+        },
+        {
+          "name": "rutas protegidas por sesión y rol permite que el rol cliente acceda a su ruta",
+          "status": "passed"
+        },
+        {
+          "name": "rutas protegidas por sesión y rol permite que el rol mecanico acceda a su ruta",
+          "status": "passed"
+        },
+        {
+          "name": "rutas protegidas por sesión y rol redirige al rol cliente a su propia ruta al intentar entrar a /administrador",
+          "status": "passed"
+        },
+        {
+          "name": "rutas protegidas por sesión y rol redirige al rol cliente a su propia ruta al intentar entrar a /mecanico",
+          "status": "passed"
+        },
+        {
+          "name": "rutas protegidas por sesión y rol redirige al rol mecanico a su propia ruta al intentar entrar a /administrador",
+          "status": "passed"
+        },
+        {
+          "name": "rutas protegidas por sesión y rol redirige al rol mecanico a su propia ruta al intentar entrar a /cliente",
+          "status": "passed"
+        },
+        {
+          "name": "rutas protegidas por sesión y rol redirige al rol administrador a su propia ruta al intentar entrar a /cliente",
+          "status": "passed"
+        },
+        {
+          "name": "rutas protegidas por sesión y rol redirige al rol administrador a su propia ruta al intentar entrar a /mecanico",
+          "status": "passed"
+        },
+        {
+          "name": "rutas protegidas por sesión y rol revalida la ruta abierta cuando la sesión cambia de cliente a mecanico",
+          "status": "passed"
+        },
+        {
+          "name": "rutas protegidas por sesión y rol revalida la ruta abierta cuando la sesión cambia de mecanico a administrador",
+          "status": "passed"
+        },
+        {
+          "name": "rutas protegidas por sesión y rol revalida la ruta abierta cuando la sesión cambia de administrador a cliente",
+          "status": "passed"
+        },
+        {
+          "name": "rutas protegidas por sesión y rol espera a que termine la recuperación de sesión antes de decidir la ruta",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "file": "__tests__/budget-views-integration.test.tsx",
+      "status": "passed",
+      "tests": [
+        {
+          "name": "Orden → presupuesto el cliente abre el presupuesto desde el detalle de la orden",
+          "status": "passed"
+        },
+        {
+          "name": "Orden → presupuesto el administrador abre el presupuesto desde el detalle de la orden",
+          "status": "passed"
+        },
+        {
+          "name": "Orden → presupuesto el mecánico no tiene acceso al presupuesto desde la orden",
+          "status": "passed"
+        },
+        {
+          "name": "Representación del presupuesto muestra total, estado, ítems con repuesto/proveedor e importes",
+          "status": "passed"
+        },
+        {
+          "name": "Representación del presupuesto el administrador no puede decidir el presupuesto",
+          "status": "passed"
+        },
+        {
+          "name": "Representación del presupuesto muestra la decisión registrada de una versión aprobada",
+          "status": "passed"
+        },
+        {
+          "name": "Representación del presupuesto indica la versión vigente cuando hay una modificación pendiente",
+          "status": "passed"
+        },
+        {
+          "name": "Representación del presupuesto muestra el estado vacío si la orden no tiene presupuesto",
+          "status": "passed"
+        },
+        {
+          "name": "Representación del presupuesto muestra el error de carga y se recupera con el reintento",
+          "status": "passed"
+        },
+        {
+          "name": "Decisión del cliente aprueba tras confirmar, muestra el efecto y recarga el presupuesto",
+          "status": "passed"
+        },
+        {
+          "name": "Decisión del cliente informa los repuestos faltantes al aprobar sin stock suficiente",
+          "status": "passed"
+        },
+        {
+          "name": "Decisión del cliente exige el motivo antes de rechazar",
+          "status": "passed"
+        },
+        {
+          "name": "Decisión del cliente el primer rechazo advierte y confirma la cancelación del servicio",
+          "status": "passed"
+        },
+        {
+          "name": "Decisión del cliente rechazar una modificación no pide cancelar el servicio",
+          "status": "passed"
+        },
+        {
+          "name": "Decisión del cliente permite volver sin enviar la decisión",
+          "status": "passed"
+        },
+        {
+          "name": "Decisión del cliente muestra el error del MS3 y conserva el formulario",
+          "status": "passed"
+        },
+        {
+          "name": "Decisión del cliente ante una aplicación pendiente reintenta sin volver a decidir",
+          "status": "passed"
+        },
+        {
+          "name": "Restricciones de acceso por rol el rol cliente no accede a /ordenes/31/presupuesto ni consulta el MS3",
+          "status": "passed"
+        },
+        {
+          "name": "Restricciones de acceso por rol el rol mecanico no accede a /ordenes/31/presupuesto ni consulta el MS3",
+          "status": "passed"
+        },
+        {
+          "name": "Restricciones de acceso por rol el rol administrador no accede a /mis-ordenes/31/presupuesto ni consulta el MS3",
+          "status": "passed"
+        },
+        {
+          "name": "Restricciones de acceso por rol el rol mecanico no accede a /mis-ordenes/31/presupuesto ni consulta el MS3",
+          "status": "passed"
+        },
+        {
+          "name": "Restricciones de acceso por rol el rol cliente accede a /mis-ordenes/31/presupuesto a través de su layout",
+          "status": "passed"
+        },
+        {
+          "name": "Restricciones de acceso por rol el rol administrador accede a /ordenes/31/presupuesto a través de su layout",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "file": "__tests__/order-role-access.test.tsx",
+      "status": "passed",
+      "tests": [
+        {
+          "name": "vistas de órdenes: acceso autorizado el rol cliente consulta su detalle con el token de la sesión",
+          "status": "passed"
+        },
+        {
+          "name": "vistas de órdenes: acceso autorizado el rol mecanico consulta su detalle con el token de la sesión",
+          "status": "passed"
+        },
+        {
+          "name": "vistas de órdenes: acceso autorizado el rol administrador consulta su detalle con el token de la sesión",
+          "status": "passed"
+        },
+        {
+          "name": "vistas de órdenes: protección visual por rol el rol cliente no accede al detalle de órdenes de administrador ni consulta al backend",
+          "status": "passed"
+        },
+        {
+          "name": "vistas de órdenes: protección visual por rol el rol cliente no accede al detalle de órdenes de mecanico ni consulta al backend",
+          "status": "passed"
+        },
+        {
+          "name": "vistas de órdenes: protección visual por rol el rol mecanico no accede al detalle de órdenes de administrador ni consulta al backend",
+          "status": "passed"
+        },
+        {
+          "name": "vistas de órdenes: protección visual por rol el rol mecanico no accede al detalle de órdenes de cliente ni consulta al backend",
+          "status": "passed"
+        },
+        {
+          "name": "vistas de órdenes: protección visual por rol el rol administrador no accede al detalle de órdenes de cliente ni consulta al backend",
+          "status": "passed"
+        },
+        {
+          "name": "vistas de órdenes: protección visual por rol el rol administrador no accede al detalle de órdenes de mecanico ni consulta al backend",
+          "status": "passed"
+        },
+        {
+          "name": "vistas de órdenes: protección visual por rol sin sesión, /mis-ordenes/31 redirige al login sin consultar al backend",
+          "status": "passed"
+        },
+        {
+          "name": "vistas de órdenes: protección visual por rol sin sesión, /ordenes-asignadas/31 redirige al login sin consultar al backend",
+          "status": "passed"
+        },
+        {
+          "name": "vistas de órdenes: protección visual por rol sin sesión, /ordenes/31 redirige al login sin consultar al backend",
+          "status": "passed"
+        },
+        {
+          "name": "vistas de órdenes: protección visual por rol no consulta la orden hasta que termina la recuperación de la sesión",
+          "status": "passed"
+        },
+        {
+          "name": "vistas de órdenes: autorización del backend un 401 del backend cierra la sesión y devuelve al login",
+          "status": "passed"
+        },
+        {
+          "name": "vistas de órdenes: autorización del backend una orden no visible para el usuario (404) muestra el error sin cerrar la sesión",
+          "status": "passed"
+        },
+        {
+          "name": "vistas de órdenes: autorización del backend un 403 del backend muestra el error de permisos sin cerrar la sesión (cliente)",
+          "status": "passed"
+        },
+        {
+          "name": "vistas de órdenes: autorización del backend un 403 del backend muestra el error de permisos sin cerrar la sesión (mecanico)",
+          "status": "passed"
+        },
+        {
+          "name": "vistas de órdenes: autorización del backend un 403 del backend muestra el error de permisos sin cerrar la sesión (administrador)",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "file": "__tests__/evidence-permissions.test.tsx",
+      "status": "passed",
+      "tests": [
+        {
+          "name": "Permisos de cámara con el permiso ya concedido abre la cámara sin volver a solicitarlo",
+          "status": "passed"
+        },
+        {
+          "name": "Permisos de cámara no solicita permisos al abrir la orden: solo tras pulsar la cámara",
+          "status": "passed"
+        },
+        {
+          "name": "Permisos de cámara si el usuario rechaza el permiso no abre la cámara y ofrece la galería",
+          "status": "passed"
+        },
+        {
+          "name": "Permisos de cámara cada pulsación solicita el permiso una sola vez, sin bucles",
+          "status": "passed"
+        },
+        {
+          "name": "Permisos de cámara con rechazo permanente no vuelve a preguntar y ofrece abrir Ajustes",
+          "status": "passed"
+        },
+        {
+          "name": "Permisos de cámara cuando el rechazo se vuelve permanente al solicitarlo también ofrece Ajustes",
+          "status": "passed"
+        },
+        {
+          "name": "Permisos de cámara permite reintentar tras habilitar el permiso en Ajustes",
+          "status": "passed"
+        },
+        {
+          "name": "Permisos de cámara detecta un permiso revocado después de haberse concedido",
+          "status": "passed"
+        },
+        {
+          "name": "Permisos de cámara un permiso revocado justo antes de abrir la cámara se informa como permiso",
+          "status": "passed"
+        },
+        {
+          "name": "Permisos de cámara una cámara no disponible no bloquea la pantalla",
+          "status": "passed"
+        },
+        {
+          "name": "Permisos de cámara un fallo del módulo nativo al consultar el permiso se informa",
+          "status": "passed"
+        },
+        {
+          "name": "Permisos de cámara cancelar la cámara tras conceder el permiso no muestra errores",
+          "status": "passed"
+        },
+        {
+          "name": "Permisos de galería usa el selector del sistema sin solicitar acceso a la biblioteca",
+          "status": "passed"
+        },
+        {
+          "name": "Permisos de galería con acceso limitado a fotografías se puede elegir una sin pedir acceso completo",
+          "status": "passed"
+        },
+        {
+          "name": "Permisos de galería si la plataforma exige permiso y fue rechazado, lo informa y ofrece Ajustes",
+          "status": "passed"
+        },
+        {
+          "name": "Permisos de galería una galería no disponible se informa sin ofrecer Ajustes",
+          "status": "passed"
+        },
+        {
+          "name": "Permisos de galería cancelar el selector no muestra errores",
+          "status": "passed"
+        },
+        {
+          "name": "Permisos de galería un archivo que no se puede leer se informa y permite elegir otro",
+          "status": "passed"
+        },
+        {
+          "name": "Diferencias de plataforma en web no ofrece abrir Ajustes, que el navegador no permite",
+          "status": "passed"
+        },
+        {
+          "name": "Sin envíos accidentales ningún rechazo de permisos dispara una subida",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "file": "__tests__/evidence-mechanic-updates.test.tsx",
+      "status": "passed",
+      "tests": [
+        {
+          "name": "OrderLogService (bitácora MS2) registra una observación con solo tipo y descripción: sin actor, estado ni fecha",
+          "status": "passed"
+        },
+        {
+          "name": "OrderLogService (bitácora MS2) una descripción vacía no llega al servidor",
+          "status": "passed"
+        },
+        {
+          "name": "OrderLogService (bitácora MS2) un identificador de orden inválido no llega al servidor",
+          "status": "passed"
+        },
+        {
+          "name": "OrderLogService (bitácora MS2) traduce el 403 del contrato",
+          "status": "passed"
+        },
+        {
+          "name": "OrderLogService (bitácora MS2) traduce el 404 del contrato",
+          "status": "passed"
+        },
+        {
+          "name": "OrderLogService (bitácora MS2) traduce el 422 del contrato",
+          "status": "passed"
+        },
+        {
+          "name": "OrderLogService (bitácora MS2) rechaza una respuesta fuera del contrato o de otra orden",
+          "status": "passed"
+        },
+        {
+          "name": "OrderLogService (bitácora MS2) no reintenta automáticamente el registro (no es idempotente)",
+          "status": "passed"
+        },
+        {
+          "name": "OrderLogService (bitácora MS2) consulta la bitácora con repuestos y rechaza entradas de otra orden",
+          "status": "passed"
+        },
+        {
+          "name": "Avances del mecánico en la orden abrir la orden no consulta la bitácora hasta que se pide",
+          "status": "passed"
+        },
+        {
+          "name": "Avances del mecánico en la orden registra un avance sin fotografía con la confirmación del servidor",
+          "status": "passed"
+        },
+        {
+          "name": "Avances del mecánico en la orden registra el avance y luego la fotografía, en ese orden",
+          "status": "passed"
+        },
+        {
+          "name": "Avances del mecánico en la orden si la fotografía falla informa el éxito parcial y reintenta solo la carga",
+          "status": "passed"
+        },
+        {
+          "name": "Avances del mecánico en la orden tras un fallo de la fotografía se puede continuar sin ella",
+          "status": "passed"
+        },
+        {
+          "name": "Avances del mecánico en la orden si el avance falla no sube la fotografía y conserva el formulario",
+          "status": "passed"
+        },
+        {
+          "name": "Avances del mecánico en la orden informa una orden inexistente o no asignada (404)",
+          "status": "passed"
+        },
+        {
+          "name": "Avances del mecánico en la orden informa una respuesta inválida del servidor sin declarar éxito",
+          "status": "passed"
+        },
+        {
+          "name": "Avances del mecánico en la orden exige una descripción antes de enviar",
+          "status": "passed"
+        },
+        {
+          "name": "Avances del mecánico en la orden una doble pulsación registra un solo avance",
+          "status": "passed"
+        },
+        {
+          "name": "Avances del mecánico en la orden en una orden entregado no ofrece fotografías y deja que el servidor decida sobre el avance",
+          "status": "passed"
+        },
+        {
+          "name": "Avances del mecánico en la orden en una orden cancelado no ofrece fotografías y deja que el servidor decida sobre el avance",
+          "status": "passed"
+        },
+        {
+          "name": "Avances del mecánico en la orden un historial que falla puede reintentarse",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "file": "__tests__/order-flow-regression.test.tsx",
+      "status": "passed",
+      "tests": [
+        {
+          "name": "flujo orden → presupuesto → repuestos: representación de estados muestra el estado esperando_diagnostico con su etiqueta y tono",
+          "status": "passed"
+        },
+        {
+          "name": "flujo orden → presupuesto → repuestos: representación de estados muestra el estado esperando_aprobacion_presupuesto con su etiqueta y tono",
+          "status": "passed"
+        },
+        {
+          "name": "flujo orden → presupuesto → repuestos: representación de estados muestra el estado pausado_por_presupuesto_rechazado con su etiqueta y tono",
+          "status": "passed"
+        },
+        {
+          "name": "flujo orden → presupuesto → repuestos: representación de estados muestra el estado esperando_repuestos con su etiqueta y tono",
+          "status": "passed"
+        },
+        {
+          "name": "flujo orden → presupuesto → repuestos: representación de estados muestra el estado en_reparacion con su etiqueta y tono",
+          "status": "passed"
+        },
+        {
+          "name": "flujo orden → presupuesto → repuestos: representación de estados la vista de cliente muestra la espera de aprobación del presupuesto",
+          "status": "passed"
+        },
+        {
+          "name": "flujo orden → presupuesto → repuestos: representación de estados la vista de mecánico muestra la espera de aprobación del presupuesto",
+          "status": "passed"
+        },
+        {
+          "name": "flujo orden → presupuesto → repuestos: representación de estados la vista de administración muestra la espera de aprobación del presupuesto",
+          "status": "passed"
+        },
+        {
+          "name": "flujo orden → presupuesto → repuestos: propagación de cambios al actualizar refleja el paso de la aprobación del presupuesto a esperando repuestos",
+          "status": "passed"
+        },
+        {
+          "name": "flujo orden → presupuesto → repuestos: propagación de cambios al actualizar refleja el paso de la aprobación del presupuesto a en reparación",
+          "status": "passed"
+        },
+        {
+          "name": "flujo orden → presupuesto → repuestos: propagación de cambios propaga un error al actualizar y recupera el estado siguiente al reintentar",
+          "status": "passed"
+        },
+        {
+          "name": "flujo orden → presupuesto → repuestos: integración con MS3 asocia la orden con su presupuesto (vista de cliente)",
+          "status": "passed"
+        },
+        {
+          "name": "flujo orden → presupuesto → repuestos: integración con MS3 asocia la orden con su presupuesto (vista de administración)",
+          "status": "passed"
+        },
+        {
+          "name": "flujo orden → presupuesto → repuestos: integración con MS3 no asocia presupuestos de otra orden",
+          "status": "passed"
+        },
+        {
+          "name": "flujo orden → presupuesto → repuestos: integración con MS3 asocia el presupuesto aprobado con los repuestos requeridos",
+          "status": "passed"
+        },
+        {
+          "name": "flujo orden → presupuesto → repuestos: integración con MS3 aprobar con stock suficiente pasa la orden a reparación sin faltantes",
+          "status": "passed"
+        },
+        {
+          "name": "flujo orden → presupuesto → repuestos: estados y transiciones MS2 propaga los códigos 3 → 4 del contrato hasta la vista",
+          "status": "passed"
+        },
+        {
+          "name": "flujo orden → presupuesto → repuestos: estados y transiciones MS2 propaga los códigos 3 → 5 del contrato hasta la vista",
+          "status": "passed"
+        },
+        {
+          "name": "flujo orden → presupuesto → repuestos: estados y transiciones MS2 registra el cambio de estado mediante PATCH /ordenes/{id}/estado",
+          "status": "passed"
+        },
+        {
+          "name": "flujo orden → presupuesto → repuestos: estados y transiciones MS2 envía la observación recortada y omite una vacía (minLength 1)",
+          "status": "passed"
+        },
+        {
+          "name": "flujo orden → presupuesto → repuestos: estados y transiciones MS2 la cancelación exige observación y no llama a MS2 sin ella",
+          "status": "passed"
+        },
+        {
+          "name": "flujo orden → presupuesto → repuestos: estados y transiciones MS2 el estado pausado_por_presupuesto_rechazado no existe en MS2 y no se envía",
+          "status": "passed"
+        },
+        {
+          "name": "flujo orden → presupuesto → repuestos: estados y transiciones MS2 el estado control_calidad no existe en MS2 y no se envía",
+          "status": "passed"
+        },
+        {
+          "name": "flujo orden → presupuesto → repuestos: estados y transiciones MS2 informa el 409 de una transición 3 → 4, reservada a la decisión de presupuesto sin alterar la orden",
+          "status": "passed"
+        },
+        {
+          "name": "flujo orden → presupuesto → repuestos: estados y transiciones MS2 informa el 409 de una transición 4 → 5, bloqueada hasta verificar repuestos sin alterar la orden",
+          "status": "passed"
+        },
+        {
+          "name": "flujo orden → presupuesto → repuestos: estados y transiciones MS2 informa el 409 de una transición 6 → 7, reservada a la entrega sin alterar la orden",
+          "status": "passed"
+        },
+        {
+          "name": "flujo orden → presupuesto → repuestos: estados y transiciones MS2 informa el 409 de una transición desde un estado terminal sin alterar la orden",
+          "status": "passed"
+        },
+        {
+          "name": "flujo orden → presupuesto → repuestos: estados y transiciones MS2 normaliza el error 403 del PATCH de estado",
+          "status": "passed"
+        },
+        {
+          "name": "flujo orden → presupuesto → repuestos: estados y transiciones MS2 normaliza el error 404 del PATCH de estado",
+          "status": "passed"
+        },
+        {
+          "name": "flujo orden → presupuesto → repuestos: estados y transiciones MS2 normaliza el error 422 del PATCH de estado",
+          "status": "passed"
+        },
+        {
+          "name": "flujo orden → presupuesto → repuestos: estados y transiciones MS2 normaliza el error 500 del PATCH de estado",
+          "status": "passed"
+        },
+        {
+          "name": "flujo orden → presupuesto → repuestos: estados y transiciones MS2 rechaza una respuesta del PATCH que no cumple OrdenRespuesta",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "file": "__tests__/evidence-capture.test.tsx",
+      "status": "passed",
+      "tests": [
+        {
+          "name": "Captura y selección de fotografías en la orden del mecánico muestra la sección de evidencia identificando la orden",
+          "status": "passed"
+        },
+        {
+          "name": "Captura y selección de fotografías en la orden del mecánico captura una fotografía con la cámara tras conceder el permiso y la previsualiza",
+          "status": "passed"
+        },
+        {
+          "name": "Captura y selección de fotografías en la orden del mecánico selecciona desde la galería sin pedir permisos de biblioteca",
+          "status": "passed"
+        },
+        {
+          "name": "Captura y selección de fotografías en la orden del mecánico una cancelación no muestra errores ni vista previa",
+          "status": "passed"
+        },
+        {
+          "name": "Captura y selección de fotografías en la orden del mecánico reemplaza la fotografía y la cancelación posterior conserva la anterior",
+          "status": "passed"
+        },
+        {
+          "name": "Captura y selección de fotografías en la orden del mecánico un archivo inválido se informa y conserva la selección válida anterior",
+          "status": "passed"
+        },
+        {
+          "name": "Captura y selección de fotografías en la orden del mecánico quita la fotografía antes de enviarla",
+          "status": "passed"
+        },
+        {
+          "name": "Captura y selección de fotografías en la orden del mecánico informa un error nativo de la cámara sin bloquear la galería",
+          "status": "passed"
+        },
+        {
+          "name": "Captura y selección de fotografías en la orden del mecánico sin identificador de orden no ofrece capturar evidencia",
+          "status": "passed"
+        },
+        {
+          "name": "Captura y selección de fotografías en la orden del mecánico no muestra la sección si la orden cargada no es la de la ruta",
+          "status": "passed"
+        },
+        {
+          "name": "Captura y selección de fotografías en la orden del mecánico envía la fotografía seleccionada a la orden de la ruta con el contexto elegido",
+          "status": "passed"
+        },
+        {
+          "name": "Captura y selección de fotografías en la orden del mecánico una doble pulsación de envío produce una sola solicitud",
+          "status": "passed"
+        },
+        {
+          "name": "Captura y selección de fotografías en la orden del mecánico una fotografía elegida en una orden no se ofrece ni se envía en otra",
+          "status": "passed"
+        },
+        {
+          "name": "Captura y selección de fotografías en la orden del mecánico descarta el resultado del selector que llega después de cambiar de orden",
+          "status": "passed"
+        },
+        {
+          "name": "Captura y selección de fotografías en la orden del mecánico no abre dos selectores a la vez",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "file": "__tests__/auth-flow.test.tsx",
+      "status": "passed",
+      "tests": [
+        {
+          "name": "flujo de autenticación valida, muestra errores y completa el login con redirección por rol",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "file": "__tests__/views-services-integration.test.tsx",
+      "status": "passed",
+      "tests": [
+        {
+          "name": "vistas de vehículos con VehiclesService real la vista de cliente consulta /mis-vehiculos a través del servicio",
+          "status": "passed"
+        },
+        {
+          "name": "vistas de vehículos con VehiclesService real la vista de mecánico consulta /vehiculos-asignados a través del servicio",
+          "status": "passed"
+        },
+        {
+          "name": "vistas de vehículos con VehiclesService real la vista de administración consulta /vehiculos a través del servicio",
+          "status": "passed"
+        },
+        {
+          "name": "vistas de vehículos con VehiclesService real mapea y representa una respuesta con atributos en español",
+          "status": "passed"
+        },
+        {
+          "name": "vistas de vehículos con VehiclesService real mapea y representa una respuesta con atributos en inglés y campos nulos",
+          "status": "passed"
+        },
+        {
+          "name": "vistas de vehículos con VehiclesService real representa el listado vacío cuando la API responde sin vehículos",
+          "status": "passed"
+        },
+        {
+          "name": "vistas de vehículos con VehiclesService real muestra el mensaje del backend cuando la respuesta trae detalle",
+          "status": "passed"
+        },
+        {
+          "name": "vistas de vehículos con VehiclesService real muestra el mensaje normalizado de un error de servidor sin detalle",
+          "status": "passed"
+        },
+        {
+          "name": "vistas de vehículos con VehiclesService real muestra el mensaje normalizado cuando el backend es inalcanzable",
+          "status": "passed"
+        },
+        {
+          "name": "vistas de órdenes con OrdersService real la vista de cliente consulta el detalle a través del servicio",
+          "status": "passed"
+        },
+        {
+          "name": "vistas de órdenes con OrdersService real la vista de mecánico consulta el detalle a través del servicio",
+          "status": "passed"
+        },
+        {
+          "name": "vistas de órdenes con OrdersService real la vista de administración consulta el detalle a través del servicio",
+          "status": "passed"
+        },
+        {
+          "name": "vistas de órdenes con OrdersService real traduce el código numérico de estado a la etiqueta de la interfaz",
+          "status": "passed"
+        },
+        {
+          "name": "vistas de órdenes con OrdersService real muestra un error ante una orden sin estado oficial",
+          "status": "passed"
+        },
+        {
+          "name": "vistas de órdenes con OrdersService real muestra el mensaje normalizado cuando la orden no existe",
+          "status": "passed"
+        },
+        {
+          "name": "vistas de órdenes con OrdersService real muestra el mensaje de permisos insuficientes devuelto por el backend",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "file": "__tests__/order-view-states.test.tsx",
+      "status": "passed",
+      "tests": [
+        {
+          "name": "vistas de órdenes: carga inicial la vista de cliente muestra la carga hasta que el servicio responde, con una sola consulta",
+          "status": "passed"
+        },
+        {
+          "name": "vistas de órdenes: carga inicial la vista de mecánico muestra la carga hasta que el servicio responde, con una sola consulta",
+          "status": "passed"
+        },
+        {
+          "name": "vistas de órdenes: carga inicial la vista de administración muestra la carga hasta que el servicio responde, con una sola consulta",
+          "status": "passed"
+        },
+        {
+          "name": "vistas de órdenes: errores de servicio informa el tiempo de espera agotado",
+          "status": "passed"
+        },
+        {
+          "name": "vistas de órdenes: errores de servicio informa la falta de conexión con el backend",
+          "status": "passed"
+        },
+        {
+          "name": "vistas de órdenes: errores de servicio informa un error 500 del servidor",
+          "status": "passed"
+        },
+        {
+          "name": "vistas de órdenes: errores de servicio informa un error 503 del servidor",
+          "status": "passed"
+        },
+        {
+          "name": "vistas de órdenes: errores de servicio no repite la consulta por su cuenta tras un error",
+          "status": "passed"
+        },
+        {
+          "name": "vistas de órdenes: reintento manual muestra la carga durante el reintento y luego el detalle",
+          "status": "passed"
+        },
+        {
+          "name": "vistas de órdenes: reintento manual descarta las actualizaciones repetidas mientras una sigue en curso",
+          "status": "passed"
+        },
+        {
+          "name": "vistas de órdenes: respuestas vacías o inválidas una respuesta 200 sin cuerpo muestra un mensaje comprensible",
+          "status": "passed"
+        },
+        {
+          "name": "vistas de órdenes: respuestas vacías o inválidas una respuesta 200 sin identificador de orden no se representa como orden válida",
+          "status": "passed"
+        },
+        {
+          "name": "vistas de órdenes: respuestas vacías o inválidas rechaza la orden cuando falta el campo obligatorio orden_id",
+          "status": "passed"
+        },
+        {
+          "name": "vistas de órdenes: respuestas vacías o inválidas rechaza la orden cuando falta el campo obligatorio vehiculo_id",
+          "status": "passed"
+        },
+        {
+          "name": "vistas de órdenes: respuestas vacías o inválidas rechaza la orden cuando falta el campo obligatorio ingreso_id",
+          "status": "passed"
+        },
+        {
+          "name": "vistas de órdenes: respuestas vacías o inválidas rechaza la orden cuando falta el campo obligatorio estado_codigo",
+          "status": "passed"
+        },
+        {
+          "name": "vistas de órdenes: respuestas vacías o inválidas rechaza la orden cuando falta el campo obligatorio mecanico_actual_id",
+          "status": "passed"
+        },
+        {
+          "name": "vistas de órdenes: respuestas vacías o inválidas rechaza la orden cuando falta el campo obligatorio creado_por_id",
+          "status": "passed"
+        },
+        {
+          "name": "vistas de órdenes: respuestas vacías o inválidas rechaza la orden cuando falta el campo obligatorio creado_en",
+          "status": "passed"
+        },
+        {
+          "name": "vistas de órdenes: respuestas vacías o inválidas rechaza la orden cuando falta el campo obligatorio actualizado_en",
+          "status": "passed"
+        },
+        {
+          "name": "vistas de órdenes: respuestas vacías o inválidas rechaza la orden con orden_id como texto",
+          "status": "passed"
+        },
+        {
+          "name": "vistas de órdenes: respuestas vacías o inválidas rechaza la orden con estado_codigo decimal",
+          "status": "passed"
+        },
+        {
+          "name": "vistas de órdenes: respuestas vacías o inválidas rechaza la orden con creado_en sin formato de fecha",
+          "status": "passed"
+        },
+        {
+          "name": "vistas de órdenes: respuestas vacías o inválidas rechaza la orden con mecanico_actual_id como texto",
+          "status": "passed"
+        },
+        {
+          "name": "vistas de órdenes: respuestas vacías o inválidas acepta mecanico_actual_id nulo, que el contrato permite",
+          "status": "passed"
+        },
+        {
+          "name": "vistas de órdenes: respuestas vacías o inválidas informa un estado fuera del catálogo sin representar la orden",
+          "status": "passed"
+        },
+        {
+          "name": "vistas de órdenes: respuestas vacías o inválidas se recupera con el reintento manual cuando la siguiente respuesta es válida",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "file": "__tests__/order-detail-integration.test.tsx",
+      "status": "passed",
+      "tests": [
+        {
+          "name": "detalle de órdenes: consulta al servicio la vista de cliente consulta la orden del parámetro de ruta",
+          "status": "passed"
+        },
+        {
+          "name": "detalle de órdenes: consulta al servicio la vista de mecánico consulta la orden del parámetro de ruta",
+          "status": "passed"
+        },
+        {
+          "name": "detalle de órdenes: consulta al servicio la vista de administración consulta la orden del parámetro de ruta",
+          "status": "passed"
+        },
+        {
+          "name": "detalle de órdenes: consulta al servicio representa los datos de la orden con el estado legible",
+          "status": "passed"
+        },
+        {
+          "name": "detalle de órdenes: consulta al servicio indica cuando la orden no tiene mecánico asignado",
+          "status": "passed"
+        },
+        {
+          "name": "detalle de órdenes: estado de carga muestra el indicador de carga mientras el servicio responde",
+          "status": "passed"
+        },
+        {
+          "name": "detalle de órdenes: órdenes inexistentes y errores la vista de cliente informa cuando la orden no existe",
+          "status": "passed"
+        },
+        {
+          "name": "detalle de órdenes: órdenes inexistentes y errores la vista de mecánico informa cuando la orden no existe",
+          "status": "passed"
+        },
+        {
+          "name": "detalle de órdenes: órdenes inexistentes y errores la vista de administración informa cuando la orden no existe",
+          "status": "passed"
+        },
+        {
+          "name": "detalle de órdenes: órdenes inexistentes y errores propaga el mensaje de recurso no encontrado del backend",
+          "status": "passed"
+        },
+        {
+          "name": "detalle de órdenes: órdenes inexistentes y errores usa un mensaje propio si el error no aporta ninguno",
+          "status": "passed"
+        },
+        {
+          "name": "detalle de órdenes: órdenes inexistentes y errores no consulta al servicio si no se indica ninguna orden",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "file": "__tests__/budget-flow-integration.test.tsx",
+      "status": "passed",
+      "tests": [
+        {
+          "name": "flujo presupuesto → decisión → orden (cliente) decide una sola vez, reintenta la aplicación pendiente y recarga el presupuesto",
+          "status": "passed"
+        },
+        {
+          "name": "flujo presupuesto → decisión → orden (cliente) muestra \"sin presupuesto\" cuando el MS3 no tiene uno para la orden",
+          "status": "passed"
+        },
+        {
+          "name": "flujo presupuesto → decisión → orden (cliente) un 403 del MS3 informa la falta de permisos sin cerrar la sesión",
+          "status": "passed"
+        },
+        {
+          "name": "flujo presupuesto → decisión → orden (cliente) un 401 del MS3 cierra la sesión y devuelve al login",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "file": "__tests__/order-contract-compatibility.test.tsx",
+      "status": "passed",
+      "tests": [
+        {
+          "name": "contrato OrdenRespuesta → mapper → modelo transforma todos los campos obligatorios del contrato",
+          "status": "passed"
+        },
+        {
+          "name": "contrato OrdenRespuesta → mapper → modelo conserva un mecánico nulo del contrato como orden sin asignar",
+          "status": "passed"
+        },
+        {
+          "name": "contrato OrdenRespuesta → mapper → modelo el código 1 coincide con el catálogo oficial (recibido)",
+          "status": "passed"
+        },
+        {
+          "name": "contrato OrdenRespuesta → mapper → modelo el código 2 coincide con el catálogo oficial (esperando_diagnostico)",
+          "status": "passed"
+        },
+        {
+          "name": "contrato OrdenRespuesta → mapper → modelo el código 4 coincide con el catálogo oficial (esperando_repuestos)",
+          "status": "passed"
+        },
+        {
+          "name": "contrato OrdenRespuesta → mapper → modelo el código 6 coincide con el catálogo oficial (listo_para_entrega)",
+          "status": "passed"
+        },
+        {
+          "name": "contrato OrdenRespuesta → mapper → modelo el código 7 coincide con el catálogo oficial (entregado)",
+          "status": "passed"
+        },
+        {
+          "name": "contrato OrdenRespuesta → mapper → modelo el código 3 corresponde a esperando_aprobacion_presupuesto",
+          "status": "passed"
+        },
+        {
+          "name": "contrato OrdenRespuesta → mapper → modelo el código 5 corresponde a en_reparacion",
+          "status": "passed"
+        },
+        {
+          "name": "contrato OrdenRespuesta → mapper → modelo el código 8 corresponde a cancelado",
+          "status": "passed"
+        },
+        {
+          "name": "contrato OrdenRespuesta → mapper → modelo el código 1 se convierte en estado_destino sin pérdida (ida y vuelta)",
+          "status": "passed"
+        },
+        {
+          "name": "contrato OrdenRespuesta → mapper → modelo el código 2 se convierte en estado_destino sin pérdida (ida y vuelta)",
+          "status": "passed"
+        },
+        {
+          "name": "contrato OrdenRespuesta → mapper → modelo el código 3 se convierte en estado_destino sin pérdida (ida y vuelta)",
+          "status": "passed"
+        },
+        {
+          "name": "contrato OrdenRespuesta → mapper → modelo el código 4 se convierte en estado_destino sin pérdida (ida y vuelta)",
+          "status": "passed"
+        },
+        {
+          "name": "contrato OrdenRespuesta → mapper → modelo el código 5 se convierte en estado_destino sin pérdida (ida y vuelta)",
+          "status": "passed"
+        },
+        {
+          "name": "contrato OrdenRespuesta → mapper → modelo el código 6 se convierte en estado_destino sin pérdida (ida y vuelta)",
+          "status": "passed"
+        },
+        {
+          "name": "contrato OrdenRespuesta → mapper → modelo el código 7 se convierte en estado_destino sin pérdida (ida y vuelta)",
+          "status": "passed"
+        },
+        {
+          "name": "contrato OrdenRespuesta → mapper → modelo el código 8 se convierte en estado_destino sin pérdida (ida y vuelta)",
+          "status": "passed"
+        },
+        {
+          "name": "contrato OrdenRespuesta → mapper → modelo el código 0, fuera del catálogo, se rechaza",
+          "status": "passed"
+        },
+        {
+          "name": "contrato OrdenRespuesta → mapper → modelo el código 9, fuera del catálogo, se rechaza",
+          "status": "passed"
+        },
+        {
+          "name": "contrato OrdenRespuesta → mapper → modelo el código -1, fuera del catálogo, se rechaza",
+          "status": "passed"
+        },
+        {
+          "name": "contrato OrdenRespuesta → servicio getOrderById consulta la ruta oficial y devuelve el modelo",
+          "status": "passed"
+        },
+        {
+          "name": "contrato OrdenRespuesta → servicio getOrders transforma una lista con el formato del contrato",
+          "status": "passed"
+        },
+        {
+          "name": "contrato OrdenRespuesta → servicio updateOrderStatus utiliza el contrato oficial MS2",
+          "status": "passed"
+        },
+        {
+          "name": "contrato OrdenRespuesta → vistas de detalle la vista de cliente representa el ejemplo oficial del contrato",
+          "status": "passed"
+        },
+        {
+          "name": "contrato OrdenRespuesta → vistas de detalle la vista de mecánico representa el ejemplo oficial del contrato",
+          "status": "passed"
+        },
+        {
+          "name": "contrato OrdenRespuesta → vistas de detalle la vista de administración representa el ejemplo oficial del contrato",
+          "status": "passed"
+        },
+        {
+          "name": "contrato OrdenRespuesta → vistas de detalle muestra una orden recién recibida sin mecánico asignado",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "file": "__tests__/test-utils.test.tsx",
+      "status": "passed",
+      "tests": [
+        {
+          "name": "ejecuta el ejemplo documentado de eventos asíncronos",
+          "status": "passed"
+        },
+        {
+          "name": "navega con Router real y consulta la ruta desde el resultado del render",
+          "status": "passed"
+        },
+        {
+          "name": "compone providers personalizados y conserva la suscripción a Zustand",
+          "status": "passed"
+        },
+        {
+          "name": "restablece valores y acciones de un store sin conservar mocks",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "file": "__tests__/auth-session.test.tsx",
+      "status": "passed",
+      "tests": [
+        {
+          "name": "persistencia y recuperación de sesión no autentica si login no puede persistir la sesión",
+          "status": "passed"
+        },
+        {
+          "name": "persistencia y recuperación de sesión no autentica si setAuth no puede persistir la sesión",
+          "status": "passed"
+        },
+        {
+          "name": "persistencia y recuperación de sesión migra la sesión antigua y conserva las claves que usa Gateway",
+          "status": "passed"
+        },
+        {
+          "name": "persistencia y recuperación de sesión un fallo de lectura termina la carga sin borrar los datos recuperables",
+          "status": "passed"
+        },
+        {
+          "name": "persistencia y recuperación de sesión guarda en SecureStore la sesión devuelta por el login",
+          "status": "passed"
+        },
+        {
+          "name": "persistencia y recuperación de sesión recupera usuario, token y rol desde SecureStore",
+          "status": "passed"
+        },
+        {
+          "name": "persistencia y recuperación de sesión descarta una sesión malformada y termina la carga",
+          "status": "passed"
+        },
+        {
+          "name": "persistencia y recuperación de sesión elimina la sesión guardada al cerrar sesión",
+          "status": "passed"
+        },
+        {
+          "name": "persistencia y recuperación de sesión espera la recuperación antes de redirigir al inicio del rol guardado",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "file": "__tests__/common-components.test.tsx",
+      "status": "passed",
+      "tests": [
+        {
+          "name": "componentes comunes Input mantiene visible el error con estilos personalizados y foco false",
+          "status": "passed"
+        },
+        {
+          "name": "componentes comunes Input mantiene visible el error con estilos personalizados y foco true",
+          "status": "passed"
+        },
+        {
+          "name": "componentes comunes Button ejecuta la acción y expone su estado de accesibilidad",
+          "status": "passed"
+        },
+        {
+          "name": "componentes comunes Button bloquea la interacción mientras carga",
+          "status": "passed"
+        },
+        {
+          "name": "componentes comunes Button admite etiqueta de accesibilidad personalizada",
+          "status": "passed"
+        },
+        {
+          "name": "componentes comunes AppButton mantiene el alias compatible del Button común",
+          "status": "passed"
+        },
+        {
+          "name": "componentes comunes Card renderiza su encabezado y contenido",
+          "status": "passed"
+        },
+        {
+          "name": "componentes comunes Input muestra errores de validación y los anuncia",
+          "status": "passed"
+        },
+        {
+          "name": "componentes comunes Input muestra ayuda y notifica foco y desenfoque",
+          "status": "passed"
+        },
+        {
+          "name": "componentes comunes Loading expone un indicador ocupado y un mensaje",
+          "status": "passed"
+        },
+        {
+          "name": "componentes comunes ErrorMessage permite reintentar la operación",
+          "status": "passed"
+        },
+        {
+          "name": "componentes comunes ErrorMessage permite personalizar el título y ocultar el reintento",
+          "status": "passed"
+        },
+        {
+          "name": "componentes comunes Button expone y respeta el estado deshabilitado explícito",
+          "status": "passed"
+        },
+        {
+          "name": "componentes comunes Input conserva su etiqueta accesible cuando no es editable",
+          "status": "passed"
+        },
+        {
+          "name": "componentes comunes Input anuncia el error como una región de actualización accesible",
+          "status": "passed"
+        },
+        {
+          "name": "componentes comunes InfoCard muestra sus campos opcionales y contenido",
+          "status": "passed"
+        },
+        {
+          "name": "componentes comunes InfoCard comparte las props de accesibilidad de Card",
+          "status": "passed"
+        },
+        {
+          "name": "componentes comunes StatusPill mantiene su etiqueta accesible en tono success",
+          "status": "passed"
+        },
+        {
+          "name": "componentes comunes StatusPill mantiene su etiqueta accesible en tono warning",
+          "status": "passed"
+        },
+        {
+          "name": "componentes comunes StatusPill mantiene su etiqueta accesible en tono info",
+          "status": "passed"
+        },
+        {
+          "name": "componentes comunes StatusPill mantiene su etiqueta accesible en tono danger",
+          "status": "passed"
+        },
+        {
+          "name": "componentes comunes AppScreen deja título, descripción y contenido disponibles",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "file": "__tests__/use-data-query.test.ts",
+      "status": "passed",
+      "tests": [
+        {
+          "name": "useDataQuery: carga inicial no realiza ninguna petición si no hay consulta",
+          "status": "passed"
+        },
+        {
+          "name": "useDataQuery: carga inicial expone los datos devueltos por la consulta",
+          "status": "passed"
+        },
+        {
+          "name": "useDataQuery: carga inicial expone el mensaje del error propagado por la consulta",
+          "status": "passed"
+        },
+        {
+          "name": "useDataQuery: carga inicial recurre al mensaje propio si el error no aporta ninguno",
+          "status": "passed"
+        },
+        {
+          "name": "useDataQuery: carga inicial no reintenta por su cuenta ante un error",
+          "status": "passed"
+        },
+        {
+          "name": "useDataQuery: actualización manual vuelve a consultar sin volver al estado de carga inicial",
+          "status": "passed"
+        },
+        {
+          "name": "useDataQuery: actualización manual sirve como reintento tras un error",
+          "status": "passed"
+        },
+        {
+          "name": "useDataQuery: actualización manual no consulta nada si no hay consulta configurada",
+          "status": "passed"
+        },
+        {
+          "name": "useDataQuery: prevención de peticiones duplicadas descarta las consultas solicitadas mientras una sigue en curso",
+          "status": "passed"
+        },
+        {
+          "name": "useDataQuery: prevención de peticiones duplicadas vuelve a aceptar consultas cuando la anterior termina",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "file": "__tests__/auth-logout.test.ts",
+      "status": "passed",
+      "tests": [
+        {
+          "name": "logout invalida un login HTTP pendiente y evita que vuelva a guardar la sesión",
+          "status": "passed"
+        },
+        {
+          "name": "logout invalida una recuperación que todavía está leyendo SecureStore",
+          "status": "passed"
+        },
+        {
+          "name": "logout espera una escritura en curso y borra su resultado antes de terminar",
+          "status": "passed"
+        },
+        {
+          "name": "un nuevo login no queda borrado por un logout anterior todavía pendiente",
+          "status": "passed"
+        },
+        {
+          "name": "intenta borrar todas las claves y permite reintentar un fallo de limpieza",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "file": "__tests__/auth-role.test.ts",
+      "status": "passed",
+      "tests": [
+        {
+          "name": "identificación del rol autenticado dirige al rol administrador a su inicio",
+          "status": "passed"
+        },
+        {
+          "name": "identificación del rol autenticado dirige al rol mecanico a su inicio",
+          "status": "passed"
+        },
+        {
+          "name": "identificación del rol autenticado dirige al rol cliente a su inicio",
+          "status": "passed"
+        },
+        {
+          "name": "identificación del rol autenticado envía a login cuando no hay un rol autenticado",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "file": "__tests__/budget-service.test.ts",
+      "status": "passed",
+      "tests": [
+        {
+          "name": "Fixtures alineados con el contrato del MS3 PresupuestoResumen contiene exactamente los campos obligatorios",
+          "status": "passed"
+        },
+        {
+          "name": "Fixtures alineados con el contrato del MS3 PresupuestoDetalle contiene exactamente los campos obligatorios",
+          "status": "passed"
+        },
+        {
+          "name": "Fixtures alineados con el contrato del MS3 PaginaPresupuestos contiene exactamente los campos obligatorios",
+          "status": "passed"
+        },
+        {
+          "name": "Fixtures alineados con el contrato del MS3 VersionDetalle contiene exactamente los campos obligatorios",
+          "status": "passed"
+        },
+        {
+          "name": "Fixtures alineados con el contrato del MS3 ItemSalida contiene exactamente los campos obligatorios",
+          "status": "passed"
+        },
+        {
+          "name": "Fixtures alineados con el contrato del MS3 DecisionSalida contiene exactamente los campos obligatorios",
+          "status": "passed"
+        },
+        {
+          "name": "budget.mapper convierte un PresupuestoDetalle ordenando las versiones",
+          "status": "passed"
+        },
+        {
+          "name": "budget.mapper conserva importes, ítems, repuesto/proveedor y la decisión",
+          "status": "passed"
+        },
+        {
+          "name": "budget.mapper acepta un presupuesto sin versión vigente (nunca aprobado)",
+          "status": "passed"
+        },
+        {
+          "name": "budget.mapper rechaza un PresupuestoDetalle inválido: cuerpo null",
+          "status": "passed"
+        },
+        {
+          "name": "budget.mapper rechaza un PresupuestoDetalle inválido: objeto vacío",
+          "status": "passed"
+        },
+        {
+          "name": "budget.mapper rechaza un PresupuestoDetalle inválido: estado de versión desconocido",
+          "status": "passed"
+        },
+        {
+          "name": "budget.mapper rechaza un PresupuestoDetalle inválido: estado del resumen desconocido",
+          "status": "passed"
+        },
+        {
+          "name": "budget.mapper rechaza un PresupuestoDetalle inválido: versión sin ítems",
+          "status": "passed"
+        },
+        {
+          "name": "budget.mapper rechaza un PresupuestoDetalle inválido: decisión desconocida",
+          "status": "passed"
+        },
+        {
+          "name": "budget.mapper convierte un ResultadoOperacion con repuestos faltantes",
+          "status": "passed"
+        },
+        {
+          "name": "budget.mapper interpreta efecto_en_orden null como \"sin cambio en la orden\"",
+          "status": "passed"
+        },
+        {
+          "name": "BudgetsService.getBudgetForOrder busca el presupuesto de la orden y consulta su detalle",
+          "status": "passed"
+        },
+        {
+          "name": "BudgetsService.getBudgetForOrder devuelve null si la orden no tiene presupuesto, sin pedir detalle",
+          "status": "passed"
+        },
+        {
+          "name": "BudgetsService.getBudgetForOrder ignora presupuestos de otra orden en la página recibida",
+          "status": "passed"
+        },
+        {
+          "name": "BudgetsService.getBudgetForOrder rechaza el identificador de orden \"\" sin consultar al MS3",
+          "status": "passed"
+        },
+        {
+          "name": "BudgetsService.getBudgetForOrder rechaza el identificador de orden \"abc\" sin consultar al MS3",
+          "status": "passed"
+        },
+        {
+          "name": "BudgetsService.getBudgetForOrder rechaza el identificador de orden \"0\" sin consultar al MS3",
+          "status": "passed"
+        },
+        {
+          "name": "BudgetsService.getBudgetForOrder rechaza el identificador de orden \"-1\" sin consultar al MS3",
+          "status": "passed"
+        },
+        {
+          "name": "BudgetsService.getBudgetForOrder rechaza el identificador de orden \"3.5\" sin consultar al MS3",
+          "status": "passed"
+        },
+        {
+          "name": "BudgetsService.getBudgetForOrder rechaza el identificador de orden \"31/../1\" sin consultar al MS3",
+          "status": "passed"
+        },
+        {
+          "name": "BudgetsService.getBudgetForOrder rechaza una página que no cumple el contrato",
+          "status": "passed"
+        },
+        {
+          "name": "BudgetsService.getBudgetForOrder propaga el error normalizado: 403 rol no permitido",
+          "status": "passed"
+        },
+        {
+          "name": "BudgetsService.getBudgetForOrder propaga el error normalizado: 404 presupuesto ajeno",
+          "status": "passed"
+        },
+        {
+          "name": "BudgetsService.getBudgetForOrder propaga el error normalizado: 503 MS2 no disponible",
+          "status": "passed"
+        },
+        {
+          "name": "BudgetsService.getBudgetForOrder propaga el error normalizado: sin conexión",
+          "status": "passed"
+        },
+        {
+          "name": "BudgetsService.decideBudgetVersion envía la aprobación a la versión indicada",
+          "status": "passed"
+        },
+        {
+          "name": "BudgetsService.decideBudgetVersion envía el rechazo con motivo y la confirmación de cancelación",
+          "status": "passed"
+        },
+        {
+          "name": "BudgetsService.decideBudgetVersion envía exactamente las propiedades de DecisionEntrada (additionalProperties: false)",
+          "status": "passed"
+        },
+        {
+          "name": "BudgetsService.decideBudgetVersion acepta un motivo de 1000 caracteres y rechaza uno más largo sin enviarlo",
+          "status": "passed"
+        },
+        {
+          "name": "BudgetsService.decideBudgetVersion no envía un rechazo sin motivo",
+          "status": "passed"
+        },
+        {
+          "name": "BudgetsService.decideBudgetVersion valida los identificadores: presupuesto inválido",
+          "status": "passed"
+        },
+        {
+          "name": "BudgetsService.decideBudgetVersion valida los identificadores: versión inválida",
+          "status": "passed"
+        },
+        {
+          "name": "BudgetsService.decideBudgetVersion propaga el 404 del MS3 al decidir sin reintentar",
+          "status": "passed"
+        },
+        {
+          "name": "BudgetsService.decideBudgetVersion propaga el 422 del MS3 al decidir sin reintentar",
+          "status": "passed"
+        },
+        {
+          "name": "BudgetsService.decideBudgetVersion distingue la decisión registrada con aplicación pendiente (503)",
+          "status": "passed"
+        },
+        {
+          "name": "BudgetsService.decideBudgetVersion trata un 503 sin decision_id como error común (decisión no registrada)",
+          "status": "passed"
+        },
+        {
+          "name": "BudgetsService.decideBudgetVersion propaga el 409 de una versión ya decidida o reemplazada",
+          "status": "passed"
+        },
+        {
+          "name": "BudgetsService.retryDecisionApplication reintenta la aplicación de la decisión sin crear otra",
+          "status": "passed"
+        },
+        {
+          "name": "BudgetsService.retryDecisionApplication informa si la aplicación sigue pendiente",
+          "status": "passed"
+        },
+        {
+          "name": "BudgetsService.retryDecisionApplication rechaza un identificador de decisión inválido sin consultar",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "file": "__tests__/evidence-request-serialization.test.ts",
+      "status": "passed",
+      "tests": [
+        {
+          "name": "Serialización de solicitudes de subida de evidencia (Body_subir_evidencias_post) modelo de la app → campos del contrato diagnostico: el mapper produce los campos esperados",
+          "status": "passed"
+        },
+        {
+          "name": "Serialización de solicitudes de subida de evidencia (Body_subir_evidencias_post) modelo de la app → campos del contrato presupuesto: el mapper produce los campos esperados",
+          "status": "passed"
+        },
+        {
+          "name": "Serialización de solicitudes de subida de evidencia (Body_subir_evidencias_post) modelo de la app → campos del contrato reparacion: el mapper produce los campos esperados",
+          "status": "passed"
+        },
+        {
+          "name": "Serialización de solicitudes de subida de evidencia (Body_subir_evidencias_post) modelo de la app → campos del contrato resultadoFinal: el mapper produce los campos esperados",
+          "status": "passed"
+        },
+        {
+          "name": "Serialización de solicitudes de subida de evidencia (Body_subir_evidencias_post) campos del contrato → multipart/form-data diagnostico: solo envía campos del contrato y nunca el texto \"null\" ni \"undefined\"",
+          "status": "passed"
+        },
+        {
+          "name": "Serialización de solicitudes de subida de evidencia (Body_subir_evidencias_post) campos del contrato → multipart/form-data presupuesto: solo envía campos del contrato y nunca el texto \"null\" ni \"undefined\"",
+          "status": "passed"
+        },
+        {
+          "name": "Serialización de solicitudes de subida de evidencia (Body_subir_evidencias_post) campos del contrato → multipart/form-data reparacion: solo envía campos del contrato y nunca el texto \"null\" ni \"undefined\"",
+          "status": "passed"
+        },
+        {
+          "name": "Serialización de solicitudes de subida de evidencia (Body_subir_evidencias_post) campos del contrato → multipart/form-data resultadoFinal: solo envía campos del contrato y nunca el texto \"null\" ni \"undefined\"",
+          "status": "passed"
+        },
+        {
+          "name": "Serialización de solicitudes de subida de evidencia (Body_subir_evidencias_post) campos del contrato → multipart/form-data envía cada campo de texto como lo interpreta el contrato",
+          "status": "passed"
+        },
+        {
+          "name": "Serialización de solicitudes de subida de evidencia (Body_subir_evidencias_post) campos del contrato → multipart/form-data omite los campos opcionales sin valor",
+          "status": "passed"
+        },
+        {
+          "name": "Serialización de solicitudes de subida de evidencia (Body_subir_evidencias_post) campos del contrato → multipart/form-data agrega el archivo como { uri, name, type } con filename y Content-Type de la parte",
+          "status": "passed"
+        },
+        {
+          "name": "Serialización de solicitudes de subida de evidencia (Body_subir_evidencias_post) metadatos inválidos contextoInvalido: el esquema lo rechaza antes del mapeo",
+          "status": "passed"
+        },
+        {
+          "name": "Serialización de solicitudes de subida de evidencia (Body_subir_evidencias_post) metadatos inválidos presupuestoVacio: el esquema lo rechaza antes del mapeo",
+          "status": "passed"
+        },
+        {
+          "name": "Serialización de solicitudes de subida de evidencia (Body_subir_evidencias_post) metadatos inválidos ordenSimulada: pasa el esquema, pero el mapper lo rechaza por no ser un entero positivo",
+          "status": "passed"
+        },
+        {
+          "name": "Serialización de solicitudes de subida de evidencia (Body_subir_evidencias_post) metadatos inválidos presupuestoNoNumerico: pasa el esquema, pero el mapper lo rechaza por no ser un entero positivo",
+          "status": "passed"
+        },
+        {
+          "name": "Serialización de solicitudes de subida de evidencia (Body_subir_evidencias_post) envío mediante EvidenceService la solicitud de la app llega a POST /evidencias como el FormData esperado",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "file": "__tests__/parts-service.test.ts",
+      "status": "passed",
+      "tests": [
+        {
+          "name": "Fixtures alineados con el contrato del MS3 RepuestoSalida contiene exactamente los campos obligatorios",
+          "status": "passed"
+        },
+        {
+          "name": "Fixtures alineados con el contrato del MS3 PaginaRepuestos contiene exactamente los campos obligatorios",
+          "status": "passed"
+        },
+        {
+          "name": "Fixtures alineados con el contrato del MS3 ProveedorSalida contiene exactamente los campos obligatorios",
+          "status": "passed"
+        },
+        {
+          "name": "Fixtures alineados con el contrato del MS3 ProveedorDetalle contiene exactamente los campos obligatorios",
+          "status": "passed"
+        },
+        {
+          "name": "Fixtures alineados con el contrato del MS3 PaginaProveedores contiene exactamente los campos obligatorios",
+          "status": "passed"
+        },
+        {
+          "name": "parts.mapper convierte un RepuestoSalida al modelo SparePart",
+          "status": "passed"
+        },
+        {
+          "name": "parts.mapper conserva los umbrales nulos (sin umbral propio ni general)",
+          "status": "passed"
+        },
+        {
+          "name": "parts.mapper convierte una PaginaRepuestos conservando el total del servidor",
+          "status": "passed"
+        },
+        {
+          "name": "parts.mapper convierte un ProveedorDetalle con sus repuestos",
+          "status": "passed"
+        },
+        {
+          "name": "parts.mapper convierte una PaginaProveedores",
+          "status": "passed"
+        },
+        {
+          "name": "parts.mapper rechaza una PaginaRepuestos inválida: cuerpo null",
+          "status": "passed"
+        },
+        {
+          "name": "parts.mapper rechaza una PaginaRepuestos inválida: objeto vacío",
+          "status": "passed"
+        },
+        {
+          "name": "parts.mapper rechaza una PaginaRepuestos inválida: lista que no es arreglo",
+          "status": "passed"
+        },
+        {
+          "name": "parts.mapper rechaza una PaginaRepuestos inválida: repuesto sin identificador",
+          "status": "passed"
+        },
+        {
+          "name": "parts.mapper rechaza una PaginaRepuestos inválida: repuesto null",
+          "status": "passed"
+        },
+        {
+          "name": "parts.mapper rechaza un ProveedorDetalle inválido: cuerpo null",
+          "status": "passed"
+        },
+        {
+          "name": "parts.mapper rechaza un ProveedorDetalle inválido: objeto vacío",
+          "status": "passed"
+        },
+        {
+          "name": "parts.mapper rechaza un ProveedorDetalle inválido: sin lista de repuestos",
+          "status": "passed"
+        },
+        {
+          "name": "PartsService.getSpareParts consulta GET /repuestos y devuelve la página mapeada",
+          "status": "passed"
+        },
+        {
+          "name": "PartsService.getSpareParts devuelve una lista vacía cuando no hay repuestos",
+          "status": "passed"
+        },
+        {
+          "name": "PartsService.getSpareParts rechaza una respuesta 200 que no cumple el contrato",
+          "status": "passed"
+        },
+        {
+          "name": "PartsService.getSpareParts propaga el error normalizado: 403 con detalle del backend",
+          "status": "passed"
+        },
+        {
+          "name": "PartsService.getSpareParts propaga el error normalizado: 401 sin detalle",
+          "status": "passed"
+        },
+        {
+          "name": "PartsService.getSpareParts propaga el error normalizado: 500 sin detalle",
+          "status": "passed"
+        },
+        {
+          "name": "PartsService.getSpareParts propaga el error normalizado: sin conexión",
+          "status": "passed"
+        },
+        {
+          "name": "PartsService.getSpareParts propaga el error normalizado: tiempo agotado",
+          "status": "passed"
+        },
+        {
+          "name": "PartsService.getSuppliers consulta GET /proveedores y devuelve la página mapeada",
+          "status": "passed"
+        },
+        {
+          "name": "PartsService.getSuppliers devuelve una lista vacía cuando no hay proveedores",
+          "status": "passed"
+        },
+        {
+          "name": "PartsService.getSuppliers propaga el error del servidor",
+          "status": "passed"
+        },
+        {
+          "name": "PartsService: paginación con desde/limite (MS3) pide la primera página sin parámetros (desde=0, limite=50 por defecto)",
+          "status": "passed"
+        },
+        {
+          "name": "PartsService: paginación con desde/limite (MS3) pide una página posterior de repuestos con desde y limite",
+          "status": "passed"
+        },
+        {
+          "name": "PartsService: paginación con desde/limite (MS3) pide una página posterior de proveedores con desde y limite",
+          "status": "passed"
+        },
+        {
+          "name": "PartsService: paginación con desde/limite (MS3) rechaza parámetros fuera del contrato sin llamar al MS3 ({ offset: -1 })",
+          "status": "passed"
+        },
+        {
+          "name": "PartsService: paginación con desde/limite (MS3) rechaza parámetros fuera del contrato sin llamar al MS3 ({ offset: 1.5 })",
+          "status": "passed"
+        },
+        {
+          "name": "PartsService: paginación con desde/limite (MS3) rechaza parámetros fuera del contrato sin llamar al MS3 ({ offset: 50, limit: 0 })",
+          "status": "passed"
+        },
+        {
+          "name": "PartsService: paginación con desde/limite (MS3) rechaza parámetros fuera del contrato sin llamar al MS3 ({ offset: 50, limit: 201 })",
+          "status": "passed"
+        },
+        {
+          "name": "PartsService: paginación con desde/limite (MS3) propaga el error de una página posterior",
+          "status": "passed"
+        },
+        {
+          "name": "PartsService.getSupplierById consulta GET /proveedores/{id} y devuelve el detalle",
+          "status": "passed"
+        },
+        {
+          "name": "PartsService.getSupplierById codifica el identificador recibido en la ruta",
+          "status": "passed"
+        },
+        {
+          "name": "PartsService.getSupplierById propaga el 404 de un proveedor inexistente",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "file": "__tests__/services-response-scenarios.test.ts",
+      "status": "passed",
+      "tests": [
+        {
+          "name": "VehiclesService: respuestas exitosas mapea una lista con elementos en getVehicles",
+          "status": "passed"
+        },
+        {
+          "name": "VehiclesService: respuestas exitosas mapea el detalle de un vehículo en getVehicleById",
+          "status": "passed"
+        },
+        {
+          "name": "VehiclesService: respuestas vacías devuelve una lista vacía cuando getVehicles no encuentra vehículos",
+          "status": "passed"
+        },
+        {
+          "name": "VehiclesService: respuestas vacías devuelve una lista vacía cuando getMyVehicles no encuentra vehículos",
+          "status": "passed"
+        },
+        {
+          "name": "VehiclesService: respuestas vacías devuelve una lista vacía cuando getAssignedVehicles no encuentra vehículos",
+          "status": "passed"
+        },
+        {
+          "name": "VehiclesService: respuestas vacías devuelve una lista vacía si la API responde con un cuerpo no iterable",
+          "status": "passed"
+        },
+        {
+          "name": "VehiclesService: respuestas vacías rechaza un detalle que incumple el contrato MS2",
+          "status": "passed"
+        },
+        {
+          "name": "VehiclesService: respuestas con error propaga el detalle enviado por el backend",
+          "status": "passed"
+        },
+        {
+          "name": "VehiclesService: respuestas con error traduce el estado 404 a un mensaje legible cuando el backend no envía detalle",
+          "status": "passed"
+        },
+        {
+          "name": "VehiclesService: respuestas con error traduce el estado 401 a un mensaje legible cuando el backend no envía detalle",
+          "status": "passed"
+        },
+        {
+          "name": "VehiclesService: respuestas con error traduce el estado 403 a un mensaje legible cuando el backend no envía detalle",
+          "status": "passed"
+        },
+        {
+          "name": "VehiclesService: respuestas con error traduce el estado 500 a un mensaje legible cuando el backend no envía detalle",
+          "status": "passed"
+        },
+        {
+          "name": "VehiclesService: respuestas con error informa la falta de conexión en getMyVehicles",
+          "status": "passed"
+        },
+        {
+          "name": "VehiclesService: respuestas con error informa el tiempo de espera agotado en getAssignedVehicles",
+          "status": "passed"
+        },
+        {
+          "name": "VehiclesService: respuestas con error usa el mensaje propio del servicio si el error no aporta ninguno",
+          "status": "passed"
+        },
+        {
+          "name": "VehiclesService: respuestas con error informa el estado 409 al registrar un vehículo inválido",
+          "status": "passed"
+        },
+        {
+          "name": "VehiclesService: respuestas con error informa el estado 422 al registrar un vehículo inválido",
+          "status": "passed"
+        },
+        {
+          "name": "OrdersService: respuestas exitosas mapea una lista con elementos en getOrders",
+          "status": "passed"
+        },
+        {
+          "name": "OrdersService: respuestas exitosas mapea el detalle de una orden en getOrderById",
+          "status": "passed"
+        },
+        {
+          "name": "OrdersService: respuestas vacías devuelve una lista vacía cuando no hay órdenes registradas",
+          "status": "passed"
+        },
+        {
+          "name": "OrdersService: respuestas vacías devuelve una lista vacía si la API responde con un cuerpo no iterable",
+          "status": "passed"
+        },
+        {
+          "name": "OrdersService: respuestas vacías rechaza una orden sin estado_codigo oficial",
+          "status": "passed"
+        },
+        {
+          "name": "OrdersService: respuestas con error propaga el detalle enviado por el backend",
+          "status": "passed"
+        },
+        {
+          "name": "OrdersService: respuestas con error traduce el estado 403 al listar órdenes sin detalle del backend",
+          "status": "passed"
+        },
+        {
+          "name": "OrdersService: respuestas con error traduce el estado 500 al listar órdenes sin detalle del backend",
+          "status": "passed"
+        },
+        {
+          "name": "OrdersService: respuestas con error informa la falta de conexión al listar órdenes",
+          "status": "passed"
+        },
+        {
+          "name": "OrdersService: respuestas con error informa que la orden consultada no existe",
+          "status": "passed"
+        },
+        {
+          "name": "OrdersService: respuestas con error usa el mensaje propio del servicio si el error no aporta ninguno",
+          "status": "passed"
+        },
+        {
+          "name": "OrdersService: respuestas con error informa datos inválidos al crear una orden",
+          "status": "passed"
+        },
+        {
+          "name": "OrdersService: respuestas con error informa la falta de permisos al actualizar el estado de una orden",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "file": "__tests__/evidence-service.test.ts",
+      "status": "passed",
+      "tests": [
+        {
+          "name": "EvidenceService.uploadEvidence envía multipart/form-data con los campos del contrato y el token",
+          "status": "passed"
+        },
+        {
+          "name": "EvidenceService.uploadEvidence no envía identificadores de usuario: el autor lo determina MS4",
+          "status": "passed"
+        },
+        {
+          "name": "EvidenceService.uploadEvidence rechaza el identificador de orden  (vacío) sin contactar al servidor",
+          "status": "passed"
+        },
+        {
+          "name": "EvidenceService.uploadEvidence rechaza el identificador de orden abc (no numérico) sin contactar al servidor",
+          "status": "passed"
+        },
+        {
+          "name": "EvidenceService.uploadEvidence rechaza el identificador de orden 0 (cero) sin contactar al servidor",
+          "status": "passed"
+        },
+        {
+          "name": "EvidenceService.uploadEvidence rechaza el identificador de orden -3 (negativo) sin contactar al servidor",
+          "status": "passed"
+        },
+        {
+          "name": "EvidenceService.uploadEvidence rechaza el identificador de orden 31/../32 (manipulado) sin contactar al servidor",
+          "status": "passed"
+        },
+        {
+          "name": "EvidenceService.uploadEvidence no invoca al cliente HTTP con un archivo vacío",
+          "status": "passed"
+        },
+        {
+          "name": "EvidenceService.uploadEvidence no invoca al cliente HTTP con un archivo demasiado grande",
+          "status": "passed"
+        },
+        {
+          "name": "EvidenceService.uploadEvidence no invoca al cliente HTTP con un archivo de tipo no permitido",
+          "status": "passed"
+        },
+        {
+          "name": "EvidenceService.uploadEvidence no invoca al cliente HTTP con un archivo con URI remota",
+          "status": "passed"
+        },
+        {
+          "name": "EvidenceService.uploadEvidence rechaza una respuesta que asocia la evidencia a otra orden",
+          "status": "passed"
+        },
+        {
+          "name": "EvidenceService.uploadEvidence rechaza una respuesta 201 que no cumple el contrato",
+          "status": "passed"
+        },
+        {
+          "name": "EvidenceService.uploadEvidence traduce el 404 de MS4 a un mensaje comprensible",
+          "status": "passed"
+        },
+        {
+          "name": "EvidenceService.uploadEvidence traduce el 409 de MS4 a un mensaje comprensible",
+          "status": "passed"
+        },
+        {
+          "name": "EvidenceService.uploadEvidence traduce el 413 de MS4 a un mensaje comprensible",
+          "status": "passed"
+        },
+        {
+          "name": "EvidenceService.uploadEvidence traduce el 415 de MS4 a un mensaje comprensible",
+          "status": "passed"
+        },
+        {
+          "name": "EvidenceService.uploadEvidence prefiere el detalle legible que entrega el servidor",
+          "status": "passed"
+        },
+        {
+          "name": "EvidenceService.uploadEvidence nunca reintenta automáticamente el POST de la evidencia",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "file": "__tests__/auth-schema.test.ts",
+      "status": "passed",
+      "tests": [
+        {
+          "name": "Validación Zod con fixtures iniciales userSchema acepta el usuario mock con rol cliente",
+          "status": "passed"
+        },
+        {
+          "name": "Validación Zod con fixtures iniciales userSchema acepta el usuario mock con rol mecanico",
+          "status": "passed"
+        },
+        {
+          "name": "Validación Zod con fixtures iniciales userSchema acepta el usuario mock con rol administrador",
+          "status": "passed"
+        },
+        {
+          "name": "Validación Zod con fixtures iniciales userSchema acepta un usuario sin los campos opcionales",
+          "status": "passed"
+        },
+        {
+          "name": "Validación Zod con fixtures iniciales userSchema rechaza un rol que no existe en la app",
+          "status": "passed"
+        },
+        {
+          "name": "Validación Zod con fixtures iniciales userSchema rechaza un correo con formato inválido",
+          "status": "passed"
+        },
+        {
+          "name": "Validación Zod con fixtures iniciales authResponseSchema acepta la respuesta de autenticación mock de cliente",
+          "status": "passed"
+        },
+        {
+          "name": "Validación Zod con fixtures iniciales authResponseSchema acepta la respuesta de autenticación mock de mecanico",
+          "status": "passed"
+        },
+        {
+          "name": "Validación Zod con fixtures iniciales authResponseSchema acepta la respuesta de autenticación mock de administrador",
+          "status": "passed"
+        },
+        {
+          "name": "Validación Zod con fixtures iniciales authResponseSchema acepta una respuesta sin refreshToken",
+          "status": "passed"
+        },
+        {
+          "name": "Validación Zod con fixtures iniciales authResponseSchema rechaza una respuesta con token vacío",
+          "status": "passed"
+        },
+        {
+          "name": "Validación Zod con fixtures iniciales authResponseSchema rechaza una respuesta cuyo usuario es inválido",
+          "status": "passed"
+        },
+        {
+          "name": "Validación Zod con fixtures iniciales loginSchema acepta credenciales con el correo de un usuario mock",
+          "status": "passed"
+        },
+        {
+          "name": "Validación Zod con fixtures iniciales loginSchema elimina los espacios alrededor del correo",
+          "status": "passed"
+        },
+        {
+          "name": "Validación Zod con fixtures iniciales loginSchema rechaza un correo vacío con el mensaje esperado",
+          "status": "passed"
+        },
+        {
+          "name": "Validación Zod con fixtures iniciales loginSchema rechaza una contraseña de menos de 6 caracteres",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "file": "__tests__/order-request-serialization.test.ts",
+      "status": "passed",
+      "tests": [
+        {
+          "name": "Serialización de solicitudes de cambio de estado (CambioEstadoSolicitud) modelo de la app → cuerpo del contrato solicitarRepuestos: el mapper produce el cuerpo esperado",
+          "status": "passed"
+        },
+        {
+          "name": "Serialización de solicitudes de cambio de estado (CambioEstadoSolicitud) modelo de la app → cuerpo del contrato iniciarReparacion: el mapper produce el cuerpo esperado",
+          "status": "passed"
+        },
+        {
+          "name": "Serialización de solicitudes de cambio de estado (CambioEstadoSolicitud) modelo de la app → cuerpo del contrato marcarListo: el mapper produce el cuerpo esperado",
+          "status": "passed"
+        },
+        {
+          "name": "Serialización de solicitudes de cambio de estado (CambioEstadoSolicitud) modelo de la app → cuerpo del contrato cancelarConObservacion: el mapper produce el cuerpo esperado",
+          "status": "passed"
+        },
+        {
+          "name": "Serialización de solicitudes de cambio de estado (CambioEstadoSolicitud) modelo de la app → cuerpo del contrato cancelarSinObservacion: el mapper produce el cuerpo esperado",
+          "status": "passed"
+        },
+        {
+          "name": "Serialización de solicitudes de cambio de estado (CambioEstadoSolicitud) modelo de la app → cuerpo del contrato solicitarRepuestos: el cuerpo solo contiene campos del contrato",
+          "status": "passed"
+        },
+        {
+          "name": "Serialización de solicitudes de cambio de estado (CambioEstadoSolicitud) modelo de la app → cuerpo del contrato iniciarReparacion: el cuerpo solo contiene campos del contrato",
+          "status": "passed"
+        },
+        {
+          "name": "Serialización de solicitudes de cambio de estado (CambioEstadoSolicitud) modelo de la app → cuerpo del contrato marcarListo: el cuerpo solo contiene campos del contrato",
+          "status": "passed"
+        },
+        {
+          "name": "Serialización de solicitudes de cambio de estado (CambioEstadoSolicitud) modelo de la app → cuerpo del contrato cancelarConObservacion: el cuerpo solo contiene campos del contrato",
+          "status": "passed"
+        },
+        {
+          "name": "Serialización de solicitudes de cambio de estado (CambioEstadoSolicitud) modelo de la app → cuerpo del contrato cancelarSinObservacion: el cuerpo solo contiene campos del contrato",
+          "status": "passed"
+        },
+        {
+          "name": "Serialización de solicitudes de cambio de estado (CambioEstadoSolicitud) cuerpo JSON enviado omite la observación cuando no se indica",
+          "status": "passed"
+        },
+        {
+          "name": "Serialización de solicitudes de cambio de estado (CambioEstadoSolicitud) cuerpo JSON enviado envía la observación null cuando se indica explícitamente",
+          "status": "passed"
+        },
+        {
+          "name": "Serialización de solicitudes de cambio de estado (CambioEstadoSolicitud) cuerpo JSON enviado envía la observación de texto tal cual",
+          "status": "passed"
+        },
+        {
+          "name": "Serialización de solicitudes de cambio de estado (CambioEstadoSolicitud) cuerpo JSON enviado no completa la observación de una cancelación: el servicio valida la exigencia de MS2 antes del HTTP",
+          "status": "passed"
+        },
+        {
+          "name": "Serialización de solicitudes de cambio de estado (CambioEstadoSolicitud) envío mediante OrdersService rechaza cancelar con observación undefined sin HTTP",
+          "status": "passed"
+        },
+        {
+          "name": "Serialización de solicitudes de cambio de estado (CambioEstadoSolicitud) envío mediante OrdersService rechaza cancelar con observación null sin HTTP",
+          "status": "passed"
+        },
+        {
+          "name": "Serialización de solicitudes de cambio de estado (CambioEstadoSolicitud) envío mediante OrdersService rechaza cancelar con observación \"\" sin HTTP",
+          "status": "passed"
+        },
+        {
+          "name": "Serialización de solicitudes de cambio de estado (CambioEstadoSolicitud) envío mediante OrdersService rechaza cancelar con observación \"   \" sin HTTP",
+          "status": "passed"
+        },
+        {
+          "name": "Serialización de solicitudes de cambio de estado (CambioEstadoSolicitud) envío mediante OrdersService solicitarRepuestos: PATCH /ordenes/{orden_id}/estado con el cuerpo esperado",
+          "status": "passed"
+        },
+        {
+          "name": "Serialización de solicitudes de cambio de estado (CambioEstadoSolicitud) envío mediante OrdersService iniciarReparacion: PATCH /ordenes/{orden_id}/estado con el cuerpo esperado",
+          "status": "passed"
+        },
+        {
+          "name": "Serialización de solicitudes de cambio de estado (CambioEstadoSolicitud) envío mediante OrdersService marcarListo: PATCH /ordenes/{orden_id}/estado con el cuerpo esperado",
+          "status": "passed"
+        },
+        {
+          "name": "Serialización de solicitudes de cambio de estado (CambioEstadoSolicitud) envío mediante OrdersService cancelarConObservacion: PATCH /ordenes/{orden_id}/estado con el cuerpo esperado",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "file": "__tests__/evidence-file-validation.test.ts",
+      "status": "passed",
+      "tests": [
+        {
+          "name": "validateEvidenceFile acepta una fotografía JPG válida y conserva solo el nombre base",
+          "status": "passed"
+        },
+        {
+          "name": "validateEvidenceFile acepta image/png",
+          "status": "passed"
+        },
+        {
+          "name": "validateEvidenceFile acepta image/webp",
+          "status": "passed"
+        },
+        {
+          "name": "validateEvidenceFile acepta image/jpg",
+          "status": "passed"
+        },
+        {
+          "name": "validateEvidenceFile rechaza el MIME no permitido video/mp4",
+          "status": "passed"
+        },
+        {
+          "name": "validateEvidenceFile rechaza el MIME no permitido application/pdf",
+          "status": "passed"
+        },
+        {
+          "name": "validateEvidenceFile rechaza el MIME no permitido application/x-msdownload",
+          "status": "passed"
+        },
+        {
+          "name": "validateEvidenceFile rechaza el MIME no permitido image/gif",
+          "status": "passed"
+        },
+        {
+          "name": "validateEvidenceFile rechaza el MIME no permitido image/heic",
+          "status": "passed"
+        },
+        {
+          "name": "validateEvidenceFile rechaza un video aunque declare un MIME de imagen",
+          "status": "passed"
+        },
+        {
+          "name": "validateEvidenceFile rechaza una extensión engañosa que no coincide con el MIME",
+          "status": "passed"
+        },
+        {
+          "name": "validateEvidenceFile no confía en la extensión: un .jpg con MIME ejecutable se rechaza",
+          "status": "passed"
+        },
+        {
+          "name": "validateEvidenceFile rechaza un archivo de tamaño cero",
+          "status": "passed"
+        },
+        {
+          "name": "validateEvidenceFile acepta exactamente el tamaño máximo y rechaza un byte más",
+          "status": "passed"
+        },
+        {
+          "name": "validateEvidenceFile rechaza metadatos ausentes o inválidos (sin MIME)",
+          "status": "passed"
+        },
+        {
+          "name": "validateEvidenceFile rechaza metadatos ausentes o inválidos (sin tamaño)",
+          "status": "passed"
+        },
+        {
+          "name": "validateEvidenceFile rechaza metadatos ausentes o inválidos (tamaño negativo)",
+          "status": "passed"
+        },
+        {
+          "name": "validateEvidenceFile rechaza metadatos ausentes o inválidos (tamaño no numérico)",
+          "status": "passed"
+        },
+        {
+          "name": "validateEvidenceFile rechaza una URI inválida (vacía)",
+          "status": "passed"
+        },
+        {
+          "name": "validateEvidenceFile rechaza una URI inválida (remota)",
+          "status": "passed"
+        },
+        {
+          "name": "validateEvidenceFile rechaza una URI inválida (javascript)",
+          "status": "passed"
+        },
+        {
+          "name": "validateEvidenceFile rechaza una URI inválida (ruta relativa)",
+          "status": "passed"
+        },
+        {
+          "name": "validateEvidenceFile acepta las URI locales de Android, iOS y web",
+          "status": "passed"
+        },
+        {
+          "name": "validateEvidenceFile genera un nombre seguro cuando el selector no informa uno",
+          "status": "passed"
+        },
+        {
+          "name": "validateEvidenceFile rechaza la ausencia de archivo",
+          "status": "passed"
+        },
+        {
+          "name": "detectImageSignature identifica JPG, PNG y WEBP por su firma",
+          "status": "passed"
+        },
+        {
+          "name": "detectImageSignature no reconoce ejecutables, cabeceras truncadas ni vacías",
+          "status": "passed"
+        },
+        {
+          "name": "prepareEvidenceFile acepta un archivo cuya firma coincide con el MIME",
+          "status": "passed"
+        },
+        {
+          "name": "prepareEvidenceFile rechaza un ejecutable renombrado como .jpg con MIME de imagen",
+          "status": "passed"
+        },
+        {
+          "name": "prepareEvidenceFile rechaza un PNG declarado como JPG",
+          "status": "passed"
+        },
+        {
+          "name": "prepareEvidenceFile trata un archivo sin contenido legible como vacío",
+          "status": "passed"
+        },
+        {
+          "name": "prepareEvidenceFile trata un archivo inexistente o ilegible como error recuperable",
+          "status": "passed"
+        },
+        {
+          "name": "prepareEvidenceFile no lee el archivo si los metadatos ya son inválidos",
+          "status": "passed"
+        },
+        {
+          "name": "prepareEvidenceFile sin lector disponible (Android/iOS) se apoya en los metadatos",
+          "status": "passed"
+        },
+        {
+          "name": "readEvidenceHeader lee los primeros bytes del File entregado en web",
+          "status": "passed"
+        },
+        {
+          "name": "readEvidenceHeader devuelve null en plataformas sin archivo legible",
+          "status": "passed"
+        },
+        {
+          "name": "selectionFromPickerResult trata la cancelación como selección vacía, no como error",
+          "status": "passed"
+        },
+        {
+          "name": "selectionFromPickerResult entrega la fotografía validada",
+          "status": "passed"
+        },
+        {
+          "name": "selectionFromPickerResult rechaza selecciones múltiples: el módulo admite una fotografía por envío",
+          "status": "passed"
+        },
+        {
+          "name": "selectionFromPickerResult informa el motivo de un archivo inválido",
+          "status": "passed"
+        },
+        {
+          "name": "política de tamaño usa 10 MiB por omisión y acepta solo enteros positivos configurados",
+          "status": "passed"
+        },
+        {
+          "name": "aislamiento de la red la validación nunca invoca al cliente HTTP",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "file": "__tests__/budget-schema.test.ts",
+      "status": "passed",
+      "tests": [
+        {
+          "name": "Esquema de presupuesto recibido de la API (PresupuestoDetalle) datos válidos acepta el presupuesto de ejemplo \"borrador\"",
+          "status": "passed"
+        },
+        {
+          "name": "Esquema de presupuesto recibido de la API (PresupuestoDetalle) datos válidos acepta el presupuesto de ejemplo \"enviado\"",
+          "status": "passed"
+        },
+        {
+          "name": "Esquema de presupuesto recibido de la API (PresupuestoDetalle) datos válidos acepta el presupuesto de ejemplo \"aprobadoConModificacion\"",
+          "status": "passed"
+        },
+        {
+          "name": "Esquema de presupuesto recibido de la API (PresupuestoDetalle) datos válidos acepta el presupuesto de ejemplo \"esperandoRepuestos\"",
+          "status": "passed"
+        },
+        {
+          "name": "Esquema de presupuesto recibido de la API (PresupuestoDetalle) datos válidos acepta el presupuesto de ejemplo \"rechazado\"",
+          "status": "passed"
+        },
+        {
+          "name": "Esquema de presupuesto recibido de la API (PresupuestoDetalle) datos válidos acepta el resumen de cada presupuesto, sin sus versiones",
+          "status": "passed"
+        },
+        {
+          "name": "Esquema de presupuesto recibido de la API (PresupuestoDetalle) datos válidos acepta un ítem sin repuesto_nombre ni proveedor_nombre, o con ellos en null",
+          "status": "passed"
+        },
+        {
+          "name": "Esquema de presupuesto recibido de la API (PresupuestoDetalle) datos válidos acepta fechas con una zona horaria distinta de UTC",
+          "status": "passed"
+        },
+        {
+          "name": "Esquema de presupuesto recibido de la API (PresupuestoDetalle) campos obligatorios rechaza un presupuesto sin presupuesto_id",
+          "status": "passed"
+        },
+        {
+          "name": "Esquema de presupuesto recibido de la API (PresupuestoDetalle) campos obligatorios rechaza un presupuesto sin orden_id",
+          "status": "passed"
+        },
+        {
+          "name": "Esquema de presupuesto recibido de la API (PresupuestoDetalle) campos obligatorios rechaza un presupuesto sin creado_en",
+          "status": "passed"
+        },
+        {
+          "name": "Esquema de presupuesto recibido de la API (PresupuestoDetalle) campos obligatorios rechaza un presupuesto sin cantidad_versiones",
+          "status": "passed"
+        },
+        {
+          "name": "Esquema de presupuesto recibido de la API (PresupuestoDetalle) campos obligatorios rechaza un presupuesto sin ultima_version",
+          "status": "passed"
+        },
+        {
+          "name": "Esquema de presupuesto recibido de la API (PresupuestoDetalle) campos obligatorios rechaza un presupuesto sin estado_ultima_version",
+          "status": "passed"
+        },
+        {
+          "name": "Esquema de presupuesto recibido de la API (PresupuestoDetalle) campos obligatorios rechaza un presupuesto sin total_ultima_version",
+          "status": "passed"
+        },
+        {
+          "name": "Esquema de presupuesto recibido de la API (PresupuestoDetalle) campos obligatorios rechaza un presupuesto sin version_vigente",
+          "status": "passed"
+        },
+        {
+          "name": "Esquema de presupuesto recibido de la API (PresupuestoDetalle) campos obligatorios rechaza un presupuesto sin versiones",
+          "status": "passed"
+        },
+        {
+          "name": "Esquema de presupuesto recibido de la API (PresupuestoDetalle) campos obligatorios rechaza una versión sin numero",
+          "status": "passed"
+        },
+        {
+          "name": "Esquema de presupuesto recibido de la API (PresupuestoDetalle) campos obligatorios rechaza una versión sin estado",
+          "status": "passed"
+        },
+        {
+          "name": "Esquema de presupuesto recibido de la API (PresupuestoDetalle) campos obligatorios rechaza una versión sin es_modificacion",
+          "status": "passed"
+        },
+        {
+          "name": "Esquema de presupuesto recibido de la API (PresupuestoDetalle) campos obligatorios rechaza una versión sin creado_por_id",
+          "status": "passed"
+        },
+        {
+          "name": "Esquema de presupuesto recibido de la API (PresupuestoDetalle) campos obligatorios rechaza una versión sin creado_en",
+          "status": "passed"
+        },
+        {
+          "name": "Esquema de presupuesto recibido de la API (PresupuestoDetalle) campos obligatorios rechaza una versión sin enviado_en",
+          "status": "passed"
+        },
+        {
+          "name": "Esquema de presupuesto recibido de la API (PresupuestoDetalle) campos obligatorios rechaza una versión sin bloqueada_en",
+          "status": "passed"
+        },
+        {
+          "name": "Esquema de presupuesto recibido de la API (PresupuestoDetalle) campos obligatorios rechaza una versión sin total",
+          "status": "passed"
+        },
+        {
+          "name": "Esquema de presupuesto recibido de la API (PresupuestoDetalle) campos obligatorios rechaza una versión sin items",
+          "status": "passed"
+        },
+        {
+          "name": "Esquema de presupuesto recibido de la API (PresupuestoDetalle) campos obligatorios rechaza una versión sin decision",
+          "status": "passed"
+        },
+        {
+          "name": "Esquema de presupuesto recibido de la API (PresupuestoDetalle) campos obligatorios rechaza un ítem sin item_id",
+          "status": "passed"
+        },
+        {
+          "name": "Esquema de presupuesto recibido de la API (PresupuestoDetalle) campos obligatorios rechaza un ítem sin tipo",
+          "status": "passed"
+        },
+        {
+          "name": "Esquema de presupuesto recibido de la API (PresupuestoDetalle) campos obligatorios rechaza un ítem sin descripcion",
+          "status": "passed"
+        },
+        {
+          "name": "Esquema de presupuesto recibido de la API (PresupuestoDetalle) campos obligatorios rechaza un ítem sin cantidad",
+          "status": "passed"
+        },
+        {
+          "name": "Esquema de presupuesto recibido de la API (PresupuestoDetalle) campos obligatorios rechaza un ítem sin precio_unitario",
+          "status": "passed"
+        },
+        {
+          "name": "Esquema de presupuesto recibido de la API (PresupuestoDetalle) campos obligatorios rechaza un ítem sin subtotal",
+          "status": "passed"
+        },
+        {
+          "name": "Esquema de presupuesto recibido de la API (PresupuestoDetalle) campos obligatorios rechaza un ítem sin repuesto_id",
+          "status": "passed"
+        },
+        {
+          "name": "Esquema de presupuesto recibido de la API (PresupuestoDetalle) campos obligatorios rechaza una decisión sin decision_id",
+          "status": "passed"
+        },
+        {
+          "name": "Esquema de presupuesto recibido de la API (PresupuestoDetalle) campos obligatorios rechaza una decisión sin decision",
+          "status": "passed"
+        },
+        {
+          "name": "Esquema de presupuesto recibido de la API (PresupuestoDetalle) campos obligatorios rechaza una decisión sin cliente_usuario_id",
+          "status": "passed"
+        },
+        {
+          "name": "Esquema de presupuesto recibido de la API (PresupuestoDetalle) campos obligatorios rechaza una decisión sin fecha_hora",
+          "status": "passed"
+        },
+        {
+          "name": "Esquema de presupuesto recibido de la API (PresupuestoDetalle) campos obligatorios rechaza una decisión sin motivo",
+          "status": "passed"
+        },
+        {
+          "name": "Esquema de presupuesto recibido de la API (PresupuestoDetalle) tipos rechaza un presupuesto con presupuesto_id como texto",
+          "status": "passed"
+        },
+        {
+          "name": "Esquema de presupuesto recibido de la API (PresupuestoDetalle) tipos rechaza un presupuesto con orden_id decimal",
+          "status": "passed"
+        },
+        {
+          "name": "Esquema de presupuesto recibido de la API (PresupuestoDetalle) tipos rechaza un presupuesto con total_ultima_version como número",
+          "status": "passed"
+        },
+        {
+          "name": "Esquema de presupuesto recibido de la API (PresupuestoDetalle) tipos rechaza un presupuesto con creado_en sin formato de fecha",
+          "status": "passed"
+        },
+        {
+          "name": "Esquema de presupuesto recibido de la API (PresupuestoDetalle) tipos rechaza un presupuesto con version_vigente como texto",
+          "status": "passed"
+        },
+        {
+          "name": "Esquema de presupuesto recibido de la API (PresupuestoDetalle) tipos rechaza una versión con es_modificacion como texto",
+          "status": "passed"
+        },
+        {
+          "name": "Esquema de presupuesto recibido de la API (PresupuestoDetalle) tipos rechaza una versión con enviado_en sin formato de fecha",
+          "status": "passed"
+        },
+        {
+          "name": "Esquema de presupuesto recibido de la API (PresupuestoDetalle) tipos rechaza una versión con items que no es una lista",
+          "status": "passed"
+        },
+        {
+          "name": "Esquema de presupuesto recibido de la API (PresupuestoDetalle) tipos rechaza un ítem con repuesto_id como texto",
+          "status": "passed"
+        },
+        {
+          "name": "Esquema de presupuesto recibido de la API (PresupuestoDetalle) montos en texto decimal acepta \"0\"",
+          "status": "passed"
+        },
+        {
+          "name": "Esquema de presupuesto recibido de la API (PresupuestoDetalle) montos en texto decimal acepta \"1\"",
+          "status": "passed"
+        },
+        {
+          "name": "Esquema de presupuesto recibido de la API (PresupuestoDetalle) montos en texto decimal acepta \"1.5\"",
+          "status": "passed"
+        },
+        {
+          "name": "Esquema de presupuesto recibido de la API (PresupuestoDetalle) montos en texto decimal acepta \"15000.00\"",
+          "status": "passed"
+        },
+        {
+          "name": "Esquema de presupuesto recibido de la API (PresupuestoDetalle) montos en texto decimal rechaza \"abc\"",
+          "status": "passed"
+        },
+        {
+          "name": "Esquema de presupuesto recibido de la API (PresupuestoDetalle) montos en texto decimal rechaza \"\"",
+          "status": "passed"
+        },
+        {
+          "name": "Esquema de presupuesto recibido de la API (PresupuestoDetalle) montos en texto decimal rechaza \"-100\"",
+          "status": "passed"
+        },
+        {
+          "name": "Esquema de presupuesto recibido de la API (PresupuestoDetalle) montos en texto decimal rechaza \"12,5\"",
+          "status": "passed"
+        },
+        {
+          "name": "Esquema de presupuesto recibido de la API (PresupuestoDetalle) montos en texto decimal rechaza \"1.\"",
+          "status": "passed"
+        },
+        {
+          "name": "Esquema de presupuesto recibido de la API (PresupuestoDetalle) montos en texto decimal rechaza \".5\"",
+          "status": "passed"
+        },
+        {
+          "name": "Esquema de presupuesto recibido de la API (PresupuestoDetalle) valores del contrato acepta el estado borrador",
+          "status": "passed"
+        },
+        {
+          "name": "Esquema de presupuesto recibido de la API (PresupuestoDetalle) valores del contrato acepta el estado enviada",
+          "status": "passed"
+        },
+        {
+          "name": "Esquema de presupuesto recibido de la API (PresupuestoDetalle) valores del contrato acepta el estado aprobada",
+          "status": "passed"
+        },
+        {
+          "name": "Esquema de presupuesto recibido de la API (PresupuestoDetalle) valores del contrato acepta el estado rechazada",
+          "status": "passed"
+        },
+        {
+          "name": "Esquema de presupuesto recibido de la API (PresupuestoDetalle) valores del contrato rechaza un estado fuera del contrato",
+          "status": "passed"
+        },
+        {
+          "name": "Esquema de presupuesto recibido de la API (PresupuestoDetalle) valores del contrato rechaza un tipo de ítem fuera del contrato",
+          "status": "passed"
+        },
+        {
+          "name": "Esquema de presupuesto recibido de la API (PresupuestoDetalle) valores del contrato rechaza una decisión fuera del contrato",
+          "status": "passed"
+        },
+        {
+          "name": "Esquema de presupuesto recibido de la API (PresupuestoDetalle) nulos rechaza null en presupuesto_id, que el contrato no admite como nulo",
+          "status": "passed"
+        },
+        {
+          "name": "Esquema de presupuesto recibido de la API (PresupuestoDetalle) nulos rechaza null en orden_id, que el contrato no admite como nulo",
+          "status": "passed"
+        },
+        {
+          "name": "Esquema de presupuesto recibido de la API (PresupuestoDetalle) nulos rechaza null en estado_ultima_version, que el contrato no admite como nulo",
+          "status": "passed"
+        },
+        {
+          "name": "Esquema de presupuesto recibido de la API (PresupuestoDetalle) nulos rechaza null en total_ultima_version, que el contrato no admite como nulo",
+          "status": "passed"
+        },
+        {
+          "name": "Esquema de presupuesto recibido de la API (PresupuestoDetalle) nulos acepta null en version_vigente, enviado_en, bloqueada_en y decision",
+          "status": "passed"
+        },
+        {
+          "name": "Esquema de presupuesto recibido de la API (PresupuestoDetalle) páginas acepta la página de presupuestos de ejemplo",
+          "status": "passed"
+        },
+        {
+          "name": "Esquema de presupuesto recibido de la API (PresupuestoDetalle) páginas acepta una página vacía",
+          "status": "passed"
+        },
+        {
+          "name": "Esquema de presupuesto recibido de la API (PresupuestoDetalle) páginas rechaza una página con un presupuesto inválido",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "file": "__tests__/order-schema.test.ts",
+      "status": "passed",
+      "tests": [
+        {
+          "name": "Esquema de orden de trabajo recibida de la API (OrdenRespuesta) datos válidos acepta la orden de ejemplo en estado \"recibido\"",
+          "status": "passed"
+        },
+        {
+          "name": "Esquema de orden de trabajo recibida de la API (OrdenRespuesta) datos válidos acepta la orden de ejemplo en estado \"esperando_diagnostico\"",
+          "status": "passed"
+        },
+        {
+          "name": "Esquema de orden de trabajo recibida de la API (OrdenRespuesta) datos válidos acepta la orden de ejemplo en estado \"esperando_aprobacion_presupuesto\"",
+          "status": "passed"
+        },
+        {
+          "name": "Esquema de orden de trabajo recibida de la API (OrdenRespuesta) datos válidos acepta la orden de ejemplo en estado \"esperando_repuestos\"",
+          "status": "passed"
+        },
+        {
+          "name": "Esquema de orden de trabajo recibida de la API (OrdenRespuesta) datos válidos acepta la orden de ejemplo en estado \"en_reparacion\"",
+          "status": "passed"
+        },
+        {
+          "name": "Esquema de orden de trabajo recibida de la API (OrdenRespuesta) datos válidos acepta la orden de ejemplo en estado \"listo_para_entrega\"",
+          "status": "passed"
+        },
+        {
+          "name": "Esquema de orden de trabajo recibida de la API (OrdenRespuesta) datos válidos acepta la orden de ejemplo en estado \"entregado\"",
+          "status": "passed"
+        },
+        {
+          "name": "Esquema de orden de trabajo recibida de la API (OrdenRespuesta) datos válidos acepta la orden de ejemplo en estado \"cancelado\"",
+          "status": "passed"
+        },
+        {
+          "name": "Esquema de orden de trabajo recibida de la API (OrdenRespuesta) datos válidos acepta mecanico_actual_id en null",
+          "status": "passed"
+        },
+        {
+          "name": "Esquema de orden de trabajo recibida de la API (OrdenRespuesta) datos válidos acepta un estado_codigo fuera del catálogo, porque esa comprobación corresponde al mapper",
+          "status": "passed"
+        },
+        {
+          "name": "Esquema de orden de trabajo recibida de la API (OrdenRespuesta) campos obligatorios rechaza una orden sin orden_id",
+          "status": "passed"
+        },
+        {
+          "name": "Esquema de orden de trabajo recibida de la API (OrdenRespuesta) campos obligatorios rechaza una orden sin vehiculo_id",
+          "status": "passed"
+        },
+        {
+          "name": "Esquema de orden de trabajo recibida de la API (OrdenRespuesta) campos obligatorios rechaza una orden sin ingreso_id",
+          "status": "passed"
+        },
+        {
+          "name": "Esquema de orden de trabajo recibida de la API (OrdenRespuesta) campos obligatorios rechaza una orden sin estado_codigo",
+          "status": "passed"
+        },
+        {
+          "name": "Esquema de orden de trabajo recibida de la API (OrdenRespuesta) campos obligatorios rechaza una orden sin mecanico_actual_id",
+          "status": "passed"
+        },
+        {
+          "name": "Esquema de orden de trabajo recibida de la API (OrdenRespuesta) campos obligatorios rechaza una orden sin creado_por_id",
+          "status": "passed"
+        },
+        {
+          "name": "Esquema de orden de trabajo recibida de la API (OrdenRespuesta) campos obligatorios rechaza una orden sin creado_en",
+          "status": "passed"
+        },
+        {
+          "name": "Esquema de orden de trabajo recibida de la API (OrdenRespuesta) campos obligatorios rechaza una orden sin actualizado_en",
+          "status": "passed"
+        },
+        {
+          "name": "Esquema de orden de trabajo recibida de la API (OrdenRespuesta) tipos rechaza orden_id como texto",
+          "status": "passed"
+        },
+        {
+          "name": "Esquema de orden de trabajo recibida de la API (OrdenRespuesta) tipos rechaza orden_id decimal",
+          "status": "passed"
+        },
+        {
+          "name": "Esquema de orden de trabajo recibida de la API (OrdenRespuesta) tipos rechaza vehiculo_id como texto",
+          "status": "passed"
+        },
+        {
+          "name": "Esquema de orden de trabajo recibida de la API (OrdenRespuesta) tipos rechaza estado_codigo como texto",
+          "status": "passed"
+        },
+        {
+          "name": "Esquema de orden de trabajo recibida de la API (OrdenRespuesta) tipos rechaza estado_codigo decimal",
+          "status": "passed"
+        },
+        {
+          "name": "Esquema de orden de trabajo recibida de la API (OrdenRespuesta) tipos rechaza mecanico_actual_id como texto",
+          "status": "passed"
+        },
+        {
+          "name": "Esquema de orden de trabajo recibida de la API (OrdenRespuesta) tipos rechaza null en orden_id, que el contrato no admite como nulo",
+          "status": "passed"
+        },
+        {
+          "name": "Esquema de orden de trabajo recibida de la API (OrdenRespuesta) tipos rechaza null en vehiculo_id, que el contrato no admite como nulo",
+          "status": "passed"
+        },
+        {
+          "name": "Esquema de orden de trabajo recibida de la API (OrdenRespuesta) tipos rechaza null en ingreso_id, que el contrato no admite como nulo",
+          "status": "passed"
+        },
+        {
+          "name": "Esquema de orden de trabajo recibida de la API (OrdenRespuesta) tipos rechaza null en estado_codigo, que el contrato no admite como nulo",
+          "status": "passed"
+        },
+        {
+          "name": "Esquema de orden de trabajo recibida de la API (OrdenRespuesta) tipos rechaza null en creado_por_id, que el contrato no admite como nulo",
+          "status": "passed"
+        },
+        {
+          "name": "Esquema de orden de trabajo recibida de la API (OrdenRespuesta) tipos rechaza null en creado_en, que el contrato no admite como nulo",
+          "status": "passed"
+        },
+        {
+          "name": "Esquema de orden de trabajo recibida de la API (OrdenRespuesta) fechas acepta una fecha UTC con Z",
+          "status": "passed"
+        },
+        {
+          "name": "Esquema de orden de trabajo recibida de la API (OrdenRespuesta) fechas acepta una fecha con desplazamiento horario",
+          "status": "passed"
+        },
+        {
+          "name": "Esquema de orden de trabajo recibida de la API (OrdenRespuesta) fechas acepta una fecha con fracciones de segundo",
+          "status": "passed"
+        },
+        {
+          "name": "Esquema de orden de trabajo recibida de la API (OrdenRespuesta) fechas rechaza una fecha sin zona horaria en creado_en y en actualizado_en",
+          "status": "passed"
+        },
+        {
+          "name": "Esquema de orden de trabajo recibida de la API (OrdenRespuesta) fechas rechaza una fecha solo con la fecha en creado_en y en actualizado_en",
+          "status": "passed"
+        },
+        {
+          "name": "Esquema de orden de trabajo recibida de la API (OrdenRespuesta) fechas rechaza una fecha en formato no ISO en creado_en y en actualizado_en",
+          "status": "passed"
+        },
+        {
+          "name": "Esquema de orden de trabajo recibida de la API (OrdenRespuesta) fechas rechaza una fecha como texto cualquiera en creado_en y en actualizado_en",
+          "status": "passed"
+        },
+        {
+          "name": "Esquema de orden de trabajo recibida de la API (OrdenRespuesta) listas acepta la lista con todas las órdenes de ejemplo",
+          "status": "passed"
+        },
+        {
+          "name": "Esquema de orden de trabajo recibida de la API (OrdenRespuesta) listas acepta una lista vacía",
+          "status": "passed"
+        },
+        {
+          "name": "Esquema de orden de trabajo recibida de la API (OrdenRespuesta) listas rechaza una lista con una orden inválida",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "file": "__tests__/auth-mapper.test.ts",
+      "status": "passed",
+      "tests": [
+        {
+          "name": "Transformación de datos de autenticación mapUserResponse convierte el usuario de la API al modelo User",
+          "status": "passed"
+        },
+        {
+          "name": "Transformación de datos de autenticación mapUserResponse convierte el id numérico a texto",
+          "status": "passed"
+        },
+        {
+          "name": "Transformación de datos de autenticación mapUserResponse asigna el rol cliente desde roles",
+          "status": "passed"
+        },
+        {
+          "name": "Transformación de datos de autenticación mapUserResponse asigna el rol mecanico desde roles",
+          "status": "passed"
+        },
+        {
+          "name": "Transformación de datos de autenticación mapUserResponse asigna el rol administrador desde roles",
+          "status": "passed"
+        },
+        {
+          "name": "Transformación de datos de autenticación mapUserResponse no incluye campos del backend que no existen en el modelo",
+          "status": "passed"
+        },
+        {
+          "name": "Transformación de datos de autenticación mapUserResponse rechaza el caso unknownRole",
+          "status": "passed"
+        },
+        {
+          "name": "Transformación de datos de autenticación mapUserResponse rechaza el caso emptyRoles",
+          "status": "passed"
+        },
+        {
+          "name": "Transformación de datos de autenticación mapLoginResponse convierte la respuesta de login al modelo AuthResponse",
+          "status": "passed"
+        },
+        {
+          "name": "Transformación de datos de autenticación mapLoginResponse transforma el login del rol cliente",
+          "status": "passed"
+        },
+        {
+          "name": "Transformación de datos de autenticación mapLoginResponse transforma el login del rol mecanico",
+          "status": "passed"
+        },
+        {
+          "name": "Transformación de datos de autenticación mapLoginResponse transforma el login del rol administrador",
+          "status": "passed"
+        },
+        {
+          "name": "Transformación de datos de autenticación mapLoginResponse no incluye token_type ni refreshToken",
+          "status": "passed"
+        },
+        {
+          "name": "Transformación de datos de autenticación mapLoginResponse rechaza un login cuyo usuario no tiene un rol válido",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "file": "__tests__/auth-contract.test.ts",
+      "status": "passed",
+      "tests": [
+        {
+          "name": "Contrato de autenticación con los payloads disponibles UsuarioRespuesta el usuario de cliente tiene exactamente los campos del contrato",
+          "status": "passed"
+        },
+        {
+          "name": "Contrato de autenticación con los payloads disponibles UsuarioRespuesta el usuario de mecanico tiene exactamente los campos del contrato",
+          "status": "passed"
+        },
+        {
+          "name": "Contrato de autenticación con los payloads disponibles UsuarioRespuesta el usuario de administrador tiene exactamente los campos del contrato",
+          "status": "passed"
+        },
+        {
+          "name": "Contrato de autenticación con los payloads disponibles UsuarioRespuesta el usuario de cliente cumple el schema del contrato",
+          "status": "passed"
+        },
+        {
+          "name": "Contrato de autenticación con los payloads disponibles UsuarioRespuesta el usuario de mecanico cumple el schema del contrato",
+          "status": "passed"
+        },
+        {
+          "name": "Contrato de autenticación con los payloads disponibles UsuarioRespuesta el usuario de administrador cumple el schema del contrato",
+          "status": "passed"
+        },
+        {
+          "name": "Contrato de autenticación con los payloads disponibles UsuarioRespuesta los roles del usuario de cliente pertenecen a NombreRol",
+          "status": "passed"
+        },
+        {
+          "name": "Contrato de autenticación con los payloads disponibles UsuarioRespuesta los roles del usuario de mecanico pertenecen a NombreRol",
+          "status": "passed"
+        },
+        {
+          "name": "Contrato de autenticación con los payloads disponibles UsuarioRespuesta los roles del usuario de administrador pertenecen a NombreRol",
+          "status": "passed"
+        },
+        {
+          "name": "Contrato de autenticación con los payloads disponibles TokenRespuesta el login de cliente solo usa campos del contrato e incluye los obligatorios",
+          "status": "passed"
+        },
+        {
+          "name": "Contrato de autenticación con los payloads disponibles TokenRespuesta el login de mecanico solo usa campos del contrato e incluye los obligatorios",
+          "status": "passed"
+        },
+        {
+          "name": "Contrato de autenticación con los payloads disponibles TokenRespuesta el login de administrador solo usa campos del contrato e incluye los obligatorios",
+          "status": "passed"
+        },
+        {
+          "name": "Contrato de autenticación con los payloads disponibles TokenRespuesta el login de cliente cumple el schema del contrato",
+          "status": "passed"
+        },
+        {
+          "name": "Contrato de autenticación con los payloads disponibles TokenRespuesta el login de mecanico cumple el schema del contrato",
+          "status": "passed"
+        },
+        {
+          "name": "Contrato de autenticación con los payloads disponibles TokenRespuesta el login de administrador cumple el schema del contrato",
+          "status": "passed"
+        },
+        {
+          "name": "Contrato de autenticación con los payloads disponibles TokenRespuesta acepta una respuesta sin token_type, que el contrato define como opcional",
+          "status": "passed"
+        },
+        {
+          "name": "Contrato de autenticación con los payloads disponibles TokenRespuesta rechaza una respuesta sin access_token",
+          "status": "passed"
+        },
+        {
+          "name": "Contrato de autenticación con los payloads disponibles TokenRespuesta rechaza una respuesta sin user",
+          "status": "passed"
+        },
+        {
+          "name": "Contrato de autenticación con los payloads disponibles LoginSolicitud tiene exactamente los campos del contrato, que no admite campos adicionales",
+          "status": "passed"
+        },
+        {
+          "name": "Contrato de autenticación con los payloads disponibles LoginSolicitud el correo tiene el formato email que exige el contrato",
+          "status": "passed"
+        },
+        {
+          "name": "Contrato de autenticación con los payloads disponibles Payloads inválidos el schema rechaza un usuario sin roles",
+          "status": "passed"
+        },
+        {
+          "name": "Contrato de autenticación con los payloads disponibles Payloads inválidos un rol desconocido no pertenece a NombreRol",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "file": "__tests__/budget-mapper.test.ts",
+      "status": "passed",
+      "tests": [
+        {
+          "name": "Transformación de presupuestos mapBudgetDetailResponse convierte el presupuesto de la API al modelo Budget",
+          "status": "passed"
+        },
+        {
+          "name": "Transformación de presupuestos mapBudgetDetailResponse convierte los identificadores del presupuesto de ejemplo \"borrador\" a texto",
+          "status": "passed"
+        },
+        {
+          "name": "Transformación de presupuestos mapBudgetDetailResponse convierte los identificadores del presupuesto de ejemplo \"enviado\" a texto",
+          "status": "passed"
+        },
+        {
+          "name": "Transformación de presupuestos mapBudgetDetailResponse convierte los identificadores del presupuesto de ejemplo \"aprobadoConModificacion\" a texto",
+          "status": "passed"
+        },
+        {
+          "name": "Transformación de presupuestos mapBudgetDetailResponse convierte los identificadores del presupuesto de ejemplo \"esperandoRepuestos\" a texto",
+          "status": "passed"
+        },
+        {
+          "name": "Transformación de presupuestos mapBudgetDetailResponse convierte los identificadores del presupuesto de ejemplo \"rechazado\" a texto",
+          "status": "passed"
+        },
+        {
+          "name": "Transformación de presupuestos mapBudgetDetailResponse convierte cantidades y montos decimales a número",
+          "status": "passed"
+        },
+        {
+          "name": "Transformación de presupuestos mapBudgetDetailResponse deja en null el repuesto y los nombres cuando no vienen en la respuesta",
+          "status": "passed"
+        },
+        {
+          "name": "Transformación de presupuestos mapBudgetDetailResponse convierte la decisión del cliente",
+          "status": "passed"
+        },
+        {
+          "name": "Transformación de presupuestos mapBudgetDetailResponse conserva el motivo de un rechazo",
+          "status": "passed"
+        },
+        {
+          "name": "Transformación de presupuestos mapBudgetDetailResponse conserva todas las versiones en orden y la versión vigente",
+          "status": "passed"
+        },
+        {
+          "name": "Transformación de presupuestos mapBudgetDetailResponse mantiene en null las fechas de envío y bloqueo de una versión no enviada",
+          "status": "passed"
+        },
+        {
+          "name": "Transformación de presupuestos mapBudgetDetailResponse no incluye campos del backend que no existen en el modelo",
+          "status": "passed"
+        },
+        {
+          "name": "Transformación de presupuestos montos inválidos lanza un error si cantidad no es un decimal válido",
+          "status": "passed"
+        },
+        {
+          "name": "Transformación de presupuestos montos inválidos lanza un error si precio_unitario no es un decimal válido",
+          "status": "passed"
+        },
+        {
+          "name": "Transformación de presupuestos montos inválidos lanza un error si subtotal no es un decimal válido",
+          "status": "passed"
+        },
+        {
+          "name": "Transformación de presupuestos montos inválidos lanza un error si el total de la versión no es un decimal válido",
+          "status": "passed"
+        },
+        {
+          "name": "Transformación de presupuestos montos inválidos lanza un error si total_ultima_version no es un decimal válido",
+          "status": "passed"
+        },
+        {
+          "name": "Transformación de presupuestos mapBudgetVersionResponse convierte una versión individual",
+          "status": "passed"
+        },
+        {
+          "name": "Transformación de presupuestos mapBudgetPageResponse convierte la página, con desde y limite como offset y limit",
+          "status": "passed"
+        },
+        {
+          "name": "Transformación de presupuestos mapBudgetPageResponse los presupuestos del listado no incluyen versiones",
+          "status": "passed"
+        },
+        {
+          "name": "Transformación de presupuestos mapBudgetPageResponse convierte una página vacía",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "file": "__tests__/auth-storage.test.ts",
+      "status": "passed",
+      "tests": [
+        {
+          "name": "almacenamiento de sesión en ios guarda, recupera y elimina objetos sin tocar datos ajenos",
+          "status": "passed"
+        },
+        {
+          "name": "almacenamiento de sesión en ios distingue JSON corrupto de un fallo de lectura",
+          "status": "passed"
+        },
+        {
+          "name": "almacenamiento de sesión en ios propaga un fallo de get sin exponer detalles nativos",
+          "status": "passed"
+        },
+        {
+          "name": "almacenamiento de sesión en ios propaga un fallo de set sin exponer detalles nativos",
+          "status": "passed"
+        },
+        {
+          "name": "almacenamiento de sesión en ios propaga un fallo de remove sin exponer detalles nativos",
+          "status": "passed"
+        },
+        {
+          "name": "almacenamiento de sesión en web guarda, recupera y elimina objetos sin tocar datos ajenos",
+          "status": "passed"
+        },
+        {
+          "name": "almacenamiento de sesión en web distingue JSON corrupto de un fallo de lectura",
+          "status": "passed"
+        },
+        {
+          "name": "almacenamiento de sesión en web propaga un fallo de get sin exponer detalles nativos",
+          "status": "passed"
+        },
+        {
+          "name": "almacenamiento de sesión en web propaga un fallo de set sin exponer detalles nativos",
+          "status": "passed"
+        },
+        {
+          "name": "almacenamiento de sesión en web propaga un fallo de remove sin exponer detalles nativos",
+          "status": "passed"
+        }
+      ]
+    }
+  ]
+}

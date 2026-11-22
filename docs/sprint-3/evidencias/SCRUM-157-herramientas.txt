@@ -1,0 +1,28 @@
+Ejecución final: 12-11-2026 UTC / 11-11-2026 America/Santiago, Victor.
+Entorno: node_modules preexistente, Node v26.12.1, npm 12.2.1.
+Incluye utilidad de rutas SCRUM-158 corregida sin commit.
+
+npm run typecheck — exit 0
+npm notice run tallerconnect@1.0.0 typecheck
+npm notice run tsc --noEmit
+
+CI=1 npm run lint — exit 0
+0 errores, 46 advertencias previas.
+
+npm test -- --watchman=false --json --outputFile=/tmp/tallerconnect-sprint3/final.json — exit 0
+74 suites; 1259 PASS / 0 FAIL / 0 pendientes (Jest, mocks).
+
+npm run test:regression -- --watchman=false --json --outputFile=/tmp/tallerconnect-sprint3/regression.json — exit 0
+41 suites; 841 PASS / 0 FAIL / 0 pendientes (subconjunto; no sumar).
+
+CI=1 npm run export:android -- --max-workers 2 — exit 0
+
+› android bundles (1):
+_expo/static/js/android/entry-9ee7ac1a79c3e242387dac7c464ddaa1.hbc (4.6MB)
+
+› Files (1):
+metadata.json (1.9KB)
+
+Exported: dist
+Bundle entry-9ee7ac1a79c3e242387dac7c464ddaa1.hbc; bytes=4555933; sha256=887247158129388c289b5caa8e6efa58cf659a0d182941a51be69b887caca7da
+Exportar bundle no prueba navegación en dispositivo, credenciales ni consultas al backend. dist está ignorado; no se añade a Git.

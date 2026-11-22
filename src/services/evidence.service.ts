@@ -1,3 +1,4 @@
+import { isMockModeEnabled } from '@/config/env';
 import { apiClient } from '@/services/api/client';
 import { HTTP_STATUS } from '@/services/api/types';
 import {
@@ -43,7 +44,7 @@ import {
 
 export { ServiceError, normalizeEvidenceServiceError };
 
-const USE_MOCKS = process.env.EXPO_PUBLIC_USE_MOCK_AUTH === 'true';
+const USE_MOCKS = isMockModeEnabled();
 
 /**
  * Tamaño máximo de referencia en el adaptador simulado (50 MB para video, 15 MB para imagen).

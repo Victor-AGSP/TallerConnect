@@ -36,6 +36,8 @@ describe('NotificationsService & Notification Adapters', () => {
     partsService.resetMocks();
   });
 
+  afterEach(() => jest.restoreAllMocks());
+
   describe('mapNotificationResponse & deriveWorkshopNotificationsFromDomain', () => {
     it('mapea un DTO de notificación en español e inglés al modelo WorkshopNotification', () => {
       const mapped = mapNotificationResponse({
@@ -127,6 +129,32 @@ describe('NotificationsService & Notification Adapters', () => {
   });
 
   describe('RealNotificationAdapter (Contrato disponible vs Fallback derivado)', () => {
+    it('conserva vacío real al derivar avisos sin datos operativos', async () => {
+      jest.spyOn(ordersService, 'getOrders').mockResolvedValue([]);
+      jest.spyOn(budgetsService, 'getBudgets').mockResolvedValue([]);
+      jest.spyOn(partsService, 'getParts').mockResolvedValue([]);
+      const service = new NotificationsService(new RealNotificationAdapter({ contractEnabled: false }));
+      await expect(service.getNotifications()).resolves.toEqual([]);
+    });
+
+    it('propaga el fallo de un recurso derivado en vez de devolver avisos ficticios', async () => {
+      jest.spyOn(ordersService, 'getOrders').mockRejectedValue(new ServiceError({
+        message: 'MS2 no disponible', status: 503, domain: 'orders',
+      }));
+      const service = new NotificationsService(new RealNotificationAdapter({ contractEnabled: false }));
+      await expect(service.getNotifications()).rejects.toMatchObject({ status: 503 });
+    });
+
+    it.each([401, 403, 502, 503])('no oculta HTTP %s de notificaciones mediante fallback', async (status) => {
+      const orders = jest.spyOn(ordersService, 'getOrders');
+      mockedApiClient.get.mockRejectedValueOnce(new ServiceError({
+        message: 'Error del servicio', status, domain: 'notifications',
+      }));
+      const service = new NotificationsService(new RealNotificationAdapter({ contractEnabled: true }));
+      await expect(service.getNotifications()).rejects.toMatchObject({ status });
+      expect(orders).not.toHaveBeenCalled();
+    });
+
     it('consume GET /notificaciones, PATCH /notificaciones/{id}/leida y POST /notificaciones/leer-todas cuando el contrato está habilitado', async () => {
       const service = new NotificationsService(
         new RealNotificationAdapter({ contractEnabled: true })

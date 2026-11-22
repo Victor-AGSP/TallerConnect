@@ -1,0 +1,361 @@
+{
+  "startTime": 1794670739307,
+  "numTotalTestSuites": 4,
+  "numPassedTestSuites": 4,
+  "numFailedTestSuites": 0,
+  "numPassedTests": 81,
+  "numFailedTests": 0,
+  "numPendingTests": 0,
+  "success": true,
+  "environment": "Jest; dobles controlados; sin backend ni dispositivo",
+  "suites": [
+    {
+      "file": "__tests__/budget-read-refresh.test.tsx",
+      "status": "passed",
+      "tests": [
+        {
+          "name": "vista Cliente: integridad de relación no selecciona el único presupuesto si es de otra orden",
+          "status": "passed"
+        },
+        {
+          "name": "vista Cliente: integridad de relación rechaza detalle que no coincide con orden/presupuesto solicitado: {\"presupuesto_id\":5,\"orden_id\":32,\"creado_en\":\"2026-11-14T10:00:00Z\",\"cantidad_versiones\":1,\"ultima_version\":1,\"estado_ultima_version\":\"enviada\",\"total_ultima_version\":\"125000.00\",\"version_vigente\":null,\"versiones\":[{\"numero\":1,\"estado\":\"enviada\",\"es_modificacion\":false,\"creado_por_id\":99,\"creado_en\":\"2026-11-14T10:00:00Z\",\"enviado_en\":\"2026-11-14T11:00:00Z\",\"bloqueada_en\":\"2026-11-14T11:00:00Z\",\"total\":\"125000.00\",\"decision\":null,\"items\":[{\"item_id\":11,\"tipo\":\"mano_de_obra\",\"descripcion\":\"Trabajo QA local\",\"cantidad\":\"1\",\"precio_unitario\":\"125000.00\",\"subtotal\":\"125000.00\",\"repuesto_id\":null}]}]}",
+          "status": "passed"
+        },
+        {
+          "name": "vista Cliente: integridad de relación rechaza detalle que no coincide con orden/presupuesto solicitado: {\"presupuesto_id\":6,\"orden_id\":31,\"creado_en\":\"2026-11-14T10:00:00Z\",\"cantidad_versiones\":1,\"ultima_version\":1,\"estado_ultima_version\":\"enviada\",\"total_ultima_version\":\"125000.00\",\"version_vigente\":null,\"versiones\":[{\"numero\":1,\"estado\":\"enviada\",\"es_modificacion\":false,\"creado_por_id\":99,\"creado_en\":\"2026-11-14T10:00:00Z\",\"enviado_en\":\"2026-11-14T11:00:00Z\",\"bloqueada_en\":\"2026-11-14T11:00:00Z\",\"total\":\"125000.00\",\"decision\":null,\"items\":[{\"item_id\":11,\"tipo\":\"mano_de_obra\",\"descripcion\":\"Trabajo QA local\",\"cantidad\":\"1\",\"precio_unitario\":\"125000.00\",\"subtotal\":\"125000.00\",\"repuesto_id\":null}]}]}",
+          "status": "passed"
+        },
+        {
+          "name": "adaptador de administración: integridad de relación no selecciona el único presupuesto si es de otra orden",
+          "status": "passed"
+        },
+        {
+          "name": "adaptador de administración: integridad de relación rechaza detalle que no coincide con orden/presupuesto solicitado: {\"presupuesto_id\":5,\"orden_id\":32,\"creado_en\":\"2026-11-14T10:00:00Z\",\"cantidad_versiones\":1,\"ultima_version\":1,\"estado_ultima_version\":\"enviada\",\"total_ultima_version\":\"125000.00\",\"version_vigente\":null,\"versiones\":[{\"numero\":1,\"estado\":\"enviada\",\"es_modificacion\":false,\"creado_por_id\":99,\"creado_en\":\"2026-11-14T10:00:00Z\",\"enviado_en\":\"2026-11-14T11:00:00Z\",\"bloqueada_en\":\"2026-11-14T11:00:00Z\",\"total\":\"125000.00\",\"decision\":null,\"items\":[{\"item_id\":11,\"tipo\":\"mano_de_obra\",\"descripcion\":\"Trabajo QA local\",\"cantidad\":\"1\",\"precio_unitario\":\"125000.00\",\"subtotal\":\"125000.00\",\"repuesto_id\":null}]}]}",
+          "status": "passed"
+        },
+        {
+          "name": "adaptador de administración: integridad de relación rechaza detalle que no coincide con orden/presupuesto solicitado: {\"presupuesto_id\":6,\"orden_id\":31,\"creado_en\":\"2026-11-14T10:00:00Z\",\"cantidad_versiones\":1,\"ultima_version\":1,\"estado_ultima_version\":\"enviada\",\"total_ultima_version\":\"125000.00\",\"version_vigente\":null,\"versiones\":[{\"numero\":1,\"estado\":\"enviada\",\"es_modificacion\":false,\"creado_por_id\":99,\"creado_en\":\"2026-11-14T10:00:00Z\",\"enviado_en\":\"2026-11-14T11:00:00Z\",\"bloqueada_en\":\"2026-11-14T11:00:00Z\",\"total\":\"125000.00\",\"decision\":null,\"items\":[{\"item_id\":11,\"tipo\":\"mano_de_obra\",\"descripcion\":\"Trabajo QA local\",\"cantidad\":\"1\",\"precio_unitario\":\"125000.00\",\"subtotal\":\"125000.00\",\"repuesto_id\":null}]}]}",
+          "status": "passed"
+        },
+        {
+          "name": "refresh y reapertura hacen nuevas lecturas y sustituyen los datos sin caché persistente",
+          "status": "passed"
+        },
+        {
+          "name": "el refresh fallido muestra error, retira datos y permite volver a consultar",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "file": "__tests__/budget-views-integration.test.tsx",
+      "status": "passed",
+      "tests": [
+        {
+          "name": "Orden → presupuesto el cliente abre el presupuesto desde el detalle de la orden",
+          "status": "passed"
+        },
+        {
+          "name": "Orden → presupuesto el administrador abre el presupuesto desde el detalle de la orden",
+          "status": "passed"
+        },
+        {
+          "name": "Orden → presupuesto el mecánico no tiene acceso al presupuesto desde la orden",
+          "status": "passed"
+        },
+        {
+          "name": "Representación del presupuesto muestra total, estado, ítems con repuesto/proveedor e importes",
+          "status": "passed"
+        },
+        {
+          "name": "Representación del presupuesto el administrador no puede decidir el presupuesto",
+          "status": "passed"
+        },
+        {
+          "name": "Representación del presupuesto muestra la decisión registrada de una versión aprobada",
+          "status": "passed"
+        },
+        {
+          "name": "Representación del presupuesto indica la versión vigente cuando hay una modificación pendiente",
+          "status": "passed"
+        },
+        {
+          "name": "Representación del presupuesto muestra el estado vacío si la orden no tiene presupuesto",
+          "status": "passed"
+        },
+        {
+          "name": "Representación del presupuesto muestra el error de carga y se recupera con el reintento",
+          "status": "passed"
+        },
+        {
+          "name": "Decisión del cliente aprueba tras confirmar, muestra el efecto y recarga el presupuesto",
+          "status": "passed"
+        },
+        {
+          "name": "Decisión del cliente informa los repuestos faltantes al aprobar sin stock suficiente",
+          "status": "passed"
+        },
+        {
+          "name": "Decisión del cliente exige el motivo antes de rechazar",
+          "status": "passed"
+        },
+        {
+          "name": "Decisión del cliente el primer rechazo advierte y confirma la cancelación del servicio",
+          "status": "passed"
+        },
+        {
+          "name": "Decisión del cliente rechazar una modificación no pide cancelar el servicio",
+          "status": "passed"
+        },
+        {
+          "name": "Decisión del cliente permite volver sin enviar la decisión",
+          "status": "passed"
+        },
+        {
+          "name": "Decisión del cliente muestra el error del MS3 y conserva el formulario",
+          "status": "passed"
+        },
+        {
+          "name": "Decisión del cliente ante una aplicación pendiente reintenta sin volver a decidir",
+          "status": "passed"
+        },
+        {
+          "name": "Restricciones de acceso por rol el rol cliente no accede a /ordenes/31/presupuesto ni consulta el MS3",
+          "status": "passed"
+        },
+        {
+          "name": "Restricciones de acceso por rol el rol mecanico no accede a /ordenes/31/presupuesto ni consulta el MS3",
+          "status": "passed"
+        },
+        {
+          "name": "Restricciones de acceso por rol el rol administrador no accede a /mis-ordenes/31/presupuesto ni consulta el MS3",
+          "status": "passed"
+        },
+        {
+          "name": "Restricciones de acceso por rol el rol mecanico no accede a /mis-ordenes/31/presupuesto ni consulta el MS3",
+          "status": "passed"
+        },
+        {
+          "name": "Restricciones de acceso por rol el rol cliente accede a /mis-ordenes/31/presupuesto a través de su layout",
+          "status": "passed"
+        },
+        {
+          "name": "Restricciones de acceso por rol el rol administrador accede a /ordenes/31/presupuesto a través de su layout",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "file": "__tests__/budget-flow-integration.test.tsx",
+      "status": "passed",
+      "tests": [
+        {
+          "name": "flujo presupuesto → decisión → orden (cliente) decide una sola vez, reintenta la aplicación pendiente y recarga el presupuesto",
+          "status": "passed"
+        },
+        {
+          "name": "flujo presupuesto → decisión → orden (cliente) muestra \"sin presupuesto\" cuando el MS3 no tiene uno para la orden",
+          "status": "passed"
+        },
+        {
+          "name": "flujo presupuesto → decisión → orden (cliente) un 403 del MS3 informa la falta de permisos sin cerrar la sesión",
+          "status": "passed"
+        },
+        {
+          "name": "flujo presupuesto → decisión → orden (cliente) un 401 del MS3 cierra la sesión y devuelve al login",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "file": "__tests__/budget-service.test.ts",
+      "status": "passed",
+      "tests": [
+        {
+          "name": "Fixtures alineados con el contrato del MS3 PresupuestoResumen contiene exactamente los campos obligatorios",
+          "status": "passed"
+        },
+        {
+          "name": "Fixtures alineados con el contrato del MS3 PresupuestoDetalle contiene exactamente los campos obligatorios",
+          "status": "passed"
+        },
+        {
+          "name": "Fixtures alineados con el contrato del MS3 PaginaPresupuestos contiene exactamente los campos obligatorios",
+          "status": "passed"
+        },
+        {
+          "name": "Fixtures alineados con el contrato del MS3 VersionDetalle contiene exactamente los campos obligatorios",
+          "status": "passed"
+        },
+        {
+          "name": "Fixtures alineados con el contrato del MS3 ItemSalida contiene exactamente los campos obligatorios",
+          "status": "passed"
+        },
+        {
+          "name": "Fixtures alineados con el contrato del MS3 DecisionSalida contiene exactamente los campos obligatorios",
+          "status": "passed"
+        },
+        {
+          "name": "budget.mapper convierte un PresupuestoDetalle ordenando las versiones",
+          "status": "passed"
+        },
+        {
+          "name": "budget.mapper conserva importes, ítems, repuesto/proveedor y la decisión",
+          "status": "passed"
+        },
+        {
+          "name": "budget.mapper acepta un presupuesto sin versión vigente (nunca aprobado)",
+          "status": "passed"
+        },
+        {
+          "name": "budget.mapper rechaza un PresupuestoDetalle inválido: cuerpo null",
+          "status": "passed"
+        },
+        {
+          "name": "budget.mapper rechaza un PresupuestoDetalle inválido: objeto vacío",
+          "status": "passed"
+        },
+        {
+          "name": "budget.mapper rechaza un PresupuestoDetalle inválido: estado de versión desconocido",
+          "status": "passed"
+        },
+        {
+          "name": "budget.mapper rechaza un PresupuestoDetalle inválido: estado del resumen desconocido",
+          "status": "passed"
+        },
+        {
+          "name": "budget.mapper rechaza un PresupuestoDetalle inválido: versión sin ítems",
+          "status": "passed"
+        },
+        {
+          "name": "budget.mapper rechaza un PresupuestoDetalle inválido: decisión desconocida",
+          "status": "passed"
+        },
+        {
+          "name": "budget.mapper convierte un ResultadoOperacion con repuestos faltantes",
+          "status": "passed"
+        },
+        {
+          "name": "budget.mapper interpreta efecto_en_orden null como \"sin cambio en la orden\"",
+          "status": "passed"
+        },
+        {
+          "name": "BudgetsService.getBudgetForOrder busca el presupuesto de la orden y consulta su detalle",
+          "status": "passed"
+        },
+        {
+          "name": "BudgetsService.getBudgetForOrder devuelve null si la orden no tiene presupuesto, sin pedir detalle",
+          "status": "passed"
+        },
+        {
+          "name": "BudgetsService.getBudgetForOrder ignora presupuestos de otra orden en la página recibida",
+          "status": "passed"
+        },
+        {
+          "name": "BudgetsService.getBudgetForOrder rechaza el identificador de orden \"\" sin consultar al MS3",
+          "status": "passed"
+        },
+        {
+          "name": "BudgetsService.getBudgetForOrder rechaza el identificador de orden \"abc\" sin consultar al MS3",
+          "status": "passed"
+        },
+        {
+          "name": "BudgetsService.getBudgetForOrder rechaza el identificador de orden \"0\" sin consultar al MS3",
+          "status": "passed"
+        },
+        {
+          "name": "BudgetsService.getBudgetForOrder rechaza el identificador de orden \"-1\" sin consultar al MS3",
+          "status": "passed"
+        },
+        {
+          "name": "BudgetsService.getBudgetForOrder rechaza el identificador de orden \"3.5\" sin consultar al MS3",
+          "status": "passed"
+        },
+        {
+          "name": "BudgetsService.getBudgetForOrder rechaza el identificador de orden \"31/../1\" sin consultar al MS3",
+          "status": "passed"
+        },
+        {
+          "name": "BudgetsService.getBudgetForOrder rechaza una página que no cumple el contrato",
+          "status": "passed"
+        },
+        {
+          "name": "BudgetsService.getBudgetForOrder propaga el error normalizado: 403 rol no permitido",
+          "status": "passed"
+        },
+        {
+          "name": "BudgetsService.getBudgetForOrder propaga el error normalizado: 404 presupuesto ajeno",
+          "status": "passed"
+        },
+        {
+          "name": "BudgetsService.getBudgetForOrder propaga el error normalizado: 503 MS2 no disponible",
+          "status": "passed"
+        },
+        {
+          "name": "BudgetsService.getBudgetForOrder propaga el error normalizado: sin conexión",
+          "status": "passed"
+        },
+        {
+          "name": "BudgetsService.decideBudgetVersion envía la aprobación a la versión indicada",
+          "status": "passed"
+        },
+        {
+          "name": "BudgetsService.decideBudgetVersion envía el rechazo con motivo y la confirmación de cancelación",
+          "status": "passed"
+        },
+        {
+          "name": "BudgetsService.decideBudgetVersion envía exactamente las propiedades de DecisionEntrada (additionalProperties: false)",
+          "status": "passed"
+        },
+        {
+          "name": "BudgetsService.decideBudgetVersion acepta un motivo de 1000 caracteres y rechaza uno más largo sin enviarlo",
+          "status": "passed"
+        },
+        {
+          "name": "BudgetsService.decideBudgetVersion no envía un rechazo sin motivo",
+          "status": "passed"
+        },
+        {
+          "name": "BudgetsService.decideBudgetVersion valida los identificadores: presupuesto inválido",
+          "status": "passed"
+        },
+        {
+          "name": "BudgetsService.decideBudgetVersion valida los identificadores: versión inválida",
+          "status": "passed"
+        },
+        {
+          "name": "BudgetsService.decideBudgetVersion propaga el 404 del MS3 al decidir sin reintentar",
+          "status": "passed"
+        },
+        {
+          "name": "BudgetsService.decideBudgetVersion propaga el 422 del MS3 al decidir sin reintentar",
+          "status": "passed"
+        },
+        {
+          "name": "BudgetsService.decideBudgetVersion distingue la decisión registrada con aplicación pendiente (503)",
+          "status": "passed"
+        },
+        {
+          "name": "BudgetsService.decideBudgetVersion trata un 503 sin decision_id como error común (decisión no registrada)",
+          "status": "passed"
+        },
+        {
+          "name": "BudgetsService.decideBudgetVersion propaga el 409 de una versión ya decidida o reemplazada",
+          "status": "passed"
+        },
+        {
+          "name": "BudgetsService.retryDecisionApplication reintenta la aplicación de la decisión sin crear otra",
+          "status": "passed"
+        },
+        {
+          "name": "BudgetsService.retryDecisionApplication informa si la aplicación sigue pendiente",
+          "status": "passed"
+        },
+        {
+          "name": "BudgetsService.retryDecisionApplication rechaza un identificador de decisión inválido sin consultar",
+          "status": "passed"
+        }
+      ]
+    }
+  ]
+}

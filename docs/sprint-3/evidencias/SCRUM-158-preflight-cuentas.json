@@ -1,0 +1,73 @@
+{
+  "kind": "REAL_ANONYMOUS_HTTP",
+  "date_utc": "2026-11-12",
+  "environment": "https://tallerconect.vercel.app",
+  "method": "GET",
+  "authorization_sent": false,
+  "cookies_sent": false,
+  "checks": [
+    {
+      "id": "ACCOUNTS-PREFLIGHT-ME",
+      "path": "/api/auth/me",
+      "expected": 401,
+      "http": 401,
+      "result": "PASS",
+      "body_sha256": "a485c68dc7f4de3302f5c3950ccd447045d2749b8c33aa39acd76862dff6c9bf"
+    },
+    {
+      "id": "ACCOUNTS-PREFLIGHT-MS1",
+      "path": "/ms1/openapi.json",
+      "expected": 200,
+      "http": 200,
+      "result": "PASS",
+      "body_sha256": "c62044b58feb198ec0acfa9bb310f096b0a27006e1b9af574ae59448f0e9920f"
+    }
+  ],
+  "ms1_info": {
+    "title": "SGTM — MS1: Autenticación y Usuarios",
+    "version": "0.1.0"
+  },
+  "login_contract": {
+    "method": "POST",
+    "path": "/api/auth/login",
+    "content_type": "application/json",
+    "required_body_keys": [
+      "email",
+      "password"
+    ],
+    "required_response_keys": [
+      "access_token",
+      "token_type",
+      "user"
+    ],
+    "statuses": [
+      200,
+      401,
+      403,
+      429,
+      422
+    ]
+  },
+  "accounts": {
+    "cliente": "Identificada por el usuario; activación y login no verificados",
+    "mecanico": "Identificada por el usuario; activación y login no verificados",
+    "administrador": "Identificada por el usuario; activación y login no verificados"
+  },
+  "secure_access": {
+    "qa_file_exists": false,
+    "password_variables_available": false,
+    "qa_url_available": false,
+    "password_values_logged": false
+  },
+  "target_environment": "URL existente etiquetada producción en .env y compartida por constantes integration/production; QA aislado no confirmado",
+  "local_backend": {
+    "url": "http://localhost:8000/openapi.json",
+    "curl_exit_code": 7,
+    "http_code": 0,
+    "state": "BLOCKED",
+    "observation": "Conexión rechazada; no backend local escuchando en el momento de la sonda."
+  },
+  "backend_repository_lookup": "GitHub instalado, búsqueda taller: solo repositorio frontend Victor-AGSP/TallerConnect; no otro backend/QA identificado con ese acceso.",
+  "authentication_attempts_executed": 0,
+  "note": "No se intentaron contraseñas por defecto/adivinadas ni se llamó POST de login. Conectividad anónima no confirma existencia/activación de cuentas."
+}
