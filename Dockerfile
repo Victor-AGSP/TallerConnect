@@ -8,7 +8,7 @@ RUN npm ci --no-audit --no-fund
 COPY . .
 
 ARG EXPO_PUBLIC_APP_ENV=integration
-ARG EXPO_PUBLIC_API_URL=https://tallerconnect-frontend.inf.uct.cl/api
+ARG EXPO_PUBLIC_API_URL=https://frontend-movil.inf.uct.cl/api
 ARG EXPO_PUBLIC_USE_MOCK_AUTH=false
 ARG EXPO_PUBLIC_USE_MOCK_SERVICES=false
 

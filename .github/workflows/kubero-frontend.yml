@@ -37,6 +37,6 @@ jobs:
             org.opencontainers.image.source=https://github.com/Victor-AGSP/TallerConnect
           build-args: |
             EXPO_PUBLIC_APP_ENV=integration
-            EXPO_PUBLIC_API_URL=https://tallerconnect-frontend.inf.uct.cl/api
+            EXPO_PUBLIC_API_URL=https://frontend-movil.inf.uct.cl/api
             EXPO_PUBLIC_USE_MOCK_AUTH=false
             EXPO_PUBLIC_USE_MOCK_SERVICES=false
