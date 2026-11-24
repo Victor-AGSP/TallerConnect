@@ -1,0 +1,52 @@
+{
+  "startTime": 1795520005162,
+  "numTotalTestSuites": 1,
+  "numPassedTestSuites": 0,
+  "numFailedTestSuites": 1,
+  "numPassedTests": 2,
+  "numFailedTests": 5,
+  "numPendingTests": 0,
+  "success": false,
+  "environment": "Jest; dobles controlados; sin backend ni dispositivo",
+  "suites": [
+    {
+      "file": "__tests__/cliente-portal-figures.test.tsx",
+      "status": "failed",
+      "tests": [
+        {
+          "name": "Portal Cliente en modo demostración existe una fuente demo para la orden mostrada",
+          "status": "passed"
+        },
+        {
+          "name": "Portal Cliente en modo demostración se declara explícitamente como demostración",
+          "status": "failed",
+          "failure": "Error: Unable to find an element with testID: cliente-demo-notice"
+        },
+        {
+          "name": "Portal Cliente en modo demostración el presupuesto coincide con la fuente demo y con el detalle que abre",
+          "status": "failed",
+          "failure": "Error: Unable to find an element with accessibility label: Presupuesto: $94.000"
+        },
+        {
+          "name": "Portal Cliente en modo demostración el conteo corresponde a los ítems del presupuesto demo",
+          "status": "failed",
+          "failure": "Error: Unable to find an element with accessibility label: Ítems del presupuesto: 3"
+        },
+        {
+          "name": "Portal Cliente en modo demostración sin fuente demo de evidencias no inventa una cantidad",
+          "status": "failed",
+          "failure": "Error: Unable to find an element with accessibility label: Evidencias: No disponible"
+        },
+        {
+          "name": "Portal Cliente en modo demostración si falta el presupuesto demo muestra «No disponible» y ningún monto",
+          "status": "failed",
+          "failure": "Error: Unable to find an element with accessibility label: Presupuesto: No disponible"
+        },
+        {
+          "name": "Portal Cliente real no muestra cifras ni consulta la fuente demo",
+          "status": "passed"
+        }
+      ]
+    }
+  ]
+}

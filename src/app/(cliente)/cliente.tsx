@@ -13,6 +13,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { Button, Card } from '@/components/common';
 import { StatusPill } from '@/components/ui/StatusPill';
+import { calculateBudgetTotal, getBudgetById } from '@/services';
 import { useAuthStore } from '@/stores/authStore';
 
 import {
@@ -20,6 +21,17 @@ import {
   radius,
   spacing,
 } from '@/constants/theme';
+
+/** Orden que usa toda la demostración (misma que abre el detalle de presupuesto demo). */
+const DEMO_ORDER = 'OT-00124';
+const NOT_AVAILABLE = 'No disponible';
+
+const formatCLP = (amount: number) =>
+  amount.toLocaleString('es-CL', {
+    style: 'currency',
+    currency: 'CLP',
+    maximumFractionDigits: 0,
+  });
 
 export default function ClienteScreen() {
   return ENV.USE_DEMO_DATA ? <DemoClienteScreen /> : <RealClienteScreen />;
@@ -45,6 +57,13 @@ function DemoClienteScreen() {
   const logout = useAuthStore(
     (state) => state.logout
   );
+
+  // Las cifras salen de la misma fuente demo que el detalle del presupuesto;
+  // sin fuente se informa «No disponible» en vez de inventar un valor.
+  const budget = getBudgetById(DEMO_ORDER);
+  const budgetTotal = budget ? formatCLP(calculateBudgetTotal(budget)) : NOT_AVAILABLE;
+  const budgetItems = budget ? String(budget.items.length) : NOT_AVAILABLE;
+
   return (
     <SafeAreaView style={styles.root}>
       <ScrollView
@@ -82,6 +101,10 @@ function DemoClienteScreen() {
             Consulta el estado de tu vehículo,
             órdenes de trabajo y la información
             asociada al servicio.
+          </Text>
+
+          <Text testID="cliente-demo-notice" style={styles.demoNotice}>
+            Modo demostración: datos ficticios que no provienen del taller.
           </Text>
         </View>
 
@@ -189,17 +212,17 @@ function DemoClienteScreen() {
 
         <View style={styles.grid}>
           <Metric
-            value="$125.000"
+            value={budgetTotal}
             label="Presupuesto"
           />
 
           <Metric
-            value="3"
-            label="Repuestos"
+            value={budgetItems}
+            label="Ítems del presupuesto"
           />
 
           <Metric
-            value="4"
+            value={NOT_AVAILABLE}
             label="Evidencias"
           />
 
@@ -228,22 +251,24 @@ function DemoClienteScreen() {
           <View style={styles.budgetRow}>
             <View
               accessible
-              accessibilityLabel="Total estimado: $125.000"
+              accessibilityLabel={`Total estimado: ${budgetTotal}`}
             >
               <Text style={styles.smallLabel}>
                 TOTAL ESTIMADO
               </Text>
 
               <Text style={styles.amount}>
-                $125.000
+                {budgetTotal}
               </Text>
             </View>
 
-            <StatusPill
-              label="Aprobado"
-              tone="success"
-              accessibilityLabel="Estado del presupuesto: Aprobado"
-            />
+            {budget ? (
+              <StatusPill
+                label={budget.status}
+                tone="success"
+                accessibilityLabel={`Estado del presupuesto: ${budget.status}`}
+              />
+            ) : null}
           </View>
 
         </Card>
@@ -286,11 +311,11 @@ function DemoClienteScreen() {
             </View>
 
             <Text style={styles.mediaTitle}>
-              4 archivos disponibles
+              Evidencias no disponibles
             </Text>
 
             <Text style={styles.mediaDescription}>
-              Evidencias asociadas a la orden.
+              La demostración no incluye archivos para esta orden.
             </Text>
           </View>
         </Card>
@@ -310,7 +335,7 @@ function DemoClienteScreen() {
           <View style={styles.orderInfo}>
             <InfoRow
               label="Número"
-              value="OT-00124"
+              value={DEMO_ORDER}
             />
 
             <InfoRow
@@ -644,6 +669,13 @@ const styles = StyleSheet.create({
     color: localTheme.textSecondary,
     fontSize: 14,
     lineHeight: 20,
+  },
+
+  demoNotice: {
+    marginTop: spacing.sm,
+    color: localTheme.warning,
+    fontSize: 13,
+    fontWeight: '700',
   },
 
   card: {

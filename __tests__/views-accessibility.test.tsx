@@ -129,8 +129,9 @@ describe('vista de vehículo y orden del cliente', () => {
     expect(
       screen.getByLabelText('Servicio: Mantención preventiva'),
     ).toBeTruthy();
-    expect(screen.getByLabelText('Total estimado: $125.000')).toBeTruthy();
-    expect(screen.getByLabelText('Presupuesto: $125.000')).toBeTruthy();
+    // SCRUM-225: el total demo proviene del presupuesto demo OT-00124 ($94.000).
+    expect(screen.getByLabelText('Total estimado: $94.000')).toBeTruthy();
+    expect(screen.getByLabelText('Presupuesto: $94.000')).toBeTruthy();
     expect(screen.getByLabelText('Número: OT-00124')).toBeTruthy();
     expect(screen.getByLabelText('Técnico: Mecánico asignado')).toBeTruthy();
   });

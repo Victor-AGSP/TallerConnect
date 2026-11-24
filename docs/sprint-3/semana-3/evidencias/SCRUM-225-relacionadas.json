@@ -1,0 +1,1173 @@
+{
+  "startTime": 1795519989570,
+  "numTotalTestSuites": 14,
+  "numPassedTestSuites": 14,
+  "numFailedTestSuites": 0,
+  "numPassedTests": 269,
+  "numFailedTests": 0,
+  "numPendingTests": 0,
+  "success": true,
+  "environment": "Jest; dobles controlados; sin backend ni dispositivo",
+  "suites": [
+    {
+      "file": "__tests__/budget-demo-empty.test.tsx",
+      "status": "passed",
+      "tests": [
+        {
+          "name": "DEMO: ausencia de presupuesto muestra vacío explícito sin total ficticio y permite navegar",
+          "status": "passed"
+        },
+        {
+          "name": "modo real con lista vacía no consulta ni muestra el presupuesto demo",
+          "status": "passed"
+        },
+        {
+          "name": "un error HTTP real simulado se presenta como error, nunca como vacío demo",
+          "status": "passed"
+        },
+        {
+          "name": "una carga pendiente permanece en loading hasta resolver la lista vacía",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "file": "__tests__/budget-flow-integration.test.tsx",
+      "status": "passed",
+      "tests": [
+        {
+          "name": "flujo presupuesto → decisión → orden (cliente) decide una sola vez, reintenta la aplicación pendiente y recarga el presupuesto",
+          "status": "passed"
+        },
+        {
+          "name": "flujo presupuesto → decisión → orden (cliente) muestra \"sin presupuesto\" cuando el MS3 no tiene uno para la orden",
+          "status": "passed"
+        },
+        {
+          "name": "flujo presupuesto → decisión → orden (cliente) un 403 del MS3 informa la falta de permisos sin cerrar la sesión",
+          "status": "passed"
+        },
+        {
+          "name": "flujo presupuesto → decisión → orden (cliente) un 401 del MS3 cierra la sesión y devuelve al login",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "file": "__tests__/budget-mapper.test.ts",
+      "status": "passed",
+      "tests": [
+        {
+          "name": "Transformación de presupuestos mapBudgetDetailResponse convierte el presupuesto de la API al modelo Budget",
+          "status": "passed"
+        },
+        {
+          "name": "Transformación de presupuestos mapBudgetDetailResponse convierte los identificadores del presupuesto de ejemplo \"borrador\" a texto",
+          "status": "passed"
+        },
+        {
+          "name": "Transformación de presupuestos mapBudgetDetailResponse convierte los identificadores del presupuesto de ejemplo \"enviado\" a texto",
+          "status": "passed"
+        },
+        {
+          "name": "Transformación de presupuestos mapBudgetDetailResponse convierte los identificadores del presupuesto de ejemplo \"aprobadoConModificacion\" a texto",
+          "status": "passed"
+        },
+        {
+          "name": "Transformación de presupuestos mapBudgetDetailResponse convierte los identificadores del presupuesto de ejemplo \"esperandoRepuestos\" a texto",
+          "status": "passed"
+        },
+        {
+          "name": "Transformación de presupuestos mapBudgetDetailResponse convierte los identificadores del presupuesto de ejemplo \"rechazado\" a texto",
+          "status": "passed"
+        },
+        {
+          "name": "Transformación de presupuestos mapBudgetDetailResponse convierte cantidades y montos decimales a número",
+          "status": "passed"
+        },
+        {
+          "name": "Transformación de presupuestos mapBudgetDetailResponse deja en null el repuesto y los nombres cuando no vienen en la respuesta",
+          "status": "passed"
+        },
+        {
+          "name": "Transformación de presupuestos mapBudgetDetailResponse convierte la decisión del cliente",
+          "status": "passed"
+        },
+        {
+          "name": "Transformación de presupuestos mapBudgetDetailResponse conserva el motivo de un rechazo",
+          "status": "passed"
+        },
+        {
+          "name": "Transformación de presupuestos mapBudgetDetailResponse conserva todas las versiones en orden y la versión vigente",
+          "status": "passed"
+        },
+        {
+          "name": "Transformación de presupuestos mapBudgetDetailResponse mantiene en null las fechas de envío y bloqueo de una versión no enviada",
+          "status": "passed"
+        },
+        {
+          "name": "Transformación de presupuestos mapBudgetDetailResponse no incluye campos del backend que no existen en el modelo",
+          "status": "passed"
+        },
+        {
+          "name": "Transformación de presupuestos montos inválidos lanza un error si cantidad no es un decimal válido",
+          "status": "passed"
+        },
+        {
+          "name": "Transformación de presupuestos montos inválidos lanza un error si precio_unitario no es un decimal válido",
+          "status": "passed"
+        },
+        {
+          "name": "Transformación de presupuestos montos inválidos lanza un error si subtotal no es un decimal válido",
+          "status": "passed"
+        },
+        {
+          "name": "Transformación de presupuestos montos inválidos lanza un error si el total de la versión no es un decimal válido",
+          "status": "passed"
+        },
+        {
+          "name": "Transformación de presupuestos montos inválidos lanza un error si total_ultima_version no es un decimal válido",
+          "status": "passed"
+        },
+        {
+          "name": "Transformación de presupuestos mapBudgetVersionResponse convierte una versión individual",
+          "status": "passed"
+        },
+        {
+          "name": "Transformación de presupuestos mapBudgetPageResponse convierte la página, con desde y limite como offset y limit",
+          "status": "passed"
+        },
+        {
+          "name": "Transformación de presupuestos mapBudgetPageResponse los presupuestos del listado no incluyen versiones",
+          "status": "passed"
+        },
+        {
+          "name": "Transformación de presupuestos mapBudgetPageResponse convierte una página vacía",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "file": "__tests__/budget-order-transition.test.tsx",
+      "status": "passed",
+      "tests": [
+        {
+          "name": "no conserva el resultado de una decisión de otra orden al navegar",
+          "status": "passed"
+        },
+        {
+          "name": "el cambio de orden inicia su lectura aunque la anterior no haya terminado",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "file": "__tests__/budget-read-refresh.test.tsx",
+      "status": "passed",
+      "tests": [
+        {
+          "name": "vista Cliente: integridad de relación no selecciona el único presupuesto si es de otra orden",
+          "status": "passed"
+        },
+        {
+          "name": "vista Cliente: integridad de relación rechaza detalle que no coincide con orden/presupuesto solicitado: {\"presupuesto_id\":5,\"orden_id\":32,\"creado_en\":\"2026-11-14T10:00:00Z\",\"cantidad_versiones\":1,\"ultima_version\":1,\"estado_ultima_version\":\"enviada\",\"total_ultima_version\":\"125000.00\",\"version_vigente\":null,\"versiones\":[{\"numero\":1,\"estado\":\"enviada\",\"es_modificacion\":false,\"creado_por_id\":99,\"creado_en\":\"2026-11-14T10:00:00Z\",\"enviado_en\":\"2026-11-14T11:00:00Z\",\"bloqueada_en\":\"2026-11-14T11:00:00Z\",\"total\":\"125000.00\",\"decision\":null,\"items\":[{\"item_id\":11,\"tipo\":\"mano_de_obra\",\"descripcion\":\"Trabajo QA local\",\"cantidad\":\"1\",\"precio_unitario\":\"125000.00\",\"subtotal\":\"125000.00\",\"repuesto_id\":null}]}]}",
+          "status": "passed"
+        },
+        {
+          "name": "vista Cliente: integridad de relación rechaza detalle que no coincide con orden/presupuesto solicitado: {\"presupuesto_id\":6,\"orden_id\":31,\"creado_en\":\"2026-11-14T10:00:00Z\",\"cantidad_versiones\":1,\"ultima_version\":1,\"estado_ultima_version\":\"enviada\",\"total_ultima_version\":\"125000.00\",\"version_vigente\":null,\"versiones\":[{\"numero\":1,\"estado\":\"enviada\",\"es_modificacion\":false,\"creado_por_id\":99,\"creado_en\":\"2026-11-14T10:00:00Z\",\"enviado_en\":\"2026-11-14T11:00:00Z\",\"bloqueada_en\":\"2026-11-14T11:00:00Z\",\"total\":\"125000.00\",\"decision\":null,\"items\":[{\"item_id\":11,\"tipo\":\"mano_de_obra\",\"descripcion\":\"Trabajo QA local\",\"cantidad\":\"1\",\"precio_unitario\":\"125000.00\",\"subtotal\":\"125000.00\",\"repuesto_id\":null}]}]}",
+          "status": "passed"
+        },
+        {
+          "name": "adaptador de administración: integridad de relación no selecciona el único presupuesto si es de otra orden",
+          "status": "passed"
+        },
+        {
+          "name": "adaptador de administración: integridad de relación rechaza detalle que no coincide con orden/presupuesto solicitado: {\"presupuesto_id\":5,\"orden_id\":32,\"creado_en\":\"2026-11-14T10:00:00Z\",\"cantidad_versiones\":1,\"ultima_version\":1,\"estado_ultima_version\":\"enviada\",\"total_ultima_version\":\"125000.00\",\"version_vigente\":null,\"versiones\":[{\"numero\":1,\"estado\":\"enviada\",\"es_modificacion\":false,\"creado_por_id\":99,\"creado_en\":\"2026-11-14T10:00:00Z\",\"enviado_en\":\"2026-11-14T11:00:00Z\",\"bloqueada_en\":\"2026-11-14T11:00:00Z\",\"total\":\"125000.00\",\"decision\":null,\"items\":[{\"item_id\":11,\"tipo\":\"mano_de_obra\",\"descripcion\":\"Trabajo QA local\",\"cantidad\":\"1\",\"precio_unitario\":\"125000.00\",\"subtotal\":\"125000.00\",\"repuesto_id\":null}]}]}",
+          "status": "passed"
+        },
+        {
+          "name": "adaptador de administración: integridad de relación rechaza detalle que no coincide con orden/presupuesto solicitado: {\"presupuesto_id\":6,\"orden_id\":31,\"creado_en\":\"2026-11-14T10:00:00Z\",\"cantidad_versiones\":1,\"ultima_version\":1,\"estado_ultima_version\":\"enviada\",\"total_ultima_version\":\"125000.00\",\"version_vigente\":null,\"versiones\":[{\"numero\":1,\"estado\":\"enviada\",\"es_modificacion\":false,\"creado_por_id\":99,\"creado_en\":\"2026-11-14T10:00:00Z\",\"enviado_en\":\"2026-11-14T11:00:00Z\",\"bloqueada_en\":\"2026-11-14T11:00:00Z\",\"total\":\"125000.00\",\"decision\":null,\"items\":[{\"item_id\":11,\"tipo\":\"mano_de_obra\",\"descripcion\":\"Trabajo QA local\",\"cantidad\":\"1\",\"precio_unitario\":\"125000.00\",\"subtotal\":\"125000.00\",\"repuesto_id\":null}]}]}",
+          "status": "passed"
+        },
+        {
+          "name": "refresh y reapertura hacen nuevas lecturas y sustituyen los datos sin caché persistente",
+          "status": "passed"
+        },
+        {
+          "name": "el refresh fallido muestra error, retira datos y permite volver a consultar",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "file": "__tests__/budget-schema.test.ts",
+      "status": "passed",
+      "tests": [
+        {
+          "name": "Esquema de presupuesto recibido de la API (PresupuestoDetalle) datos válidos acepta el presupuesto de ejemplo \"borrador\"",
+          "status": "passed"
+        },
+        {
+          "name": "Esquema de presupuesto recibido de la API (PresupuestoDetalle) datos válidos acepta el presupuesto de ejemplo \"enviado\"",
+          "status": "passed"
+        },
+        {
+          "name": "Esquema de presupuesto recibido de la API (PresupuestoDetalle) datos válidos acepta el presupuesto de ejemplo \"aprobadoConModificacion\"",
+          "status": "passed"
+        },
+        {
+          "name": "Esquema de presupuesto recibido de la API (PresupuestoDetalle) datos válidos acepta el presupuesto de ejemplo \"esperandoRepuestos\"",
+          "status": "passed"
+        },
+        {
+          "name": "Esquema de presupuesto recibido de la API (PresupuestoDetalle) datos válidos acepta el presupuesto de ejemplo \"rechazado\"",
+          "status": "passed"
+        },
+        {
+          "name": "Esquema de presupuesto recibido de la API (PresupuestoDetalle) datos válidos acepta el resumen de cada presupuesto, sin sus versiones",
+          "status": "passed"
+        },
+        {
+          "name": "Esquema de presupuesto recibido de la API (PresupuestoDetalle) datos válidos acepta un ítem sin repuesto_nombre ni proveedor_nombre, o con ellos en null",
+          "status": "passed"
+        },
+        {
+          "name": "Esquema de presupuesto recibido de la API (PresupuestoDetalle) datos válidos acepta fechas con una zona horaria distinta de UTC",
+          "status": "passed"
+        },
+        {
+          "name": "Esquema de presupuesto recibido de la API (PresupuestoDetalle) campos obligatorios rechaza un presupuesto sin presupuesto_id",
+          "status": "passed"
+        },
+        {
+          "name": "Esquema de presupuesto recibido de la API (PresupuestoDetalle) campos obligatorios rechaza un presupuesto sin orden_id",
+          "status": "passed"
+        },
+        {
+          "name": "Esquema de presupuesto recibido de la API (PresupuestoDetalle) campos obligatorios rechaza un presupuesto sin creado_en",
+          "status": "passed"
+        },
+        {
+          "name": "Esquema de presupuesto recibido de la API (PresupuestoDetalle) campos obligatorios rechaza un presupuesto sin cantidad_versiones",
+          "status": "passed"
+        },
+        {
+          "name": "Esquema de presupuesto recibido de la API (PresupuestoDetalle) campos obligatorios rechaza un presupuesto sin ultima_version",
+          "status": "passed"
+        },
+        {
+          "name": "Esquema de presupuesto recibido de la API (PresupuestoDetalle) campos obligatorios rechaza un presupuesto sin estado_ultima_version",
+          "status": "passed"
+        },
+        {
+          "name": "Esquema de presupuesto recibido de la API (PresupuestoDetalle) campos obligatorios rechaza un presupuesto sin total_ultima_version",
+          "status": "passed"
+        },
+        {
+          "name": "Esquema de presupuesto recibido de la API (PresupuestoDetalle) campos obligatorios rechaza un presupuesto sin version_vigente",
+          "status": "passed"
+        },
+        {
+          "name": "Esquema de presupuesto recibido de la API (PresupuestoDetalle) campos obligatorios rechaza un presupuesto sin versiones",
+          "status": "passed"
+        },
+        {
+          "name": "Esquema de presupuesto recibido de la API (PresupuestoDetalle) campos obligatorios rechaza una versión sin numero",
+          "status": "passed"
+        },
+        {
+          "name": "Esquema de presupuesto recibido de la API (PresupuestoDetalle) campos obligatorios rechaza una versión sin estado",
+          "status": "passed"
+        },
+        {
+          "name": "Esquema de presupuesto recibido de la API (PresupuestoDetalle) campos obligatorios rechaza una versión sin es_modificacion",
+          "status": "passed"
+        },
+        {
+          "name": "Esquema de presupuesto recibido de la API (PresupuestoDetalle) campos obligatorios rechaza una versión sin creado_por_id",
+          "status": "passed"
+        },
+        {
+          "name": "Esquema de presupuesto recibido de la API (PresupuestoDetalle) campos obligatorios rechaza una versión sin creado_en",
+          "status": "passed"
+        },
+        {
+          "name": "Esquema de presupuesto recibido de la API (PresupuestoDetalle) campos obligatorios rechaza una versión sin enviado_en",
+          "status": "passed"
+        },
+        {
+          "name": "Esquema de presupuesto recibido de la API (PresupuestoDetalle) campos obligatorios rechaza una versión sin bloqueada_en",
+          "status": "passed"
+        },
+        {
+          "name": "Esquema de presupuesto recibido de la API (PresupuestoDetalle) campos obligatorios rechaza una versión sin total",
+          "status": "passed"
+        },
+        {
+          "name": "Esquema de presupuesto recibido de la API (PresupuestoDetalle) campos obligatorios rechaza una versión sin items",
+          "status": "passed"
+        },
+        {
+          "name": "Esquema de presupuesto recibido de la API (PresupuestoDetalle) campos obligatorios rechaza una versión sin decision",
+          "status": "passed"
+        },
+        {
+          "name": "Esquema de presupuesto recibido de la API (PresupuestoDetalle) campos obligatorios rechaza un ítem sin item_id",
+          "status": "passed"
+        },
+        {
+          "name": "Esquema de presupuesto recibido de la API (PresupuestoDetalle) campos obligatorios rechaza un ítem sin tipo",
+          "status": "passed"
+        },
+        {
+          "name": "Esquema de presupuesto recibido de la API (PresupuestoDetalle) campos obligatorios rechaza un ítem sin descripcion",
+          "status": "passed"
+        },
+        {
+          "name": "Esquema de presupuesto recibido de la API (PresupuestoDetalle) campos obligatorios rechaza un ítem sin cantidad",
+          "status": "passed"
+        },
+        {
+          "name": "Esquema de presupuesto recibido de la API (PresupuestoDetalle) campos obligatorios rechaza un ítem sin precio_unitario",
+          "status": "passed"
+        },
+        {
+          "name": "Esquema de presupuesto recibido de la API (PresupuestoDetalle) campos obligatorios rechaza un ítem sin subtotal",
+          "status": "passed"
+        },
+        {
+          "name": "Esquema de presupuesto recibido de la API (PresupuestoDetalle) campos obligatorios rechaza un ítem sin repuesto_id",
+          "status": "passed"
+        },
+        {
+          "name": "Esquema de presupuesto recibido de la API (PresupuestoDetalle) campos obligatorios rechaza una decisión sin decision_id",
+          "status": "passed"
+        },
+        {
+          "name": "Esquema de presupuesto recibido de la API (PresupuestoDetalle) campos obligatorios rechaza una decisión sin decision",
+          "status": "passed"
+        },
+        {
+          "name": "Esquema de presupuesto recibido de la API (PresupuestoDetalle) campos obligatorios rechaza una decisión sin cliente_usuario_id",
+          "status": "passed"
+        },
+        {
+          "name": "Esquema de presupuesto recibido de la API (PresupuestoDetalle) campos obligatorios rechaza una decisión sin fecha_hora",
+          "status": "passed"
+        },
+        {
+          "name": "Esquema de presupuesto recibido de la API (PresupuestoDetalle) campos obligatorios rechaza una decisión sin motivo",
+          "status": "passed"
+        },
+        {
+          "name": "Esquema de presupuesto recibido de la API (PresupuestoDetalle) tipos rechaza un presupuesto con presupuesto_id como texto",
+          "status": "passed"
+        },
+        {
+          "name": "Esquema de presupuesto recibido de la API (PresupuestoDetalle) tipos rechaza un presupuesto con orden_id decimal",
+          "status": "passed"
+        },
+        {
+          "name": "Esquema de presupuesto recibido de la API (PresupuestoDetalle) tipos rechaza un presupuesto con total_ultima_version como número",
+          "status": "passed"
+        },
+        {
+          "name": "Esquema de presupuesto recibido de la API (PresupuestoDetalle) tipos rechaza un presupuesto con creado_en sin formato de fecha",
+          "status": "passed"
+        },
+        {
+          "name": "Esquema de presupuesto recibido de la API (PresupuestoDetalle) tipos rechaza un presupuesto con version_vigente como texto",
+          "status": "passed"
+        },
+        {
+          "name": "Esquema de presupuesto recibido de la API (PresupuestoDetalle) tipos rechaza una versión con es_modificacion como texto",
+          "status": "passed"
+        },
+        {
+          "name": "Esquema de presupuesto recibido de la API (PresupuestoDetalle) tipos rechaza una versión con enviado_en sin formato de fecha",
+          "status": "passed"
+        },
+        {
+          "name": "Esquema de presupuesto recibido de la API (PresupuestoDetalle) tipos rechaza una versión con items que no es una lista",
+          "status": "passed"
+        },
+        {
+          "name": "Esquema de presupuesto recibido de la API (PresupuestoDetalle) tipos rechaza un ítem con repuesto_id como texto",
+          "status": "passed"
+        },
+        {
+          "name": "Esquema de presupuesto recibido de la API (PresupuestoDetalle) montos en texto decimal acepta \"0\"",
+          "status": "passed"
+        },
+        {
+          "name": "Esquema de presupuesto recibido de la API (PresupuestoDetalle) montos en texto decimal acepta \"1\"",
+          "status": "passed"
+        },
+        {
+          "name": "Esquema de presupuesto recibido de la API (PresupuestoDetalle) montos en texto decimal acepta \"1.5\"",
+          "status": "passed"
+        },
+        {
+          "name": "Esquema de presupuesto recibido de la API (PresupuestoDetalle) montos en texto decimal acepta \"15000.00\"",
+          "status": "passed"
+        },
+        {
+          "name": "Esquema de presupuesto recibido de la API (PresupuestoDetalle) montos en texto decimal rechaza \"abc\"",
+          "status": "passed"
+        },
+        {
+          "name": "Esquema de presupuesto recibido de la API (PresupuestoDetalle) montos en texto decimal rechaza \"\"",
+          "status": "passed"
+        },
+        {
+          "name": "Esquema de presupuesto recibido de la API (PresupuestoDetalle) montos en texto decimal rechaza \"-100\"",
+          "status": "passed"
+        },
+        {
+          "name": "Esquema de presupuesto recibido de la API (PresupuestoDetalle) montos en texto decimal rechaza \"12,5\"",
+          "status": "passed"
+        },
+        {
+          "name": "Esquema de presupuesto recibido de la API (PresupuestoDetalle) montos en texto decimal rechaza \"1.\"",
+          "status": "passed"
+        },
+        {
+          "name": "Esquema de presupuesto recibido de la API (PresupuestoDetalle) montos en texto decimal rechaza \".5\"",
+          "status": "passed"
+        },
+        {
+          "name": "Esquema de presupuesto recibido de la API (PresupuestoDetalle) valores del contrato acepta el estado borrador",
+          "status": "passed"
+        },
+        {
+          "name": "Esquema de presupuesto recibido de la API (PresupuestoDetalle) valores del contrato acepta el estado enviada",
+          "status": "passed"
+        },
+        {
+          "name": "Esquema de presupuesto recibido de la API (PresupuestoDetalle) valores del contrato acepta el estado aprobada",
+          "status": "passed"
+        },
+        {
+          "name": "Esquema de presupuesto recibido de la API (PresupuestoDetalle) valores del contrato acepta el estado rechazada",
+          "status": "passed"
+        },
+        {
+          "name": "Esquema de presupuesto recibido de la API (PresupuestoDetalle) valores del contrato rechaza un estado fuera del contrato",
+          "status": "passed"
+        },
+        {
+          "name": "Esquema de presupuesto recibido de la API (PresupuestoDetalle) valores del contrato rechaza un tipo de ítem fuera del contrato",
+          "status": "passed"
+        },
+        {
+          "name": "Esquema de presupuesto recibido de la API (PresupuestoDetalle) valores del contrato rechaza una decisión fuera del contrato",
+          "status": "passed"
+        },
+        {
+          "name": "Esquema de presupuesto recibido de la API (PresupuestoDetalle) nulos rechaza null en presupuesto_id, que el contrato no admite como nulo",
+          "status": "passed"
+        },
+        {
+          "name": "Esquema de presupuesto recibido de la API (PresupuestoDetalle) nulos rechaza null en orden_id, que el contrato no admite como nulo",
+          "status": "passed"
+        },
+        {
+          "name": "Esquema de presupuesto recibido de la API (PresupuestoDetalle) nulos rechaza null en estado_ultima_version, que el contrato no admite como nulo",
+          "status": "passed"
+        },
+        {
+          "name": "Esquema de presupuesto recibido de la API (PresupuestoDetalle) nulos rechaza null en total_ultima_version, que el contrato no admite como nulo",
+          "status": "passed"
+        },
+        {
+          "name": "Esquema de presupuesto recibido de la API (PresupuestoDetalle) nulos acepta null en version_vigente, enviado_en, bloqueada_en y decision",
+          "status": "passed"
+        },
+        {
+          "name": "Esquema de presupuesto recibido de la API (PresupuestoDetalle) páginas acepta la página de presupuestos de ejemplo",
+          "status": "passed"
+        },
+        {
+          "name": "Esquema de presupuesto recibido de la API (PresupuestoDetalle) páginas acepta una página vacía",
+          "status": "passed"
+        },
+        {
+          "name": "Esquema de presupuesto recibido de la API (PresupuestoDetalle) páginas rechaza una página con un presupuesto inválido",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "file": "__tests__/budget-service.test.ts",
+      "status": "passed",
+      "tests": [
+        {
+          "name": "Fixtures alineados con el contrato del MS3 PresupuestoResumen contiene exactamente los campos obligatorios",
+          "status": "passed"
+        },
+        {
+          "name": "Fixtures alineados con el contrato del MS3 PresupuestoDetalle contiene exactamente los campos obligatorios",
+          "status": "passed"
+        },
+        {
+          "name": "Fixtures alineados con el contrato del MS3 PaginaPresupuestos contiene exactamente los campos obligatorios",
+          "status": "passed"
+        },
+        {
+          "name": "Fixtures alineados con el contrato del MS3 VersionDetalle contiene exactamente los campos obligatorios",
+          "status": "passed"
+        },
+        {
+          "name": "Fixtures alineados con el contrato del MS3 ItemSalida contiene exactamente los campos obligatorios",
+          "status": "passed"
+        },
+        {
+          "name": "Fixtures alineados con el contrato del MS3 DecisionSalida contiene exactamente los campos obligatorios",
+          "status": "passed"
+        },
+        {
+          "name": "budget.mapper convierte un PresupuestoDetalle ordenando las versiones",
+          "status": "passed"
+        },
+        {
+          "name": "budget.mapper conserva importes, ítems, repuesto/proveedor y la decisión",
+          "status": "passed"
+        },
+        {
+          "name": "budget.mapper acepta un presupuesto sin versión vigente (nunca aprobado)",
+          "status": "passed"
+        },
+        {
+          "name": "budget.mapper rechaza un PresupuestoDetalle inválido: cuerpo null",
+          "status": "passed"
+        },
+        {
+          "name": "budget.mapper rechaza un PresupuestoDetalle inválido: objeto vacío",
+          "status": "passed"
+        },
+        {
+          "name": "budget.mapper rechaza un PresupuestoDetalle inválido: estado de versión desconocido",
+          "status": "passed"
+        },
+        {
+          "name": "budget.mapper rechaza un PresupuestoDetalle inválido: estado del resumen desconocido",
+          "status": "passed"
+        },
+        {
+          "name": "budget.mapper rechaza un PresupuestoDetalle inválido: versión sin ítems",
+          "status": "passed"
+        },
+        {
+          "name": "budget.mapper rechaza un PresupuestoDetalle inválido: decisión desconocida",
+          "status": "passed"
+        },
+        {
+          "name": "budget.mapper convierte un ResultadoOperacion con repuestos faltantes",
+          "status": "passed"
+        },
+        {
+          "name": "budget.mapper interpreta efecto_en_orden null como \"sin cambio en la orden\"",
+          "status": "passed"
+        },
+        {
+          "name": "BudgetsService.getBudgetForOrder busca el presupuesto de la orden y consulta su detalle",
+          "status": "passed"
+        },
+        {
+          "name": "BudgetsService.getBudgetForOrder devuelve null si la orden no tiene presupuesto, sin pedir detalle",
+          "status": "passed"
+        },
+        {
+          "name": "BudgetsService.getBudgetForOrder ignora presupuestos de otra orden en la página recibida",
+          "status": "passed"
+        },
+        {
+          "name": "BudgetsService.getBudgetForOrder rechaza el identificador de orden \"\" sin consultar al MS3",
+          "status": "passed"
+        },
+        {
+          "name": "BudgetsService.getBudgetForOrder rechaza el identificador de orden \"abc\" sin consultar al MS3",
+          "status": "passed"
+        },
+        {
+          "name": "BudgetsService.getBudgetForOrder rechaza el identificador de orden \"0\" sin consultar al MS3",
+          "status": "passed"
+        },
+        {
+          "name": "BudgetsService.getBudgetForOrder rechaza el identificador de orden \"-1\" sin consultar al MS3",
+          "status": "passed"
+        },
+        {
+          "name": "BudgetsService.getBudgetForOrder rechaza el identificador de orden \"3.5\" sin consultar al MS3",
+          "status": "passed"
+        },
+        {
+          "name": "BudgetsService.getBudgetForOrder rechaza el identificador de orden \"31/../1\" sin consultar al MS3",
+          "status": "passed"
+        },
+        {
+          "name": "BudgetsService.getBudgetForOrder rechaza una página que no cumple el contrato",
+          "status": "passed"
+        },
+        {
+          "name": "BudgetsService.getBudgetForOrder propaga el error normalizado: 403 rol no permitido",
+          "status": "passed"
+        },
+        {
+          "name": "BudgetsService.getBudgetForOrder propaga el error normalizado: 404 presupuesto ajeno",
+          "status": "passed"
+        },
+        {
+          "name": "BudgetsService.getBudgetForOrder propaga el error normalizado: 500 error del servidor",
+          "status": "passed"
+        },
+        {
+          "name": "BudgetsService.getBudgetForOrder propaga el error normalizado: 503 MS2 no disponible",
+          "status": "passed"
+        },
+        {
+          "name": "BudgetsService.getBudgetForOrder propaga el error normalizado: sin conexión",
+          "status": "passed"
+        },
+        {
+          "name": "BudgetsService.decideBudgetVersion envía la aprobación a la versión indicada",
+          "status": "passed"
+        },
+        {
+          "name": "BudgetsService.decideBudgetVersion envía el rechazo con motivo y la confirmación de cancelación",
+          "status": "passed"
+        },
+        {
+          "name": "BudgetsService.decideBudgetVersion envía exactamente las propiedades de DecisionEntrada (additionalProperties: false)",
+          "status": "passed"
+        },
+        {
+          "name": "BudgetsService.decideBudgetVersion acepta un motivo de 1000 caracteres y rechaza uno más largo sin enviarlo",
+          "status": "passed"
+        },
+        {
+          "name": "BudgetsService.decideBudgetVersion no envía un rechazo sin motivo",
+          "status": "passed"
+        },
+        {
+          "name": "BudgetsService.decideBudgetVersion valida los identificadores: presupuesto inválido",
+          "status": "passed"
+        },
+        {
+          "name": "BudgetsService.decideBudgetVersion valida los identificadores: versión inválida",
+          "status": "passed"
+        },
+        {
+          "name": "BudgetsService.decideBudgetVersion propaga el 404 del MS3 al decidir sin reintentar",
+          "status": "passed"
+        },
+        {
+          "name": "BudgetsService.decideBudgetVersion propaga el 422 del MS3 al decidir sin reintentar",
+          "status": "passed"
+        },
+        {
+          "name": "BudgetsService.decideBudgetVersion distingue la decisión registrada con aplicación pendiente (503)",
+          "status": "passed"
+        },
+        {
+          "name": "BudgetsService.decideBudgetVersion trata un 503 sin decision_id como error común (decisión no registrada)",
+          "status": "passed"
+        },
+        {
+          "name": "BudgetsService.decideBudgetVersion propaga el 409 de una versión ya decidida o reemplazada",
+          "status": "passed"
+        },
+        {
+          "name": "BudgetsService.retryDecisionApplication reintenta la aplicación de la decisión sin crear otra",
+          "status": "passed"
+        },
+        {
+          "name": "BudgetsService.retryDecisionApplication informa si la aplicación sigue pendiente",
+          "status": "passed"
+        },
+        {
+          "name": "BudgetsService.retryDecisionApplication rechaza un identificador de decisión inválido sin consultar",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "file": "__tests__/budget-views-integration.test.tsx",
+      "status": "passed",
+      "tests": [
+        {
+          "name": "Orden → presupuesto el cliente abre el presupuesto desde el detalle de la orden",
+          "status": "passed"
+        },
+        {
+          "name": "Orden → presupuesto el administrador abre el presupuesto desde el detalle de la orden",
+          "status": "passed"
+        },
+        {
+          "name": "Orden → presupuesto el mecánico no tiene acceso al presupuesto desde la orden",
+          "status": "passed"
+        },
+        {
+          "name": "Representación del presupuesto muestra total, estado, ítems con repuesto/proveedor e importes",
+          "status": "passed"
+        },
+        {
+          "name": "Representación del presupuesto el administrador no puede decidir el presupuesto",
+          "status": "passed"
+        },
+        {
+          "name": "Representación del presupuesto muestra la decisión registrada de una versión aprobada",
+          "status": "passed"
+        },
+        {
+          "name": "Representación del presupuesto indica la versión vigente cuando hay una modificación pendiente",
+          "status": "passed"
+        },
+        {
+          "name": "Representación del presupuesto muestra el estado vacío si la orden no tiene presupuesto",
+          "status": "passed"
+        },
+        {
+          "name": "Representación del presupuesto muestra el error de carga y se recupera con el reintento",
+          "status": "passed"
+        },
+        {
+          "name": "Decisión del cliente aprueba tras confirmar, muestra el efecto y recarga el presupuesto",
+          "status": "passed"
+        },
+        {
+          "name": "Decisión del cliente informa los repuestos faltantes al aprobar sin stock suficiente",
+          "status": "passed"
+        },
+        {
+          "name": "Decisión del cliente exige el motivo antes de rechazar",
+          "status": "passed"
+        },
+        {
+          "name": "Decisión del cliente el primer rechazo advierte y confirma la cancelación del servicio",
+          "status": "passed"
+        },
+        {
+          "name": "Decisión del cliente rechazar una modificación no pide cancelar el servicio",
+          "status": "passed"
+        },
+        {
+          "name": "Decisión del cliente permite volver sin enviar la decisión",
+          "status": "passed"
+        },
+        {
+          "name": "Decisión del cliente muestra el error del MS3 y conserva el formulario",
+          "status": "passed"
+        },
+        {
+          "name": "Decisión del cliente ante una aplicación pendiente reintenta sin volver a decidir",
+          "status": "passed"
+        },
+        {
+          "name": "Restricciones de acceso por rol el rol cliente no accede a /ordenes/31/presupuesto ni consulta el MS3",
+          "status": "passed"
+        },
+        {
+          "name": "Restricciones de acceso por rol el rol mecanico no accede a /ordenes/31/presupuesto ni consulta el MS3",
+          "status": "passed"
+        },
+        {
+          "name": "Restricciones de acceso por rol el rol administrador no accede a /mis-ordenes/31/presupuesto ni consulta el MS3",
+          "status": "passed"
+        },
+        {
+          "name": "Restricciones de acceso por rol el rol mecanico no accede a /mis-ordenes/31/presupuesto ni consulta el MS3",
+          "status": "passed"
+        },
+        {
+          "name": "Restricciones de acceso por rol el rol cliente accede a /mis-ordenes/31/presupuesto a través de su layout",
+          "status": "passed"
+        },
+        {
+          "name": "Restricciones de acceso por rol el rol administrador accede a /ordenes/31/presupuesto a través de su layout",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "file": "__tests__/cliente-portal-figures.test.tsx",
+      "status": "passed",
+      "tests": [
+        {
+          "name": "Portal Cliente en modo demostración existe una fuente demo para la orden mostrada",
+          "status": "passed"
+        },
+        {
+          "name": "Portal Cliente en modo demostración se declara explícitamente como demostración",
+          "status": "passed"
+        },
+        {
+          "name": "Portal Cliente en modo demostración el presupuesto coincide con la fuente demo y con el detalle que abre",
+          "status": "passed"
+        },
+        {
+          "name": "Portal Cliente en modo demostración el conteo corresponde a los ítems del presupuesto demo",
+          "status": "passed"
+        },
+        {
+          "name": "Portal Cliente en modo demostración sin fuente demo de evidencias no inventa una cantidad",
+          "status": "passed"
+        },
+        {
+          "name": "Portal Cliente en modo demostración si falta el presupuesto demo muestra «No disponible» y ningún monto",
+          "status": "passed"
+        },
+        {
+          "name": "Portal Cliente real no muestra cifras ni consulta la fuente demo",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "file": "__tests__/cliente-real.test.tsx",
+      "status": "passed",
+      "tests": [
+        {
+          "name": "Consulta del cliente sin demostración ofrece la consulta real de vehículos sin inventar una orden o presupuesto",
+          "status": "passed"
+        },
+        {
+          "name": "Consulta del cliente sin demostración no consulta ni selecciona una orden fija si falta su identificador",
+          "status": "passed"
+        },
+        {
+          "name": "Consulta del cliente sin demostración consulta el servicio para la orden solicitada y conserva el resultado vacío",
+          "status": "passed"
+        },
+        {
+          "name": "Consulta del cliente sin demostración muestra el error de consulta sin sustituirlo por presupuesto demo",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "file": "__tests__/hardcoded-figures-detection.test.tsx",
+      "status": "passed",
+      "tests": [
+        {
+          "name": "Detección estática en pantallas y componentes recorre las pantallas reales del proyecto",
+          "status": "passed"
+        },
+        {
+          "name": "Detección estática en pantallas y componentes ninguna pantalla importa mocks ni el snapshot fijo del panel de administración",
+          "status": "passed"
+        },
+        {
+          "name": "Detección estática en pantallas y componentes las cifras de negocio literales solo aparecen en archivos protegidos por ENV.USE_DEMO_DATA",
+          "status": "passed"
+        },
+        {
+          "name": "Detección estática en pantallas y componentes control positivo: detecta las cifras de las vistas de demostración protegidas",
+          "status": "passed"
+        },
+        {
+          "name": "Detección estática en pantallas y componentes no confunde valores de presentación o configuración con datos de negocio",
+          "status": "passed"
+        },
+        {
+          "name": "Configuración real la demostración está desactivada sin banderas explícitas y exige ambas",
+          "status": "passed"
+        },
+        {
+          "name": "Configuración real la pantalla de inicio de Cliente no muestra cifras ficticias",
+          "status": "passed"
+        },
+        {
+          "name": "Configuración real la pantalla de inicio de Mecánico no muestra cifras ficticias",
+          "status": "passed"
+        },
+        {
+          "name": "Configuración real la pantalla de inicio de Administrador no muestra cifras ficticias",
+          "status": "passed"
+        },
+        {
+          "name": "Métricas dinámicas del panel de administración reflejan la respuesta del servicio y cambian cuando esta cambia",
+          "status": "passed"
+        },
+        {
+          "name": "Métricas dinámicas del panel de administración un fallo de órdenes muestra «No disponible», no un conteo 0 inventado",
+          "status": "passed"
+        },
+        {
+          "name": "Métricas dinámicas del panel de administración un fallo de vehículos muestra «No disponible» solo en su métrica",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "file": "__tests__/order-flow-regression.test.tsx",
+      "status": "passed",
+      "tests": [
+        {
+          "name": "flujo orden → presupuesto → repuestos: representación de estados muestra el estado esperando_diagnostico con su etiqueta y tono",
+          "status": "passed"
+        },
+        {
+          "name": "flujo orden → presupuesto → repuestos: representación de estados muestra el estado esperando_aprobacion_presupuesto con su etiqueta y tono",
+          "status": "passed"
+        },
+        {
+          "name": "flujo orden → presupuesto → repuestos: representación de estados muestra el estado pausado_por_presupuesto_rechazado con su etiqueta y tono",
+          "status": "passed"
+        },
+        {
+          "name": "flujo orden → presupuesto → repuestos: representación de estados muestra el estado esperando_repuestos con su etiqueta y tono",
+          "status": "passed"
+        },
+        {
+          "name": "flujo orden → presupuesto → repuestos: representación de estados muestra el estado en_reparacion con su etiqueta y tono",
+          "status": "passed"
+        },
+        {
+          "name": "flujo orden → presupuesto → repuestos: representación de estados la vista de cliente muestra la espera de aprobación del presupuesto",
+          "status": "passed"
+        },
+        {
+          "name": "flujo orden → presupuesto → repuestos: representación de estados la vista de mecánico muestra la espera de aprobación del presupuesto",
+          "status": "passed"
+        },
+        {
+          "name": "flujo orden → presupuesto → repuestos: representación de estados la vista de administración muestra la espera de aprobación del presupuesto",
+          "status": "passed"
+        },
+        {
+          "name": "flujo orden → presupuesto → repuestos: propagación de cambios al actualizar refleja el paso de la aprobación del presupuesto a esperando repuestos",
+          "status": "passed"
+        },
+        {
+          "name": "flujo orden → presupuesto → repuestos: propagación de cambios al actualizar refleja el paso de la aprobación del presupuesto a en reparación",
+          "status": "passed"
+        },
+        {
+          "name": "flujo orden → presupuesto → repuestos: propagación de cambios propaga un error al actualizar y recupera el estado siguiente al reintentar",
+          "status": "passed"
+        },
+        {
+          "name": "flujo orden → presupuesto → repuestos: integración con MS3 asocia la orden con su presupuesto (vista de cliente)",
+          "status": "passed"
+        },
+        {
+          "name": "flujo orden → presupuesto → repuestos: integración con MS3 asocia la orden con su presupuesto (vista de administración)",
+          "status": "passed"
+        },
+        {
+          "name": "flujo orden → presupuesto → repuestos: integración con MS3 no asocia presupuestos de otra orden",
+          "status": "passed"
+        },
+        {
+          "name": "flujo orden → presupuesto → repuestos: integración con MS3 asocia el presupuesto aprobado con los repuestos requeridos",
+          "status": "passed"
+        },
+        {
+          "name": "flujo orden → presupuesto → repuestos: integración con MS3 aprobar con stock suficiente pasa la orden a reparación sin faltantes",
+          "status": "passed"
+        },
+        {
+          "name": "flujo orden → presupuesto → repuestos: estados y transiciones MS2 propaga los códigos 3 → 4 del contrato hasta la vista",
+          "status": "passed"
+        },
+        {
+          "name": "flujo orden → presupuesto → repuestos: estados y transiciones MS2 propaga los códigos 3 → 5 del contrato hasta la vista",
+          "status": "passed"
+        },
+        {
+          "name": "flujo orden → presupuesto → repuestos: estados y transiciones MS2 registra el cambio de estado mediante PATCH /ordenes/{id}/estado",
+          "status": "passed"
+        },
+        {
+          "name": "flujo orden → presupuesto → repuestos: estados y transiciones MS2 envía la observación recortada y omite una vacía (minLength 1)",
+          "status": "passed"
+        },
+        {
+          "name": "flujo orden → presupuesto → repuestos: estados y transiciones MS2 la cancelación exige observación y no llama a MS2 sin ella",
+          "status": "passed"
+        },
+        {
+          "name": "flujo orden → presupuesto → repuestos: estados y transiciones MS2 el estado pausado_por_presupuesto_rechazado no existe en MS2 y no se envía",
+          "status": "passed"
+        },
+        {
+          "name": "flujo orden → presupuesto → repuestos: estados y transiciones MS2 el estado control_calidad no existe en MS2 y no se envía",
+          "status": "passed"
+        },
+        {
+          "name": "flujo orden → presupuesto → repuestos: estados y transiciones MS2 informa el 409 de una transición 3 → 4, reservada a la decisión de presupuesto sin alterar la orden",
+          "status": "passed"
+        },
+        {
+          "name": "flujo orden → presupuesto → repuestos: estados y transiciones MS2 informa el 409 de una transición 4 → 5, bloqueada hasta verificar repuestos sin alterar la orden",
+          "status": "passed"
+        },
+        {
+          "name": "flujo orden → presupuesto → repuestos: estados y transiciones MS2 informa el 409 de una transición 6 → 7, reservada a la entrega sin alterar la orden",
+          "status": "passed"
+        },
+        {
+          "name": "flujo orden → presupuesto → repuestos: estados y transiciones MS2 informa el 409 de una transición desde un estado terminal sin alterar la orden",
+          "status": "passed"
+        },
+        {
+          "name": "flujo orden → presupuesto → repuestos: estados y transiciones MS2 normaliza el error 403 del PATCH de estado",
+          "status": "passed"
+        },
+        {
+          "name": "flujo orden → presupuesto → repuestos: estados y transiciones MS2 normaliza el error 404 del PATCH de estado",
+          "status": "passed"
+        },
+        {
+          "name": "flujo orden → presupuesto → repuestos: estados y transiciones MS2 normaliza el error 422 del PATCH de estado",
+          "status": "passed"
+        },
+        {
+          "name": "flujo orden → presupuesto → repuestos: estados y transiciones MS2 normaliza el error 500 del PATCH de estado",
+          "status": "passed"
+        },
+        {
+          "name": "flujo orden → presupuesto → repuestos: estados y transiciones MS2 rechaza una respuesta del PATCH que no cumple OrdenRespuesta",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "file": "__tests__/order-functional.test.tsx",
+      "status": "passed",
+      "tests": [
+        {
+          "name": "caso de uso: consultar una orden de trabajo el rol cliente inicia sesión, consulta y actualiza una orden, vuelve al panel y cierra la sesión",
+          "status": "passed"
+        },
+        {
+          "name": "caso de uso: consultar una orden de trabajo el rol mecanico inicia sesión, consulta y actualiza una orden, vuelve al panel y cierra la sesión",
+          "status": "passed"
+        },
+        {
+          "name": "caso de uso: consultar una orden de trabajo el rol administrador inicia sesión, consulta y actualiza una orden, vuelve al panel y cierra la sesión",
+          "status": "passed"
+        },
+        {
+          "name": "caso de uso: consultar una orden de trabajo el cliente recupera la orden reintentando tras agotarse los reintentos automáticos",
+          "status": "passed"
+        },
+        {
+          "name": "caso de uso: decidir el presupuesto de una orden el cliente aprueba el presupuesto tras confirmar y la orden refleja la decisión",
+          "status": "passed"
+        },
+        {
+          "name": "caso de uso: decidir el presupuesto de una orden el rechazo exige motivo, advierte la cancelación y puede deshacerse antes de confirmar",
+          "status": "passed"
+        },
+        {
+          "name": "caso de uso: decidir el presupuesto de una orden un error del MS3 no se reintenta automáticamente y el cliente puede volver a intentarlo",
+          "status": "passed"
+        },
+        {
+          "name": "caso de uso: decidir el presupuesto de una orden una aplicación pendiente se reintenta sin duplicar la decisión",
+          "status": "passed"
+        },
+        {
+          "name": "caso de uso: decidir el presupuesto de una orden una decisión registrada no puede volver a enviarse",
+          "status": "passed"
+        },
+        {
+          "name": "caso de uso: decidir el presupuesto de una orden una doble pulsación de confirmar con la decisión en curso envía una sola decisión",
+          "status": "passed"
+        },
+        {
+          "name": "caso de uso: decidir el presupuesto de una orden una doble pulsación de reintentar la aplicación envía un solo reintento",
+          "status": "passed"
+        },
+        {
+          "name": "caso de uso: decidir el presupuesto de una orden el presupuesto se recupera con el reintento manual tras agotarse los reintentos automáticos",
+          "status": "passed"
+        },
+        {
+          "name": "caso de uso: consultar vehículos, repuestos y proveedores el administrador recorre vehículos, repuestos y proveedores desde su panel y cierra la sesión",
+          "status": "passed"
+        },
+        {
+          "name": "caso de uso: consultar vehículos, repuestos y proveedores el rol cliente consulta sus vehículos desde el panel",
+          "status": "passed"
+        },
+        {
+          "name": "caso de uso: consultar vehículos, repuestos y proveedores el rol mecanico consulta sus vehículos desde el panel",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "file": "__tests__/views-accessibility.test.tsx",
+      "status": "passed",
+      "tests": [
+        {
+          "name": "StatusPill se anuncia como texto usando su etiqueta visible",
+          "status": "passed"
+        },
+        {
+          "name": "StatusPill permite describir el estado con una etiqueta explícita",
+          "status": "passed"
+        },
+        {
+          "name": "vista de vehículo y orden del cliente expone el título principal y los títulos de tarjeta como encabezados",
+          "status": "passed"
+        },
+        {
+          "name": "vista de vehículo y orden del cliente describe el estado del vehículo y del presupuesto sin depender del color",
+          "status": "passed"
+        },
+        {
+          "name": "vista de vehículo y orden del cliente comunica el estado de cada etapa del seguimiento como texto",
+          "status": "passed"
+        },
+        {
+          "name": "vista de vehículo y orden del cliente agrupa los datos del vehículo y de la orden en una sola etiqueta",
+          "status": "passed"
+        },
+        {
+          "name": "vista de vehículo y orden del cliente oculta el icono decorativo de evidencias a los lectores de pantalla",
+          "status": "passed"
+        },
+        {
+          "name": "vista de vehículo y orden del cliente mantiene el cierre de sesión como control accesible y enfocable",
+          "status": "passed"
+        },
+        {
+          "name": "vista de órdenes del mecánico expone los títulos de la vista como encabezados",
+          "status": "passed"
+        },
+        {
+          "name": "vista de órdenes del mecánico describe el estado de la orden y de sus etapas sin depender del color",
+          "status": "passed"
+        },
+        {
+          "name": "vista de órdenes del mecánico agrupa cada orden del listado con su vehículo y estado",
+          "status": "passed"
+        },
+        {
+          "name": "vista de órdenes del mecánico agrupa las métricas y los detalles de la orden",
+          "status": "passed"
+        },
+        {
+          "name": "vista de órdenes del mecánico no anuncia como botones las tarjetas de acción que aún no tienen acción asociada",
+          "status": "passed"
+        },
+        {
+          "name": "vista de vehículos y órdenes del administrador expone los títulos de la vista como encabezados",
+          "status": "passed"
+        },
+        {
+          "name": "vista de vehículos y órdenes del administrador agrupa cada orden con su patente y estado",
+          "status": "passed"
+        },
+        {
+          "name": "vista de vehículos y órdenes del administrador agrupa el resumen por estado, los mecánicos y las aprobaciones pendientes",
+          "status": "passed"
+        }
+      ]
+    }
+  ]
+}

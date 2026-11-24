@@ -18,6 +18,8 @@ module.exports = {
     '**/__tests__/http-500-client-states.test.tsx',
     // SCRUM-163: cifras hardcodeadas en entorno real.
     '**/__tests__/hardcoded-figures-detection.test.tsx',
+    // SCRUM-225: cifras del portal Cliente derivadas de su fuente.
+    '**/__tests__/cliente-portal-figures.test.tsx',
     // Integración con MS3: presupuestos, repuestos y proveedores.
     '**/__tests__/budget-*.test.ts?(x)',
     '**/__tests__/parts-*.test.ts?(x)',

@@ -1,0 +1,47 @@
+{
+  "startTime": 1795519976130,
+  "numTotalTestSuites": 1,
+  "numPassedTestSuites": 1,
+  "numFailedTestSuites": 0,
+  "numPassedTests": 7,
+  "numFailedTests": 0,
+  "numPendingTests": 0,
+  "success": true,
+  "environment": "Jest; dobles controlados; sin backend ni dispositivo",
+  "suites": [
+    {
+      "file": "__tests__/cliente-portal-figures.test.tsx",
+      "status": "passed",
+      "tests": [
+        {
+          "name": "Portal Cliente en modo demostración existe una fuente demo para la orden mostrada",
+          "status": "passed"
+        },
+        {
+          "name": "Portal Cliente en modo demostración se declara explícitamente como demostración",
+          "status": "passed"
+        },
+        {
+          "name": "Portal Cliente en modo demostración el presupuesto coincide con la fuente demo y con el detalle que abre",
+          "status": "passed"
+        },
+        {
+          "name": "Portal Cliente en modo demostración el conteo corresponde a los ítems del presupuesto demo",
+          "status": "passed"
+        },
+        {
+          "name": "Portal Cliente en modo demostración sin fuente demo de evidencias no inventa una cantidad",
+          "status": "passed"
+        },
+        {
+          "name": "Portal Cliente en modo demostración si falta el presupuesto demo muestra «No disponible» y ningún monto",
+          "status": "passed"
+        },
+        {
+          "name": "Portal Cliente real no muestra cifras ni consulta la fuente demo",
+          "status": "passed"
+        }
+      ]
+    }
+  ]
+}
