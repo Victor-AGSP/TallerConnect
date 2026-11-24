@@ -1,0 +1,21 @@
+Validación global final — 2026-11-24T11:49:17Z
+HEAD: 4e773ac94255ac2a5199bb313f847f1f97b98ed3
+Entorno: Linux 7.3.5-arch1-1, Node v26.13.1, Expo CLI 58.1.19; CI=1 EXPO_NO_TELEMETRY=1
+
+jest exit=0 seconds=20
+regression exit=0 seconds=29
+tsc exit=0 seconds=3
+lint exit=0 seconds=2
+expo-doctor exit=1 seconds=2
+export-android exit=0 seconds=9
+export-web exit=0 seconds=2
+docs exit=0 seconds=0
+
+jest: Tests:       1441 passed, 1441 total
+      Test Suites: 90 passed, 90 total
+regresión: Tests:       987 passed, 987 total / Test Suites: 53 passed, 53 total
+lint: ✖ 46 problems (0 errors, 46 warnings)
+expo-doctor: 19/20 checks passed. 1 checks failed. Possible issues detected: 12 packages out of date.
+export android: Android Bundled 8058ms node_modules/expo-router/entry.js (1570 modules)
+export web: 49 rutas estáticas HTML; exit 0 (bundle desde caché de Metro)
+docs: PASS: links, required case fields and evidence counts
