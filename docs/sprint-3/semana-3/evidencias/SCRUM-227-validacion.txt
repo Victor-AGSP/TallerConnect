@@ -1,0 +1,29 @@
+SCRUM-227 — validación focalizada 2026-11-24T11:39:39Z, HEAD 3b8bfc9
+
+Línea base (antes de semana 3, HEAD 24bfbbe): jest 83 suites / 1321 PASS / 0 FAIL; tsc exit 0; lint 0 errores / 46 advertencias
+
+$ npm run test:regression
+Test Suites: 51 passed, 51 total
+Tests:       969 passed, 969 total
+exit 0
+
+$ npx jest env-config environment services- http-client interceptors retry-policy use-data-query protected-routes services-session-navigation role-access mapper schema cliente admin mecanico vehicle
+Test Suites: 33 passed, 33 total
+Tests:       579 passed, 579 total
+exit 0
+
+$ npx tsc --noEmit
+exit 0
+
+$ npm run lint
+  320:15  warning  Unused eslint-disable directive (no problems were reported from '@typescript-eslint/no-var-requires')
+✖ 46 problems (0 errors, 46 warnings)
+exit 0; advertencias idénticas a la línea base (diff vacío)
+
+$ git diff --stat 24bfbbe -- src
+ src/app/(admin)/administrador.tsx | 19 +++++++------
+ src/app/(cliente)/cliente.tsx     | 60 ++++++++++++++++++++++++++++++---------
+ src/mappers/order.mapper.ts       |  6 +++-
+ src/mappers/vehicle.mapper.ts     |  5 +++-
+ src/services/orders.service.ts    |  6 +++-
+ 5 files changed, 71 insertions(+), 25 deletions(-)
