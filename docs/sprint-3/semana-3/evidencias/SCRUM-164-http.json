@@ -1,0 +1,246 @@
+{
+  "kind": "REAL_ANONYMOUS_HTTP",
+  "ticket": "SCRUM-164",
+  "method": "GET",
+  "authorization_sent": false,
+  "cookies_sent": false,
+  "mutations": 0,
+  "date_utc": "2026-11-24T11:35:42+00:00",
+  "checks": [
+    {
+      "id": "VERCEL-API",
+      "base": "https://tallerconect.vercel.app",
+      "path": "/api/auth/me",
+      "expected": 401,
+      "http": 404,
+      "result": "FAIL",
+      "curl_exit_code": 0,
+      "seconds": 0.462,
+      "body_sha256": "cfccccfa0281556289a23d80c81e267c6a63aea8ca132ecb70aa9eec22e73372",
+      "response_headers_allowlist": {
+        "content-type": "text/plain; charset=utf-8",
+        "date": "Tue, 24 Nov 2026 11:35:37 GMT",
+        "server": "Vercel",
+        "x-vercel-error": "DEPLOYMENT_NOT_FOUND"
+      },
+      "body_json": false
+    },
+    {
+      "id": "VERCEL-MS4-HEALTH",
+      "base": "https://tallerconect.vercel.app",
+      "path": "/ms4/health",
+      "expected": 200,
+      "http": 404,
+      "result": "FAIL",
+      "curl_exit_code": 0,
+      "seconds": 0.41,
+      "body_sha256": "0d53ff3c78a440ae505809bc6d9c355656628d69427bb91ebce7d1e70c107504",
+      "response_headers_allowlist": {
+        "content-type": "text/plain; charset=utf-8",
+        "date": "Tue, 24 Nov 2026 11:35:37 GMT",
+        "server": "Vercel",
+        "x-vercel-error": "DEPLOYMENT_NOT_FOUND"
+      },
+      "body_json": false
+    },
+    {
+      "id": "VERCEL-MS4-STORAGE",
+      "base": "https://tallerconect.vercel.app",
+      "path": "/ms4/health/storage",
+      "expected": 200,
+      "http": 404,
+      "result": "FAIL",
+      "curl_exit_code": 0,
+      "seconds": 0.307,
+      "body_sha256": "dd55b6452f4e021ba12fae0cbec08dfe6b25407b19e32eb4d3b5183a2a487cf9",
+      "response_headers_allowlist": {
+        "content-type": "text/plain; charset=utf-8",
+        "date": "Tue, 24 Nov 2026 11:35:38 GMT",
+        "server": "Vercel",
+        "x-vercel-error": "DEPLOYMENT_NOT_FOUND"
+      },
+      "body_json": false
+    },
+    {
+      "id": "UCT-GATEWAY-HEALTH",
+      "base": "https://api-tallerconnect.inf.uct.cl",
+      "path": "/api/health",
+      "expected": 200,
+      "http": 200,
+      "result": "PASS",
+      "curl_exit_code": 0,
+      "seconds": 0.522,
+      "body_sha256": "fd17adba51bd3c5e158d54ddcb25150f5263ca6f327a422b74225560b37c79ec",
+      "response_headers_allowlist": {
+        "date": "Tue, 24 Nov 2026 11:35:38 GMT",
+        "content-type": "application/json"
+      },
+      "body_allowlist": {
+        "status": "ok",
+        "servicio": "gateway"
+      }
+    },
+    {
+      "id": "UCT-SERVICES-HEALTH",
+      "base": "https://api-tallerconnect.inf.uct.cl",
+      "path": "/api/health/servicios",
+      "expected": 200,
+      "http": 200,
+      "result": "PASS",
+      "curl_exit_code": 0,
+      "seconds": 0.301,
+      "body_sha256": "c981f27ea6f9bc8e58b4beee0cca912281a918d2312e1c999094c57c92a460de",
+      "response_headers_allowlist": {
+        "date": "Tue, 24 Nov 2026 11:35:38 GMT",
+        "content-type": "application/json"
+      },
+      "body_allowlist": {
+        "status": "ok",
+        "gateway": "ok",
+        "servicios": {
+          "ms1_auth": {
+            "estado": "ok",
+            "latencia_ms": 73
+          },
+          "ms2_taller": {
+            "estado": "ok",
+            "latencia_ms": 28
+          },
+          "ms3_presupuestos": {
+            "estado": "ok",
+            "latencia_ms": 27
+          },
+          "ms4_evidencias": {
+            "estado": "ok",
+            "latencia_ms": 30
+          }
+        }
+      }
+    },
+    {
+      "id": "UCT-MS4-HEALTH",
+      "base": "https://api-tallerconnect.inf.uct.cl",
+      "path": "/api/health/servicios/ms4_evidencias",
+      "expected": 200,
+      "http": 200,
+      "result": "PASS",
+      "curl_exit_code": 0,
+      "seconds": 1.447,
+      "body_sha256": "7039d1637f0af76fbed93f105400971467350182f859310709e8d97b2e2841cd",
+      "response_headers_allowlist": {
+        "date": "Tue, 24 Nov 2026 11:35:40 GMT",
+        "content-type": "application/json"
+      },
+      "body_allowlist": {
+        "servicio": "ms4_evidencias",
+        "estado": "ok"
+      }
+    },
+    {
+      "id": "UCT-MS1-HEALTH",
+      "base": "https://api-tallerconnect.inf.uct.cl",
+      "path": "/api/health/servicios/ms1_auth",
+      "expected": 200,
+      "http": 200,
+      "result": "PASS",
+      "curl_exit_code": 0,
+      "seconds": 0.906,
+      "body_sha256": "a411987954f08c17463e2d5ead219f6bea8b0c0f340baa5e468940a1ef2b72b4",
+      "response_headers_allowlist": {
+        "date": "Tue, 24 Nov 2026 11:35:40 GMT",
+        "content-type": "application/json"
+      },
+      "body_allowlist": {
+        "servicio": "ms1_auth",
+        "estado": "ok"
+      }
+    },
+    {
+      "id": "UCT-OPENAPI",
+      "base": "https://api-tallerconnect.inf.uct.cl",
+      "path": "/openapi.json",
+      "expected": 200,
+      "http": 200,
+      "result": "PASS",
+      "curl_exit_code": 0,
+      "seconds": 0.522,
+      "body_sha256": "9b8f363b74cd5d15272618c5b7e38adf34a74eff6b91e1d4358cd1c6a830c4cb",
+      "response_headers_allowlist": {
+        "date": "Tue, 24 Nov 2026 11:35:41 GMT",
+        "content-type": "application/json"
+      },
+      "openapi_title": "SGTM — API Gateway",
+      "openapi_paths": 75
+    },
+    {
+      "id": "UCT-EVIDENCE-LIST-ANON",
+      "base": "https://api-tallerconnect.inf.uct.cl",
+      "path": "/api/evidencias?orden_id=1",
+      "expected": 401,
+      "http": 401,
+      "result": "PASS",
+      "curl_exit_code": 0,
+      "seconds": 0.201,
+      "body_sha256": "a485c68dc7f4de3302f5c3950ccd447045d2749b8c33aa39acd76862dff6c9bf",
+      "response_headers_allowlist": {
+        "date": "Tue, 24 Nov 2026 11:35:42 GMT",
+        "content-type": "application/json"
+      },
+      "body_allowlist": {
+        "detail": "No autenticado"
+      }
+    },
+    {
+      "id": "UCT-AUTH-ME-ANON",
+      "base": "https://api-tallerconnect.inf.uct.cl",
+      "path": "/api/auth/me",
+      "expected": 401,
+      "http": 401,
+      "result": "PASS",
+      "curl_exit_code": 0,
+      "seconds": 0.113,
+      "body_sha256": "a485c68dc7f4de3302f5c3950ccd447045d2749b8c33aa39acd76862dff6c9bf",
+      "response_headers_allowlist": {
+        "date": "Tue, 24 Nov 2026 11:35:42 GMT",
+        "content-type": "application/json"
+      },
+      "body_allowlist": {
+        "detail": "No autenticado"
+      }
+    },
+    {
+      "id": "PROXY-HEALTHZ",
+      "base": "https://frontend-movil.inf.uct.cl",
+      "path": "/healthz",
+      "expected": 200,
+      "http": 200,
+      "result": "PASS",
+      "curl_exit_code": 0,
+      "seconds": 0.138,
+      "body_sha256": "dc51b8c96c2d745df3bd5590d990230a482fd247123599548e0632fdbf97fc22",
+      "response_headers_allowlist": {
+        "date": "Tue, 24 Nov 2026 11:35:42 GMT",
+        "content-type": "application/octet-stream"
+      },
+      "body_json": false
+    },
+    {
+      "id": "PROXY-EVIDENCE-LIST-ANON",
+      "base": "https://frontend-movil.inf.uct.cl",
+      "path": "/api/evidencias?orden_id=1",
+      "expected": 401,
+      "http": 401,
+      "result": "PASS",
+      "curl_exit_code": 0,
+      "seconds": 0.335,
+      "body_sha256": "a485c68dc7f4de3302f5c3950ccd447045d2749b8c33aa39acd76862dff6c9bf",
+      "response_headers_allowlist": {
+        "date": "Tue, 24 Nov 2026 11:35:42 GMT",
+        "content-type": "application/json"
+      },
+      "body_allowlist": {
+        "detail": "No autenticado"
+      }
+    }
+  ]
+}

@@ -1,0 +1,186 @@
+{
+  "source": {
+    "url": "https://api-tallerconnect.inf.uct.cl/openapi.json",
+    "title": "SGTM — API Gateway",
+    "sha256": "9b8f363b74cd5d15272618c5b7e38adf34a74eff6b91e1d4358cd1c6a830c4cb",
+    "retrieved_utc": "2026-11-24",
+    "note": "Extracto de solo lectura: rutas GET de evidencias (MS4) y sus esquemas de respuesta."
+  },
+  "paths": {
+    "GET /api/evidencias": {
+      "parameters": [
+        {
+          "name": "orden_id",
+          "in": "query",
+          "required": true,
+          "schema": {
+            "type": "integer",
+            "minimum": 1
+          }
+        },
+        {
+          "name": "limite",
+          "in": "query",
+          "required": false,
+          "schema": {
+            "type": "integer",
+            "default": 50,
+            "minimum": 1,
+            "maximum": 100
+          }
+        },
+        {
+          "name": "desde",
+          "in": "query",
+          "required": false,
+          "schema": {
+            "type": "integer",
+            "default": 0,
+            "minimum": 0
+          }
+        }
+      ],
+      "responses": [
+        "200",
+        "401",
+        "404",
+        "422",
+        "500",
+        "502",
+        "503",
+        "504"
+      ],
+      "response200": {
+        "type": "array",
+        "schema": "EvidenciaRespuesta"
+      }
+    },
+    "GET /api/evidencias/{evidencia_id}": {
+      "parameters": [
+        {
+          "name": "evidencia_id",
+          "in": "path",
+          "required": true,
+          "schema": {
+            "type": "string"
+          }
+        }
+      ],
+      "responses": [
+        "200",
+        "401",
+        "404",
+        "422",
+        "500",
+        "502",
+        "503",
+        "504"
+      ],
+      "response200": {
+        "type": "object",
+        "schema": "EvidenciaRespuesta"
+      }
+    },
+    "GET /api/evidencias/{evidencia_id}/descarga": {
+      "parameters": [
+        {
+          "name": "evidencia_id",
+          "in": "path",
+          "required": true,
+          "schema": {
+            "type": "string"
+          }
+        }
+      ],
+      "responses": [
+        "200",
+        "401",
+        "404",
+        "422",
+        "500",
+        "502",
+        "503",
+        "504"
+      ],
+      "response200": {
+        "type": "object",
+        "schema": "UrlDescargaRespuesta"
+      }
+    }
+  },
+  "schemas": {
+    "EvidenciaRespuesta": {
+      "required": [
+        "evidencia_id",
+        "orden_id",
+        "presupuesto_id",
+        "contexto",
+        "tipo_archivo",
+        "visible_cliente",
+        "estado",
+        "nombre_original",
+        "content_type",
+        "tamano_bytes",
+        "creada_en"
+      ],
+      "properties": {
+        "evidencia_id": {
+          "format": "uuid",
+          "type": "string"
+        },
+        "orden_id": {
+          "type": "integer"
+        },
+        "presupuesto_id": {
+          "anyOf": [
+            {
+              "type": "integer"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "contexto": {
+          "type": "string"
+        },
+        "tipo_archivo": {
+          "type": "string"
+        },
+        "visible_cliente": {
+          "type": "boolean"
+        },
+        "estado": {
+          "type": "string"
+        },
+        "nombre_original": {
+          "type": "string"
+        },
+        "content_type": {
+          "type": "string"
+        },
+        "tamano_bytes": {
+          "type": "integer"
+        },
+        "creada_en": {
+          "format": "date-time",
+          "type": "string"
+        }
+      }
+    },
+    "UrlDescargaRespuesta": {
+      "required": [
+        "url",
+        "expira_en"
+      ],
+      "properties": {
+        "url": {
+          "type": "string"
+        },
+        "expira_en": {
+          "type": "integer"
+        }
+      }
+    }
+  }
+}

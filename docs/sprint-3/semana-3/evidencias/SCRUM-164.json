@@ -1,0 +1,127 @@
+{
+  "startTime": 1795520200568,
+  "numTotalTestSuites": 1,
+  "numPassedTestSuites": 1,
+  "numFailedTestSuites": 0,
+  "numPassedTests": 27,
+  "numFailedTests": 0,
+  "numPendingTests": 0,
+  "success": true,
+  "environment": "Jest; dobles controlados; sin backend ni dispositivo",
+  "suites": [
+    {
+      "file": "__tests__/evidence-ms4-revalidation.test.tsx",
+      "status": "passed",
+      "tests": [
+        {
+          "name": "Contrato vigente de la Gateway (MS4) el extracto proviene de la Gateway vigente",
+          "status": "passed"
+        },
+        {
+          "name": "Contrato vigente de la Gateway (MS4) el payload de la app tiene exactamente los campos requeridos de EvidenciaRespuesta",
+          "status": "passed"
+        },
+        {
+          "name": "Contrato vigente de la Gateway (MS4) el DTO rechaza una evidencia sin «evidencia_id»",
+          "status": "passed"
+        },
+        {
+          "name": "Contrato vigente de la Gateway (MS4) el DTO rechaza una evidencia sin «orden_id»",
+          "status": "passed"
+        },
+        {
+          "name": "Contrato vigente de la Gateway (MS4) el DTO rechaza una evidencia sin «presupuesto_id»",
+          "status": "passed"
+        },
+        {
+          "name": "Contrato vigente de la Gateway (MS4) el DTO rechaza una evidencia sin «contexto»",
+          "status": "passed"
+        },
+        {
+          "name": "Contrato vigente de la Gateway (MS4) el DTO rechaza una evidencia sin «tipo_archivo»",
+          "status": "passed"
+        },
+        {
+          "name": "Contrato vigente de la Gateway (MS4) el DTO rechaza una evidencia sin «visible_cliente»",
+          "status": "passed"
+        },
+        {
+          "name": "Contrato vigente de la Gateway (MS4) el DTO rechaza una evidencia sin «estado»",
+          "status": "passed"
+        },
+        {
+          "name": "Contrato vigente de la Gateway (MS4) el DTO rechaza una evidencia sin «nombre_original»",
+          "status": "passed"
+        },
+        {
+          "name": "Contrato vigente de la Gateway (MS4) el DTO rechaza una evidencia sin «content_type»",
+          "status": "passed"
+        },
+        {
+          "name": "Contrato vigente de la Gateway (MS4) el DTO rechaza una evidencia sin «tamano_bytes»",
+          "status": "passed"
+        },
+        {
+          "name": "Contrato vigente de la Gateway (MS4) el DTO rechaza una evidencia sin «creada_en»",
+          "status": "passed"
+        },
+        {
+          "name": "Contrato vigente de la Gateway (MS4) el DTO de descarga exige los campos de UrlDescargaRespuesta",
+          "status": "passed"
+        },
+        {
+          "name": "Contrato vigente de la Gateway (MS4) el listado envía orden_id entero, el único parámetro obligatorio",
+          "status": "passed"
+        },
+        {
+          "name": "Códigos documentados del listado el contrato documenta 401, 404, 422 y la familia 5xx",
+          "status": "passed"
+        },
+        {
+          "name": "Códigos documentados del listado HTTP 401 produce un error de dominio con mensaje y resultado",
+          "status": "passed"
+        },
+        {
+          "name": "Códigos documentados del listado HTTP 404 produce un error de dominio con mensaje y resultado",
+          "status": "passed"
+        },
+        {
+          "name": "Códigos documentados del listado HTTP 422 produce un error de dominio con mensaje y resultado",
+          "status": "passed"
+        },
+        {
+          "name": "Códigos documentados del listado HTTP 500 produce un error de dominio con mensaje y resultado",
+          "status": "passed"
+        },
+        {
+          "name": "Códigos documentados del listado HTTP 502 produce un error de dominio con mensaje y resultado",
+          "status": "passed"
+        },
+        {
+          "name": "Códigos documentados del listado HTTP 503 produce un error de dominio con mensaje y resultado",
+          "status": "passed"
+        },
+        {
+          "name": "Códigos documentados del listado HTTP 504 produce un error de dominio con mensaje y resultado",
+          "status": "passed"
+        },
+        {
+          "name": "Recuperación tras errores transitorios HTTP 502: error con reintento y luego la evidencia visible",
+          "status": "passed"
+        },
+        {
+          "name": "Recuperación tras errores transitorios HTTP 503: error con reintento y luego la evidencia visible",
+          "status": "passed"
+        },
+        {
+          "name": "Recuperación tras errores transitorios HTTP 504: error con reintento y luego la evidencia visible",
+          "status": "passed"
+        },
+        {
+          "name": "Recuperación tras errores transitorios timeout: error con reintento y luego la evidencia visible",
+          "status": "passed"
+        }
+      ]
+    }
+  ]
+}

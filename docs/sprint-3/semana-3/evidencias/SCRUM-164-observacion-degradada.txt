@@ -1,0 +1,13 @@
+SCRUM-164 — observación puntual previa al registro consolidado (SCRUM-164-http.json)
+
+Fecha: 2026-11-24, aprox. 11:35 UTC (antes del registro consolidado del mismo día).
+Método: GET anónimo con curl, sin Authorization ni cookies. Salida copiada textualmente de la consola;
+no se archivó en JSON en ese momento.
+
+GET https://api-tallerconnect.inf.uct.cl/api/health/servicios
+HTTP 503
+{"status":"degradado","gateway":"ok","servicios":{"ms1_auth":{"estado":"tiempo_agotado"},"ms2_taller":{"estado":"ok","latencia_ms":25},"ms3_presupuestos":{"estado":"ok","latencia_ms":26},"ms4_evidencias":{"estado":"ok","latencia_ms":127}}}
+
+Minutos después, en SCRUM-164-http.json, la misma ruta respondió 200 con ms1_auth "ok".
+Interpretación: indisponibilidad transitoria de MS1 (autenticación) observada una vez. No se conoce la causa
+ni su frecuencia; no se atribuye a MS4 ni al frontend.

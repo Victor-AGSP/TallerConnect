@@ -1,0 +1,1055 @@
+{
+  "startTime": 1795520211806,
+  "numTotalTestSuites": 11,
+  "numPassedTestSuites": 11,
+  "numFailedTestSuites": 0,
+  "numPassedTests": 244,
+  "numFailedTests": 0,
+  "numPendingTests": 0,
+  "success": true,
+  "environment": "Jest; dobles controlados; sin backend ni dispositivo",
+  "suites": [
+    {
+      "file": "__tests__/evidence-capture.test.tsx",
+      "status": "passed",
+      "tests": [
+        {
+          "name": "Captura y selección de fotografías en la orden del mecánico muestra la sección de evidencia identificando la orden",
+          "status": "passed"
+        },
+        {
+          "name": "Captura y selección de fotografías en la orden del mecánico captura una fotografía con la cámara tras conceder el permiso y la previsualiza",
+          "status": "passed"
+        },
+        {
+          "name": "Captura y selección de fotografías en la orden del mecánico selecciona desde la galería sin pedir permisos de biblioteca",
+          "status": "passed"
+        },
+        {
+          "name": "Captura y selección de fotografías en la orden del mecánico una cancelación no muestra errores ni vista previa",
+          "status": "passed"
+        },
+        {
+          "name": "Captura y selección de fotografías en la orden del mecánico reemplaza la fotografía y la cancelación posterior conserva la anterior",
+          "status": "passed"
+        },
+        {
+          "name": "Captura y selección de fotografías en la orden del mecánico un archivo inválido se informa y conserva la selección válida anterior",
+          "status": "passed"
+        },
+        {
+          "name": "Captura y selección de fotografías en la orden del mecánico quita la fotografía antes de enviarla",
+          "status": "passed"
+        },
+        {
+          "name": "Captura y selección de fotografías en la orden del mecánico informa un error nativo de la cámara sin bloquear la galería",
+          "status": "passed"
+        },
+        {
+          "name": "Captura y selección de fotografías en la orden del mecánico sin identificador de orden no ofrece capturar evidencia",
+          "status": "passed"
+        },
+        {
+          "name": "Captura y selección de fotografías en la orden del mecánico no muestra la sección si la orden cargada no es la de la ruta",
+          "status": "passed"
+        },
+        {
+          "name": "Captura y selección de fotografías en la orden del mecánico envía la fotografía seleccionada a la orden de la ruta con el contexto elegido",
+          "status": "passed"
+        },
+        {
+          "name": "Captura y selección de fotografías en la orden del mecánico una doble pulsación de envío produce una sola solicitud",
+          "status": "passed"
+        },
+        {
+          "name": "Captura y selección de fotografías en la orden del mecánico una fotografía elegida en una orden no se ofrece ni se envía en otra",
+          "status": "passed"
+        },
+        {
+          "name": "Captura y selección de fotografías en la orden del mecánico descarta el resultado del selector que llega después de cambiar de orden",
+          "status": "passed"
+        },
+        {
+          "name": "Captura y selección de fotografías en la orden del mecánico no abre dos selectores a la vez",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "file": "__tests__/evidence-file-validation.test.ts",
+      "status": "passed",
+      "tests": [
+        {
+          "name": "validateEvidenceFile acepta una fotografía JPG válida y conserva solo el nombre base",
+          "status": "passed"
+        },
+        {
+          "name": "validateEvidenceFile acepta image/png",
+          "status": "passed"
+        },
+        {
+          "name": "validateEvidenceFile acepta image/webp",
+          "status": "passed"
+        },
+        {
+          "name": "validateEvidenceFile acepta image/jpg",
+          "status": "passed"
+        },
+        {
+          "name": "validateEvidenceFile rechaza el MIME no permitido video/mp4",
+          "status": "passed"
+        },
+        {
+          "name": "validateEvidenceFile rechaza el MIME no permitido application/pdf",
+          "status": "passed"
+        },
+        {
+          "name": "validateEvidenceFile rechaza el MIME no permitido application/x-msdownload",
+          "status": "passed"
+        },
+        {
+          "name": "validateEvidenceFile rechaza el MIME no permitido image/gif",
+          "status": "passed"
+        },
+        {
+          "name": "validateEvidenceFile rechaza el MIME no permitido image/heic",
+          "status": "passed"
+        },
+        {
+          "name": "validateEvidenceFile rechaza un video aunque declare un MIME de imagen",
+          "status": "passed"
+        },
+        {
+          "name": "validateEvidenceFile rechaza una extensión engañosa que no coincide con el MIME",
+          "status": "passed"
+        },
+        {
+          "name": "validateEvidenceFile no confía en la extensión: un .jpg con MIME ejecutable se rechaza",
+          "status": "passed"
+        },
+        {
+          "name": "validateEvidenceFile rechaza un archivo de tamaño cero",
+          "status": "passed"
+        },
+        {
+          "name": "validateEvidenceFile acepta exactamente el tamaño máximo y rechaza un byte más",
+          "status": "passed"
+        },
+        {
+          "name": "validateEvidenceFile rechaza metadatos ausentes o inválidos (sin MIME)",
+          "status": "passed"
+        },
+        {
+          "name": "validateEvidenceFile rechaza metadatos ausentes o inválidos (sin tamaño)",
+          "status": "passed"
+        },
+        {
+          "name": "validateEvidenceFile rechaza metadatos ausentes o inválidos (tamaño negativo)",
+          "status": "passed"
+        },
+        {
+          "name": "validateEvidenceFile rechaza metadatos ausentes o inválidos (tamaño no numérico)",
+          "status": "passed"
+        },
+        {
+          "name": "validateEvidenceFile rechaza una URI inválida (vacía)",
+          "status": "passed"
+        },
+        {
+          "name": "validateEvidenceFile rechaza una URI inválida (remota)",
+          "status": "passed"
+        },
+        {
+          "name": "validateEvidenceFile rechaza una URI inválida (javascript)",
+          "status": "passed"
+        },
+        {
+          "name": "validateEvidenceFile rechaza una URI inválida (ruta relativa)",
+          "status": "passed"
+        },
+        {
+          "name": "validateEvidenceFile acepta las URI locales de Android, iOS y web",
+          "status": "passed"
+        },
+        {
+          "name": "validateEvidenceFile genera un nombre seguro cuando el selector no informa uno",
+          "status": "passed"
+        },
+        {
+          "name": "validateEvidenceFile rechaza la ausencia de archivo",
+          "status": "passed"
+        },
+        {
+          "name": "detectImageSignature identifica JPG, PNG y WEBP por su firma",
+          "status": "passed"
+        },
+        {
+          "name": "detectImageSignature no reconoce ejecutables, cabeceras truncadas ni vacías",
+          "status": "passed"
+        },
+        {
+          "name": "prepareEvidenceFile acepta un archivo cuya firma coincide con el MIME",
+          "status": "passed"
+        },
+        {
+          "name": "prepareEvidenceFile rechaza un ejecutable renombrado como .jpg con MIME de imagen",
+          "status": "passed"
+        },
+        {
+          "name": "prepareEvidenceFile rechaza un PNG declarado como JPG",
+          "status": "passed"
+        },
+        {
+          "name": "prepareEvidenceFile trata un archivo sin contenido legible como vacío",
+          "status": "passed"
+        },
+        {
+          "name": "prepareEvidenceFile trata un archivo inexistente o ilegible como error recuperable",
+          "status": "passed"
+        },
+        {
+          "name": "prepareEvidenceFile no lee el archivo si los metadatos ya son inválidos",
+          "status": "passed"
+        },
+        {
+          "name": "prepareEvidenceFile sin lector disponible (Android/iOS) se apoya en los metadatos",
+          "status": "passed"
+        },
+        {
+          "name": "readEvidenceHeader lee los primeros bytes del File entregado en web",
+          "status": "passed"
+        },
+        {
+          "name": "readEvidenceHeader devuelve null en plataformas sin archivo legible",
+          "status": "passed"
+        },
+        {
+          "name": "selectionFromPickerResult trata la cancelación como selección vacía, no como error",
+          "status": "passed"
+        },
+        {
+          "name": "selectionFromPickerResult entrega la fotografía validada",
+          "status": "passed"
+        },
+        {
+          "name": "selectionFromPickerResult rechaza selecciones múltiples: el módulo admite una fotografía por envío",
+          "status": "passed"
+        },
+        {
+          "name": "selectionFromPickerResult informa el motivo de un archivo inválido",
+          "status": "passed"
+        },
+        {
+          "name": "política de tamaño usa 10 MiB por omisión y acepta solo enteros positivos configurados",
+          "status": "passed"
+        },
+        {
+          "name": "aislamiento de la red la validación nunca invoca al cliente HTTP",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "file": "__tests__/evidence-functional.test.tsx",
+      "status": "passed",
+      "tests": [
+        {
+          "name": "Flujo principal del mecánico login → orden → avance con foto → evidencia → consulta → otra orden → logout",
+          "status": "passed"
+        },
+        {
+          "name": "Flujos alternativos cámara rechazada: no la abre, ofrece la galería y el envío sigue funcionando",
+          "status": "passed"
+        },
+        {
+          "name": "Flujos alternativos galería cancelada: sin selección, sin errores y sin solicitudes",
+          "status": "passed"
+        },
+        {
+          "name": "Flujos alternativos imagen inválida: se rechaza antes de enviar",
+          "status": "passed"
+        },
+        {
+          "name": "Flujos alternativos archivo demasiado grande: se rechaza antes de enviar",
+          "status": "passed"
+        },
+        {
+          "name": "Flujos alternativos falta de conectividad: resultado incierto; el reintento encuentra la foto y no duplica",
+          "status": "passed"
+        },
+        {
+          "name": "Flujos alternativos timeout sin guardar: el reintento comprueba y reenvía una sola vez",
+          "status": "passed"
+        },
+        {
+          "name": "Flujos alternativos error de subida (503): reintento seguro sin consulta previa",
+          "status": "passed"
+        },
+        {
+          "name": "Flujos alternativos doble pulsación: una sola evidencia",
+          "status": "passed"
+        },
+        {
+          "name": "Flujos alternativos permiso de rol rechazado (403): informa sin cerrar la sesión ni subir la foto",
+          "status": "passed"
+        },
+        {
+          "name": "Flujos alternativos orden no asignada (404 de MS4): informa sin reintento",
+          "status": "passed"
+        },
+        {
+          "name": "Flujos alternativos orden inexistente: no muestra secciones ni consulta evidencias",
+          "status": "passed"
+        },
+        {
+          "name": "Flujos alternativos orden entregada: no ofrece fotografías",
+          "status": "passed"
+        },
+        {
+          "name": "Flujos alternativos cambio de orden durante el envío: la respuesta tardía no aparece en la nueva",
+          "status": "passed"
+        },
+        {
+          "name": "Flujos alternativos sesión expirada (401 al subir): cierra la sesión y vuelve al login",
+          "status": "passed"
+        },
+        {
+          "name": "Flujos alternativos error inesperado del backend al consultar evidencias: se informa y se recupera",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "file": "__tests__/evidence-mechanic-updates.test.tsx",
+      "status": "passed",
+      "tests": [
+        {
+          "name": "OrderLogService (bitácora MS2) registra una observación con solo tipo y descripción: sin actor, estado ni fecha",
+          "status": "passed"
+        },
+        {
+          "name": "OrderLogService (bitácora MS2) una descripción vacía no llega al servidor",
+          "status": "passed"
+        },
+        {
+          "name": "OrderLogService (bitácora MS2) un identificador de orden inválido no llega al servidor",
+          "status": "passed"
+        },
+        {
+          "name": "OrderLogService (bitácora MS2) traduce el 403 del contrato",
+          "status": "passed"
+        },
+        {
+          "name": "OrderLogService (bitácora MS2) traduce el 404 del contrato",
+          "status": "passed"
+        },
+        {
+          "name": "OrderLogService (bitácora MS2) traduce el 422 del contrato",
+          "status": "passed"
+        },
+        {
+          "name": "OrderLogService (bitácora MS2) rechaza una respuesta fuera del contrato o de otra orden",
+          "status": "passed"
+        },
+        {
+          "name": "OrderLogService (bitácora MS2) no reintenta automáticamente el registro (no es idempotente)",
+          "status": "passed"
+        },
+        {
+          "name": "OrderLogService (bitácora MS2) consulta la bitácora con repuestos y rechaza entradas de otra orden",
+          "status": "passed"
+        },
+        {
+          "name": "Avances del mecánico en la orden abrir la orden no consulta la bitácora hasta que se pide",
+          "status": "passed"
+        },
+        {
+          "name": "Avances del mecánico en la orden registra un avance sin fotografía con la confirmación del servidor",
+          "status": "passed"
+        },
+        {
+          "name": "Avances del mecánico en la orden registra el avance y luego la fotografía, en ese orden",
+          "status": "passed"
+        },
+        {
+          "name": "Avances del mecánico en la orden si la fotografía falla informa el éxito parcial y reintenta solo la carga",
+          "status": "passed"
+        },
+        {
+          "name": "Avances del mecánico en la orden tras un fallo de la fotografía se puede continuar sin ella",
+          "status": "passed"
+        },
+        {
+          "name": "Avances del mecánico en la orden si el avance falla no sube la fotografía y conserva el formulario",
+          "status": "passed"
+        },
+        {
+          "name": "Avances del mecánico en la orden informa una orden inexistente o no asignada (404)",
+          "status": "passed"
+        },
+        {
+          "name": "Avances del mecánico en la orden informa una respuesta inválida del servidor sin declarar éxito",
+          "status": "passed"
+        },
+        {
+          "name": "Avances del mecánico en la orden exige una descripción antes de enviar",
+          "status": "passed"
+        },
+        {
+          "name": "Avances del mecánico en la orden una doble pulsación registra un solo avance",
+          "status": "passed"
+        },
+        {
+          "name": "Avances del mecánico en la orden en una orden entregado no ofrece fotografías y deja que el servidor decida sobre el avance",
+          "status": "passed"
+        },
+        {
+          "name": "Avances del mecánico en la orden en una orden cancelado no ofrece fotografías y deja que el servidor decida sobre el avance",
+          "status": "passed"
+        },
+        {
+          "name": "Avances del mecánico en la orden un historial que falla puede reintentarse",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "file": "__tests__/evidence-ms4-revalidation.test.tsx",
+      "status": "passed",
+      "tests": [
+        {
+          "name": "Contrato vigente de la Gateway (MS4) el extracto proviene de la Gateway vigente",
+          "status": "passed"
+        },
+        {
+          "name": "Contrato vigente de la Gateway (MS4) el payload de la app tiene exactamente los campos requeridos de EvidenciaRespuesta",
+          "status": "passed"
+        },
+        {
+          "name": "Contrato vigente de la Gateway (MS4) el DTO rechaza una evidencia sin «evidencia_id»",
+          "status": "passed"
+        },
+        {
+          "name": "Contrato vigente de la Gateway (MS4) el DTO rechaza una evidencia sin «orden_id»",
+          "status": "passed"
+        },
+        {
+          "name": "Contrato vigente de la Gateway (MS4) el DTO rechaza una evidencia sin «presupuesto_id»",
+          "status": "passed"
+        },
+        {
+          "name": "Contrato vigente de la Gateway (MS4) el DTO rechaza una evidencia sin «contexto»",
+          "status": "passed"
+        },
+        {
+          "name": "Contrato vigente de la Gateway (MS4) el DTO rechaza una evidencia sin «tipo_archivo»",
+          "status": "passed"
+        },
+        {
+          "name": "Contrato vigente de la Gateway (MS4) el DTO rechaza una evidencia sin «visible_cliente»",
+          "status": "passed"
+        },
+        {
+          "name": "Contrato vigente de la Gateway (MS4) el DTO rechaza una evidencia sin «estado»",
+          "status": "passed"
+        },
+        {
+          "name": "Contrato vigente de la Gateway (MS4) el DTO rechaza una evidencia sin «nombre_original»",
+          "status": "passed"
+        },
+        {
+          "name": "Contrato vigente de la Gateway (MS4) el DTO rechaza una evidencia sin «content_type»",
+          "status": "passed"
+        },
+        {
+          "name": "Contrato vigente de la Gateway (MS4) el DTO rechaza una evidencia sin «tamano_bytes»",
+          "status": "passed"
+        },
+        {
+          "name": "Contrato vigente de la Gateway (MS4) el DTO rechaza una evidencia sin «creada_en»",
+          "status": "passed"
+        },
+        {
+          "name": "Contrato vigente de la Gateway (MS4) el DTO de descarga exige los campos de UrlDescargaRespuesta",
+          "status": "passed"
+        },
+        {
+          "name": "Contrato vigente de la Gateway (MS4) el listado envía orden_id entero, el único parámetro obligatorio",
+          "status": "passed"
+        },
+        {
+          "name": "Códigos documentados del listado el contrato documenta 401, 404, 422 y la familia 5xx",
+          "status": "passed"
+        },
+        {
+          "name": "Códigos documentados del listado HTTP 401 produce un error de dominio con mensaje y resultado",
+          "status": "passed"
+        },
+        {
+          "name": "Códigos documentados del listado HTTP 404 produce un error de dominio con mensaje y resultado",
+          "status": "passed"
+        },
+        {
+          "name": "Códigos documentados del listado HTTP 422 produce un error de dominio con mensaje y resultado",
+          "status": "passed"
+        },
+        {
+          "name": "Códigos documentados del listado HTTP 500 produce un error de dominio con mensaje y resultado",
+          "status": "passed"
+        },
+        {
+          "name": "Códigos documentados del listado HTTP 502 produce un error de dominio con mensaje y resultado",
+          "status": "passed"
+        },
+        {
+          "name": "Códigos documentados del listado HTTP 503 produce un error de dominio con mensaje y resultado",
+          "status": "passed"
+        },
+        {
+          "name": "Códigos documentados del listado HTTP 504 produce un error de dominio con mensaje y resultado",
+          "status": "passed"
+        },
+        {
+          "name": "Recuperación tras errores transitorios HTTP 502: error con reintento y luego la evidencia visible",
+          "status": "passed"
+        },
+        {
+          "name": "Recuperación tras errores transitorios HTTP 503: error con reintento y luego la evidencia visible",
+          "status": "passed"
+        },
+        {
+          "name": "Recuperación tras errores transitorios HTTP 504: error con reintento y luego la evidencia visible",
+          "status": "passed"
+        },
+        {
+          "name": "Recuperación tras errores transitorios timeout: error con reintento y luego la evidencia visible",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "file": "__tests__/evidence-permissions.test.tsx",
+      "status": "passed",
+      "tests": [
+        {
+          "name": "Permisos de cámara con el permiso ya concedido abre la cámara sin volver a solicitarlo",
+          "status": "passed"
+        },
+        {
+          "name": "Permisos de cámara no solicita permisos al abrir la orden: solo tras pulsar la cámara",
+          "status": "passed"
+        },
+        {
+          "name": "Permisos de cámara si el usuario rechaza el permiso no abre la cámara y ofrece la galería",
+          "status": "passed"
+        },
+        {
+          "name": "Permisos de cámara cada pulsación solicita el permiso una sola vez, sin bucles",
+          "status": "passed"
+        },
+        {
+          "name": "Permisos de cámara con rechazo permanente no vuelve a preguntar y ofrece abrir Ajustes",
+          "status": "passed"
+        },
+        {
+          "name": "Permisos de cámara cuando el rechazo se vuelve permanente al solicitarlo también ofrece Ajustes",
+          "status": "passed"
+        },
+        {
+          "name": "Permisos de cámara permite reintentar tras habilitar el permiso en Ajustes",
+          "status": "passed"
+        },
+        {
+          "name": "Permisos de cámara detecta un permiso revocado después de haberse concedido",
+          "status": "passed"
+        },
+        {
+          "name": "Permisos de cámara un permiso revocado justo antes de abrir la cámara se informa como permiso",
+          "status": "passed"
+        },
+        {
+          "name": "Permisos de cámara una cámara no disponible no bloquea la pantalla",
+          "status": "passed"
+        },
+        {
+          "name": "Permisos de cámara un fallo del módulo nativo al consultar el permiso se informa",
+          "status": "passed"
+        },
+        {
+          "name": "Permisos de cámara cancelar la cámara tras conceder el permiso no muestra errores",
+          "status": "passed"
+        },
+        {
+          "name": "Permisos de galería usa el selector del sistema sin solicitar acceso a la biblioteca",
+          "status": "passed"
+        },
+        {
+          "name": "Permisos de galería con acceso limitado a fotografías se puede elegir una sin pedir acceso completo",
+          "status": "passed"
+        },
+        {
+          "name": "Permisos de galería si la plataforma exige permiso y fue rechazado, lo informa y ofrece Ajustes",
+          "status": "passed"
+        },
+        {
+          "name": "Permisos de galería una galería no disponible se informa sin ofrecer Ajustes",
+          "status": "passed"
+        },
+        {
+          "name": "Permisos de galería cancelar el selector no muestra errores",
+          "status": "passed"
+        },
+        {
+          "name": "Permisos de galería un archivo que no se puede leer se informa y permite elegir otro",
+          "status": "passed"
+        },
+        {
+          "name": "Diferencias de plataforma en web no ofrece abrir Ajustes, que el navegador no permite",
+          "status": "passed"
+        },
+        {
+          "name": "Sin envíos accidentales ningún rechazo de permisos dispara una subida",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "file": "__tests__/evidence-request-serialization.test.ts",
+      "status": "passed",
+      "tests": [
+        {
+          "name": "Serialización de solicitudes de subida de evidencia (Body_subir_evidencias_post) modelo de la app → campos del contrato diagnostico: el mapper produce los campos esperados",
+          "status": "passed"
+        },
+        {
+          "name": "Serialización de solicitudes de subida de evidencia (Body_subir_evidencias_post) modelo de la app → campos del contrato presupuesto: el mapper produce los campos esperados",
+          "status": "passed"
+        },
+        {
+          "name": "Serialización de solicitudes de subida de evidencia (Body_subir_evidencias_post) modelo de la app → campos del contrato reparacion: el mapper produce los campos esperados",
+          "status": "passed"
+        },
+        {
+          "name": "Serialización de solicitudes de subida de evidencia (Body_subir_evidencias_post) modelo de la app → campos del contrato resultadoFinal: el mapper produce los campos esperados",
+          "status": "passed"
+        },
+        {
+          "name": "Serialización de solicitudes de subida de evidencia (Body_subir_evidencias_post) campos del contrato → multipart/form-data diagnostico: solo envía campos del contrato y nunca el texto \"null\" ni \"undefined\"",
+          "status": "passed"
+        },
+        {
+          "name": "Serialización de solicitudes de subida de evidencia (Body_subir_evidencias_post) campos del contrato → multipart/form-data presupuesto: solo envía campos del contrato y nunca el texto \"null\" ni \"undefined\"",
+          "status": "passed"
+        },
+        {
+          "name": "Serialización de solicitudes de subida de evidencia (Body_subir_evidencias_post) campos del contrato → multipart/form-data reparacion: solo envía campos del contrato y nunca el texto \"null\" ni \"undefined\"",
+          "status": "passed"
+        },
+        {
+          "name": "Serialización de solicitudes de subida de evidencia (Body_subir_evidencias_post) campos del contrato → multipart/form-data resultadoFinal: solo envía campos del contrato y nunca el texto \"null\" ni \"undefined\"",
+          "status": "passed"
+        },
+        {
+          "name": "Serialización de solicitudes de subida de evidencia (Body_subir_evidencias_post) campos del contrato → multipart/form-data envía cada campo de texto como lo interpreta el contrato",
+          "status": "passed"
+        },
+        {
+          "name": "Serialización de solicitudes de subida de evidencia (Body_subir_evidencias_post) campos del contrato → multipart/form-data omite los campos opcionales sin valor",
+          "status": "passed"
+        },
+        {
+          "name": "Serialización de solicitudes de subida de evidencia (Body_subir_evidencias_post) campos del contrato → multipart/form-data agrega el archivo como { uri, name, type } con filename y Content-Type de la parte",
+          "status": "passed"
+        },
+        {
+          "name": "Serialización de solicitudes de subida de evidencia (Body_subir_evidencias_post) metadatos inválidos contextoInvalido: el esquema lo rechaza antes del mapeo",
+          "status": "passed"
+        },
+        {
+          "name": "Serialización de solicitudes de subida de evidencia (Body_subir_evidencias_post) metadatos inválidos presupuestoVacio: el esquema lo rechaza antes del mapeo",
+          "status": "passed"
+        },
+        {
+          "name": "Serialización de solicitudes de subida de evidencia (Body_subir_evidencias_post) metadatos inválidos ordenSimulada: pasa el esquema, pero el mapper lo rechaza por no ser un entero positivo",
+          "status": "passed"
+        },
+        {
+          "name": "Serialización de solicitudes de subida de evidencia (Body_subir_evidencias_post) metadatos inválidos presupuestoNoNumerico: pasa el esquema, pero el mapper lo rechaza por no ser un entero positivo",
+          "status": "passed"
+        },
+        {
+          "name": "Serialización de solicitudes de subida de evidencia (Body_subir_evidencias_post) envío mediante EvidenceService la solicitud de la app llega a POST /evidencias como el FormData esperado",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "file": "__tests__/evidence-role-visibility.test.tsx",
+      "status": "passed",
+      "tests": [
+        {
+          "name": "Visualización de evidencias por rol la nueva ruta de cliente conserva evidencias y sus acciones por rol",
+          "status": "passed"
+        },
+        {
+          "name": "Visualización de evidencias por rol la nueva ruta de mecanico conserva evidencias y sus acciones por rol",
+          "status": "passed"
+        },
+        {
+          "name": "Visualización de evidencias por rol abrir la orden como cliente no consulta evidencias hasta que se piden",
+          "status": "passed"
+        },
+        {
+          "name": "Visualización de evidencias por rol abrir la orden como mecanico no consulta evidencias hasta que se piden",
+          "status": "passed"
+        },
+        {
+          "name": "Visualización de evidencias por rol abrir la orden como administrador no consulta evidencias hasta que se piden",
+          "status": "passed"
+        },
+        {
+          "name": "Visualización de evidencias por rol mecánico asignado: ve las evidencias con su visibilidad y estado",
+          "status": "passed"
+        },
+        {
+          "name": "Visualización de evidencias por rol mecánico no asignado: el 404 de MS4 se informa sin mostrar evidencias",
+          "status": "passed"
+        },
+        {
+          "name": "Visualización de evidencias por rol cliente propietario: ve solo las visibles y sin datos internos",
+          "status": "passed"
+        },
+        {
+          "name": "Visualización de evidencias por rol cliente ajeno: el 404 de MS4 se informa",
+          "status": "passed"
+        },
+        {
+          "name": "Visualización de evidencias por rol administrador: ve también las eliminadas con su estado",
+          "status": "passed"
+        },
+        {
+          "name": "Visualización de evidencias por rol sin sesión la ruta redirige al login y no consulta evidencias",
+          "status": "passed"
+        },
+        {
+          "name": "Visualización de evidencias por rol cliente no accede a /ordenes-asignadas/31: la guarda redirige sin solicitudes",
+          "status": "passed"
+        },
+        {
+          "name": "Visualización de evidencias por rol cliente no accede a /(admin)/ordenes/31: la guarda redirige sin solicitudes",
+          "status": "passed"
+        },
+        {
+          "name": "Visualización de evidencias por rol mecanico no accede a /mis-ordenes/31: la guarda redirige sin solicitudes",
+          "status": "passed"
+        },
+        {
+          "name": "Visualización de evidencias por rol sesión expirada: el 401 cierra la sesión",
+          "status": "passed"
+        },
+        {
+          "name": "Visualización de evidencias por rol un 403 se informa sin cerrar la sesión",
+          "status": "passed"
+        },
+        {
+          "name": "Visualización de evidencias por rol una lista vacía se muestra como tal",
+          "status": "passed"
+        },
+        {
+          "name": "Visualización de evidencias por rol una respuesta fuera de contrato no muestra nada y permite reintentar",
+          "status": "passed"
+        },
+        {
+          "name": "Visualización de evidencias por rol una respuesta con evidencias de otra orden no muestra nada y permite reintentar",
+          "status": "passed"
+        },
+        {
+          "name": "Visualización de evidencias por rol actualiza la lista a petición",
+          "status": "passed"
+        },
+        {
+          "name": "Visualización de evidencias por rol al cambiar de orden no conserva evidencias ni fotografías de la anterior",
+          "status": "passed"
+        },
+        {
+          "name": "Fotografías con URL prefirmada pide la URL al ver la fotografía y la muestra sin caché",
+          "status": "passed"
+        },
+        {
+          "name": "Fotografías con URL prefirmada no muestra en línea archivos que no son fotografías",
+          "status": "passed"
+        },
+        {
+          "name": "Fotografías con URL prefirmada reutiliza la URL vigente y pide otra cuando caducó",
+          "status": "passed"
+        },
+        {
+          "name": "Fotografías con URL prefirmada una imagen inaccesible se informa y puede reintentarse con una URL nueva",
+          "status": "passed"
+        },
+        {
+          "name": "Fotografías con URL prefirmada una URL caducada que falla al mostrarse se renueva automáticamente una vez",
+          "status": "passed"
+        },
+        {
+          "name": "Fotografías con URL prefirmada una evidencia fuera de alcance (404) en la descarga se informa",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "file": "__tests__/evidence-service.test.ts",
+      "status": "passed",
+      "tests": [
+        {
+          "name": "EvidenceService.uploadEvidence envía multipart/form-data con los campos del contrato y el token",
+          "status": "passed"
+        },
+        {
+          "name": "EvidenceService.uploadEvidence no envía identificadores de usuario: el autor lo determina MS4",
+          "status": "passed"
+        },
+        {
+          "name": "EvidenceService.uploadEvidence rechaza el identificador de orden  (vacío) sin contactar al servidor",
+          "status": "passed"
+        },
+        {
+          "name": "EvidenceService.uploadEvidence rechaza el identificador de orden abc (no numérico) sin contactar al servidor",
+          "status": "passed"
+        },
+        {
+          "name": "EvidenceService.uploadEvidence rechaza el identificador de orden 0 (cero) sin contactar al servidor",
+          "status": "passed"
+        },
+        {
+          "name": "EvidenceService.uploadEvidence rechaza el identificador de orden -3 (negativo) sin contactar al servidor",
+          "status": "passed"
+        },
+        {
+          "name": "EvidenceService.uploadEvidence rechaza el identificador de orden 31/../32 (manipulado) sin contactar al servidor",
+          "status": "passed"
+        },
+        {
+          "name": "EvidenceService.uploadEvidence no invoca al cliente HTTP con un archivo vacío",
+          "status": "passed"
+        },
+        {
+          "name": "EvidenceService.uploadEvidence no invoca al cliente HTTP con un archivo demasiado grande",
+          "status": "passed"
+        },
+        {
+          "name": "EvidenceService.uploadEvidence no invoca al cliente HTTP con un archivo de tipo no permitido",
+          "status": "passed"
+        },
+        {
+          "name": "EvidenceService.uploadEvidence no invoca al cliente HTTP con un archivo con URI remota",
+          "status": "passed"
+        },
+        {
+          "name": "EvidenceService.uploadEvidence rechaza una respuesta que asocia la evidencia a otra orden",
+          "status": "passed"
+        },
+        {
+          "name": "EvidenceService.uploadEvidence rechaza una respuesta 201 que no cumple el contrato",
+          "status": "passed"
+        },
+        {
+          "name": "EvidenceService.uploadEvidence traduce el 404 de MS4 a un mensaje comprensible",
+          "status": "passed"
+        },
+        {
+          "name": "EvidenceService.uploadEvidence traduce el 409 de MS4 a un mensaje comprensible",
+          "status": "passed"
+        },
+        {
+          "name": "EvidenceService.uploadEvidence traduce el 413 de MS4 a un mensaje comprensible",
+          "status": "passed"
+        },
+        {
+          "name": "EvidenceService.uploadEvidence traduce el 415 de MS4 a un mensaje comprensible",
+          "status": "passed"
+        },
+        {
+          "name": "EvidenceService.uploadEvidence prefiere el detalle legible que entrega el servidor",
+          "status": "passed"
+        },
+        {
+          "name": "EvidenceService.uploadEvidence nunca reintenta automáticamente el POST de la evidencia",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "file": "__tests__/evidence-upload-states.test.tsx",
+      "status": "passed",
+      "tests": [
+        {
+          "name": "Estados del envío de evidencia sin fotografía no ofrece enviar; con fotografía ofrece enviar sin subir nada",
+          "status": "passed"
+        },
+        {
+          "name": "Estados del envío de evidencia muestra el envío pendiente y solo informa éxito tras la confirmación válida",
+          "status": "passed"
+        },
+        {
+          "name": "Estados del envío de evidencia muestra el progreso real solo cuando la plataforma informa el total",
+          "status": "passed"
+        },
+        {
+          "name": "Estados del envío de evidencia una doble pulsación produce un solo POST",
+          "status": "passed"
+        },
+        {
+          "name": "Estados del envío de evidencia un rechazo 400 se informa sin ofrecer reintentar la misma fotografía",
+          "status": "passed"
+        },
+        {
+          "name": "Estados del envío de evidencia un rechazo 404 se informa sin ofrecer reintentar la misma fotografía",
+          "status": "passed"
+        },
+        {
+          "name": "Estados del envío de evidencia un rechazo 409 se informa sin ofrecer reintentar la misma fotografía",
+          "status": "passed"
+        },
+        {
+          "name": "Estados del envío de evidencia un rechazo 413 se informa sin ofrecer reintentar la misma fotografía",
+          "status": "passed"
+        },
+        {
+          "name": "Estados del envío de evidencia un rechazo 415 se informa sin ofrecer reintentar la misma fotografía",
+          "status": "passed"
+        },
+        {
+          "name": "Estados del envío de evidencia un rechazo 422 se informa sin ofrecer reintentar la misma fotografía",
+          "status": "passed"
+        },
+        {
+          "name": "Estados del envío de evidencia tras un 503 (sin nada guardado) reintenta reenviando la fotografía",
+          "status": "passed"
+        },
+        {
+          "name": "Estados del envío de evidencia tras un 429 (sin nada guardado) reintenta reenviando la fotografía",
+          "status": "passed"
+        },
+        {
+          "name": "Estados del envío de evidencia un timeout deja el resultado incierto y no permite reenviar sin comprobar",
+          "status": "passed"
+        },
+        {
+          "name": "Estados del envío de evidencia al reintentar tras un timeout encuentra la fotografía ya guardada y no la duplica",
+          "status": "passed"
+        },
+        {
+          "name": "Estados del envío de evidencia al reintentar tras un timeout reenvía solo si el servidor no la tiene",
+          "status": "passed"
+        },
+        {
+          "name": "Estados del envío de evidencia si no puede comprobar el servidor tras un resultado incierto no reenvía",
+          "status": "passed"
+        },
+        {
+          "name": "Estados del envío de evidencia trata 500 como resultado incierto",
+          "status": "passed"
+        },
+        {
+          "name": "Estados del envío de evidencia trata 502 como resultado incierto",
+          "status": "passed"
+        },
+        {
+          "name": "Estados del envío de evidencia trata una respuesta 201 inválida como resultado incierto",
+          "status": "passed"
+        },
+        {
+          "name": "Estados del envío de evidencia permite cancelar el envío y comprueba antes de reintentar",
+          "status": "passed"
+        },
+        {
+          "name": "Estados del envío de evidencia un 401 cierra la sesión y no ofrece reintento",
+          "status": "passed"
+        },
+        {
+          "name": "Estados del envío de evidencia un 403 informa el permiso sin cerrar la sesión",
+          "status": "passed"
+        },
+        {
+          "name": "Estados del envío de evidencia reemplazar la fotografía tras un rechazo permite enviar la nueva",
+          "status": "passed"
+        },
+        {
+          "name": "Estados del envío de evidencia una respuesta tardía de otra orden no aparece en la orden actual",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "file": "src/__tests__/evidence.service.test.ts",
+      "status": "passed",
+      "tests": [
+        {
+          "name": "evidenceService (Evidencia Multimedia — MS4, Permisos, Multipart y Progreso) 1. Manejo de permisos de cámara y archivos (media-permissions) concede acceso cuando el permiso de cámara ya está otorgado",
+          "status": "passed"
+        },
+        {
+          "name": "evidenceService (Evidencia Multimedia — MS4, Permisos, Multipart y Progreso) 1. Manejo de permisos de cámara y archivos (media-permissions) solicita permiso de galería si estaba undetermined y falla con MediaPermissionError si el usuario rechaza",
+          "status": "passed"
+        },
+        {
+          "name": "evidenceService (Evidencia Multimedia — MS4, Permisos, Multipart y Progreso) 1. Manejo de permisos de cámara y archivos (media-permissions) indica habilitar desde Configuración cuando canAskAgain es false (permiso bloqueado)",
+          "status": "passed"
+        },
+        {
+          "name": "evidenceService (Evidencia Multimedia — MS4, Permisos, Multipart y Progreso) 2. Construcción de solicitudes multipart/form-data (buildEvidenceFormData) construye un FormData con archivo, orden_id, contexto, presupuesto_id y visible_cliente",
+          "status": "passed"
+        },
+        {
+          "name": "evidenceService (Evidencia Multimedia — MS4, Permisos, Multipart y Progreso) 3. Subida de evidencia y estado de progreso/carga (POST /evidencias) envía multipart/form-data, actualiza useEvidenceUploadStore (0% → 50% → 100%) y retorna Evidence mapeada",
+          "status": "passed"
+        },
+        {
+          "name": "evidenceService (Evidencia Multimedia — MS4, Permisos, Multipart y Progreso) 3. Subida de evidencia y estado de progreso/carga (POST /evidencias) integra captura desde cámara y subida directa con captureAndUploadEvidence",
+          "status": "passed"
+        },
+        {
+          "name": "evidenceService (Evidencia Multimedia — MS4, Permisos, Multipart y Progreso) 3. Subida de evidencia y estado de progreso/carga (POST /evidencias) retorna null y limpia el estado de carga si el usuario cancela la selección en galería",
+          "status": "passed"
+        },
+        {
+          "name": "evidenceService (Evidencia Multimedia — MS4, Permisos, Multipart y Progreso) 4. Consulta de evidencias y URL prefirmada de descarga (GET /evidencias) lista las evidencias de una orden (GET /evidencias?orden_id={id})",
+          "status": "passed"
+        },
+        {
+          "name": "evidenceService (Evidencia Multimedia — MS4, Permisos, Multipart y Progreso) 4. Consulta de evidencias y URL prefirmada de descarga (GET /evidencias) obtiene el detalle de una evidencia y su URL prefirmada de descarga",
+          "status": "passed"
+        },
+        {
+          "name": "evidenceService (Evidencia Multimedia — MS4, Permisos, Multipart y Progreso) 5. Tratamiento de errores de carga (400, 409, 413, 415, 422, 503) y MockEvidenceAdapter normaliza HTTP 400 como ServiceError con código EVIDENCE_BAD_FILE y actualiza el store en estado error",
+          "status": "passed"
+        },
+        {
+          "name": "evidenceService (Evidencia Multimedia — MS4, Permisos, Multipart y Progreso) 5. Tratamiento de errores de carga (400, 409, 413, 415, 422, 503) y MockEvidenceAdapter normaliza HTTP 409 como ServiceError con código EVIDENCE_CONFLICT y actualiza el store en estado error",
+          "status": "passed"
+        },
+        {
+          "name": "evidenceService (Evidencia Multimedia — MS4, Permisos, Multipart y Progreso) 5. Tratamiento de errores de carga (400, 409, 413, 415, 422, 503) y MockEvidenceAdapter normaliza HTTP 413 como ServiceError con código EVIDENCE_TOO_LARGE y actualiza el store en estado error",
+          "status": "passed"
+        },
+        {
+          "name": "evidenceService (Evidencia Multimedia — MS4, Permisos, Multipart y Progreso) 5. Tratamiento de errores de carga (400, 409, 413, 415, 422, 503) y MockEvidenceAdapter normaliza HTTP 415 como ServiceError con código EVIDENCE_UNSUPPORTED_MEDIA y actualiza el store en estado error",
+          "status": "passed"
+        },
+        {
+          "name": "evidenceService (Evidencia Multimedia — MS4, Permisos, Multipart y Progreso) 5. Tratamiento de errores de carga (400, 409, 413, 415, 422, 503) y MockEvidenceAdapter normaliza HTTP 422 como ServiceError con código EVIDENCE_VALIDATION_ERROR y actualiza el store en estado error",
+          "status": "passed"
+        },
+        {
+          "name": "evidenceService (Evidencia Multimedia — MS4, Permisos, Multipart y Progreso) 5. Tratamiento de errores de carga (400, 409, 413, 415, 422, 503) y MockEvidenceAdapter normaliza HTTP 503 como ServiceError con código EVIDENCE_STORAGE_UNAVAILABLE y actualiza el store en estado error",
+          "status": "passed"
+        },
+        {
+          "name": "evidenceService (Evidencia Multimedia — MS4, Permisos, Multipart y Progreso) 5. Tratamiento de errores de carga (400, 409, 413, 415, 422, 503) y MockEvidenceAdapter valida formato (415), tamaño máximo (413) y subida con progreso en MockEvidenceAdapter",
+          "status": "passed"
+        }
+      ]
+    }
+  ]
+}
