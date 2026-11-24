@@ -1,0 +1,30 @@
+2026-11-24T11:37:27Z
+Linux 7.3.5-arch1-1 x86_64
+ANDROID_HOME=<unset> ANDROID_SDK_ROOT=<unset>
+adb         no encontrado
+emulator    no encontrado
+sdkmanager  no encontrado
+avdmanager  no encontrado
+java        /usr/bin/java
+scrcpy      no encontrado
+ls: no se puede acceder a '/home/victor/Android/Sdk': No existe el fichero o el directorio
+ls: no se puede acceder a '/home/victor/Android': No existe el fichero o el directorio
+v26.13.1
+npm notice run tallerconnect@1.0.0 npx
+npm notice run 'expo' --version
+58.1.19
+lsusb: sin dispositivos Android reconocidos
+    "version": "1.0.0",
+    "android": {
+
+== Exportación Android con Gateway vigente (no es ejecución en dispositivo)
+Comando: CI=1 EXPO_NO_TELEMETRY=1 EXPO_PUBLIC_API_URL=https://api-tallerconnect.inf.uct.cl/api EXPO_PUBLIC_HTTP_TRACE=true npx expo export --platform android --output-dir <scratchpad>/android-uct --max-workers 2
+Android Bundled 15948ms node_modules/expo-router/entry.js (1569 modules)
+Exported: <scratchpad>/android-uct
+exit 0
+bundle: entry-44dc3ed643c8a36c9581657362692e41.hbc 4569249 bytes sha256=98bf160032ee0ff314bfa7fdc473fcbb5682de5b2d856ec30aae0916357e35fb
+ocurrencias api-tallerconnect.inf.uct.cl en bundle: 1
+ocurrencias tallerconect.vercel.app en bundle (constantes de env.ts): 2
+
+== .env / .env.local (solo claves públicas; no modificados)
+      2 EXPO_PUBLIC_API_URL=https://tallerconect.vercel.app/api
