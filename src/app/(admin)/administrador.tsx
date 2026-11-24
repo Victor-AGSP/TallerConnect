@@ -123,13 +123,14 @@ export default function AdministradorScreen() {
         .filter((id): id is string => id !== null),
     );
 
+    // Una consulta fallida no es un conteo cero: su métrica queda sin valor.
     return {
-      vehicles: vehicles.length,
-      activeOrders: activeOrders.length,
-      awaitingApproval: awaitingApproval.length,
-      assignedMechanics: assignedMechanics.size,
+      vehicles: vehiclesError ? null : vehicles.length,
+      activeOrders: ordersError ? null : activeOrders.length,
+      awaitingApproval: ordersError ? null : awaitingApproval.length,
+      assignedMechanics: ordersError ? null : assignedMechanics.size,
     };
-  }, [orders, vehicles]);
+  }, [orders, vehicles, ordersError, vehiclesError]);
 
   const vehicleById = useMemo(
     () => new Map(vehicles.map((vehicle) => [vehicle.id, vehicle])),
@@ -492,15 +493,17 @@ export default function AdministradorScreen() {
 
 interface MetricCardProps {
   label: string;
-  value: number;
+  /** `null` cuando la consulta de origen falló: se informa como no disponible. */
+  value: number | null;
   accent: string;
 }
 
 function MetricCard({ label, value, accent }: MetricCardProps) {
+  const display = value === null ? 'No disponible' : String(value);
   return (
-    <View accessible accessibilityLabel={`${label}: ${value}`} style={styles.metricCard}>
+    <View accessible accessibilityLabel={`${label}: ${display}`} style={styles.metricCard}>
       <View style={[styles.metricAccent, { backgroundColor: accent }]} />
-      <Text style={styles.metricValue}>{value}</Text>
+      <Text style={styles.metricValue}>{value === null ? '—' : value}</Text>
       <Text style={styles.metricLabel}>{label}</Text>
     </View>
   );

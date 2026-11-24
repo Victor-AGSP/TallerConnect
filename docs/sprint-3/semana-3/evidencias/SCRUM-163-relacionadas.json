@@ -1,0 +1,865 @@
+{
+  "startTime": 1795519874997,
+  "numTotalTestSuites": 12,
+  "numPassedTestSuites": 12,
+  "numFailedTestSuites": 0,
+  "numPassedTests": 195,
+  "numFailedTests": 0,
+  "numPendingTests": 0,
+  "success": true,
+  "environment": "Jest; dobles controlados; sin backend ni dispositivo",
+  "suites": [
+    {
+      "file": "__tests__/admin-notice-validation.test.ts",
+      "status": "passed",
+      "tests": [
+        {
+          "name": "Validación del resumen administrativo rechaza una orden con un estado_codigo fuera del catálogo",
+          "status": "passed"
+        },
+        {
+          "name": "Validación del resumen administrativo rechaza un usuario con un rol que no pertenece a la app",
+          "status": "passed"
+        },
+        {
+          "name": "Validación del resumen administrativo rechaza un presupuesto con un estado fuera del contrato",
+          "status": "passed"
+        },
+        {
+          "name": "Validación del resumen administrativo rechaza una solicitud de cancelación con un estado fuera del contrato",
+          "status": "passed"
+        },
+        {
+          "name": "Validación del resumen administrativo solo cuenta las solicitudes de cancelación pendientes",
+          "status": "passed"
+        },
+        {
+          "name": "Validación del resumen administrativo deja en null las secciones no disponibles",
+          "status": "passed"
+        },
+        {
+          "name": "Validación de los avisos rechaza una solicitud de cancelación con un estado fuera del contrato",
+          "status": "passed"
+        },
+        {
+          "name": "Validación de los avisos rechaza una solicitud con un estado_al_solicitar fuera del catálogo",
+          "status": "passed"
+        },
+        {
+          "name": "Validación de los avisos solo genera avisos para las solicitudes pendientes",
+          "status": "passed"
+        },
+        {
+          "name": "Validación de los avisos no genera aviso de capacidad en el caso \"sinConfigurar\"",
+          "status": "passed"
+        },
+        {
+          "name": "Validación de los avisos no genera aviso de capacidad en el caso \"dentroDelLimite\"",
+          "status": "passed"
+        },
+        {
+          "name": "Validación de los avisos genera el aviso de capacidad cuando hay mecánicos sobre el límite",
+          "status": "passed"
+        },
+        {
+          "name": "Validación de los avisos no genera aviso de cupo en el caso \"sinConfigurar\"",
+          "status": "passed"
+        },
+        {
+          "name": "Validación de los avisos no genera aviso de cupo en el caso \"dentroDelCupo\"",
+          "status": "passed"
+        },
+        {
+          "name": "Validación de los avisos genera el aviso de cupo cuando se superó",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "file": "__tests__/admin-query-states.test.tsx",
+      "status": "passed",
+      "tests": [
+        {
+          "name": "[Function AdministradorScreen] espera la respuesta antes de mostrar un resultado vacío",
+          "status": "passed"
+        },
+        {
+          "name": "[Function AdminOrdersScreen] espera la respuesta antes de mostrar un resultado vacío",
+          "status": "passed"
+        },
+        {
+          "name": "[Function AdministradorScreen] permite reintentar una consulta fallida sin error de estado",
+          "status": "passed"
+        },
+        {
+          "name": "[Function AdminOrdersScreen] permite reintentar una consulta fallida sin error de estado",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "file": "__tests__/budget-views-integration.test.tsx",
+      "status": "passed",
+      "tests": [
+        {
+          "name": "Orden → presupuesto el cliente abre el presupuesto desde el detalle de la orden",
+          "status": "passed"
+        },
+        {
+          "name": "Orden → presupuesto el administrador abre el presupuesto desde el detalle de la orden",
+          "status": "passed"
+        },
+        {
+          "name": "Orden → presupuesto el mecánico no tiene acceso al presupuesto desde la orden",
+          "status": "passed"
+        },
+        {
+          "name": "Representación del presupuesto muestra total, estado, ítems con repuesto/proveedor e importes",
+          "status": "passed"
+        },
+        {
+          "name": "Representación del presupuesto el administrador no puede decidir el presupuesto",
+          "status": "passed"
+        },
+        {
+          "name": "Representación del presupuesto muestra la decisión registrada de una versión aprobada",
+          "status": "passed"
+        },
+        {
+          "name": "Representación del presupuesto indica la versión vigente cuando hay una modificación pendiente",
+          "status": "passed"
+        },
+        {
+          "name": "Representación del presupuesto muestra el estado vacío si la orden no tiene presupuesto",
+          "status": "passed"
+        },
+        {
+          "name": "Representación del presupuesto muestra el error de carga y se recupera con el reintento",
+          "status": "passed"
+        },
+        {
+          "name": "Decisión del cliente aprueba tras confirmar, muestra el efecto y recarga el presupuesto",
+          "status": "passed"
+        },
+        {
+          "name": "Decisión del cliente informa los repuestos faltantes al aprobar sin stock suficiente",
+          "status": "passed"
+        },
+        {
+          "name": "Decisión del cliente exige el motivo antes de rechazar",
+          "status": "passed"
+        },
+        {
+          "name": "Decisión del cliente el primer rechazo advierte y confirma la cancelación del servicio",
+          "status": "passed"
+        },
+        {
+          "name": "Decisión del cliente rechazar una modificación no pide cancelar el servicio",
+          "status": "passed"
+        },
+        {
+          "name": "Decisión del cliente permite volver sin enviar la decisión",
+          "status": "passed"
+        },
+        {
+          "name": "Decisión del cliente muestra el error del MS3 y conserva el formulario",
+          "status": "passed"
+        },
+        {
+          "name": "Decisión del cliente ante una aplicación pendiente reintenta sin volver a decidir",
+          "status": "passed"
+        },
+        {
+          "name": "Restricciones de acceso por rol el rol cliente no accede a /ordenes/31/presupuesto ni consulta el MS3",
+          "status": "passed"
+        },
+        {
+          "name": "Restricciones de acceso por rol el rol mecanico no accede a /ordenes/31/presupuesto ni consulta el MS3",
+          "status": "passed"
+        },
+        {
+          "name": "Restricciones de acceso por rol el rol administrador no accede a /mis-ordenes/31/presupuesto ni consulta el MS3",
+          "status": "passed"
+        },
+        {
+          "name": "Restricciones de acceso por rol el rol mecanico no accede a /mis-ordenes/31/presupuesto ni consulta el MS3",
+          "status": "passed"
+        },
+        {
+          "name": "Restricciones de acceso por rol el rol cliente accede a /mis-ordenes/31/presupuesto a través de su layout",
+          "status": "passed"
+        },
+        {
+          "name": "Restricciones de acceso por rol el rol administrador accede a /ordenes/31/presupuesto a través de su layout",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "file": "__tests__/env-config.test.ts",
+      "status": "passed",
+      "tests": [
+        {
+          "name": "Configuración de Entornos y URL de la API Gateway resolveApiUrl y normalizeGatewayBaseUrl prioriza la URL explícita (EXPO_PUBLIC_API_URL) por sobre cualquier entorno y limpia barras finales",
+          "status": "passed"
+        },
+        {
+          "name": "Configuración de Entornos y URL de la API Gateway resolveApiUrl y normalizeGatewayBaseUrl resuelve la URL de la nube (Vercel) para entorno de integración",
+          "status": "passed"
+        },
+        {
+          "name": "Configuración de Entornos y URL de la API Gateway resolveApiUrl y normalizeGatewayBaseUrl resuelve la URL de la nube para entorno de producción",
+          "status": "passed"
+        },
+        {
+          "name": "Configuración de Entornos y URL de la API Gateway resolveApiUrl y normalizeGatewayBaseUrl resuelve localhost para desarrollo en Web o iOS",
+          "status": "passed"
+        },
+        {
+          "name": "Configuración de Entornos y URL de la API Gateway resolveApiUrl y normalizeGatewayBaseUrl resuelve 10.0.2.2 para desarrollo en emulador Android",
+          "status": "passed"
+        },
+        {
+          "name": "Configuración de Entornos y URL de la API Gateway buildGatewayEndpointPath evita duplicar el prefijo /api cuando la URL base ya termina en /api",
+          "status": "passed"
+        },
+        {
+          "name": "Configuración de Entornos y URL de la API Gateway buildGatewayEndpointPath respeta URLs absolutas o bases sin sufijo /api",
+          "status": "passed"
+        },
+        {
+          "name": "Configuración de Entornos y URL de la API Gateway Helpers de validación de entorno, seguridad y timeouts resuelve entornos correctamente mediante resolveAppEnvironment",
+          "status": "passed"
+        },
+        {
+          "name": "Configuración de Entornos y URL de la API Gateway Helpers de validación de entorno, seguridad y timeouts valida timeouts personalizados y usa fallback ante valores inválidos",
+          "status": "passed"
+        },
+        {
+          "name": "Configuración de Entornos y URL de la API Gateway Helpers de validación de entorno, seguridad y timeouts exige HTTPS en entornos de integración y producción",
+          "status": "passed"
+        },
+        {
+          "name": "Configuración de Entornos y URL de la API Gateway Helpers de validación de entorno, seguridad y timeouts evalúa flags de modo simulado (mocks) con prioridad para EXPO_PUBLIC_USE_MOCK_SERVICES",
+          "status": "passed"
+        },
+        {
+          "name": "Configuración de Entornos y URL de la API Gateway Constantes de Timeout y Configuración Global (ENV) define timeouts estándar (15s), de subida multimedia (60s) y de ping (5s)",
+          "status": "passed"
+        },
+        {
+          "name": "Configuración de Entornos y URL de la API Gateway Constantes de Timeout y Configuración Global (ENV) sincroniza API_BASE_URL de apiClient con la configuración ENV.API_URL",
+          "status": "passed"
+        },
+        {
+          "name": "Configuración de Entornos y URL de la API Gateway Constantes de Timeout y Configuración Global (ENV) expone propiedades de configuración tipadas y rutas de Gateway en el objeto ENV",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "file": "__tests__/evidence-role-visibility.test.tsx",
+      "status": "passed",
+      "tests": [
+        {
+          "name": "Visualización de evidencias por rol la nueva ruta de cliente conserva evidencias y sus acciones por rol",
+          "status": "passed"
+        },
+        {
+          "name": "Visualización de evidencias por rol la nueva ruta de mecanico conserva evidencias y sus acciones por rol",
+          "status": "passed"
+        },
+        {
+          "name": "Visualización de evidencias por rol abrir la orden como cliente no consulta evidencias hasta que se piden",
+          "status": "passed"
+        },
+        {
+          "name": "Visualización de evidencias por rol abrir la orden como mecanico no consulta evidencias hasta que se piden",
+          "status": "passed"
+        },
+        {
+          "name": "Visualización de evidencias por rol abrir la orden como administrador no consulta evidencias hasta que se piden",
+          "status": "passed"
+        },
+        {
+          "name": "Visualización de evidencias por rol mecánico asignado: ve las evidencias con su visibilidad y estado",
+          "status": "passed"
+        },
+        {
+          "name": "Visualización de evidencias por rol mecánico no asignado: el 404 de MS4 se informa sin mostrar evidencias",
+          "status": "passed"
+        },
+        {
+          "name": "Visualización de evidencias por rol cliente propietario: ve solo las visibles y sin datos internos",
+          "status": "passed"
+        },
+        {
+          "name": "Visualización de evidencias por rol cliente ajeno: el 404 de MS4 se informa",
+          "status": "passed"
+        },
+        {
+          "name": "Visualización de evidencias por rol administrador: ve también las eliminadas con su estado",
+          "status": "passed"
+        },
+        {
+          "name": "Visualización de evidencias por rol sin sesión la ruta redirige al login y no consulta evidencias",
+          "status": "passed"
+        },
+        {
+          "name": "Visualización de evidencias por rol cliente no accede a /ordenes-asignadas/31: la guarda redirige sin solicitudes",
+          "status": "passed"
+        },
+        {
+          "name": "Visualización de evidencias por rol cliente no accede a /(admin)/ordenes/31: la guarda redirige sin solicitudes",
+          "status": "passed"
+        },
+        {
+          "name": "Visualización de evidencias por rol mecanico no accede a /mis-ordenes/31: la guarda redirige sin solicitudes",
+          "status": "passed"
+        },
+        {
+          "name": "Visualización de evidencias por rol sesión expirada: el 401 cierra la sesión",
+          "status": "passed"
+        },
+        {
+          "name": "Visualización de evidencias por rol un 403 se informa sin cerrar la sesión",
+          "status": "passed"
+        },
+        {
+          "name": "Visualización de evidencias por rol una lista vacía se muestra como tal",
+          "status": "passed"
+        },
+        {
+          "name": "Visualización de evidencias por rol una respuesta fuera de contrato no muestra nada y permite reintentar",
+          "status": "passed"
+        },
+        {
+          "name": "Visualización de evidencias por rol una respuesta con evidencias de otra orden no muestra nada y permite reintentar",
+          "status": "passed"
+        },
+        {
+          "name": "Visualización de evidencias por rol actualiza la lista a petición",
+          "status": "passed"
+        },
+        {
+          "name": "Visualización de evidencias por rol al cambiar de orden no conserva evidencias ni fotografías de la anterior",
+          "status": "passed"
+        },
+        {
+          "name": "Fotografías con URL prefirmada pide la URL al ver la fotografía y la muestra sin caché",
+          "status": "passed"
+        },
+        {
+          "name": "Fotografías con URL prefirmada no muestra en línea archivos que no son fotografías",
+          "status": "passed"
+        },
+        {
+          "name": "Fotografías con URL prefirmada reutiliza la URL vigente y pide otra cuando caducó",
+          "status": "passed"
+        },
+        {
+          "name": "Fotografías con URL prefirmada una imagen inaccesible se informa y puede reintentarse con una URL nueva",
+          "status": "passed"
+        },
+        {
+          "name": "Fotografías con URL prefirmada una URL caducada que falla al mostrarse se renueva automáticamente una vez",
+          "status": "passed"
+        },
+        {
+          "name": "Fotografías con URL prefirmada una evidencia fuera de alcance (404) en la descarga se informa",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "file": "__tests__/hardcoded-figures-detection.test.tsx",
+      "status": "passed",
+      "tests": [
+        {
+          "name": "Detección estática en pantallas y componentes recorre las pantallas reales del proyecto",
+          "status": "passed"
+        },
+        {
+          "name": "Detección estática en pantallas y componentes ninguna pantalla importa mocks ni el snapshot fijo del panel de administración",
+          "status": "passed"
+        },
+        {
+          "name": "Detección estática en pantallas y componentes las cifras de negocio literales solo aparecen en archivos protegidos por ENV.USE_DEMO_DATA",
+          "status": "passed"
+        },
+        {
+          "name": "Detección estática en pantallas y componentes control positivo: detecta las cifras de las vistas de demostración protegidas",
+          "status": "passed"
+        },
+        {
+          "name": "Detección estática en pantallas y componentes no confunde valores de presentación o configuración con datos de negocio",
+          "status": "passed"
+        },
+        {
+          "name": "Configuración real la demostración está desactivada sin banderas explícitas y exige ambas",
+          "status": "passed"
+        },
+        {
+          "name": "Configuración real la pantalla de inicio de Cliente no muestra cifras ficticias",
+          "status": "passed"
+        },
+        {
+          "name": "Configuración real la pantalla de inicio de Mecánico no muestra cifras ficticias",
+          "status": "passed"
+        },
+        {
+          "name": "Configuración real la pantalla de inicio de Administrador no muestra cifras ficticias",
+          "status": "passed"
+        },
+        {
+          "name": "Métricas dinámicas del panel de administración reflejan la respuesta del servicio y cambian cuando esta cambia",
+          "status": "passed"
+        },
+        {
+          "name": "Métricas dinámicas del panel de administración un fallo de órdenes muestra «No disponible», no un conteo 0 inventado",
+          "status": "passed"
+        },
+        {
+          "name": "Métricas dinámicas del panel de administración un fallo de vehículos muestra «No disponible» solo en su métrica",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "file": "__tests__/order-role-access.test.tsx",
+      "status": "passed",
+      "tests": [
+        {
+          "name": "vistas de órdenes: acceso autorizado el rol cliente consulta su detalle con el token de la sesión",
+          "status": "passed"
+        },
+        {
+          "name": "vistas de órdenes: acceso autorizado el rol mecanico consulta su detalle con el token de la sesión",
+          "status": "passed"
+        },
+        {
+          "name": "vistas de órdenes: acceso autorizado el rol administrador consulta su detalle con el token de la sesión",
+          "status": "passed"
+        },
+        {
+          "name": "vistas de órdenes: protección visual por rol el rol cliente no accede al detalle de órdenes de administrador ni consulta al backend",
+          "status": "passed"
+        },
+        {
+          "name": "vistas de órdenes: protección visual por rol el rol cliente no accede al detalle de órdenes de mecanico ni consulta al backend",
+          "status": "passed"
+        },
+        {
+          "name": "vistas de órdenes: protección visual por rol el rol mecanico no accede al detalle de órdenes de administrador ni consulta al backend",
+          "status": "passed"
+        },
+        {
+          "name": "vistas de órdenes: protección visual por rol el rol mecanico no accede al detalle de órdenes de cliente ni consulta al backend",
+          "status": "passed"
+        },
+        {
+          "name": "vistas de órdenes: protección visual por rol el rol administrador no accede al detalle de órdenes de cliente ni consulta al backend",
+          "status": "passed"
+        },
+        {
+          "name": "vistas de órdenes: protección visual por rol el rol administrador no accede al detalle de órdenes de mecanico ni consulta al backend",
+          "status": "passed"
+        },
+        {
+          "name": "vistas de órdenes: protección visual por rol sin sesión, /mis-ordenes/31 redirige al login sin consultar al backend",
+          "status": "passed"
+        },
+        {
+          "name": "vistas de órdenes: protección visual por rol sin sesión, /ordenes-asignadas/31 redirige al login sin consultar al backend",
+          "status": "passed"
+        },
+        {
+          "name": "vistas de órdenes: protección visual por rol sin sesión, /ordenes/31 redirige al login sin consultar al backend",
+          "status": "passed"
+        },
+        {
+          "name": "vistas de órdenes: protección visual por rol no consulta la orden hasta que termina la recuperación de la sesión",
+          "status": "passed"
+        },
+        {
+          "name": "vistas de órdenes: autorización del backend un 401 del backend cierra la sesión y devuelve al login",
+          "status": "passed"
+        },
+        {
+          "name": "vistas de órdenes: autorización del backend una orden no visible para el usuario (404) muestra el error sin cerrar la sesión",
+          "status": "passed"
+        },
+        {
+          "name": "vistas de órdenes: autorización del backend un 403 del backend muestra el error de permisos sin cerrar la sesión (cliente)",
+          "status": "passed"
+        },
+        {
+          "name": "vistas de órdenes: autorización del backend un 403 del backend muestra el error de permisos sin cerrar la sesión (mecanico)",
+          "status": "passed"
+        },
+        {
+          "name": "vistas de órdenes: autorización del backend un 403 del backend muestra el error de permisos sin cerrar la sesión (administrador)",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "file": "__tests__/parts-views-integration.test.tsx",
+      "status": "passed",
+      "tests": [
+        {
+          "name": "Repuestos (administrador) muestra la carga y luego los repuestos con proveedor, stock y umbral",
+          "status": "passed"
+        },
+        {
+          "name": "Repuestos (administrador) indica cuando el servidor tiene más repuestos que los recibidos",
+          "status": "passed"
+        },
+        {
+          "name": "Repuestos (administrador) muestra el estado vacío y permite actualizar",
+          "status": "passed"
+        },
+        {
+          "name": "Repuestos (administrador) muestra el error del servicio y se recupera con el reintento",
+          "status": "passed"
+        },
+        {
+          "name": "Repuestos (administrador) actualiza manualmente los datos ya cargados",
+          "status": "passed"
+        },
+        {
+          "name": "Repuestos: carga incremental (desde/limite) carga la página siguiente desde la cantidad mostrada y oculta el botón al completar",
+          "status": "passed"
+        },
+        {
+          "name": "Repuestos: carga incremental (desde/limite) no muestra el botón cuando la primera página ya trae todos los registros",
+          "status": "passed"
+        },
+        {
+          "name": "Repuestos: carga incremental (desde/limite) descarta los repuestos repetidos y se detiene si la página no trae nuevos",
+          "status": "passed"
+        },
+        {
+          "name": "Repuestos: carga incremental (desde/limite) conserva lo cargado ante un error de paginación y permite reintentar",
+          "status": "passed"
+        },
+        {
+          "name": "Repuestos: carga incremental (desde/limite) una actualización descarta las páginas posteriores y vuelve a la primera",
+          "status": "passed"
+        },
+        {
+          "name": "Repuestos: carga incremental (desde/limite) descarta una página posterior que llega después de una actualización",
+          "status": "passed"
+        },
+        {
+          "name": "Proveedores: carga incremental (desde/limite) carga la página siguiente de proveedores",
+          "status": "passed"
+        },
+        {
+          "name": "Proveedores: carga incremental (desde/limite) informa el error de paginación sin perder el listado",
+          "status": "passed"
+        },
+        {
+          "name": "Proveedores (administrador) lista los proveedores y abre el detalle con sus repuestos",
+          "status": "passed"
+        },
+        {
+          "name": "Proveedores (administrador) muestra el estado vacío del listado",
+          "status": "passed"
+        },
+        {
+          "name": "Proveedores (administrador) muestra el error del listado y se recupera con el reintento",
+          "status": "passed"
+        },
+        {
+          "name": "Proveedores (administrador) muestra un proveedor sin repuestos",
+          "status": "passed"
+        },
+        {
+          "name": "Proveedores (administrador) muestra el 404 de un proveedor inexistente con reintento",
+          "status": "passed"
+        },
+        {
+          "name": "Navegación desde el panel del administrador \"Ver repuestos\" abre /repuestos",
+          "status": "passed"
+        },
+        {
+          "name": "Navegación desde el panel del administrador \"Ver proveedores\" abre /proveedores",
+          "status": "passed"
+        },
+        {
+          "name": "Restricciones de acceso por rol el administrador accede a /repuestos a través de su layout",
+          "status": "passed"
+        },
+        {
+          "name": "Restricciones de acceso por rol el administrador accede a /proveedores a través de su layout",
+          "status": "passed"
+        },
+        {
+          "name": "Restricciones de acceso por rol el administrador accede a /proveedores/3 a través de su layout",
+          "status": "passed"
+        },
+        {
+          "name": "Restricciones de acceso por rol el rol cliente no accede a /repuestos ni consulta el MS3",
+          "status": "passed"
+        },
+        {
+          "name": "Restricciones de acceso por rol el rol cliente no accede a /proveedores ni consulta el MS3",
+          "status": "passed"
+        },
+        {
+          "name": "Restricciones de acceso por rol el rol cliente no accede a /proveedores/3 ni consulta el MS3",
+          "status": "passed"
+        },
+        {
+          "name": "Restricciones de acceso por rol el rol mecanico no accede a /repuestos ni consulta el MS3",
+          "status": "passed"
+        },
+        {
+          "name": "Restricciones de acceso por rol el rol mecanico no accede a /proveedores ni consulta el MS3",
+          "status": "passed"
+        },
+        {
+          "name": "Restricciones de acceso por rol el rol mecanico no accede a /proveedores/3 ni consulta el MS3",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "file": "__tests__/role-access-restrictions.test.tsx",
+      "status": "passed",
+      "tests": [
+        {
+          "name": "ProtectedRoute: acceso autorizado permite al rol administrador ver el contenido de su propia ruta",
+          "status": "passed"
+        },
+        {
+          "name": "ProtectedRoute: acceso autorizado permite al rol mecanico ver el contenido de su propia ruta",
+          "status": "passed"
+        },
+        {
+          "name": "ProtectedRoute: acceso autorizado permite al rol cliente ver el contenido de su propia ruta",
+          "status": "passed"
+        },
+        {
+          "name": "ProtectedRoute: acceso restringido impide que el rol cliente abra /administrador y no renderiza su contenido",
+          "status": "passed"
+        },
+        {
+          "name": "ProtectedRoute: acceso restringido impide que el rol cliente abra /mecanico y no renderiza su contenido",
+          "status": "passed"
+        },
+        {
+          "name": "ProtectedRoute: acceso restringido impide que el rol mecanico abra /administrador y no renderiza su contenido",
+          "status": "passed"
+        },
+        {
+          "name": "ProtectedRoute: acceso restringido impide que el rol mecanico abra /cliente y no renderiza su contenido",
+          "status": "passed"
+        },
+        {
+          "name": "ProtectedRoute: acceso restringido impide que el rol administrador abra /mecanico y no renderiza su contenido",
+          "status": "passed"
+        },
+        {
+          "name": "ProtectedRoute: acceso restringido impide que el rol administrador abra /cliente y no renderiza su contenido",
+          "status": "passed"
+        },
+        {
+          "name": "ProtectedRoute: acceso restringido envía al login al entrar a /administrador sin una sesión autenticada",
+          "status": "passed"
+        },
+        {
+          "name": "ProtectedRoute: acceso restringido envía al login al entrar a /mecanico sin una sesión autenticada",
+          "status": "passed"
+        },
+        {
+          "name": "ProtectedRoute: acceso restringido envía al login al entrar a /cliente sin una sesión autenticada",
+          "status": "passed"
+        },
+        {
+          "name": "RoleGuard: sesiones incompletas trata como no autenticada una sesión marcada como activa pero sin usuario",
+          "status": "passed"
+        },
+        {
+          "name": "RoleGuard: sesiones incompletas no expone el contenido protegido mientras la sesión sigue cargando",
+          "status": "passed"
+        },
+        {
+          "name": "RoleGuard: sesiones incompletas aplica la misma restricción por rol que ProtectedRoute",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "file": "__tests__/views-accessibility.test.tsx",
+      "status": "passed",
+      "tests": [
+        {
+          "name": "StatusPill se anuncia como texto usando su etiqueta visible",
+          "status": "passed"
+        },
+        {
+          "name": "StatusPill permite describir el estado con una etiqueta explícita",
+          "status": "passed"
+        },
+        {
+          "name": "vista de vehículo y orden del cliente expone el título principal y los títulos de tarjeta como encabezados",
+          "status": "passed"
+        },
+        {
+          "name": "vista de vehículo y orden del cliente describe el estado del vehículo y del presupuesto sin depender del color",
+          "status": "passed"
+        },
+        {
+          "name": "vista de vehículo y orden del cliente comunica el estado de cada etapa del seguimiento como texto",
+          "status": "passed"
+        },
+        {
+          "name": "vista de vehículo y orden del cliente agrupa los datos del vehículo y de la orden en una sola etiqueta",
+          "status": "passed"
+        },
+        {
+          "name": "vista de vehículo y orden del cliente oculta el icono decorativo de evidencias a los lectores de pantalla",
+          "status": "passed"
+        },
+        {
+          "name": "vista de vehículo y orden del cliente mantiene el cierre de sesión como control accesible y enfocable",
+          "status": "passed"
+        },
+        {
+          "name": "vista de órdenes del mecánico expone los títulos de la vista como encabezados",
+          "status": "passed"
+        },
+        {
+          "name": "vista de órdenes del mecánico describe el estado de la orden y de sus etapas sin depender del color",
+          "status": "passed"
+        },
+        {
+          "name": "vista de órdenes del mecánico agrupa cada orden del listado con su vehículo y estado",
+          "status": "passed"
+        },
+        {
+          "name": "vista de órdenes del mecánico agrupa las métricas y los detalles de la orden",
+          "status": "passed"
+        },
+        {
+          "name": "vista de órdenes del mecánico no anuncia como botones las tarjetas de acción que aún no tienen acción asociada",
+          "status": "passed"
+        },
+        {
+          "name": "vista de vehículos y órdenes del administrador expone los títulos de la vista como encabezados",
+          "status": "passed"
+        },
+        {
+          "name": "vista de vehículos y órdenes del administrador agrupa cada orden con su patente y estado",
+          "status": "passed"
+        },
+        {
+          "name": "vista de vehículos y órdenes del administrador agrupa el resumen por estado, los mecánicos y las aprobaciones pendientes",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "file": "__tests__/views-services-integration.test.tsx",
+      "status": "passed",
+      "tests": [
+        {
+          "name": "vistas de vehículos con VehiclesService real la vista de cliente consulta /mis-vehiculos a través del servicio",
+          "status": "passed"
+        },
+        {
+          "name": "vistas de vehículos con VehiclesService real la vista de mecánico consulta /vehiculos-asignados a través del servicio",
+          "status": "passed"
+        },
+        {
+          "name": "vistas de vehículos con VehiclesService real la vista de administración consulta /vehiculos a través del servicio",
+          "status": "passed"
+        },
+        {
+          "name": "vistas de vehículos con VehiclesService real mapea y representa una respuesta con atributos en español",
+          "status": "passed"
+        },
+        {
+          "name": "vistas de vehículos con VehiclesService real mapea y representa una respuesta con atributos en inglés y campos nulos",
+          "status": "passed"
+        },
+        {
+          "name": "vistas de vehículos con VehiclesService real representa el listado vacío cuando la API responde sin vehículos",
+          "status": "passed"
+        },
+        {
+          "name": "vistas de vehículos con VehiclesService real muestra el mensaje del backend cuando la respuesta trae detalle",
+          "status": "passed"
+        },
+        {
+          "name": "vistas de vehículos con VehiclesService real muestra el mensaje normalizado de un error de servidor sin detalle",
+          "status": "passed"
+        },
+        {
+          "name": "vistas de vehículos con VehiclesService real muestra el mensaje normalizado cuando el backend es inalcanzable",
+          "status": "passed"
+        },
+        {
+          "name": "vistas de órdenes con OrdersService real la vista de cliente consulta el detalle a través del servicio",
+          "status": "passed"
+        },
+        {
+          "name": "vistas de órdenes con OrdersService real la vista de mecánico consulta el detalle a través del servicio",
+          "status": "passed"
+        },
+        {
+          "name": "vistas de órdenes con OrdersService real la vista de administración consulta el detalle a través del servicio",
+          "status": "passed"
+        },
+        {
+          "name": "vistas de órdenes con OrdersService real traduce el código numérico de estado a la etiqueta de la interfaz",
+          "status": "passed"
+        },
+        {
+          "name": "vistas de órdenes con OrdersService real muestra un error ante una orden sin estado oficial",
+          "status": "passed"
+        },
+        {
+          "name": "vistas de órdenes con OrdersService real muestra el mensaje normalizado cuando la orden no existe",
+          "status": "passed"
+        },
+        {
+          "name": "vistas de órdenes con OrdersService real muestra el mensaje de permisos insuficientes devuelto por el backend",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "file": "src/__tests__/admin-services-integration.test.tsx",
+      "status": "passed",
+      "tests": [
+        {
+          "name": "Integración de servicios necesarios del administrador agrega métricas de vehículos, órdenes, presupuestos, repuestos, proveedores y avisos en adminDashboardService",
+          "status": "passed"
+        },
+        {
+          "name": "Integración de servicios necesarios del administrador conserva cero y listas vacías cuando todos los recursos están vacíos",
+          "status": "passed"
+        },
+        {
+          "name": "Integración de servicios necesarios del administrador propaga un error de consulta en lugar de presentarlo como métricas válidas",
+          "status": "passed"
+        },
+        {
+          "name": "Integración de servicios necesarios del administrador muestra un fallo de avisos y permite recuperar la consulta sin datos ficticios",
+          "status": "passed"
+        },
+        {
+          "name": "Integración de servicios necesarios del administrador permite ejecutar acciones administrativas sobre órdenes y notificaciones",
+          "status": "passed"
+        },
+        {
+          "name": "Integración de servicios necesarios del administrador construye correctamente el resumen con buildAdminDashboardFromDomain y renderiza AdministradorScreen",
+          "status": "passed"
+        }
+      ]
+    }
+  ]
+}

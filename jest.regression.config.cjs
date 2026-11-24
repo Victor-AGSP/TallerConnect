@@ -16,6 +16,8 @@ module.exports = {
     '**/__tests__/list-error-empty-regression.test.tsx',
     // SCRUM-224: estado visual del portal Cliente ante HTTP 500.
     '**/__tests__/http-500-client-states.test.tsx',
+    // SCRUM-163: cifras hardcodeadas en entorno real.
+    '**/__tests__/hardcoded-figures-detection.test.tsx',
     // Integración con MS3: presupuestos, repuestos y proveedores.
     '**/__tests__/budget-*.test.ts?(x)',
     '**/__tests__/parts-*.test.ts?(x)',

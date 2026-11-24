@@ -1,0 +1,67 @@
+{
+  "startTime": 1795519865038,
+  "numTotalTestSuites": 1,
+  "numPassedTestSuites": 1,
+  "numFailedTestSuites": 0,
+  "numPassedTests": 12,
+  "numFailedTests": 0,
+  "numPendingTests": 0,
+  "success": true,
+  "environment": "Jest; dobles controlados; sin backend ni dispositivo",
+  "suites": [
+    {
+      "file": "__tests__/hardcoded-figures-detection.test.tsx",
+      "status": "passed",
+      "tests": [
+        {
+          "name": "Detección estática en pantallas y componentes recorre las pantallas reales del proyecto",
+          "status": "passed"
+        },
+        {
+          "name": "Detección estática en pantallas y componentes ninguna pantalla importa mocks ni el snapshot fijo del panel de administración",
+          "status": "passed"
+        },
+        {
+          "name": "Detección estática en pantallas y componentes las cifras de negocio literales solo aparecen en archivos protegidos por ENV.USE_DEMO_DATA",
+          "status": "passed"
+        },
+        {
+          "name": "Detección estática en pantallas y componentes control positivo: detecta las cifras de las vistas de demostración protegidas",
+          "status": "passed"
+        },
+        {
+          "name": "Detección estática en pantallas y componentes no confunde valores de presentación o configuración con datos de negocio",
+          "status": "passed"
+        },
+        {
+          "name": "Configuración real la demostración está desactivada sin banderas explícitas y exige ambas",
+          "status": "passed"
+        },
+        {
+          "name": "Configuración real la pantalla de inicio de Cliente no muestra cifras ficticias",
+          "status": "passed"
+        },
+        {
+          "name": "Configuración real la pantalla de inicio de Mecánico no muestra cifras ficticias",
+          "status": "passed"
+        },
+        {
+          "name": "Configuración real la pantalla de inicio de Administrador no muestra cifras ficticias",
+          "status": "passed"
+        },
+        {
+          "name": "Métricas dinámicas del panel de administración reflejan la respuesta del servicio y cambian cuando esta cambia",
+          "status": "passed"
+        },
+        {
+          "name": "Métricas dinámicas del panel de administración un fallo de órdenes muestra «No disponible», no un conteo 0 inventado",
+          "status": "passed"
+        },
+        {
+          "name": "Métricas dinámicas del panel de administración un fallo de vehículos muestra «No disponible» solo en su métrica",
+          "status": "passed"
+        }
+      ]
+    }
+  ]
+}
