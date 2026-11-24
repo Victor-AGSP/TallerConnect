@@ -1,0 +1,67 @@
+{
+  "startTime": 1795520550619,
+  "numTotalTestSuites": 1,
+  "numPassedTestSuites": 1,
+  "numFailedTestSuites": 0,
+  "numPassedTests": 12,
+  "numFailedTests": 0,
+  "numPendingTests": 0,
+  "success": true,
+  "environment": "Jest; dobles controlados; sin backend ni dispositivo",
+  "suites": [
+    {
+      "file": "__tests__/cliente-navigation-flow.test.tsx",
+      "status": "passed",
+      "tests": [
+        {
+          "name": "Recorrido principal del Cliente portal → vehículos → vehículo → orden → presupuesto, y vuelve atrás paso a paso",
+          "status": "passed"
+        },
+        {
+          "name": "Recorrido principal del Cliente los botones «Volver» de las pantallas regresan a la anterior",
+          "status": "passed"
+        },
+        {
+          "name": "Enlace directo sin historial (arranque desde enlace en Android o recarga web) «Volver a vehículos» lleva a la lista del Cliente",
+          "status": "passed"
+        },
+        {
+          "name": "Enlace directo sin historial (arranque desde enlace en Android o recarga web) «Volver» del vehículo con error también tiene salida",
+          "status": "passed"
+        },
+        {
+          "name": "Enlace directo sin historial (arranque desde enlace en Android o recarga web) «Volver» de la orden lleva al portal del Cliente",
+          "status": "passed"
+        },
+        {
+          "name": "Enlace directo sin historial (arranque desde enlace en Android o recarga web) «Volver» de la orden con error también tiene salida",
+          "status": "passed"
+        },
+        {
+          "name": "Protección de rutas un Cliente que abre /administrador vuelve a su portal",
+          "status": "passed"
+        },
+        {
+          "name": "Protección de rutas un Cliente que abre /mecanico vuelve a su portal",
+          "status": "passed"
+        },
+        {
+          "name": "Protección de rutas sin sesión, un enlace directo a un vehículo lleva al login sin consultar la API",
+          "status": "passed"
+        },
+        {
+          "name": "Cierre de sesión «Cerrar sesión» lleva al login y las rutas del Cliente dejan de estar accesibles",
+          "status": "passed"
+        },
+        {
+          "name": "Estados de error durante la navegación un vehículo inexistente (404) muestra error con reintento y salida",
+          "status": "passed"
+        },
+        {
+          "name": "Estados de error durante la navegación un 403 en la orden se informa sin cerrar la sesión",
+          "status": "passed"
+        }
+      ]
+    }
+  ]
+}

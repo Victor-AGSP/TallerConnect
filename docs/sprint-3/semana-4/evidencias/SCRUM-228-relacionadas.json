@@ -1,0 +1,1691 @@
+{
+  "startTime": 1795520563014,
+  "numTotalTestSuites": 23,
+  "numPassedTestSuites": 23,
+  "numFailedTestSuites": 0,
+  "numPassedTests": 385,
+  "numFailedTests": 0,
+  "numPendingTests": 0,
+  "success": true,
+  "environment": "Jest; dobles controlados; sin backend ni dispositivo",
+  "suites": [
+    {
+      "file": "__tests__/auth-full-flow.test.tsx",
+      "status": "passed",
+      "tests": [
+        {
+          "name": "flujo completo de Login → rol → Logout autentica al rol cliente, abre su panel y cierra la sesión",
+          "status": "passed"
+        },
+        {
+          "name": "flujo completo de Login → rol → Logout autentica al rol mecanico, abre su panel y cierra la sesión",
+          "status": "passed"
+        },
+        {
+          "name": "flujo completo de Login → rol → Logout autentica al rol administrador, abre su panel y cierra la sesión",
+          "status": "passed"
+        },
+        {
+          "name": "permite reintentar una limpieza fallida desde el logout de cliente",
+          "status": "passed"
+        },
+        {
+          "name": "permite reintentar una limpieza fallida desde el logout de mecanico",
+          "status": "passed"
+        },
+        {
+          "name": "permite reintentar una limpieza fallida desde el logout de administrador",
+          "status": "passed"
+        },
+        {
+          "name": "recupera cliente al arrancar y no recupera la sesión después de Logout y reinicio",
+          "status": "passed"
+        },
+        {
+          "name": "recupera mecanico al arrancar y no recupera la sesión después de Logout y reinicio",
+          "status": "passed"
+        },
+        {
+          "name": "recupera administrador al arrancar y no recupera la sesión después de Logout y reinicio",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "file": "__tests__/budget-flow-integration.test.tsx",
+      "status": "passed",
+      "tests": [
+        {
+          "name": "flujo presupuesto → decisión → orden (cliente) decide una sola vez, reintenta la aplicación pendiente y recarga el presupuesto",
+          "status": "passed"
+        },
+        {
+          "name": "flujo presupuesto → decisión → orden (cliente) muestra \"sin presupuesto\" cuando el MS3 no tiene uno para la orden",
+          "status": "passed"
+        },
+        {
+          "name": "flujo presupuesto → decisión → orden (cliente) un 403 del MS3 informa la falta de permisos sin cerrar la sesión",
+          "status": "passed"
+        },
+        {
+          "name": "flujo presupuesto → decisión → orden (cliente) un 401 del MS3 cierra la sesión y devuelve al login",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "file": "__tests__/budget-views-integration.test.tsx",
+      "status": "passed",
+      "tests": [
+        {
+          "name": "Orden → presupuesto el cliente abre el presupuesto desde el detalle de la orden",
+          "status": "passed"
+        },
+        {
+          "name": "Orden → presupuesto el administrador abre el presupuesto desde el detalle de la orden",
+          "status": "passed"
+        },
+        {
+          "name": "Orden → presupuesto el mecánico no tiene acceso al presupuesto desde la orden",
+          "status": "passed"
+        },
+        {
+          "name": "Representación del presupuesto muestra total, estado, ítems con repuesto/proveedor e importes",
+          "status": "passed"
+        },
+        {
+          "name": "Representación del presupuesto el administrador no puede decidir el presupuesto",
+          "status": "passed"
+        },
+        {
+          "name": "Representación del presupuesto muestra la decisión registrada de una versión aprobada",
+          "status": "passed"
+        },
+        {
+          "name": "Representación del presupuesto indica la versión vigente cuando hay una modificación pendiente",
+          "status": "passed"
+        },
+        {
+          "name": "Representación del presupuesto muestra el estado vacío si la orden no tiene presupuesto",
+          "status": "passed"
+        },
+        {
+          "name": "Representación del presupuesto muestra el error de carga y se recupera con el reintento",
+          "status": "passed"
+        },
+        {
+          "name": "Decisión del cliente aprueba tras confirmar, muestra el efecto y recarga el presupuesto",
+          "status": "passed"
+        },
+        {
+          "name": "Decisión del cliente informa los repuestos faltantes al aprobar sin stock suficiente",
+          "status": "passed"
+        },
+        {
+          "name": "Decisión del cliente exige el motivo antes de rechazar",
+          "status": "passed"
+        },
+        {
+          "name": "Decisión del cliente el primer rechazo advierte y confirma la cancelación del servicio",
+          "status": "passed"
+        },
+        {
+          "name": "Decisión del cliente rechazar una modificación no pide cancelar el servicio",
+          "status": "passed"
+        },
+        {
+          "name": "Decisión del cliente permite volver sin enviar la decisión",
+          "status": "passed"
+        },
+        {
+          "name": "Decisión del cliente muestra el error del MS3 y conserva el formulario",
+          "status": "passed"
+        },
+        {
+          "name": "Decisión del cliente ante una aplicación pendiente reintenta sin volver a decidir",
+          "status": "passed"
+        },
+        {
+          "name": "Restricciones de acceso por rol el rol cliente no accede a /ordenes/31/presupuesto ni consulta el MS3",
+          "status": "passed"
+        },
+        {
+          "name": "Restricciones de acceso por rol el rol mecanico no accede a /ordenes/31/presupuesto ni consulta el MS3",
+          "status": "passed"
+        },
+        {
+          "name": "Restricciones de acceso por rol el rol administrador no accede a /mis-ordenes/31/presupuesto ni consulta el MS3",
+          "status": "passed"
+        },
+        {
+          "name": "Restricciones de acceso por rol el rol mecanico no accede a /mis-ordenes/31/presupuesto ni consulta el MS3",
+          "status": "passed"
+        },
+        {
+          "name": "Restricciones de acceso por rol el rol cliente accede a /mis-ordenes/31/presupuesto a través de su layout",
+          "status": "passed"
+        },
+        {
+          "name": "Restricciones de acceso por rol el rol administrador accede a /ordenes/31/presupuesto a través de su layout",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "file": "__tests__/cliente-navigation-flow.test.tsx",
+      "status": "passed",
+      "tests": [
+        {
+          "name": "Recorrido principal del Cliente portal → vehículos → vehículo → orden → presupuesto, y vuelve atrás paso a paso",
+          "status": "passed"
+        },
+        {
+          "name": "Recorrido principal del Cliente los botones «Volver» de las pantallas regresan a la anterior",
+          "status": "passed"
+        },
+        {
+          "name": "Enlace directo sin historial (arranque desde enlace en Android o recarga web) «Volver a vehículos» lleva a la lista del Cliente",
+          "status": "passed"
+        },
+        {
+          "name": "Enlace directo sin historial (arranque desde enlace en Android o recarga web) «Volver» del vehículo con error también tiene salida",
+          "status": "passed"
+        },
+        {
+          "name": "Enlace directo sin historial (arranque desde enlace en Android o recarga web) «Volver» de la orden lleva al portal del Cliente",
+          "status": "passed"
+        },
+        {
+          "name": "Enlace directo sin historial (arranque desde enlace en Android o recarga web) «Volver» de la orden con error también tiene salida",
+          "status": "passed"
+        },
+        {
+          "name": "Protección de rutas un Cliente que abre /administrador vuelve a su portal",
+          "status": "passed"
+        },
+        {
+          "name": "Protección de rutas un Cliente que abre /mecanico vuelve a su portal",
+          "status": "passed"
+        },
+        {
+          "name": "Protección de rutas sin sesión, un enlace directo a un vehículo lleva al login sin consultar la API",
+          "status": "passed"
+        },
+        {
+          "name": "Cierre de sesión «Cerrar sesión» lleva al login y las rutas del Cliente dejan de estar accesibles",
+          "status": "passed"
+        },
+        {
+          "name": "Estados de error durante la navegación un vehículo inexistente (404) muestra error con reintento y salida",
+          "status": "passed"
+        },
+        {
+          "name": "Estados de error durante la navegación un 403 en la orden se informa sin cerrar la sesión",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "file": "__tests__/evidence-capture.test.tsx",
+      "status": "passed",
+      "tests": [
+        {
+          "name": "Captura y selección de fotografías en la orden del mecánico muestra la sección de evidencia identificando la orden",
+          "status": "passed"
+        },
+        {
+          "name": "Captura y selección de fotografías en la orden del mecánico captura una fotografía con la cámara tras conceder el permiso y la previsualiza",
+          "status": "passed"
+        },
+        {
+          "name": "Captura y selección de fotografías en la orden del mecánico selecciona desde la galería sin pedir permisos de biblioteca",
+          "status": "passed"
+        },
+        {
+          "name": "Captura y selección de fotografías en la orden del mecánico una cancelación no muestra errores ni vista previa",
+          "status": "passed"
+        },
+        {
+          "name": "Captura y selección de fotografías en la orden del mecánico reemplaza la fotografía y la cancelación posterior conserva la anterior",
+          "status": "passed"
+        },
+        {
+          "name": "Captura y selección de fotografías en la orden del mecánico un archivo inválido se informa y conserva la selección válida anterior",
+          "status": "passed"
+        },
+        {
+          "name": "Captura y selección de fotografías en la orden del mecánico quita la fotografía antes de enviarla",
+          "status": "passed"
+        },
+        {
+          "name": "Captura y selección de fotografías en la orden del mecánico informa un error nativo de la cámara sin bloquear la galería",
+          "status": "passed"
+        },
+        {
+          "name": "Captura y selección de fotografías en la orden del mecánico sin identificador de orden no ofrece capturar evidencia",
+          "status": "passed"
+        },
+        {
+          "name": "Captura y selección de fotografías en la orden del mecánico no muestra la sección si la orden cargada no es la de la ruta",
+          "status": "passed"
+        },
+        {
+          "name": "Captura y selección de fotografías en la orden del mecánico envía la fotografía seleccionada a la orden de la ruta con el contexto elegido",
+          "status": "passed"
+        },
+        {
+          "name": "Captura y selección de fotografías en la orden del mecánico una doble pulsación de envío produce una sola solicitud",
+          "status": "passed"
+        },
+        {
+          "name": "Captura y selección de fotografías en la orden del mecánico una fotografía elegida en una orden no se ofrece ni se envía en otra",
+          "status": "passed"
+        },
+        {
+          "name": "Captura y selección de fotografías en la orden del mecánico descarta el resultado del selector que llega después de cambiar de orden",
+          "status": "passed"
+        },
+        {
+          "name": "Captura y selección de fotografías en la orden del mecánico no abre dos selectores a la vez",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "file": "__tests__/evidence-functional.test.tsx",
+      "status": "passed",
+      "tests": [
+        {
+          "name": "Flujo principal del mecánico login → orden → avance con foto → evidencia → consulta → otra orden → logout",
+          "status": "passed"
+        },
+        {
+          "name": "Flujos alternativos cámara rechazada: no la abre, ofrece la galería y el envío sigue funcionando",
+          "status": "passed"
+        },
+        {
+          "name": "Flujos alternativos galería cancelada: sin selección, sin errores y sin solicitudes",
+          "status": "passed"
+        },
+        {
+          "name": "Flujos alternativos imagen inválida: se rechaza antes de enviar",
+          "status": "passed"
+        },
+        {
+          "name": "Flujos alternativos archivo demasiado grande: se rechaza antes de enviar",
+          "status": "passed"
+        },
+        {
+          "name": "Flujos alternativos falta de conectividad: resultado incierto; el reintento encuentra la foto y no duplica",
+          "status": "passed"
+        },
+        {
+          "name": "Flujos alternativos timeout sin guardar: el reintento comprueba y reenvía una sola vez",
+          "status": "passed"
+        },
+        {
+          "name": "Flujos alternativos error de subida (503): reintento seguro sin consulta previa",
+          "status": "passed"
+        },
+        {
+          "name": "Flujos alternativos doble pulsación: una sola evidencia",
+          "status": "passed"
+        },
+        {
+          "name": "Flujos alternativos permiso de rol rechazado (403): informa sin cerrar la sesión ni subir la foto",
+          "status": "passed"
+        },
+        {
+          "name": "Flujos alternativos orden no asignada (404 de MS4): informa sin reintento",
+          "status": "passed"
+        },
+        {
+          "name": "Flujos alternativos orden inexistente: no muestra secciones ni consulta evidencias",
+          "status": "passed"
+        },
+        {
+          "name": "Flujos alternativos orden entregada: no ofrece fotografías",
+          "status": "passed"
+        },
+        {
+          "name": "Flujos alternativos cambio de orden durante el envío: la respuesta tardía no aparece en la nueva",
+          "status": "passed"
+        },
+        {
+          "name": "Flujos alternativos sesión expirada (401 al subir): cierra la sesión y vuelve al login",
+          "status": "passed"
+        },
+        {
+          "name": "Flujos alternativos error inesperado del backend al consultar evidencias: se informa y se recupera",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "file": "__tests__/evidence-mechanic-updates.test.tsx",
+      "status": "passed",
+      "tests": [
+        {
+          "name": "OrderLogService (bitácora MS2) registra una observación con solo tipo y descripción: sin actor, estado ni fecha",
+          "status": "passed"
+        },
+        {
+          "name": "OrderLogService (bitácora MS2) una descripción vacía no llega al servidor",
+          "status": "passed"
+        },
+        {
+          "name": "OrderLogService (bitácora MS2) un identificador de orden inválido no llega al servidor",
+          "status": "passed"
+        },
+        {
+          "name": "OrderLogService (bitácora MS2) traduce el 403 del contrato",
+          "status": "passed"
+        },
+        {
+          "name": "OrderLogService (bitácora MS2) traduce el 404 del contrato",
+          "status": "passed"
+        },
+        {
+          "name": "OrderLogService (bitácora MS2) traduce el 422 del contrato",
+          "status": "passed"
+        },
+        {
+          "name": "OrderLogService (bitácora MS2) rechaza una respuesta fuera del contrato o de otra orden",
+          "status": "passed"
+        },
+        {
+          "name": "OrderLogService (bitácora MS2) no reintenta automáticamente el registro (no es idempotente)",
+          "status": "passed"
+        },
+        {
+          "name": "OrderLogService (bitácora MS2) consulta la bitácora con repuestos y rechaza entradas de otra orden",
+          "status": "passed"
+        },
+        {
+          "name": "Avances del mecánico en la orden abrir la orden no consulta la bitácora hasta que se pide",
+          "status": "passed"
+        },
+        {
+          "name": "Avances del mecánico en la orden registra un avance sin fotografía con la confirmación del servidor",
+          "status": "passed"
+        },
+        {
+          "name": "Avances del mecánico en la orden registra el avance y luego la fotografía, en ese orden",
+          "status": "passed"
+        },
+        {
+          "name": "Avances del mecánico en la orden si la fotografía falla informa el éxito parcial y reintenta solo la carga",
+          "status": "passed"
+        },
+        {
+          "name": "Avances del mecánico en la orden tras un fallo de la fotografía se puede continuar sin ella",
+          "status": "passed"
+        },
+        {
+          "name": "Avances del mecánico en la orden si el avance falla no sube la fotografía y conserva el formulario",
+          "status": "passed"
+        },
+        {
+          "name": "Avances del mecánico en la orden informa una orden inexistente o no asignada (404)",
+          "status": "passed"
+        },
+        {
+          "name": "Avances del mecánico en la orden informa una respuesta inválida del servidor sin declarar éxito",
+          "status": "passed"
+        },
+        {
+          "name": "Avances del mecánico en la orden exige una descripción antes de enviar",
+          "status": "passed"
+        },
+        {
+          "name": "Avances del mecánico en la orden una doble pulsación registra un solo avance",
+          "status": "passed"
+        },
+        {
+          "name": "Avances del mecánico en la orden en una orden entregado no ofrece fotografías y deja que el servidor decida sobre el avance",
+          "status": "passed"
+        },
+        {
+          "name": "Avances del mecánico en la orden en una orden cancelado no ofrece fotografías y deja que el servidor decida sobre el avance",
+          "status": "passed"
+        },
+        {
+          "name": "Avances del mecánico en la orden un historial que falla puede reintentarse",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "file": "__tests__/evidence-permissions.test.tsx",
+      "status": "passed",
+      "tests": [
+        {
+          "name": "Permisos de cámara con el permiso ya concedido abre la cámara sin volver a solicitarlo",
+          "status": "passed"
+        },
+        {
+          "name": "Permisos de cámara no solicita permisos al abrir la orden: solo tras pulsar la cámara",
+          "status": "passed"
+        },
+        {
+          "name": "Permisos de cámara si el usuario rechaza el permiso no abre la cámara y ofrece la galería",
+          "status": "passed"
+        },
+        {
+          "name": "Permisos de cámara cada pulsación solicita el permiso una sola vez, sin bucles",
+          "status": "passed"
+        },
+        {
+          "name": "Permisos de cámara con rechazo permanente no vuelve a preguntar y ofrece abrir Ajustes",
+          "status": "passed"
+        },
+        {
+          "name": "Permisos de cámara cuando el rechazo se vuelve permanente al solicitarlo también ofrece Ajustes",
+          "status": "passed"
+        },
+        {
+          "name": "Permisos de cámara permite reintentar tras habilitar el permiso en Ajustes",
+          "status": "passed"
+        },
+        {
+          "name": "Permisos de cámara detecta un permiso revocado después de haberse concedido",
+          "status": "passed"
+        },
+        {
+          "name": "Permisos de cámara un permiso revocado justo antes de abrir la cámara se informa como permiso",
+          "status": "passed"
+        },
+        {
+          "name": "Permisos de cámara una cámara no disponible no bloquea la pantalla",
+          "status": "passed"
+        },
+        {
+          "name": "Permisos de cámara un fallo del módulo nativo al consultar el permiso se informa",
+          "status": "passed"
+        },
+        {
+          "name": "Permisos de cámara cancelar la cámara tras conceder el permiso no muestra errores",
+          "status": "passed"
+        },
+        {
+          "name": "Permisos de galería usa el selector del sistema sin solicitar acceso a la biblioteca",
+          "status": "passed"
+        },
+        {
+          "name": "Permisos de galería con acceso limitado a fotografías se puede elegir una sin pedir acceso completo",
+          "status": "passed"
+        },
+        {
+          "name": "Permisos de galería si la plataforma exige permiso y fue rechazado, lo informa y ofrece Ajustes",
+          "status": "passed"
+        },
+        {
+          "name": "Permisos de galería una galería no disponible se informa sin ofrecer Ajustes",
+          "status": "passed"
+        },
+        {
+          "name": "Permisos de galería cancelar el selector no muestra errores",
+          "status": "passed"
+        },
+        {
+          "name": "Permisos de galería un archivo que no se puede leer se informa y permite elegir otro",
+          "status": "passed"
+        },
+        {
+          "name": "Diferencias de plataforma en web no ofrece abrir Ajustes, que el navegador no permite",
+          "status": "passed"
+        },
+        {
+          "name": "Sin envíos accidentales ningún rechazo de permisos dispara una subida",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "file": "__tests__/evidence-role-visibility.test.tsx",
+      "status": "passed",
+      "tests": [
+        {
+          "name": "Visualización de evidencias por rol la nueva ruta de cliente conserva evidencias y sus acciones por rol",
+          "status": "passed"
+        },
+        {
+          "name": "Visualización de evidencias por rol la nueva ruta de mecanico conserva evidencias y sus acciones por rol",
+          "status": "passed"
+        },
+        {
+          "name": "Visualización de evidencias por rol abrir la orden como cliente no consulta evidencias hasta que se piden",
+          "status": "passed"
+        },
+        {
+          "name": "Visualización de evidencias por rol abrir la orden como mecanico no consulta evidencias hasta que se piden",
+          "status": "passed"
+        },
+        {
+          "name": "Visualización de evidencias por rol abrir la orden como administrador no consulta evidencias hasta que se piden",
+          "status": "passed"
+        },
+        {
+          "name": "Visualización de evidencias por rol mecánico asignado: ve las evidencias con su visibilidad y estado",
+          "status": "passed"
+        },
+        {
+          "name": "Visualización de evidencias por rol mecánico no asignado: el 404 de MS4 se informa sin mostrar evidencias",
+          "status": "passed"
+        },
+        {
+          "name": "Visualización de evidencias por rol cliente propietario: ve solo las visibles y sin datos internos",
+          "status": "passed"
+        },
+        {
+          "name": "Visualización de evidencias por rol cliente ajeno: el 404 de MS4 se informa",
+          "status": "passed"
+        },
+        {
+          "name": "Visualización de evidencias por rol administrador: ve también las eliminadas con su estado",
+          "status": "passed"
+        },
+        {
+          "name": "Visualización de evidencias por rol sin sesión la ruta redirige al login y no consulta evidencias",
+          "status": "passed"
+        },
+        {
+          "name": "Visualización de evidencias por rol cliente no accede a /ordenes-asignadas/31: la guarda redirige sin solicitudes",
+          "status": "passed"
+        },
+        {
+          "name": "Visualización de evidencias por rol cliente no accede a /(admin)/ordenes/31: la guarda redirige sin solicitudes",
+          "status": "passed"
+        },
+        {
+          "name": "Visualización de evidencias por rol mecanico no accede a /mis-ordenes/31: la guarda redirige sin solicitudes",
+          "status": "passed"
+        },
+        {
+          "name": "Visualización de evidencias por rol sesión expirada: el 401 cierra la sesión",
+          "status": "passed"
+        },
+        {
+          "name": "Visualización de evidencias por rol un 403 se informa sin cerrar la sesión",
+          "status": "passed"
+        },
+        {
+          "name": "Visualización de evidencias por rol una lista vacía se muestra como tal",
+          "status": "passed"
+        },
+        {
+          "name": "Visualización de evidencias por rol una respuesta fuera de contrato no muestra nada y permite reintentar",
+          "status": "passed"
+        },
+        {
+          "name": "Visualización de evidencias por rol una respuesta con evidencias de otra orden no muestra nada y permite reintentar",
+          "status": "passed"
+        },
+        {
+          "name": "Visualización de evidencias por rol actualiza la lista a petición",
+          "status": "passed"
+        },
+        {
+          "name": "Visualización de evidencias por rol al cambiar de orden no conserva evidencias ni fotografías de la anterior",
+          "status": "passed"
+        },
+        {
+          "name": "Fotografías con URL prefirmada pide la URL al ver la fotografía y la muestra sin caché",
+          "status": "passed"
+        },
+        {
+          "name": "Fotografías con URL prefirmada no muestra en línea archivos que no son fotografías",
+          "status": "passed"
+        },
+        {
+          "name": "Fotografías con URL prefirmada reutiliza la URL vigente y pide otra cuando caducó",
+          "status": "passed"
+        },
+        {
+          "name": "Fotografías con URL prefirmada una imagen inaccesible se informa y puede reintentarse con una URL nueva",
+          "status": "passed"
+        },
+        {
+          "name": "Fotografías con URL prefirmada una URL caducada que falla al mostrarse se renueva automáticamente una vez",
+          "status": "passed"
+        },
+        {
+          "name": "Fotografías con URL prefirmada una evidencia fuera de alcance (404) en la descarga se informa",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "file": "__tests__/evidence-upload-states.test.tsx",
+      "status": "passed",
+      "tests": [
+        {
+          "name": "Estados del envío de evidencia sin fotografía no ofrece enviar; con fotografía ofrece enviar sin subir nada",
+          "status": "passed"
+        },
+        {
+          "name": "Estados del envío de evidencia muestra el envío pendiente y solo informa éxito tras la confirmación válida",
+          "status": "passed"
+        },
+        {
+          "name": "Estados del envío de evidencia muestra el progreso real solo cuando la plataforma informa el total",
+          "status": "passed"
+        },
+        {
+          "name": "Estados del envío de evidencia una doble pulsación produce un solo POST",
+          "status": "passed"
+        },
+        {
+          "name": "Estados del envío de evidencia un rechazo 400 se informa sin ofrecer reintentar la misma fotografía",
+          "status": "passed"
+        },
+        {
+          "name": "Estados del envío de evidencia un rechazo 404 se informa sin ofrecer reintentar la misma fotografía",
+          "status": "passed"
+        },
+        {
+          "name": "Estados del envío de evidencia un rechazo 409 se informa sin ofrecer reintentar la misma fotografía",
+          "status": "passed"
+        },
+        {
+          "name": "Estados del envío de evidencia un rechazo 413 se informa sin ofrecer reintentar la misma fotografía",
+          "status": "passed"
+        },
+        {
+          "name": "Estados del envío de evidencia un rechazo 415 se informa sin ofrecer reintentar la misma fotografía",
+          "status": "passed"
+        },
+        {
+          "name": "Estados del envío de evidencia un rechazo 422 se informa sin ofrecer reintentar la misma fotografía",
+          "status": "passed"
+        },
+        {
+          "name": "Estados del envío de evidencia tras un 503 (sin nada guardado) reintenta reenviando la fotografía",
+          "status": "passed"
+        },
+        {
+          "name": "Estados del envío de evidencia tras un 429 (sin nada guardado) reintenta reenviando la fotografía",
+          "status": "passed"
+        },
+        {
+          "name": "Estados del envío de evidencia un timeout deja el resultado incierto y no permite reenviar sin comprobar",
+          "status": "passed"
+        },
+        {
+          "name": "Estados del envío de evidencia al reintentar tras un timeout encuentra la fotografía ya guardada y no la duplica",
+          "status": "passed"
+        },
+        {
+          "name": "Estados del envío de evidencia al reintentar tras un timeout reenvía solo si el servidor no la tiene",
+          "status": "passed"
+        },
+        {
+          "name": "Estados del envío de evidencia si no puede comprobar el servidor tras un resultado incierto no reenvía",
+          "status": "passed"
+        },
+        {
+          "name": "Estados del envío de evidencia trata 500 como resultado incierto",
+          "status": "passed"
+        },
+        {
+          "name": "Estados del envío de evidencia trata 502 como resultado incierto",
+          "status": "passed"
+        },
+        {
+          "name": "Estados del envío de evidencia trata una respuesta 201 inválida como resultado incierto",
+          "status": "passed"
+        },
+        {
+          "name": "Estados del envío de evidencia permite cancelar el envío y comprueba antes de reintentar",
+          "status": "passed"
+        },
+        {
+          "name": "Estados del envío de evidencia un 401 cierra la sesión y no ofrece reintento",
+          "status": "passed"
+        },
+        {
+          "name": "Estados del envío de evidencia un 403 informa el permiso sin cerrar la sesión",
+          "status": "passed"
+        },
+        {
+          "name": "Estados del envío de evidencia reemplazar la fotografía tras un rechazo permite enviar la nueva",
+          "status": "passed"
+        },
+        {
+          "name": "Estados del envío de evidencia una respuesta tardía de otra orden no aparece en la orden actual",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "file": "__tests__/http-500-client-states.test.tsx",
+      "status": "passed",
+      "tests": [
+        {
+          "name": "HTTP 500 en Mis vehículos muestra error con reintento y no el vacío; al reintentar con 200 vacío aparece el vacío real",
+          "status": "passed"
+        },
+        {
+          "name": "HTTP 500 en Mis vehículos se recupera con datos al reintentar",
+          "status": "passed"
+        },
+        {
+          "name": "HTTP 500 en las órdenes del detalle de vehículo informa el fallo de órdenes sin decir «No hay órdenes asociadas»",
+          "status": "passed"
+        },
+        {
+          "name": "HTTP 500 en evidencias MS4 de una orden muestra error y no «Sin evidencias»; al reintentar con 200 vacío sí lo muestra",
+          "status": "passed"
+        },
+        {
+          "name": "HTTP 500 en el presupuesto de una orden (MS3) muestra error y no el vacío; al reintentar con lista vacía real aparece el vacío",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "file": "__tests__/order-client-scope.test.tsx",
+      "status": "passed",
+      "tests": [
+        {
+          "name": "lista solo órdenes del vehículo consultado y abre el detalle propio aunque otro usuario lo creó",
+          "status": "passed"
+        },
+        {
+          "name": "el detalle directo ajeno rechazado no muestra datos ni consulta el vehículo",
+          "status": "passed"
+        },
+        {
+          "name": "distingue una lista vacía válida sin registros demo",
+          "status": "passed"
+        },
+        {
+          "name": "HTTP 401 de órdenes muestra error recuperable, sin declararlo vacío",
+          "status": "passed"
+        },
+        {
+          "name": "HTTP 403 de órdenes muestra error recuperable, sin declararlo vacío",
+          "status": "passed"
+        },
+        {
+          "name": "HTTP 503 de órdenes muestra error recuperable, sin declararlo vacío",
+          "status": "passed"
+        },
+        {
+          "name": "refresh sustituye el listado y reabrir consulta nuevamente el servicio",
+          "status": "passed"
+        },
+        {
+          "name": "un refresh denegado retira las órdenes anteriores",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "file": "__tests__/order-contract-compatibility.test.tsx",
+      "status": "passed",
+      "tests": [
+        {
+          "name": "contrato OrdenRespuesta → mapper → modelo transforma todos los campos obligatorios del contrato",
+          "status": "passed"
+        },
+        {
+          "name": "contrato OrdenRespuesta → mapper → modelo conserva un mecánico nulo del contrato como orden sin asignar",
+          "status": "passed"
+        },
+        {
+          "name": "contrato OrdenRespuesta → mapper → modelo el código 1 coincide con el catálogo oficial (recibido)",
+          "status": "passed"
+        },
+        {
+          "name": "contrato OrdenRespuesta → mapper → modelo el código 2 coincide con el catálogo oficial (esperando_diagnostico)",
+          "status": "passed"
+        },
+        {
+          "name": "contrato OrdenRespuesta → mapper → modelo el código 4 coincide con el catálogo oficial (esperando_repuestos)",
+          "status": "passed"
+        },
+        {
+          "name": "contrato OrdenRespuesta → mapper → modelo el código 6 coincide con el catálogo oficial (listo_para_entrega)",
+          "status": "passed"
+        },
+        {
+          "name": "contrato OrdenRespuesta → mapper → modelo el código 7 coincide con el catálogo oficial (entregado)",
+          "status": "passed"
+        },
+        {
+          "name": "contrato OrdenRespuesta → mapper → modelo el código 3 corresponde a esperando_aprobacion_presupuesto",
+          "status": "passed"
+        },
+        {
+          "name": "contrato OrdenRespuesta → mapper → modelo el código 5 corresponde a en_reparacion",
+          "status": "passed"
+        },
+        {
+          "name": "contrato OrdenRespuesta → mapper → modelo el código 8 corresponde a cancelado",
+          "status": "passed"
+        },
+        {
+          "name": "contrato OrdenRespuesta → mapper → modelo el código 1 se convierte en estado_destino sin pérdida (ida y vuelta)",
+          "status": "passed"
+        },
+        {
+          "name": "contrato OrdenRespuesta → mapper → modelo el código 2 se convierte en estado_destino sin pérdida (ida y vuelta)",
+          "status": "passed"
+        },
+        {
+          "name": "contrato OrdenRespuesta → mapper → modelo el código 3 se convierte en estado_destino sin pérdida (ida y vuelta)",
+          "status": "passed"
+        },
+        {
+          "name": "contrato OrdenRespuesta → mapper → modelo el código 4 se convierte en estado_destino sin pérdida (ida y vuelta)",
+          "status": "passed"
+        },
+        {
+          "name": "contrato OrdenRespuesta → mapper → modelo el código 5 se convierte en estado_destino sin pérdida (ida y vuelta)",
+          "status": "passed"
+        },
+        {
+          "name": "contrato OrdenRespuesta → mapper → modelo el código 6 se convierte en estado_destino sin pérdida (ida y vuelta)",
+          "status": "passed"
+        },
+        {
+          "name": "contrato OrdenRespuesta → mapper → modelo el código 7 se convierte en estado_destino sin pérdida (ida y vuelta)",
+          "status": "passed"
+        },
+        {
+          "name": "contrato OrdenRespuesta → mapper → modelo el código 8 se convierte en estado_destino sin pérdida (ida y vuelta)",
+          "status": "passed"
+        },
+        {
+          "name": "contrato OrdenRespuesta → mapper → modelo el código 0, fuera del catálogo, se rechaza",
+          "status": "passed"
+        },
+        {
+          "name": "contrato OrdenRespuesta → mapper → modelo el código 9, fuera del catálogo, se rechaza",
+          "status": "passed"
+        },
+        {
+          "name": "contrato OrdenRespuesta → mapper → modelo el código -1, fuera del catálogo, se rechaza",
+          "status": "passed"
+        },
+        {
+          "name": "contrato OrdenRespuesta → servicio getOrderById consulta la ruta oficial y devuelve el modelo",
+          "status": "passed"
+        },
+        {
+          "name": "contrato OrdenRespuesta → servicio getOrders transforma una lista con el formato del contrato",
+          "status": "passed"
+        },
+        {
+          "name": "contrato OrdenRespuesta → servicio updateOrderStatus utiliza el contrato oficial MS2",
+          "status": "passed"
+        },
+        {
+          "name": "contrato OrdenRespuesta → vistas de detalle la vista de cliente representa el ejemplo oficial del contrato",
+          "status": "passed"
+        },
+        {
+          "name": "contrato OrdenRespuesta → vistas de detalle la vista de mecánico representa el ejemplo oficial del contrato",
+          "status": "passed"
+        },
+        {
+          "name": "contrato OrdenRespuesta → vistas de detalle la vista de administración representa el ejemplo oficial del contrato",
+          "status": "passed"
+        },
+        {
+          "name": "contrato OrdenRespuesta → vistas de detalle muestra una orden recién recibida sin mecánico asignado",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "file": "__tests__/order-detail-integration.test.tsx",
+      "status": "passed",
+      "tests": [
+        {
+          "name": "detalle de órdenes: consulta al servicio la vista de cliente consulta la orden del parámetro de ruta",
+          "status": "passed"
+        },
+        {
+          "name": "detalle de órdenes: consulta al servicio la vista de mecánico consulta la orden del parámetro de ruta",
+          "status": "passed"
+        },
+        {
+          "name": "detalle de órdenes: consulta al servicio la vista de administración consulta la orden del parámetro de ruta",
+          "status": "passed"
+        },
+        {
+          "name": "detalle de órdenes: consulta al servicio representa los datos de la orden con el estado legible",
+          "status": "passed"
+        },
+        {
+          "name": "detalle de órdenes: consulta al servicio indica cuando la orden no tiene mecánico asignado",
+          "status": "passed"
+        },
+        {
+          "name": "detalle de órdenes: estado de carga muestra el indicador de carga mientras el servicio responde",
+          "status": "passed"
+        },
+        {
+          "name": "detalle de órdenes: órdenes inexistentes y errores la vista de cliente informa cuando la orden no existe",
+          "status": "passed"
+        },
+        {
+          "name": "detalle de órdenes: órdenes inexistentes y errores la vista de mecánico informa cuando la orden no existe",
+          "status": "passed"
+        },
+        {
+          "name": "detalle de órdenes: órdenes inexistentes y errores la vista de administración informa cuando la orden no existe",
+          "status": "passed"
+        },
+        {
+          "name": "detalle de órdenes: órdenes inexistentes y errores propaga el mensaje de recurso no encontrado del backend",
+          "status": "passed"
+        },
+        {
+          "name": "detalle de órdenes: órdenes inexistentes y errores usa un mensaje propio si el error no aporta ninguno",
+          "status": "passed"
+        },
+        {
+          "name": "detalle de órdenes: órdenes inexistentes y errores no consulta al servicio si no se indica ninguna orden",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "file": "__tests__/order-flow-regression.test.tsx",
+      "status": "passed",
+      "tests": [
+        {
+          "name": "flujo orden → presupuesto → repuestos: representación de estados muestra el estado esperando_diagnostico con su etiqueta y tono",
+          "status": "passed"
+        },
+        {
+          "name": "flujo orden → presupuesto → repuestos: representación de estados muestra el estado esperando_aprobacion_presupuesto con su etiqueta y tono",
+          "status": "passed"
+        },
+        {
+          "name": "flujo orden → presupuesto → repuestos: representación de estados muestra el estado pausado_por_presupuesto_rechazado con su etiqueta y tono",
+          "status": "passed"
+        },
+        {
+          "name": "flujo orden → presupuesto → repuestos: representación de estados muestra el estado esperando_repuestos con su etiqueta y tono",
+          "status": "passed"
+        },
+        {
+          "name": "flujo orden → presupuesto → repuestos: representación de estados muestra el estado en_reparacion con su etiqueta y tono",
+          "status": "passed"
+        },
+        {
+          "name": "flujo orden → presupuesto → repuestos: representación de estados la vista de cliente muestra la espera de aprobación del presupuesto",
+          "status": "passed"
+        },
+        {
+          "name": "flujo orden → presupuesto → repuestos: representación de estados la vista de mecánico muestra la espera de aprobación del presupuesto",
+          "status": "passed"
+        },
+        {
+          "name": "flujo orden → presupuesto → repuestos: representación de estados la vista de administración muestra la espera de aprobación del presupuesto",
+          "status": "passed"
+        },
+        {
+          "name": "flujo orden → presupuesto → repuestos: propagación de cambios al actualizar refleja el paso de la aprobación del presupuesto a esperando repuestos",
+          "status": "passed"
+        },
+        {
+          "name": "flujo orden → presupuesto → repuestos: propagación de cambios al actualizar refleja el paso de la aprobación del presupuesto a en reparación",
+          "status": "passed"
+        },
+        {
+          "name": "flujo orden → presupuesto → repuestos: propagación de cambios propaga un error al actualizar y recupera el estado siguiente al reintentar",
+          "status": "passed"
+        },
+        {
+          "name": "flujo orden → presupuesto → repuestos: integración con MS3 asocia la orden con su presupuesto (vista de cliente)",
+          "status": "passed"
+        },
+        {
+          "name": "flujo orden → presupuesto → repuestos: integración con MS3 asocia la orden con su presupuesto (vista de administración)",
+          "status": "passed"
+        },
+        {
+          "name": "flujo orden → presupuesto → repuestos: integración con MS3 no asocia presupuestos de otra orden",
+          "status": "passed"
+        },
+        {
+          "name": "flujo orden → presupuesto → repuestos: integración con MS3 asocia el presupuesto aprobado con los repuestos requeridos",
+          "status": "passed"
+        },
+        {
+          "name": "flujo orden → presupuesto → repuestos: integración con MS3 aprobar con stock suficiente pasa la orden a reparación sin faltantes",
+          "status": "passed"
+        },
+        {
+          "name": "flujo orden → presupuesto → repuestos: estados y transiciones MS2 propaga los códigos 3 → 4 del contrato hasta la vista",
+          "status": "passed"
+        },
+        {
+          "name": "flujo orden → presupuesto → repuestos: estados y transiciones MS2 propaga los códigos 3 → 5 del contrato hasta la vista",
+          "status": "passed"
+        },
+        {
+          "name": "flujo orden → presupuesto → repuestos: estados y transiciones MS2 registra el cambio de estado mediante PATCH /ordenes/{id}/estado",
+          "status": "passed"
+        },
+        {
+          "name": "flujo orden → presupuesto → repuestos: estados y transiciones MS2 envía la observación recortada y omite una vacía (minLength 1)",
+          "status": "passed"
+        },
+        {
+          "name": "flujo orden → presupuesto → repuestos: estados y transiciones MS2 la cancelación exige observación y no llama a MS2 sin ella",
+          "status": "passed"
+        },
+        {
+          "name": "flujo orden → presupuesto → repuestos: estados y transiciones MS2 el estado pausado_por_presupuesto_rechazado no existe en MS2 y no se envía",
+          "status": "passed"
+        },
+        {
+          "name": "flujo orden → presupuesto → repuestos: estados y transiciones MS2 el estado control_calidad no existe en MS2 y no se envía",
+          "status": "passed"
+        },
+        {
+          "name": "flujo orden → presupuesto → repuestos: estados y transiciones MS2 informa el 409 de una transición 3 → 4, reservada a la decisión de presupuesto sin alterar la orden",
+          "status": "passed"
+        },
+        {
+          "name": "flujo orden → presupuesto → repuestos: estados y transiciones MS2 informa el 409 de una transición 4 → 5, bloqueada hasta verificar repuestos sin alterar la orden",
+          "status": "passed"
+        },
+        {
+          "name": "flujo orden → presupuesto → repuestos: estados y transiciones MS2 informa el 409 de una transición 6 → 7, reservada a la entrega sin alterar la orden",
+          "status": "passed"
+        },
+        {
+          "name": "flujo orden → presupuesto → repuestos: estados y transiciones MS2 informa el 409 de una transición desde un estado terminal sin alterar la orden",
+          "status": "passed"
+        },
+        {
+          "name": "flujo orden → presupuesto → repuestos: estados y transiciones MS2 normaliza el error 403 del PATCH de estado",
+          "status": "passed"
+        },
+        {
+          "name": "flujo orden → presupuesto → repuestos: estados y transiciones MS2 normaliza el error 404 del PATCH de estado",
+          "status": "passed"
+        },
+        {
+          "name": "flujo orden → presupuesto → repuestos: estados y transiciones MS2 normaliza el error 422 del PATCH de estado",
+          "status": "passed"
+        },
+        {
+          "name": "flujo orden → presupuesto → repuestos: estados y transiciones MS2 normaliza el error 500 del PATCH de estado",
+          "status": "passed"
+        },
+        {
+          "name": "flujo orden → presupuesto → repuestos: estados y transiciones MS2 rechaza una respuesta del PATCH que no cumple OrdenRespuesta",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "file": "__tests__/order-functional.test.tsx",
+      "status": "passed",
+      "tests": [
+        {
+          "name": "caso de uso: consultar una orden de trabajo el rol cliente inicia sesión, consulta y actualiza una orden, vuelve al panel y cierra la sesión",
+          "status": "passed"
+        },
+        {
+          "name": "caso de uso: consultar una orden de trabajo el rol mecanico inicia sesión, consulta y actualiza una orden, vuelve al panel y cierra la sesión",
+          "status": "passed"
+        },
+        {
+          "name": "caso de uso: consultar una orden de trabajo el rol administrador inicia sesión, consulta y actualiza una orden, vuelve al panel y cierra la sesión",
+          "status": "passed"
+        },
+        {
+          "name": "caso de uso: consultar una orden de trabajo el cliente recupera la orden reintentando tras agotarse los reintentos automáticos",
+          "status": "passed"
+        },
+        {
+          "name": "caso de uso: decidir el presupuesto de una orden el cliente aprueba el presupuesto tras confirmar y la orden refleja la decisión",
+          "status": "passed"
+        },
+        {
+          "name": "caso de uso: decidir el presupuesto de una orden el rechazo exige motivo, advierte la cancelación y puede deshacerse antes de confirmar",
+          "status": "passed"
+        },
+        {
+          "name": "caso de uso: decidir el presupuesto de una orden un error del MS3 no se reintenta automáticamente y el cliente puede volver a intentarlo",
+          "status": "passed"
+        },
+        {
+          "name": "caso de uso: decidir el presupuesto de una orden una aplicación pendiente se reintenta sin duplicar la decisión",
+          "status": "passed"
+        },
+        {
+          "name": "caso de uso: decidir el presupuesto de una orden una decisión registrada no puede volver a enviarse",
+          "status": "passed"
+        },
+        {
+          "name": "caso de uso: decidir el presupuesto de una orden una doble pulsación de confirmar con la decisión en curso envía una sola decisión",
+          "status": "passed"
+        },
+        {
+          "name": "caso de uso: decidir el presupuesto de una orden una doble pulsación de reintentar la aplicación envía un solo reintento",
+          "status": "passed"
+        },
+        {
+          "name": "caso de uso: decidir el presupuesto de una orden el presupuesto se recupera con el reintento manual tras agotarse los reintentos automáticos",
+          "status": "passed"
+        },
+        {
+          "name": "caso de uso: consultar vehículos, repuestos y proveedores el administrador recorre vehículos, repuestos y proveedores desde su panel y cierra la sesión",
+          "status": "passed"
+        },
+        {
+          "name": "caso de uso: consultar vehículos, repuestos y proveedores el rol cliente consulta sus vehículos desde el panel",
+          "status": "passed"
+        },
+        {
+          "name": "caso de uso: consultar vehículos, repuestos y proveedores el rol mecanico consulta sus vehículos desde el panel",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "file": "__tests__/order-role-access.test.tsx",
+      "status": "passed",
+      "tests": [
+        {
+          "name": "vistas de órdenes: acceso autorizado el rol cliente consulta su detalle con el token de la sesión",
+          "status": "passed"
+        },
+        {
+          "name": "vistas de órdenes: acceso autorizado el rol mecanico consulta su detalle con el token de la sesión",
+          "status": "passed"
+        },
+        {
+          "name": "vistas de órdenes: acceso autorizado el rol administrador consulta su detalle con el token de la sesión",
+          "status": "passed"
+        },
+        {
+          "name": "vistas de órdenes: protección visual por rol el rol cliente no accede al detalle de órdenes de administrador ni consulta al backend",
+          "status": "passed"
+        },
+        {
+          "name": "vistas de órdenes: protección visual por rol el rol cliente no accede al detalle de órdenes de mecanico ni consulta al backend",
+          "status": "passed"
+        },
+        {
+          "name": "vistas de órdenes: protección visual por rol el rol mecanico no accede al detalle de órdenes de administrador ni consulta al backend",
+          "status": "passed"
+        },
+        {
+          "name": "vistas de órdenes: protección visual por rol el rol mecanico no accede al detalle de órdenes de cliente ni consulta al backend",
+          "status": "passed"
+        },
+        {
+          "name": "vistas de órdenes: protección visual por rol el rol administrador no accede al detalle de órdenes de cliente ni consulta al backend",
+          "status": "passed"
+        },
+        {
+          "name": "vistas de órdenes: protección visual por rol el rol administrador no accede al detalle de órdenes de mecanico ni consulta al backend",
+          "status": "passed"
+        },
+        {
+          "name": "vistas de órdenes: protección visual por rol sin sesión, /mis-ordenes/31 redirige al login sin consultar al backend",
+          "status": "passed"
+        },
+        {
+          "name": "vistas de órdenes: protección visual por rol sin sesión, /ordenes-asignadas/31 redirige al login sin consultar al backend",
+          "status": "passed"
+        },
+        {
+          "name": "vistas de órdenes: protección visual por rol sin sesión, /ordenes/31 redirige al login sin consultar al backend",
+          "status": "passed"
+        },
+        {
+          "name": "vistas de órdenes: protección visual por rol no consulta la orden hasta que termina la recuperación de la sesión",
+          "status": "passed"
+        },
+        {
+          "name": "vistas de órdenes: autorización del backend un 401 del backend cierra la sesión y devuelve al login",
+          "status": "passed"
+        },
+        {
+          "name": "vistas de órdenes: autorización del backend una orden no visible para el usuario (404) muestra el error sin cerrar la sesión",
+          "status": "passed"
+        },
+        {
+          "name": "vistas de órdenes: autorización del backend un 403 del backend muestra el error de permisos sin cerrar la sesión (cliente)",
+          "status": "passed"
+        },
+        {
+          "name": "vistas de órdenes: autorización del backend un 403 del backend muestra el error de permisos sin cerrar la sesión (mecanico)",
+          "status": "passed"
+        },
+        {
+          "name": "vistas de órdenes: autorización del backend un 403 del backend muestra el error de permisos sin cerrar la sesión (administrador)",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "file": "__tests__/order-view-states.test.tsx",
+      "status": "passed",
+      "tests": [
+        {
+          "name": "vistas de órdenes: carga inicial la vista de cliente muestra la carga hasta que el servicio responde, con una sola consulta",
+          "status": "passed"
+        },
+        {
+          "name": "vistas de órdenes: carga inicial la vista de mecánico muestra la carga hasta que el servicio responde, con una sola consulta",
+          "status": "passed"
+        },
+        {
+          "name": "vistas de órdenes: carga inicial la vista de administración muestra la carga hasta que el servicio responde, con una sola consulta",
+          "status": "passed"
+        },
+        {
+          "name": "vistas de órdenes: errores de servicio informa el tiempo de espera agotado",
+          "status": "passed"
+        },
+        {
+          "name": "vistas de órdenes: errores de servicio informa la falta de conexión con el backend",
+          "status": "passed"
+        },
+        {
+          "name": "vistas de órdenes: errores de servicio informa un error 500 del servidor",
+          "status": "passed"
+        },
+        {
+          "name": "vistas de órdenes: errores de servicio informa un error 503 del servidor",
+          "status": "passed"
+        },
+        {
+          "name": "vistas de órdenes: errores de servicio no repite la consulta por su cuenta tras un error",
+          "status": "passed"
+        },
+        {
+          "name": "vistas de órdenes: reintento manual muestra la carga durante el reintento y luego el detalle",
+          "status": "passed"
+        },
+        {
+          "name": "vistas de órdenes: reintento manual descarta las actualizaciones repetidas mientras una sigue en curso",
+          "status": "passed"
+        },
+        {
+          "name": "vistas de órdenes: respuestas vacías o inválidas una respuesta 200 sin cuerpo muestra un mensaje comprensible",
+          "status": "passed"
+        },
+        {
+          "name": "vistas de órdenes: respuestas vacías o inválidas una respuesta 200 sin identificador de orden no se representa como orden válida",
+          "status": "passed"
+        },
+        {
+          "name": "vistas de órdenes: respuestas vacías o inválidas rechaza la orden cuando falta el campo obligatorio orden_id",
+          "status": "passed"
+        },
+        {
+          "name": "vistas de órdenes: respuestas vacías o inválidas rechaza la orden cuando falta el campo obligatorio vehiculo_id",
+          "status": "passed"
+        },
+        {
+          "name": "vistas de órdenes: respuestas vacías o inválidas rechaza la orden cuando falta el campo obligatorio ingreso_id",
+          "status": "passed"
+        },
+        {
+          "name": "vistas de órdenes: respuestas vacías o inválidas rechaza la orden cuando falta el campo obligatorio estado_codigo",
+          "status": "passed"
+        },
+        {
+          "name": "vistas de órdenes: respuestas vacías o inválidas rechaza la orden cuando falta el campo obligatorio mecanico_actual_id",
+          "status": "passed"
+        },
+        {
+          "name": "vistas de órdenes: respuestas vacías o inválidas rechaza la orden cuando falta el campo obligatorio creado_por_id",
+          "status": "passed"
+        },
+        {
+          "name": "vistas de órdenes: respuestas vacías o inválidas rechaza la orden cuando falta el campo obligatorio creado_en",
+          "status": "passed"
+        },
+        {
+          "name": "vistas de órdenes: respuestas vacías o inválidas rechaza la orden cuando falta el campo obligatorio actualizado_en",
+          "status": "passed"
+        },
+        {
+          "name": "vistas de órdenes: respuestas vacías o inválidas rechaza la orden con orden_id como texto",
+          "status": "passed"
+        },
+        {
+          "name": "vistas de órdenes: respuestas vacías o inválidas rechaza la orden con estado_codigo decimal",
+          "status": "passed"
+        },
+        {
+          "name": "vistas de órdenes: respuestas vacías o inválidas rechaza la orden con creado_en sin formato de fecha",
+          "status": "passed"
+        },
+        {
+          "name": "vistas de órdenes: respuestas vacías o inválidas rechaza la orden con mecanico_actual_id como texto",
+          "status": "passed"
+        },
+        {
+          "name": "vistas de órdenes: respuestas vacías o inválidas acepta mecanico_actual_id nulo, que el contrato permite",
+          "status": "passed"
+        },
+        {
+          "name": "vistas de órdenes: respuestas vacías o inválidas informa un estado fuera del catálogo sin representar la orden",
+          "status": "passed"
+        },
+        {
+          "name": "vistas de órdenes: respuestas vacías o inválidas se recupera con el reintento manual cuando la siguiente respuesta es válida",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "file": "__tests__/protected-routes.test.tsx",
+      "status": "passed",
+      "tests": [
+        {
+          "name": "rutas protegidas por sesión y rol redirige de /administrador al login si no hay una sesión autenticada",
+          "status": "passed"
+        },
+        {
+          "name": "rutas protegidas por sesión y rol redirige de /cliente al login si no hay una sesión autenticada",
+          "status": "passed"
+        },
+        {
+          "name": "rutas protegidas por sesión y rol redirige de /mecanico al login si no hay una sesión autenticada",
+          "status": "passed"
+        },
+        {
+          "name": "rutas protegidas por sesión y rol permite que el rol administrador acceda a su ruta",
+          "status": "passed"
+        },
+        {
+          "name": "rutas protegidas por sesión y rol permite que el rol cliente acceda a su ruta",
+          "status": "passed"
+        },
+        {
+          "name": "rutas protegidas por sesión y rol permite que el rol mecanico acceda a su ruta",
+          "status": "passed"
+        },
+        {
+          "name": "rutas protegidas por sesión y rol redirige al rol cliente a su propia ruta al intentar entrar a /administrador",
+          "status": "passed"
+        },
+        {
+          "name": "rutas protegidas por sesión y rol redirige al rol cliente a su propia ruta al intentar entrar a /mecanico",
+          "status": "passed"
+        },
+        {
+          "name": "rutas protegidas por sesión y rol redirige al rol mecanico a su propia ruta al intentar entrar a /administrador",
+          "status": "passed"
+        },
+        {
+          "name": "rutas protegidas por sesión y rol redirige al rol mecanico a su propia ruta al intentar entrar a /cliente",
+          "status": "passed"
+        },
+        {
+          "name": "rutas protegidas por sesión y rol redirige al rol administrador a su propia ruta al intentar entrar a /cliente",
+          "status": "passed"
+        },
+        {
+          "name": "rutas protegidas por sesión y rol redirige al rol administrador a su propia ruta al intentar entrar a /mecanico",
+          "status": "passed"
+        },
+        {
+          "name": "rutas protegidas por sesión y rol revalida la ruta abierta cuando la sesión cambia de cliente a mecanico",
+          "status": "passed"
+        },
+        {
+          "name": "rutas protegidas por sesión y rol revalida la ruta abierta cuando la sesión cambia de mecanico a administrador",
+          "status": "passed"
+        },
+        {
+          "name": "rutas protegidas por sesión y rol revalida la ruta abierta cuando la sesión cambia de administrador a cliente",
+          "status": "passed"
+        },
+        {
+          "name": "rutas protegidas por sesión y rol espera a que termine la recuperación de sesión antes de decidir la ruta",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "file": "__tests__/role-access-restrictions.test.tsx",
+      "status": "passed",
+      "tests": [
+        {
+          "name": "ProtectedRoute: acceso autorizado permite al rol administrador ver el contenido de su propia ruta",
+          "status": "passed"
+        },
+        {
+          "name": "ProtectedRoute: acceso autorizado permite al rol mecanico ver el contenido de su propia ruta",
+          "status": "passed"
+        },
+        {
+          "name": "ProtectedRoute: acceso autorizado permite al rol cliente ver el contenido de su propia ruta",
+          "status": "passed"
+        },
+        {
+          "name": "ProtectedRoute: acceso restringido impide que el rol cliente abra /administrador y no renderiza su contenido",
+          "status": "passed"
+        },
+        {
+          "name": "ProtectedRoute: acceso restringido impide que el rol cliente abra /mecanico y no renderiza su contenido",
+          "status": "passed"
+        },
+        {
+          "name": "ProtectedRoute: acceso restringido impide que el rol mecanico abra /administrador y no renderiza su contenido",
+          "status": "passed"
+        },
+        {
+          "name": "ProtectedRoute: acceso restringido impide que el rol mecanico abra /cliente y no renderiza su contenido",
+          "status": "passed"
+        },
+        {
+          "name": "ProtectedRoute: acceso restringido impide que el rol administrador abra /mecanico y no renderiza su contenido",
+          "status": "passed"
+        },
+        {
+          "name": "ProtectedRoute: acceso restringido impide que el rol administrador abra /cliente y no renderiza su contenido",
+          "status": "passed"
+        },
+        {
+          "name": "ProtectedRoute: acceso restringido envía al login al entrar a /administrador sin una sesión autenticada",
+          "status": "passed"
+        },
+        {
+          "name": "ProtectedRoute: acceso restringido envía al login al entrar a /mecanico sin una sesión autenticada",
+          "status": "passed"
+        },
+        {
+          "name": "ProtectedRoute: acceso restringido envía al login al entrar a /cliente sin una sesión autenticada",
+          "status": "passed"
+        },
+        {
+          "name": "RoleGuard: sesiones incompletas trata como no autenticada una sesión marcada como activa pero sin usuario",
+          "status": "passed"
+        },
+        {
+          "name": "RoleGuard: sesiones incompletas no expone el contenido protegido mientras la sesión sigue cargando",
+          "status": "passed"
+        },
+        {
+          "name": "RoleGuard: sesiones incompletas aplica la misma restricción por rol que ProtectedRoute",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "file": "__tests__/services-session-navigation.test.tsx",
+      "status": "passed",
+      "tests": [
+        {
+          "name": "Pruebas Integradas: Servicios, Sesión y Navegación 1. Servicio ➔ Sesión ➔ Navegación: Login exitoso autentica y permite navegación a dashboard de cliente",
+          "status": "passed"
+        },
+        {
+          "name": "Pruebas Integradas: Servicios, Sesión y Navegación 2. Sesión activa ➔ Consumo de Servicios: Mecánico consulta órdenes autenticado",
+          "status": "passed"
+        },
+        {
+          "name": "Pruebas Integradas: Servicios, Sesión y Navegación 3. Expiración/Cierre de Sesión ➔ Navegación: Logout devuelve al usuario a /login",
+          "status": "passed"
+        },
+        {
+          "name": "Pruebas Integradas: Servicios, Sesión y Navegación 4. Consumo de Vehículos: Cliente autenticado consulta sus vehículos",
+          "status": "passed"
+        },
+        {
+          "name": "Pruebas Integradas: Servicios, Sesión y Navegación 5. Resiliencia de Red: Pérdida de conectividad activa banner sin destruir la sesión ni la navegación",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "file": "__tests__/vehicle-list-integration.test.tsx",
+      "status": "passed",
+      "tests": [
+        {
+          "name": "listado de vehículos: consulta al servicio el listado de cliente permite abrir el detalle",
+          "status": "passed"
+        },
+        {
+          "name": "listado de vehículos: consulta al servicio el listado de mecánico permite abrir el detalle",
+          "status": "passed"
+        },
+        {
+          "name": "listado de vehículos: consulta al servicio el listado de administración permite abrir el detalle",
+          "status": "passed"
+        },
+        {
+          "name": "listado de vehículos: consulta al servicio la vista de cliente consulta getMyVehicles y representa los vehículos recibidos",
+          "status": "passed"
+        },
+        {
+          "name": "listado de vehículos: consulta al servicio la vista de mecánico consulta getAssignedVehicles y representa los vehículos recibidos",
+          "status": "passed"
+        },
+        {
+          "name": "listado de vehículos: consulta al servicio la vista de administración consulta getVehicles y representa los vehículos recibidos",
+          "status": "passed"
+        },
+        {
+          "name": "listado de vehículos: consulta al servicio no consulta el endpoint de otro rol",
+          "status": "passed"
+        },
+        {
+          "name": "listado de vehículos: estado de carga muestra el indicador de carga mientras el servicio responde",
+          "status": "passed"
+        },
+        {
+          "name": "listado de vehículos: resultados vacíos la vista de cliente informa cuando no hay vehículos",
+          "status": "passed"
+        },
+        {
+          "name": "listado de vehículos: resultados vacíos la vista de mecánico informa cuando no hay vehículos",
+          "status": "passed"
+        },
+        {
+          "name": "listado de vehículos: resultados vacíos la vista de administración informa cuando no hay vehículos",
+          "status": "passed"
+        },
+        {
+          "name": "listado de vehículos: errores la vista de cliente muestra el mensaje de error propagado por el servicio",
+          "status": "passed"
+        },
+        {
+          "name": "listado de vehículos: errores la vista de mecánico muestra el mensaje de error propagado por el servicio",
+          "status": "passed"
+        },
+        {
+          "name": "listado de vehículos: errores la vista de administración muestra el mensaje de error propagado por el servicio",
+          "status": "passed"
+        },
+        {
+          "name": "listado de vehículos: errores usa un mensaje propio si el error no aporta ninguno",
+          "status": "passed"
+        },
+        {
+          "name": "listado de vehículos: acceso desde cada panel cada panel ofrece un control que abre su propio listado",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "file": "__tests__/views-services-integration.test.tsx",
+      "status": "passed",
+      "tests": [
+        {
+          "name": "vistas de vehículos con VehiclesService real la vista de cliente consulta /mis-vehiculos a través del servicio",
+          "status": "passed"
+        },
+        {
+          "name": "vistas de vehículos con VehiclesService real la vista de mecánico consulta /vehiculos-asignados a través del servicio",
+          "status": "passed"
+        },
+        {
+          "name": "vistas de vehículos con VehiclesService real la vista de administración consulta /vehiculos a través del servicio",
+          "status": "passed"
+        },
+        {
+          "name": "vistas de vehículos con VehiclesService real mapea y representa una respuesta con atributos en español",
+          "status": "passed"
+        },
+        {
+          "name": "vistas de vehículos con VehiclesService real mapea y representa una respuesta con atributos en inglés y campos nulos",
+          "status": "passed"
+        },
+        {
+          "name": "vistas de vehículos con VehiclesService real representa el listado vacío cuando la API responde sin vehículos",
+          "status": "passed"
+        },
+        {
+          "name": "vistas de vehículos con VehiclesService real muestra el mensaje del backend cuando la respuesta trae detalle",
+          "status": "passed"
+        },
+        {
+          "name": "vistas de vehículos con VehiclesService real muestra el mensaje normalizado de un error de servidor sin detalle",
+          "status": "passed"
+        },
+        {
+          "name": "vistas de vehículos con VehiclesService real muestra el mensaje normalizado cuando el backend es inalcanzable",
+          "status": "passed"
+        },
+        {
+          "name": "vistas de órdenes con OrdersService real la vista de cliente consulta el detalle a través del servicio",
+          "status": "passed"
+        },
+        {
+          "name": "vistas de órdenes con OrdersService real la vista de mecánico consulta el detalle a través del servicio",
+          "status": "passed"
+        },
+        {
+          "name": "vistas de órdenes con OrdersService real la vista de administración consulta el detalle a través del servicio",
+          "status": "passed"
+        },
+        {
+          "name": "vistas de órdenes con OrdersService real traduce el código numérico de estado a la etiqueta de la interfaz",
+          "status": "passed"
+        },
+        {
+          "name": "vistas de órdenes con OrdersService real muestra un error ante una orden sin estado oficial",
+          "status": "passed"
+        },
+        {
+          "name": "vistas de órdenes con OrdersService real muestra el mensaje normalizado cuando la orden no existe",
+          "status": "passed"
+        },
+        {
+          "name": "vistas de órdenes con OrdersService real muestra el mensaje de permisos insuficientes devuelto por el backend",
+          "status": "passed"
+        }
+      ]
+    }
+  ]
+}

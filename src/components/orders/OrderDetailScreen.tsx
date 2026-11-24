@@ -21,6 +21,7 @@ import {
 import { AppScreen } from '@/components/layout/AppScreen';
 import { colors, radius, spacing } from '@/constants/theme';
 import type { UserRole } from '@/constants/roles';
+import { getRouteByRole } from '@/constants/routes';
 import type { WorkOrder } from '@/models/order.model';
 import type { Vehicle } from '@/models/vehicle.model';
 import { ordersService } from '@/services/orders.service';
@@ -71,6 +72,11 @@ function OrderDetailScreenContent({
   role,
 }: OrderDetailScreenProps) {
   const router = useRouter();
+  // Sin historial (enlace directo, arranque en frío o recarga web) se vuelve al inicio del rol.
+  const goBack = () => {
+    if (router.canGoBack()) router.back();
+    else router.replace(getRouteByRole(role) as never);
+  };
   const [order, setOrder] = useState<WorkOrder | null>(null);
   const [vehicle, setVehicle] = useState<Vehicle | null>(null);
   const [isLoading, setIsLoading] = useState(true);
@@ -148,7 +154,7 @@ function OrderDetailScreenContent({
         <Button
           title="Volver"
           variant="outline"
-          onPress={() => router.back()}
+          onPress={goBack}
         />
       </AppScreen>
     );
@@ -283,7 +289,7 @@ function OrderDetailScreenContent({
         <Button
           title="Volver"
           variant="outline"
-          onPress={() => router.back()}
+          onPress={goBack}
         />
       </ScrollView>
     </AppScreen>

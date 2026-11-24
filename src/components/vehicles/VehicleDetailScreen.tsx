@@ -23,6 +23,13 @@ interface VehicleDetailScreenProps {
   vehicleId: string;
 }
 
+/** Destino de «Volver» cuando no hay historial (enlace directo, arranque en frío o recarga web). */
+const VEHICLE_LIST_PATH: Record<UserRole, string> = {
+  cliente: '/(cliente)/mis-vehiculos',
+  mecanico: '/(mecanico)/vehiculos-asignados',
+  administrador: '/(admin)/vehiculos',
+};
+
 function getOrderDetailPath(role: UserRole, orderId: string) {
   switch (role) {
     case 'cliente':
@@ -101,6 +108,10 @@ function VehicleDetailScreenContent({
   vehicleId,
 }: VehicleDetailScreenProps) {
   const router = useRouter();
+  const goBack = () => {
+    if (router.canGoBack()) router.back();
+    else router.replace(VEHICLE_LIST_PATH[role] as never);
+  };
 
   const [vehicle, setVehicle] = useState<Vehicle | null>(null);
   const [orders, setOrders] = useState<WorkOrder[]>([]);
@@ -181,7 +192,7 @@ function VehicleDetailScreenContent({
         <Button
           title="Volver a vehículos"
           variant="outline"
-          onPress={() => router.back()}
+          onPress={goBack}
           testID="vehicle-detail-back"
         />
       </AppScreen>
@@ -329,7 +340,7 @@ function VehicleDetailScreenContent({
         <Button
           title="Volver a vehículos"
           variant="outline"
-          onPress={() => router.back()}
+          onPress={goBack}
           testID="vehicle-detail-back-bottom"
         />
       </ScrollView>
