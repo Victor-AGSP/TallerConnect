@@ -21,6 +21,8 @@ Resumen: **12 defectos registrados; 10 corregidos, 1 abierto (D-11), 1 no reprod
 
 D-11 es P1 porque cualquier ejecución con la configuración versionada falla por completo; está mitigado (variable de entorno en la línea de comandos y despliegue Kubero ya configurado), por eso no bloquea la demo.
 
+> **Actualización 2026-11-24 (D-11):** integración corregida y entornos separados en `src/config/env.ts`; producción y `.env` privados siguen pendientes. Detalle en [D-11](D-11.md). La fila D-11 de [defectos.csv](defectos.csv) está actualizada.
+
 ## Observaciones (no son defectos demostrados)
 
 | ID | Observación | Riesgo | Acción propuesta |

@@ -25,6 +25,8 @@ Los 14 tickets de las semanas 3 y 4 tienen trabajo verificable y un commit indiv
 | SCRUM-230 | Este documento | — | `git log -1 --format=%h -- docs/sprint-3/semana-4/SCRUM-230.md` |
 | SCRUM-231 | Matriz registrada: 22 PASS, 4 BLOCKED, 2 NOT RUN | Cuentas y dispositivo | `git log -1 --format=%h -- docs/sprint-3/semana-4/SCRUM-231.md` |
 
+> **Actualización 2026-11-24 (D-11):** integración corregida y entornos separados en `src/config/env.ts`; producción y `.env` privados siguen pendientes. Detalle en [D-11](D-11.md).
+
 ## Problemas del frontend (corregidos en esta rama)
 
 | ID | Problema | Ticket |

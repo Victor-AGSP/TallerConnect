@@ -1,0 +1,131 @@
+{
+  "startTime": 1795522764909,
+  "numTotalTestSuites": 1,
+  "numPassedTestSuites": 1,
+  "numFailedTestSuites": 0,
+  "numPassedTests": 28,
+  "numFailedTests": 0,
+  "numPendingTests": 0,
+  "success": true,
+  "environment": "Jest; dobles controlados; sin backend ni dispositivo",
+  "suites": [
+    {
+      "file": "__tests__/env-config.test.ts",
+      "status": "passed",
+      "tests": [
+        {
+          "name": "Configuración de Entornos y URL de la API Gateway resolveApiUrl y normalizeGatewayBaseUrl prioriza la URL explícita (EXPO_PUBLIC_API_URL) por sobre cualquier entorno y limpia barras finales",
+          "status": "passed"
+        },
+        {
+          "name": "Configuración de Entornos y URL de la API Gateway resolveApiUrl y normalizeGatewayBaseUrl resuelve la Gateway UCT para integración sin URL explícita (ios)",
+          "status": "passed"
+        },
+        {
+          "name": "Configuración de Entornos y URL de la API Gateway resolveApiUrl y normalizeGatewayBaseUrl resuelve la Gateway UCT para integración sin URL explícita (android)",
+          "status": "passed"
+        },
+        {
+          "name": "Configuración de Entornos y URL de la API Gateway resolveApiUrl y normalizeGatewayBaseUrl resuelve la Gateway UCT para integración sin URL explícita (web)",
+          "status": "passed"
+        },
+        {
+          "name": "Configuración de Entornos y URL de la API Gateway resolveApiUrl y normalizeGatewayBaseUrl acepta el nombre de entorno sin distinguir mayúsculas",
+          "status": "passed"
+        },
+        {
+          "name": "Configuración de Entornos y URL de la API Gateway resolveApiUrl y normalizeGatewayBaseUrl resuelve producción con su propia constante, sin cambios hasta autorización del equipo",
+          "status": "passed"
+        },
+        {
+          "name": "Configuración de Entornos y URL de la API Gateway resolveApiUrl y normalizeGatewayBaseUrl integración y producción se resuelven de forma independiente",
+          "status": "passed"
+        },
+        {
+          "name": "Configuración de Entornos y URL de la API Gateway resolveApiUrl y normalizeGatewayBaseUrl la URL explícita tiene prioridad en todos los entornos y plataformas",
+          "status": "passed"
+        },
+        {
+          "name": "Configuración de Entornos y URL de la API Gateway resolveApiUrl y normalizeGatewayBaseUrl una URL explícita vacía o solo con espacios no anula la resolución por entorno",
+          "status": "passed"
+        },
+        {
+          "name": "Configuración de Entornos y URL de la API Gateway resolveApiUrl y normalizeGatewayBaseUrl un entorno desconocido o ausente nunca resuelve a la nube",
+          "status": "passed"
+        },
+        {
+          "name": "Configuración de Entornos y URL de la API Gateway resolveApiUrl y normalizeGatewayBaseUrl normaliza barras finales de la URL explícita",
+          "status": "passed"
+        },
+        {
+          "name": "Configuración de Entornos y URL de la API Gateway resolveApiUrl y normalizeGatewayBaseUrl resuelve localhost para desarrollo en Web o iOS",
+          "status": "passed"
+        },
+        {
+          "name": "Configuración de Entornos y URL de la API Gateway resolveApiUrl y normalizeGatewayBaseUrl resuelve 10.0.2.2 para desarrollo en emulador Android",
+          "status": "passed"
+        },
+        {
+          "name": "Configuración de Entornos y URL de la API Gateway ENV.API_URL según variables de entorno (cableado del módulo) integración sin URL explícita usa la Gateway UCT y no activa mocks",
+          "status": "passed"
+        },
+        {
+          "name": "Configuración de Entornos y URL de la API Gateway ENV.API_URL según variables de entorno (cableado del módulo) producción sin URL explícita conserva su constante",
+          "status": "passed"
+        },
+        {
+          "name": "Configuración de Entornos y URL de la API Gateway ENV.API_URL según variables de entorno (cableado del módulo) una URL explícita (p. ej. en .env.local) prevalece sobre el entorno",
+          "status": "passed"
+        },
+        {
+          "name": "Configuración de Entornos y URL de la API Gateway buildGatewayEndpointPath evita duplicar el prefijo /api cuando la URL base ya termina en /api",
+          "status": "passed"
+        },
+        {
+          "name": "Configuración de Entornos y URL de la API Gateway buildGatewayEndpointPath no duplica /api con la Gateway de integración",
+          "status": "passed"
+        },
+        {
+          "name": "Configuración de Entornos y URL de la API Gateway buildGatewayEndpointPath respeta URLs absolutas o bases sin sufijo /api",
+          "status": "passed"
+        },
+        {
+          "name": "Configuración de Entornos y URL de la API Gateway Helpers de validación de entorno, seguridad y timeouts resuelve entornos correctamente mediante resolveAppEnvironment",
+          "status": "passed"
+        },
+        {
+          "name": "Configuración de Entornos y URL de la API Gateway Helpers de validación de entorno, seguridad y timeouts valida timeouts personalizados y usa fallback ante valores inválidos",
+          "status": "passed"
+        },
+        {
+          "name": "Configuración de Entornos y URL de la API Gateway Helpers de validación de entorno, seguridad y timeouts exige HTTPS en entornos de integración y producción",
+          "status": "passed"
+        },
+        {
+          "name": "Configuración de Entornos y URL de la API Gateway Helpers de validación de entorno, seguridad y timeouts las Gateways en la nube usan HTTPS y pasan la validación de su entorno",
+          "status": "passed"
+        },
+        {
+          "name": "Configuración de Entornos y URL de la API Gateway Helpers de validación de entorno, seguridad y timeouts no activa mocks automáticamente sin banderas explícitas",
+          "status": "passed"
+        },
+        {
+          "name": "Configuración de Entornos y URL de la API Gateway Helpers de validación de entorno, seguridad y timeouts evalúa flags de modo simulado (mocks) con prioridad para EXPO_PUBLIC_USE_MOCK_SERVICES",
+          "status": "passed"
+        },
+        {
+          "name": "Configuración de Entornos y URL de la API Gateway Constantes de Timeout y Configuración Global (ENV) define timeouts estándar (15s), de subida multimedia (60s) y de ping (5s)",
+          "status": "passed"
+        },
+        {
+          "name": "Configuración de Entornos y URL de la API Gateway Constantes de Timeout y Configuración Global (ENV) sincroniza API_BASE_URL de apiClient con la configuración ENV.API_URL",
+          "status": "passed"
+        },
+        {
+          "name": "Configuración de Entornos y URL de la API Gateway Constantes de Timeout y Configuración Global (ENV) expone propiedades de configuración tipadas y rutas de Gateway en el objeto ENV",
+          "status": "passed"
+        }
+      ]
+    }
+  ]
+}

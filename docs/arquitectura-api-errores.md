@@ -9,8 +9,11 @@ Este documento detalla la arquitectura de comunicación HTTP entre la aplicació
 ### Variables de Entorno en Expo
 En Expo (React Native), las variables de entorno accesibles en tiempo de ejecución por el cliente JavaScript deben estar prefijadas obligatoriamente con `EXPO_PUBLIC_`. Cualquier otra variable es ignorada durante la compilación por motivos de seguridad.
 
-- Variable oficial: `EXPO_PUBLIC_API_URL`
-- Fallback por defecto: `'https://tallerconect.vercel.app/api'`
+- Variable oficial: `EXPO_PUBLIC_API_URL` (máxima prioridad)
+- Sin URL explícita, `resolveApiUrl` elige según `EXPO_PUBLIC_APP_ENV` (ver `src/config/env.ts` y [D-11](sprint-3/semana-4/D-11.md)):
+  - `integration`: `https://api-tallerconnect.inf.uct.cl/api`
+  - `production`: `https://tallerconect.vercel.app/api` (despliegue retirado; reemplazo pendiente de aprobación)
+  - desarrollo: `http://localhost:8000/api`, o `http://10.0.2.2:8000/api` en emulador Android
 
 ### Configuración del Cliente (`src/services/api/client.ts`)
 Para evitar instancias dispersas de Axios que compliquen el mantenimiento o el monitoreo de peticiones, se centraliza una única instancia tipada:

@@ -27,17 +27,59 @@ describe('Configuración de Entornos y URL de la API Gateway', () => {
       );
     });
 
-    it('resuelve la URL de la nube (Vercel) para entorno de integración', () => {
-      const resolved = resolveApiUrl('integration', undefined, 'ios');
+    // D-11: la Gateway de integración vigente es la de la UCT (la de Vercel fue retirada).
+    it.each(['ios', 'android', 'web'])(
+      'resuelve la Gateway UCT para integración sin URL explícita (%s)',
+      (platform) => {
+        const resolved = resolveApiUrl('integration', undefined, platform);
 
-      expect(resolved).toBe(API_GATEWAY_URLS.INTEGRATION);
-      expect(resolved).toBe('https://tallerconect.vercel.app/api');
+        expect(resolved).toBe(API_GATEWAY_URLS.INTEGRATION);
+        expect(resolved).toBe('https://api-tallerconnect.inf.uct.cl/api');
+      },
+    );
+
+    it('acepta el nombre de entorno sin distinguir mayúsculas', () => {
+      expect(resolveApiUrl('INTEGRATION', undefined, 'ios')).toBe(API_GATEWAY_URLS.INTEGRATION);
+      expect(resolveApiUrl('Production', undefined, 'ios')).toBe(API_GATEWAY_URLS.PRODUCTION);
     });
 
-    it('resuelve la URL de la nube para entorno de producción', () => {
+    it('resuelve producción con su propia constante, sin cambios hasta autorización del equipo', () => {
       const resolved = resolveApiUrl('production', undefined, 'android');
 
       expect(resolved).toBe(API_GATEWAY_URLS.PRODUCTION);
+      // Valor de producción conservado a propósito (pendiente de aprobación; ver D-11).
+      expect(API_GATEWAY_URLS.PRODUCTION).toBe('https://tallerconect.vercel.app/api');
+    });
+
+    it('integración y producción se resuelven de forma independiente', () => {
+      expect(resolveApiUrl('integration', undefined, 'ios')).not.toBe(
+        resolveApiUrl('production', undefined, 'ios'),
+      );
+    });
+
+    it('la URL explícita tiene prioridad en todos los entornos y plataformas', () => {
+      const explicitUrl = 'https://gateway.example.test/api';
+      for (const env of ['integration', 'production', 'development', undefined]) {
+        for (const platform of ['ios', 'android', 'web']) {
+          expect(resolveApiUrl(env, explicitUrl, platform)).toBe(explicitUrl);
+        }
+      }
+    });
+
+    it('una URL explícita vacía o solo con espacios no anula la resolución por entorno', () => {
+      expect(resolveApiUrl('integration', '   ', 'ios')).toBe(API_GATEWAY_URLS.INTEGRATION);
+      expect(resolveApiUrl('development', '', 'android')).toBe(API_GATEWAY_URLS.ANDROID_EMULATOR);
+    });
+
+    it('un entorno desconocido o ausente nunca resuelve a la nube', () => {
+      expect(resolveApiUrl('staging', undefined, 'web')).toBe(API_GATEWAY_URLS.LOCAL);
+      expect(resolveApiUrl(undefined, undefined, 'android')).toBe(API_GATEWAY_URLS.ANDROID_EMULATOR);
+    });
+
+    it('normaliza barras finales de la URL explícita', () => {
+      expect(resolveApiUrl('integration', 'https://api-tallerconnect.inf.uct.cl/api///', 'ios')).toBe(
+        'https://api-tallerconnect.inf.uct.cl/api',
+      );
     });
 
     it('resuelve localhost para desarrollo en Web o iOS', () => {
@@ -57,6 +99,47 @@ describe('Configuración de Entornos y URL de la API Gateway', () => {
     });
   });
 
+  describe('ENV.API_URL según variables de entorno (cableado del módulo)', () => {
+    const KEYS = ['EXPO_PUBLIC_APP_ENV', 'EXPO_PUBLIC_API_URL', 'EXPO_PUBLIC_USE_MOCK_SERVICES', 'EXPO_PUBLIC_USE_MOCK_AUTH'];
+    const saved: Record<string, string | undefined> = {};
+
+    beforeEach(() => KEYS.forEach((key) => { saved[key] = process.env[key]; delete process.env[key]; }));
+    afterEach(() => KEYS.forEach((key) => {
+      if (saved[key] === undefined) delete process.env[key];
+      else process.env[key] = saved[key];
+    }));
+
+    function loadEnv(vars: Record<string, string>) {
+      Object.assign(process.env, vars);
+      let env!: typeof ENV;
+      jest.isolateModules(() => {
+        env = (jest.requireActual('@/config/env') as { ENV: typeof ENV }).ENV;
+      });
+      return env;
+    }
+
+    it('integración sin URL explícita usa la Gateway UCT y no activa mocks', () => {
+      const env = loadEnv({ EXPO_PUBLIC_APP_ENV: 'integration' });
+      expect(env.APP_ENV).toBe('integration');
+      expect(env.API_URL).toBe('https://api-tallerconnect.inf.uct.cl/api');
+      expect(env.IS_SECURE_GATEWAY).toBe(true);
+      expect(env.USE_MOCK_SERVICES).toBe(false);
+    });
+
+    it('producción sin URL explícita conserva su constante', () => {
+      const env = loadEnv({ EXPO_PUBLIC_APP_ENV: 'production' });
+      expect(env.API_URL).toBe(API_GATEWAY_URLS.PRODUCTION);
+    });
+
+    it('una URL explícita (p. ej. en .env.local) prevalece sobre el entorno', () => {
+      const env = loadEnv({
+        EXPO_PUBLIC_APP_ENV: 'integration',
+        EXPO_PUBLIC_API_URL: 'https://frontend-movil.inf.uct.cl/api/',
+      });
+      expect(env.API_URL).toBe('https://frontend-movil.inf.uct.cl/api');
+    });
+  });
+
   describe('buildGatewayEndpointPath', () => {
     it('evita duplicar el prefijo /api cuando la URL base ya termina en /api', () => {
       expect(
@@ -68,6 +151,11 @@ describe('Configuración de Entornos y URL de la API Gateway', () => {
       expect(
         buildGatewayEndpointPath('/presupuestos', 'https://tallerconect.vercel.app/api')
       ).toBe('/presupuestos');
+    });
+
+    it('no duplica /api con la Gateway de integración', () => {
+      expect(buildGatewayEndpointPath('/api/evidencias', API_GATEWAY_URLS.INTEGRATION)).toBe('/evidencias');
+      expect(buildGatewayEndpointPath('auth/me', `${API_GATEWAY_URLS.INTEGRATION}/`)).toBe('/auth/me');
     });
 
     it('respeta URLs absolutas o bases sin sufijo /api', () => {
@@ -100,6 +188,21 @@ describe('Configuración de Entornos y URL de la API Gateway', () => {
       expect(isSecureGatewayUrl('https://tallerconect.vercel.app/api', 'integration')).toBe(true);
       expect(isSecureGatewayUrl('http://tallerconect.vercel.app/api', 'production')).toBe(false);
       expect(isSecureGatewayUrl('http://localhost:8000/api', 'development')).toBe(true);
+    });
+
+    it('las Gateways en la nube usan HTTPS y pasan la validación de su entorno', () => {
+      expect(isSecureGatewayUrl(API_GATEWAY_URLS.INTEGRATION, 'integration')).toBe(true);
+      expect(isSecureGatewayUrl(API_GATEWAY_URLS.PRODUCTION, 'production')).toBe(true);
+      expect(
+        isSecureGatewayUrl(API_GATEWAY_URLS.INTEGRATION.replace('https://', 'http://'), 'integration'),
+      ).toBe(false);
+    });
+
+    it('no activa mocks automáticamente sin banderas explícitas', () => {
+      expect(isMockModeEnabled(undefined, undefined)).toBe(false);
+      expect(isMockModeEnabled('', '')).toBe(false);
+      expect(ENV.USE_MOCK_SERVICES).toBe(false);
+      expect(ENV.USE_DEMO_DATA).toBe(false);
     });
 
     it('evalúa flags de modo simulado (mocks) con prioridad para EXPO_PUBLIC_USE_MOCK_SERVICES', () => {

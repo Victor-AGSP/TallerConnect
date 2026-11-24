@@ -1,0 +1,31 @@
+D-11 — validación 2026-11-24T12:20:25Z, base 17fc162 + cambios D-11
+Entorno: Linux 7.3.5-arch1-1, Node v26.13.1, Expo CLI 58.1.19; CI=1 EXPO_NO_TELEMETRY=1
+
+== Pruebas
+env-config antes (env.ts original, pruebas nuevas): 23 PASS / 5 FAIL
+env-config después: 28 PASS / 0 FAIL
+npm test: Test Suites: 90 passed, 90 total | Tests: 1455 passed, 1455 total  (exit 0; antes del cambio: 90 suites / 1441 PASS)
+npm run test:regression: Test Suites: 53 passed, 53 total | Tests: 987 passed, 987 total  (exit 0)
+npm run typecheck: exit 0
+npm run lint: exit 0; ✖ 46 problems (0 errors, 46 warnings)
+
+== Exportaciones (exit codes)
+export-android-private exit=0 seconds=16
+export-android-integration exit=0 seconds=17
+export-web-integration exit=0 seconds=22
+android-private: cargó '.env.local .env' → URL explícita privada (Vercel retirada) sobrescribe la resolución por entorno
+android-integration: EXPO_NO_DOTENV=1 EXPO_PUBLIC_APP_ENV=integration, sin URL explícita → resolveApiUrl = Gateway UCT (cableado verificado en env-config)
+web-integration: misma configuración; 49 rutas HTML estáticas
+
+Sondas GET anónimas (sin Authorization ni cookies, sin escrituras) — 2026-11-24T12:17:26Z
+https://tallerconect.vercel.app          /api/health              404 x-vercel-error: DEPLOYMENT_NOT_FOUND
+https://tallerconect.vercel.app          /api/auth/me             404 x-vercel-error: DEPLOYMENT_NOT_FOUND
+https://tallerconect.vercel.app          /api/health/servicios    404 x-vercel-error: DEPLOYMENT_NOT_FOUND
+https://api-tallerconnect.inf.uct.cl     /api/health              200
+https://api-tallerconnect.inf.uct.cl     /api/auth/me             401
+https://api-tallerconnect.inf.uct.cl     /api/health/servicios    200
+https://frontend-movil.inf.uct.cl        /api/health              200
+https://frontend-movil.inf.uct.cl        /api/auth/me             401
+https://frontend-movil.inf.uct.cl        /api/health/servicios    200
+
+Nota: 200 en /api/health y 401 en /api/auth/me prueban disponibilidad y exigencia de autenticación, no una integración autenticada.

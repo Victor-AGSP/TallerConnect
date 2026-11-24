@@ -31,6 +31,8 @@ Línea base antes de la semana 3 (HEAD `24bfbbe`): 83 suites / 1321 PASS / 0 FAI
 - Tests: `USE_DEMO_DATA` y mocks desactivados sin banderas explícitas (SCRUM-163).
 - **D-11 (no corregido, decisión del equipo):** la URL por defecto de integración/producción en `src/config/env.ts` y los `.env` locales apuntan a `https://tallerconect.vercel.app/api`, hoy `DEPLOYMENT_NOT_FOUND`. El despliegue Kubero ya usa `EXPO_PUBLIC_API_URL=https://frontend-movil.inf.uct.cl/api` (proxy a `https://api-tallerconnect.inf.uct.cl`). Cambiar el valor por defecto altera producción y no es una regresión de estas tareas; se propone al equipo con el cambio exacto: `API_GATEWAY_URLS.INTEGRATION`/`PRODUCTION` → `https://api-tallerconnect.inf.uct.cl/api`, y actualizar `.env.example`. Mientras tanto se usa la variable en línea de comandos ([SCRUM-226](SCRUM-226.md)).
 
+> **Actualización 2026-11-24 (D-11):** integración corregida y entornos separados en `src/config/env.ts`; producción y `.env` privados siguen pendientes. Detalle en [D-11](../semana-4/D-11.md).
+
 ## No cubierto
 
 Navegación en dispositivo Android y flujos autenticados reales (BLOCKED, ver SCRUM-226 y SCRUM-164). La suite completa, `expo-doctor` y exportaciones se ejecutan en SCRUM-165.

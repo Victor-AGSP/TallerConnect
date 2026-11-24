@@ -9,9 +9,10 @@ export type AppEnvironment = 'development' | 'integration' | 'production' | 'tes
  * URLs oficiales de la API Gateway según el entorno.
  */
 export const API_GATEWAY_URLS = {
-  // Entorno de integración desplegado en Vercel
-  INTEGRATION: 'https://tallerconect.vercel.app/api',
-  // Entorno de producción
+  // Gateway de integración vigente (UCT). El despliegue Vercel anterior fue retirado (D-11).
+  INTEGRATION: 'https://api-tallerconnect.inf.uct.cl/api',
+  // Producción: valor conservado sin cambios hasta que el equipo autorice su
+  // reemplazo (D-11). Usar EXPO_PUBLIC_API_URL para apuntar a otra Gateway.
   PRODUCTION: 'https://tallerconect.vercel.app/api',
   // Entorno local para Web e iOS Simulator
   LOCAL: 'http://localhost:8000/api',
@@ -151,9 +152,12 @@ export function resolveApiUrl(
 
   const env = (configuredEnv ?? '').toLowerCase();
 
-  // 2. Entornos de integración o producción apuntan a la nube
-  if (env === 'integration' || env === 'production') {
+  // 2. Integración y producción usan cada uno su propia Gateway en la nube
+  if (env === 'integration') {
     return API_GATEWAY_URLS.INTEGRATION;
+  }
+  if (env === 'production') {
+    return API_GATEWAY_URLS.PRODUCTION;
   }
 
   // 3. Entorno de desarrollo: distinguir Android Emulator de Web/iOS

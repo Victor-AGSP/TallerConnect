@@ -2,7 +2,7 @@
 
 ## Propósito y estado del contrato
 
-Esta lista verifica la integración entre la aplicación móvil **TallerConnect** y la API Gateway (`https://tallerconect.vercel.app/api`), considerando las especificaciones OpenAPI publicadas por los microservicios (`/ms1/openapi.json`, `/ms2/openapi.json`, `/ms3/openapi.json`) y las restricciones del contrato multimedia (`docs/restricciones-evidencia-multimedia.md`).
+Esta lista verifica la integración entre la aplicación móvil **TallerConnect** y la API Gateway (integración vigente: `https://api-tallerconnect.inf.uct.cl/api`; la Gateway `https://tallerconect.vercel.app/api` usada en la tabla histórica fue retirada, ver [D-11](sprint-3/semana-4/D-11.md)), considerando las especificaciones OpenAPI publicadas por los microservicios (`/ms1/openapi.json`, `/ms2/openapi.json`, `/ms3/openapi.json`) y las restricciones del contrato multimedia (`docs/restricciones-evidencia-multimedia.md`).
 
 ## Datos compartidos de la Gateway
 
