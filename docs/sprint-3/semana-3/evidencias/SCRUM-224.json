@@ -1,0 +1,39 @@
+{
+  "startTime": 1795519616866,
+  "numTotalTestSuites": 1,
+  "numPassedTestSuites": 1,
+  "numFailedTestSuites": 0,
+  "numPassedTests": 5,
+  "numFailedTests": 0,
+  "numPendingTests": 0,
+  "success": true,
+  "environment": "Jest; dobles controlados; sin backend ni dispositivo",
+  "suites": [
+    {
+      "file": "__tests__/http-500-client-states.test.tsx",
+      "status": "passed",
+      "tests": [
+        {
+          "name": "HTTP 500 en Mis vehículos muestra error con reintento y no el vacío; al reintentar con 200 vacío aparece el vacío real",
+          "status": "passed"
+        },
+        {
+          "name": "HTTP 500 en Mis vehículos se recupera con datos al reintentar",
+          "status": "passed"
+        },
+        {
+          "name": "HTTP 500 en las órdenes del detalle de vehículo informa el fallo de órdenes sin decir «No hay órdenes asociadas»",
+          "status": "passed"
+        },
+        {
+          "name": "HTTP 500 en evidencias MS4 de una orden muestra error y no «Sin evidencias»; al reintentar con 200 vacío sí lo muestra",
+          "status": "passed"
+        },
+        {
+          "name": "HTTP 500 en el presupuesto de una orden (MS3) muestra error y no el vacío; al reintentar con lista vacía real aparece el vacío",
+          "status": "passed"
+        }
+      ]
+    }
+  ]
+}

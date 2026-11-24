@@ -1,0 +1,41 @@
+{
+  "startTime": 1795519632275,
+  "numTotalTestSuites": 1,
+  "numPassedTestSuites": 0,
+  "numFailedTestSuites": 1,
+  "numPassedTests": 3,
+  "numFailedTests": 2,
+  "numPendingTests": 0,
+  "success": false,
+  "environment": "Jest; mutación temporal en VehicleListView (vacío antes que error), revertida con git checkout",
+  "suites": [
+    {
+      "file": "__tests__/http-500-client-states.test.tsx",
+      "status": "failed",
+      "tests": [
+        {
+          "name": "HTTP 500 en Mis vehículos muestra error con reintento y no el vacío; al reintentar con 200 vacío aparece el vacío real",
+          "status": "failed",
+          "failure": "Error: Unable to find an element with testID: vehicle-list-error"
+        },
+        {
+          "name": "HTTP 500 en Mis vehículos se recupera con datos al reintentar",
+          "status": "failed",
+          "failure": "Error: Unable to find an element with testID: vehicle-list-error"
+        },
+        {
+          "name": "HTTP 500 en las órdenes del detalle de vehículo informa el fallo de órdenes sin decir «No hay órdenes asociadas»",
+          "status": "passed"
+        },
+        {
+          "name": "HTTP 500 en evidencias MS4 de una orden muestra error y no «Sin evidencias»; al reintentar con 200 vacío sí lo muestra",
+          "status": "passed"
+        },
+        {
+          "name": "HTTP 500 en el presupuesto de una orden (MS3) muestra error y no el vacío; al reintentar con lista vacía real aparece el vacío",
+          "status": "passed"
+        }
+      ]
+    }
+  ]
+}

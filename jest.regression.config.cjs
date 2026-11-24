@@ -14,6 +14,8 @@ module.exports = {
     '**/__tests__/services-response-scenarios.test.ts',
     // SCRUM-162: errores y respuestas inválidas no se muestran como listas vacías.
     '**/__tests__/list-error-empty-regression.test.tsx',
+    // SCRUM-224: estado visual del portal Cliente ante HTTP 500.
+    '**/__tests__/http-500-client-states.test.tsx',
     // Integración con MS3: presupuestos, repuestos y proveedores.
     '**/__tests__/budget-*.test.ts?(x)',
     '**/__tests__/parts-*.test.ts?(x)',
