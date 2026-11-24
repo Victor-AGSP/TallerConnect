@@ -79,9 +79,13 @@ export function mapOrderResponse(raw: OrderResponseDto): WorkOrder {
 
 /**
  * Mapea una lista de órdenes de trabajo devuelta por la API Gateway.
+ * Un cuerpo que no es arreglo (HTML de un proxy, `{detail}`, `null`) se rechaza:
+ * convertirlo en `[]` haría pasar un fallo por "sin órdenes".
  */
 export function mapOrdersResponseList(dtos: OrderResponseDto[]): WorkOrder[] {
-  if (!Array.isArray(dtos)) return [];
+  if (!Array.isArray(dtos)) {
+    throw new InvalidOrderResponseError('El servidor devolvió una lista de órdenes inválida.');
+  }
   return dtos.map(mapOrderResponse);
 }
 

@@ -105,8 +105,11 @@ export function mapVehicleResponse(
 
 /**
  * Mapea una lista de vehículos devuelta por la API Gateway.
+ * Un cuerpo que no es arreglo se rechaza para no mostrarlo como "sin vehículos".
  */
 export function mapVehiclesResponseList(dtos: VehicleResponseDto[]): Vehicle[] {
-  if (!Array.isArray(dtos)) return [];
+  if (!Array.isArray(dtos)) {
+    throw new Error('Respuesta de vehículos inválida.');
+  }
   return dtos.map(mapVehicleResponse);
 }

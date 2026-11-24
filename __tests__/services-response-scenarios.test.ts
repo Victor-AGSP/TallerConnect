@@ -136,10 +136,14 @@ describe('VehiclesService: respuestas vacías', () => {
     },
   );
 
-  it('devuelve una lista vacía si la API responde con un cuerpo no iterable', async () => {
+  // SCRUM-162: un cuerpo no iterable es una respuesta inválida, no "sin vehículos".
+  it('rechaza un cuerpo no iterable en lugar de devolver una lista vacía', async () => {
     mockedApiClient.get.mockResolvedValueOnce({ data: null } as never);
 
-    await expect(vehiclesService.getVehicles()).resolves.toEqual([]);
+    await expect(vehiclesService.getVehicles()).rejects.toMatchObject({
+      name: 'ServiceError',
+      message: 'Respuesta de vehículos inválida.',
+    });
   });
 
   it('rechaza un detalle que incumple el contrato MS2', async () => {
@@ -275,10 +279,14 @@ describe('OrdersService: respuestas vacías', () => {
     await expect(ordersService.getOrders()).resolves.toEqual([]);
   });
 
-  it('devuelve una lista vacía si la API responde con un cuerpo no iterable', async () => {
+  // SCRUM-162: un cuerpo no iterable es una respuesta inválida, no "sin órdenes".
+  it('rechaza un cuerpo no iterable en lugar de devolver una lista vacía', async () => {
     mockedApiClient.get.mockResolvedValueOnce({ data: undefined } as never);
 
-    await expect(ordersService.getOrders()).resolves.toEqual([]);
+    await expect(ordersService.getOrders()).rejects.toMatchObject({
+      name: 'ServiceError',
+      code: 'ORDER_INVALID_RESPONSE',
+    });
   });
 
   it('rechaza una orden sin estado_codigo oficial', async () => {

@@ -12,6 +12,8 @@ module.exports = {
     '**/__tests__/manual-refresh-retry.test.tsx',
     '**/__tests__/use-data-query.test.ts',
     '**/__tests__/services-response-scenarios.test.ts',
+    // SCRUM-162: errores y respuestas inválidas no se muestran como listas vacías.
+    '**/__tests__/list-error-empty-regression.test.tsx',
     // Integración con MS3: presupuestos, repuestos y proveedores.
     '**/__tests__/budget-*.test.ts?(x)',
     '**/__tests__/parts-*.test.ts?(x)',

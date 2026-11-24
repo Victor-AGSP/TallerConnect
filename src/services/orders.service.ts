@@ -13,6 +13,7 @@ import {
 } from '@/dto/order.dto';
 import {
   CODE_TO_STATUS,
+  InvalidOrderResponseError,
   STATUS_TO_CODE,
   mapOrderResponse,
   mapOrderStatusUpdateRequest,
@@ -458,7 +459,10 @@ export class RealOrderAdapter implements OrderServiceAdapter {
     const response = await apiClient.get<OrderHistoryEntryDto[]>(
       `/ordenes/${orderId}/historial`
     );
-    return Array.isArray(response.data) ? response.data : [];
+    if (!Array.isArray(response.data)) {
+      throw new InvalidOrderResponseError('El servidor devolvió un historial de orden inválido.');
+    }
+    return response.data;
   }
 }
 

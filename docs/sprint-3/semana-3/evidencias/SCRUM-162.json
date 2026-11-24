@@ -1,0 +1,223 @@
+{
+  "startTime": 1795519492297,
+  "numTotalTestSuites": 1,
+  "numPassedTestSuites": 1,
+  "numFailedTestSuites": 0,
+  "numPassedTests": 51,
+  "numFailedTests": 0,
+  "numPendingTests": 0,
+  "success": true,
+  "environment": "Jest; dobles controlados; sin backend ni dispositivo",
+  "suites": [
+    {
+      "file": "__tests__/list-error-empty-regression.test.tsx",
+      "status": "passed",
+      "tests": [
+        {
+          "name": "Servicio: vehículos del cliente (GET /vehiculos) HTTP 200 con arreglo vacío resuelve una lista vacía",
+          "status": "passed"
+        },
+        {
+          "name": "Servicio: vehículos del cliente (GET /vehiculos) HTTP 200 con datos resuelve los elementos mapeados",
+          "status": "passed"
+        },
+        {
+          "name": "Servicio: vehículos del cliente (GET /vehiculos) HTTP 500 se rechaza con su estado, no como lista vacía",
+          "status": "passed"
+        },
+        {
+          "name": "Servicio: vehículos del cliente (GET /vehiculos) HTTP 503 se rechaza con su estado, no como lista vacía",
+          "status": "passed"
+        },
+        {
+          "name": "Servicio: vehículos del cliente (GET /vehiculos) timeout se rechaza marcado como timeout",
+          "status": "passed"
+        },
+        {
+          "name": "Servicio: vehículos del cliente (GET /vehiculos) error de conectividad se rechaza marcado como error de red",
+          "status": "passed"
+        },
+        {
+          "name": "Servicio: vehículos del cliente (GET /vehiculos) HTTP 200 con página HTML se rechaza como respuesta inválida",
+          "status": "passed"
+        },
+        {
+          "name": "Servicio: vehículos del cliente (GET /vehiculos) HTTP 200 con objeto con detail se rechaza como respuesta inválida",
+          "status": "passed"
+        },
+        {
+          "name": "Servicio: vehículos del cliente (GET /vehiculos) HTTP 200 con null se rechaza como respuesta inválida",
+          "status": "passed"
+        },
+        {
+          "name": "Servicio: vehículos asignados (GET /vehiculos/asignados) HTTP 200 con arreglo vacío resuelve una lista vacía",
+          "status": "passed"
+        },
+        {
+          "name": "Servicio: vehículos asignados (GET /vehiculos/asignados) HTTP 200 con datos resuelve los elementos mapeados",
+          "status": "passed"
+        },
+        {
+          "name": "Servicio: vehículos asignados (GET /vehiculos/asignados) HTTP 500 se rechaza con su estado, no como lista vacía",
+          "status": "passed"
+        },
+        {
+          "name": "Servicio: vehículos asignados (GET /vehiculos/asignados) HTTP 503 se rechaza con su estado, no como lista vacía",
+          "status": "passed"
+        },
+        {
+          "name": "Servicio: vehículos asignados (GET /vehiculos/asignados) timeout se rechaza marcado como timeout",
+          "status": "passed"
+        },
+        {
+          "name": "Servicio: vehículos asignados (GET /vehiculos/asignados) error de conectividad se rechaza marcado como error de red",
+          "status": "passed"
+        },
+        {
+          "name": "Servicio: vehículos asignados (GET /vehiculos/asignados) HTTP 200 con página HTML se rechaza como respuesta inválida",
+          "status": "passed"
+        },
+        {
+          "name": "Servicio: vehículos asignados (GET /vehiculos/asignados) HTTP 200 con objeto con detail se rechaza como respuesta inválida",
+          "status": "passed"
+        },
+        {
+          "name": "Servicio: vehículos asignados (GET /vehiculos/asignados) HTTP 200 con null se rechaza como respuesta inválida",
+          "status": "passed"
+        },
+        {
+          "name": "Servicio: órdenes (GET /ordenes) HTTP 200 con arreglo vacío resuelve una lista vacía",
+          "status": "passed"
+        },
+        {
+          "name": "Servicio: órdenes (GET /ordenes) HTTP 200 con datos resuelve los elementos mapeados",
+          "status": "passed"
+        },
+        {
+          "name": "Servicio: órdenes (GET /ordenes) HTTP 500 se rechaza con su estado, no como lista vacía",
+          "status": "passed"
+        },
+        {
+          "name": "Servicio: órdenes (GET /ordenes) HTTP 503 se rechaza con su estado, no como lista vacía",
+          "status": "passed"
+        },
+        {
+          "name": "Servicio: órdenes (GET /ordenes) timeout se rechaza marcado como timeout",
+          "status": "passed"
+        },
+        {
+          "name": "Servicio: órdenes (GET /ordenes) error de conectividad se rechaza marcado como error de red",
+          "status": "passed"
+        },
+        {
+          "name": "Servicio: órdenes (GET /ordenes) HTTP 200 con página HTML se rechaza como respuesta inválida",
+          "status": "passed"
+        },
+        {
+          "name": "Servicio: órdenes (GET /ordenes) HTTP 200 con objeto con detail se rechaza como respuesta inválida",
+          "status": "passed"
+        },
+        {
+          "name": "Servicio: órdenes (GET /ordenes) HTTP 200 con null se rechaza como respuesta inválida",
+          "status": "passed"
+        },
+        {
+          "name": "Servicio: historial de orden (GET /ordenes/{id}/historial) HTTP 200 con arreglo vacío resuelve una lista vacía",
+          "status": "passed"
+        },
+        {
+          "name": "Servicio: historial de orden (GET /ordenes/{id}/historial) HTTP 200 con datos resuelve los elementos mapeados",
+          "status": "passed"
+        },
+        {
+          "name": "Servicio: historial de orden (GET /ordenes/{id}/historial) HTTP 500 se rechaza con su estado, no como lista vacía",
+          "status": "passed"
+        },
+        {
+          "name": "Servicio: historial de orden (GET /ordenes/{id}/historial) HTTP 503 se rechaza con su estado, no como lista vacía",
+          "status": "passed"
+        },
+        {
+          "name": "Servicio: historial de orden (GET /ordenes/{id}/historial) timeout se rechaza marcado como timeout",
+          "status": "passed"
+        },
+        {
+          "name": "Servicio: historial de orden (GET /ordenes/{id}/historial) error de conectividad se rechaza marcado como error de red",
+          "status": "passed"
+        },
+        {
+          "name": "Servicio: historial de orden (GET /ordenes/{id}/historial) HTTP 200 con página HTML se rechaza como respuesta inválida",
+          "status": "passed"
+        },
+        {
+          "name": "Servicio: historial de orden (GET /ordenes/{id}/historial) HTTP 200 con objeto con detail se rechaza como respuesta inválida",
+          "status": "passed"
+        },
+        {
+          "name": "Servicio: historial de orden (GET /ordenes/{id}/historial) HTTP 200 con null se rechaza como respuesta inválida",
+          "status": "passed"
+        },
+        {
+          "name": "Servicio: evidencias MS4 (GET /evidencias?orden_id) HTTP 200 con arreglo vacío resuelve una lista vacía",
+          "status": "passed"
+        },
+        {
+          "name": "Servicio: evidencias MS4 (GET /evidencias?orden_id) HTTP 200 con datos resuelve los elementos mapeados",
+          "status": "passed"
+        },
+        {
+          "name": "Servicio: evidencias MS4 (GET /evidencias?orden_id) HTTP 500 se rechaza con su estado, no como lista vacía",
+          "status": "passed"
+        },
+        {
+          "name": "Servicio: evidencias MS4 (GET /evidencias?orden_id) HTTP 503 se rechaza con su estado, no como lista vacía",
+          "status": "passed"
+        },
+        {
+          "name": "Servicio: evidencias MS4 (GET /evidencias?orden_id) timeout se rechaza marcado como timeout",
+          "status": "passed"
+        },
+        {
+          "name": "Servicio: evidencias MS4 (GET /evidencias?orden_id) error de conectividad se rechaza marcado como error de red",
+          "status": "passed"
+        },
+        {
+          "name": "Servicio: evidencias MS4 (GET /evidencias?orden_id) HTTP 200 con página HTML se rechaza como respuesta inválida",
+          "status": "passed"
+        },
+        {
+          "name": "Servicio: evidencias MS4 (GET /evidencias?orden_id) HTTP 200 con objeto con detail se rechaza como respuesta inválida",
+          "status": "passed"
+        },
+        {
+          "name": "Servicio: evidencias MS4 (GET /evidencias?orden_id) HTTP 200 con null se rechaza como respuesta inválida",
+          "status": "passed"
+        },
+        {
+          "name": "UI: Mis vehículos distingue vacío de fallo 200 vacío muestra el estado sin vehículos y ningún error",
+          "status": "passed"
+        },
+        {
+          "name": "UI: Mis vehículos distingue vacío de fallo 200 con datos muestra los vehículos",
+          "status": "passed"
+        },
+        {
+          "name": "UI: Mis vehículos distingue vacío de fallo HTTP 503 muestra error con reintento y no el estado vacío",
+          "status": "passed"
+        },
+        {
+          "name": "UI: Mis vehículos distingue vacío de fallo timeout muestra error con reintento y no el estado vacío",
+          "status": "passed"
+        },
+        {
+          "name": "UI: Mis vehículos distingue vacío de fallo sin conectividad muestra error con reintento y no el estado vacío",
+          "status": "passed"
+        },
+        {
+          "name": "UI: Mis vehículos distingue vacío de fallo respuesta inválida muestra error con reintento y no el estado vacío",
+          "status": "passed"
+        }
+      ]
+    }
+  ]
+}
