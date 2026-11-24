@@ -1,0 +1,83 @@
+SCRUM-165 — regresión completa, 2026-11-24 UTC
+HEAD de código: 9cb4144 (sin cambios de código sin commit; solo docs/scripts de SCRUM-166 sin seguimiento, que no afectan a Jest ni a las exportaciones)
+Entorno: Linux 7.3.5-arch1-1, Node v26.13.1, Expo CLI 58.1.19; CI=1 EXPO_NO_TELEMETRY=1
+
+== Códigos de salida
+jest exit=0 seconds=19
+regression exit=0 seconds=29
+tsc exit=0 seconds=3
+lint exit=0 seconds=2
+expo-doctor exit=1 seconds=3
+install-check exit=1 seconds=0
+export-android exit=0 seconds=9
+export-web exit=0 seconds=23
+
+== Jest completo: npx jest --runInBand
+Test Suites: 89 passed, 89 total
+Tests:       1435 passed, 1435 total
+
+== Regresión: jest --config jest.regression.config.cjs
+Test Suites: 52 passed, 52 total
+Tests:       981 passed, 981 total
+
+== Lint
+  320:15  warning  Unused eslint-disable directive (no problems were reported from '@typescript-eslint/no-var-requires')
+✖ 46 problems (0 errors, 46 warnings)
+
+== npx expo-doctor
+Running 20 checks on your project...
+19/20 checks passed. 1 checks failed. Possible issues detected:
+Use the --verbose flag to see more details about passed checks.
+
+✖ Check that packages match versions required by installed Expo SDK
+
+⚠️ Minor version mismatches
+package             expected  found    
+expo-web-browser    ~58.1.0   58.0.7   
+
+🔧 Patch version mismatches
+package             expected  found    
+@expo/ui            ~58.0.29  58.0.27  
+expo                ~58.0.26  58.0.23  
+expo-constants      ~58.0.16  58.0.15  
+expo-font           ~58.0.12  58.0.11  
+expo-linking        ~58.0.17  58.0.16  
+expo-router         ~58.0.32  58.0.30  
+expo-secure-store   ~58.0.3   58.0.2   
+expo-splash-screen  ~58.0.14  58.0.13  
+expo-status-bar     ~58.0.5   58.0.4   
+expo-symbols        ~58.0.5   58.0.4   
+jest-expo           ~58.0.15  58.0.14  
+
+
+12 packages out of date.
+Advice:
+Use 'npx expo install --check' to review and upgrade your dependencies.
+To ignore specific packages, add them to "expo.install.exclude" in package.json. Learn more: https://expo.fyi/dependency-validation
+
+1 check failed, indicating possible issues with the project.
+
+== npx expo install --check
+The following packages should be updated for best compatibility with the installed expo version:
+  @expo/ui@58.0.27 - expected version: ~58.0.29
+  expo@58.0.23 - expected version: ~58.0.26
+  expo-constants@58.0.15 - expected version: ~58.0.16
+  expo-font@58.0.11 - expected version: ~58.0.12
+  expo-linking@58.0.16 - expected version: ~58.0.17
+  expo-router@58.0.30 - expected version: ~58.0.32
+  expo-secure-store@58.0.2 - expected version: ~58.0.3
+  expo-splash-screen@58.0.13 - expected version: ~58.0.14
+  expo-status-bar@58.0.4 - expected version: ~58.0.5
+  expo-symbols@58.0.4 - expected version: ~58.0.5
+  expo-web-browser@58.0.7 - expected version: ~58.1.0
+  jest-expo@58.0.14 - expected version: ~58.0.15
+Your project may not work correctly until you install the expected versions of the packages.
+Found outdated dependencies
+
+== Exportaciones (configuración de .env.local; es empaquetado, no ejecución)
+Android Bundled 8239ms node_modules/expo-router/entry.js (1569 modules)
+Exported: <scratchpad>/165/android
+android bundle: entry-9953362b555cffb8b65c7965d83bca4b.hbc 5,5M
+Web Bundled 20589ms node_modules/expo-router/entry.js (1120 modules)
+Exported: <scratchpad>/165/web
+web: 49 páginas HTML estáticas, 4,0M
