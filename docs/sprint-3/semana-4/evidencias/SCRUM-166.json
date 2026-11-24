@@ -1,0 +1,43 @@
+{
+  "startTime": 1795520755009,
+  "numTotalTestSuites": 1,
+  "numPassedTestSuites": 1,
+  "numFailedTestSuites": 0,
+  "numPassedTests": 6,
+  "numFailedTests": 0,
+  "numPendingTests": 0,
+  "success": true,
+  "environment": "Jest; dobles controlados; sin backend ni dispositivo",
+  "suites": [
+    {
+      "file": "__tests__/demo-mode-banner.test.tsx",
+      "status": "passed",
+      "tests": [
+        {
+          "name": "Franja de modo demostración se muestra con servicios simulados",
+          "status": "passed"
+        },
+        {
+          "name": "Franja de modo demostración se muestra con autenticación simulada",
+          "status": "passed"
+        },
+        {
+          "name": "Franja de modo demostración no se muestra con la configuración real",
+          "status": "passed"
+        },
+        {
+          "name": "Franja de modo demostración el layout raíz la muestra sobre cualquier pantalla en modo demostración",
+          "status": "passed"
+        },
+        {
+          "name": "MS4 sin camino simulado la lista de evidencias consulta la API aun en modo demostración y propaga su fallo",
+          "status": "passed"
+        },
+        {
+          "name": "MS4 sin camino simulado los identificadores de orden simulados no se aceptan como órdenes MS4",
+          "status": "passed"
+        }
+      ]
+    }
+  ]
+}

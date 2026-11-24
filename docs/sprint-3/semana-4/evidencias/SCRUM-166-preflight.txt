@@ -1,0 +1,25 @@
+SCRUM-166 — scripts/demo-preflight.sh (GET anónimos; sin token, cookies ni escrituras)
+
+$ scripts/demo-preflight.sh
+Gateway: https://api-tallerconnect.inf.uct.cl  (2026-11-24T11:44:06Z)
+OK    Gateway /api/health                200 (esperado 200)
+OK    Servicio ms1_auth                  200 (esperado 200)
+OK    Servicio ms2_taller                200 (esperado 200)
+OK    Servicio ms3_presupuestos          200 (esperado 200)
+OK    Servicio ms4_evidencias            200 (esperado 200)
+OK    MS4 exige autenticación           401 (esperado 401)
+OK    MS1 exige autenticación           401 (esperado 401)
+Resultado: listo para la demo con backend real.
+exit 0
+
+$ scripts/demo-preflight.sh https://tallerconect.vercel.app/api
+Gateway: https://tallerconect.vercel.app  (2026-11-24T11:44:08Z)
+FALLA Gateway /api/health                404 (esperado 200)
+FALLA Servicio ms1_auth                  404 (esperado 200)
+FALLA Servicio ms2_taller                404 (esperado 200)
+FALLA Servicio ms3_presupuestos          404 (esperado 200)
+FALLA Servicio ms4_evidencias            404 (esperado 200)
+FALLA MS4 exige autenticación           404 (esperado 401)
+FALLA MS1 exige autenticación           404 (esperado 401)
+Resultado: hay servicios no disponibles. Aplicar la contingencia de docs/sprint-3/semana-4/SCRUM-166.md.
+exit 1

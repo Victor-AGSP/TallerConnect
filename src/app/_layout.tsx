@@ -3,7 +3,7 @@ import { View, StyleSheet } from 'react-native';
 import { Stack } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
 import { useAuthStore } from '@/stores/authStore';
-import { ConnectivityBanner } from '@/components/common';
+import { ConnectivityBanner, DemoModeBanner } from '@/components/common';
 
 export default function RootLayout() {
   const hydrateSession = useAuthStore((state) => state.hydrateSession);
@@ -15,6 +15,7 @@ export default function RootLayout() {
   return (
     <View style={styles.rootContainer}>
       <StatusBar style="dark" />
+      <DemoModeBanner />
       <ConnectivityBanner />
       <Stack
         screenOptions={{

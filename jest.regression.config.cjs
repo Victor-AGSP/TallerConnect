@@ -22,6 +22,8 @@ module.exports = {
     '**/__tests__/cliente-portal-figures.test.tsx',
     // SCRUM-228: navegación del rol Cliente.
     '**/__tests__/cliente-navigation-flow.test.tsx',
+    // SCRUM-166: modo demostración identificado y MS4 sin camino simulado.
+    '**/__tests__/demo-mode-banner.test.tsx',
     // Integración con MS3: presupuestos, repuestos y proveedores.
     '**/__tests__/budget-*.test.ts?(x)',
     '**/__tests__/parts-*.test.ts?(x)',

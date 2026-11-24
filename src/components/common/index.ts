@@ -18,3 +18,6 @@ export type { LoadingProps } from './Loading';
 
 export { ConnectivityBanner } from './ConnectivityBanner';
 export type { ConnectivityBannerProps } from './ConnectivityBanner';
+
+export { DemoModeBanner } from './DemoModeBanner';
+export type { DemoModeBannerProps } from './DemoModeBanner';

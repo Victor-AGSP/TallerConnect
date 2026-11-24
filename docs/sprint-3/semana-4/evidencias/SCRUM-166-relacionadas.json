@@ -1,0 +1,351 @@
+{
+  "startTime": 1795520757138,
+  "numTotalTestSuites": 7,
+  "numPassedTestSuites": 7,
+  "numFailedTestSuites": 0,
+  "numPassedTests": 74,
+  "numFailedTests": 0,
+  "numPendingTests": 0,
+  "success": true,
+  "environment": "Jest; dobles controlados; sin backend ni dispositivo",
+  "suites": [
+    {
+      "file": "__tests__/auth-full-flow.test.tsx",
+      "status": "passed",
+      "tests": [
+        {
+          "name": "flujo completo de Login → rol → Logout autentica al rol cliente, abre su panel y cierra la sesión",
+          "status": "passed"
+        },
+        {
+          "name": "flujo completo de Login → rol → Logout autentica al rol mecanico, abre su panel y cierra la sesión",
+          "status": "passed"
+        },
+        {
+          "name": "flujo completo de Login → rol → Logout autentica al rol administrador, abre su panel y cierra la sesión",
+          "status": "passed"
+        },
+        {
+          "name": "permite reintentar una limpieza fallida desde el logout de cliente",
+          "status": "passed"
+        },
+        {
+          "name": "permite reintentar una limpieza fallida desde el logout de mecanico",
+          "status": "passed"
+        },
+        {
+          "name": "permite reintentar una limpieza fallida desde el logout de administrador",
+          "status": "passed"
+        },
+        {
+          "name": "recupera cliente al arrancar y no recupera la sesión después de Logout y reinicio",
+          "status": "passed"
+        },
+        {
+          "name": "recupera mecanico al arrancar y no recupera la sesión después de Logout y reinicio",
+          "status": "passed"
+        },
+        {
+          "name": "recupera administrador al arrancar y no recupera la sesión después de Logout y reinicio",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "file": "__tests__/common-components.test.tsx",
+      "status": "passed",
+      "tests": [
+        {
+          "name": "componentes comunes Input mantiene visible el error con estilos personalizados y foco false",
+          "status": "passed"
+        },
+        {
+          "name": "componentes comunes Input mantiene visible el error con estilos personalizados y foco true",
+          "status": "passed"
+        },
+        {
+          "name": "componentes comunes Button ejecuta la acción y expone su estado de accesibilidad",
+          "status": "passed"
+        },
+        {
+          "name": "componentes comunes Button bloquea la interacción mientras carga",
+          "status": "passed"
+        },
+        {
+          "name": "componentes comunes Button admite etiqueta de accesibilidad personalizada",
+          "status": "passed"
+        },
+        {
+          "name": "componentes comunes AppButton mantiene el alias compatible del Button común",
+          "status": "passed"
+        },
+        {
+          "name": "componentes comunes Card renderiza su encabezado y contenido",
+          "status": "passed"
+        },
+        {
+          "name": "componentes comunes Input muestra errores de validación y los anuncia",
+          "status": "passed"
+        },
+        {
+          "name": "componentes comunes Input muestra ayuda y notifica foco y desenfoque",
+          "status": "passed"
+        },
+        {
+          "name": "componentes comunes Loading expone un indicador ocupado y un mensaje",
+          "status": "passed"
+        },
+        {
+          "name": "componentes comunes ErrorMessage permite reintentar la operación",
+          "status": "passed"
+        },
+        {
+          "name": "componentes comunes ErrorMessage permite personalizar el título y ocultar el reintento",
+          "status": "passed"
+        },
+        {
+          "name": "componentes comunes Button expone y respeta el estado deshabilitado explícito",
+          "status": "passed"
+        },
+        {
+          "name": "componentes comunes Input conserva su etiqueta accesible cuando no es editable",
+          "status": "passed"
+        },
+        {
+          "name": "componentes comunes Input anuncia el error como una región de actualización accesible",
+          "status": "passed"
+        },
+        {
+          "name": "componentes comunes InfoCard muestra sus campos opcionales y contenido",
+          "status": "passed"
+        },
+        {
+          "name": "componentes comunes InfoCard comparte las props de accesibilidad de Card",
+          "status": "passed"
+        },
+        {
+          "name": "componentes comunes StatusPill mantiene su etiqueta accesible en tono success",
+          "status": "passed"
+        },
+        {
+          "name": "componentes comunes StatusPill mantiene su etiqueta accesible en tono warning",
+          "status": "passed"
+        },
+        {
+          "name": "componentes comunes StatusPill mantiene su etiqueta accesible en tono info",
+          "status": "passed"
+        },
+        {
+          "name": "componentes comunes StatusPill mantiene su etiqueta accesible en tono danger",
+          "status": "passed"
+        },
+        {
+          "name": "componentes comunes AppScreen deja título, descripción y contenido disponibles",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "file": "__tests__/connectivity-banner.test.tsx",
+      "status": "passed",
+      "tests": [
+        {
+          "name": "ConnectivityBanner (Componente Global de Alerta de Red) no se renderiza cuando la conectividad es saludable (hasNetworkIssue: false)",
+          "status": "passed"
+        },
+        {
+          "name": "ConnectivityBanner (Componente Global de Alerta de Red) se renderiza visible cuando se detecta un problema de red",
+          "status": "passed"
+        },
+        {
+          "name": "ConnectivityBanner (Componente Global de Alerta de Red) permite accionar el botón Reintentar y dispara checkConnectivity",
+          "status": "passed"
+        },
+        {
+          "name": "ConnectivityBanner (Componente Global de Alerta de Red) permite ejecutar un handler personalizado onRetry si se provee por props",
+          "status": "passed"
+        },
+        {
+          "name": "ConnectivityBanner (Componente Global de Alerta de Red) deshabilita el botón de reintento mientras está comprobando (isChecking: true)",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "file": "__tests__/connectivity-store.test.ts",
+      "status": "passed",
+      "tests": [
+        {
+          "name": "connectivityStore (Gestión Global de Conectividad) inicia con un estado de conectividad saludable",
+          "status": "passed"
+        },
+        {
+          "name": "connectivityStore (Gestión Global de Conectividad) setConnected(false) marca que existe un problema de conectividad",
+          "status": "passed"
+        },
+        {
+          "name": "connectivityStore (Gestión Global de Conectividad) setNetworkIssue registra el mensaje descriptivo y tipo del fallo",
+          "status": "passed"
+        },
+        {
+          "name": "connectivityStore (Gestión Global de Conectividad) reportNetworkError clasifica correctamente errores de timeout, gateway_unavailable y offline",
+          "status": "passed"
+        },
+        {
+          "name": "connectivityStore (Gestión Global de Conectividad) clearNetworkIssue restablece el estado de conectividad y el contador de fallos",
+          "status": "passed"
+        },
+        {
+          "name": "connectivityStore (Gestión Global de Conectividad) checkConnectivity ejecuta customPing exitosamente y limpia cualquier problema previo",
+          "status": "passed"
+        },
+        {
+          "name": "connectivityStore (Gestión Global de Conectividad) checkConnectivity registra fallo si customPing retorna false",
+          "status": "passed"
+        },
+        {
+          "name": "connectivityStore (Gestión Global de Conectividad) checkConnectivity detecta conectividad activa si la API Gateway responde con 200 OK",
+          "status": "passed"
+        },
+        {
+          "name": "connectivityStore (Gestión Global de Conectividad) checkConnectivity detecta conectividad activa si la API Gateway responde con código HTTP de aplicación (ej. 401)",
+          "status": "passed"
+        },
+        {
+          "name": "connectivityStore (Gestión Global de Conectividad) checkConnectivity marca gateway_unavailable si la API Gateway responde con 503 Service Unavailable",
+          "status": "passed"
+        },
+        {
+          "name": "connectivityStore (Gestión Global de Conectividad) checkConnectivity registra timeout si la verificación se agota (ECONNABORTED)",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "file": "__tests__/protected-routes.test.tsx",
+      "status": "passed",
+      "tests": [
+        {
+          "name": "rutas protegidas por sesión y rol redirige de /administrador al login si no hay una sesión autenticada",
+          "status": "passed"
+        },
+        {
+          "name": "rutas protegidas por sesión y rol redirige de /cliente al login si no hay una sesión autenticada",
+          "status": "passed"
+        },
+        {
+          "name": "rutas protegidas por sesión y rol redirige de /mecanico al login si no hay una sesión autenticada",
+          "status": "passed"
+        },
+        {
+          "name": "rutas protegidas por sesión y rol permite que el rol administrador acceda a su ruta",
+          "status": "passed"
+        },
+        {
+          "name": "rutas protegidas por sesión y rol permite que el rol cliente acceda a su ruta",
+          "status": "passed"
+        },
+        {
+          "name": "rutas protegidas por sesión y rol permite que el rol mecanico acceda a su ruta",
+          "status": "passed"
+        },
+        {
+          "name": "rutas protegidas por sesión y rol redirige al rol cliente a su propia ruta al intentar entrar a /administrador",
+          "status": "passed"
+        },
+        {
+          "name": "rutas protegidas por sesión y rol redirige al rol cliente a su propia ruta al intentar entrar a /mecanico",
+          "status": "passed"
+        },
+        {
+          "name": "rutas protegidas por sesión y rol redirige al rol mecanico a su propia ruta al intentar entrar a /administrador",
+          "status": "passed"
+        },
+        {
+          "name": "rutas protegidas por sesión y rol redirige al rol mecanico a su propia ruta al intentar entrar a /cliente",
+          "status": "passed"
+        },
+        {
+          "name": "rutas protegidas por sesión y rol redirige al rol administrador a su propia ruta al intentar entrar a /cliente",
+          "status": "passed"
+        },
+        {
+          "name": "rutas protegidas por sesión y rol redirige al rol administrador a su propia ruta al intentar entrar a /mecanico",
+          "status": "passed"
+        },
+        {
+          "name": "rutas protegidas por sesión y rol revalida la ruta abierta cuando la sesión cambia de cliente a mecanico",
+          "status": "passed"
+        },
+        {
+          "name": "rutas protegidas por sesión y rol revalida la ruta abierta cuando la sesión cambia de mecanico a administrador",
+          "status": "passed"
+        },
+        {
+          "name": "rutas protegidas por sesión y rol revalida la ruta abierta cuando la sesión cambia de administrador a cliente",
+          "status": "passed"
+        },
+        {
+          "name": "rutas protegidas por sesión y rol espera a que termine la recuperación de sesión antes de decidir la ruta",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "file": "__tests__/services-public-exports.test.ts",
+      "status": "passed",
+      "tests": [
+        {
+          "name": "el barrel conserva la API pública de orders y la identidad de sus exportaciones",
+          "status": "passed"
+        },
+        {
+          "name": "el barrel conserva la API pública de parts y la identidad de sus exportaciones",
+          "status": "passed"
+        },
+        {
+          "name": "el barrel conserva la API pública de budgets y la identidad de sus exportaciones",
+          "status": "passed"
+        },
+        {
+          "name": "el barrel conserva la API pública de evidence y la identidad de sus exportaciones",
+          "status": "passed"
+        },
+        {
+          "name": "el barrel conserva la API pública de providers y la identidad de sus exportaciones",
+          "status": "passed"
+        },
+        {
+          "name": "el barrel conserva la API pública de errors y la identidad de sus exportaciones",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "file": "__tests__/services-session-navigation.test.tsx",
+      "status": "passed",
+      "tests": [
+        {
+          "name": "Pruebas Integradas: Servicios, Sesión y Navegación 1. Servicio ➔ Sesión ➔ Navegación: Login exitoso autentica y permite navegación a dashboard de cliente",
+          "status": "passed"
+        },
+        {
+          "name": "Pruebas Integradas: Servicios, Sesión y Navegación 2. Sesión activa ➔ Consumo de Servicios: Mecánico consulta órdenes autenticado",
+          "status": "passed"
+        },
+        {
+          "name": "Pruebas Integradas: Servicios, Sesión y Navegación 3. Expiración/Cierre de Sesión ➔ Navegación: Logout devuelve al usuario a /login",
+          "status": "passed"
+        },
+        {
+          "name": "Pruebas Integradas: Servicios, Sesión y Navegación 4. Consumo de Vehículos: Cliente autenticado consulta sus vehículos",
+          "status": "passed"
+        },
+        {
+          "name": "Pruebas Integradas: Servicios, Sesión y Navegación 5. Resiliencia de Red: Pérdida de conectividad activa banner sin destruir la sesión ni la navegación",
+          "status": "passed"
+        }
+      ]
+    }
+  ]
+}
