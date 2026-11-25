@@ -15,7 +15,7 @@ const emptySession = {
   isAuthenticated: false,
 } as const;
 
-type SessionIssue = { kind: 'restore' | 'logout'; message: string };
+type SessionIssue = { kind: 'restore' | 'logout' | 'expired'; message: string };
 
 export interface AuthState {
   user: User | null;
@@ -29,6 +29,7 @@ export interface AuthState {
   login: (credentials: LoginCredentials) => Promise<void>;
   setAuth: (user: User, token: string, refreshToken?: string) => Promise<void>;
   logout: () => Promise<void>;
+  expireSession: () => Promise<void>;
   hydrateSession: () => Promise<void>;
   restoreSession: () => Promise<void>;
   setLoading: (loading: boolean) => void;
@@ -191,6 +192,26 @@ export const useAuthStore = create<AuthState>((set) => {
         if (operation === revision) set({ sessionIssue: {
           kind: 'logout',
           message: 'La sesión se cerró en memoria, pero no se pudieron borrar todos los datos guardados. Reintenta la limpieza antes de cerrar la app.',
+        } });
+      }
+    },
+    expireSession: async () => {
+      const operation = ++revision;
+      set({
+        ...emptySession,
+        isLoading: false,
+        isHydrated: true,
+        sessionIssue: {
+          kind: 'expired',
+          message: 'Tu sesión expiró o dejó de ser válida. Inicia sesión nuevamente para continuar.',
+        },
+      });
+      try {
+        await mutateStorage(clearPersistedSession);
+      } catch {
+        if (operation === revision) set({ sessionIssue: {
+          kind: 'logout',
+          message: 'Tu sesión expiró y se cerró en memoria, pero no se pudieron borrar todos los datos guardados. Reintenta la limpieza antes de volver a iniciar sesión.',
         } });
       }
     },

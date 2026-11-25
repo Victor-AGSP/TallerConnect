@@ -11,6 +11,7 @@ import {
 import { mockAuthResponses } from '@/mocks/auth.mock';
 import { authService } from '@/services/auth.service';
 import IndexScreen from '@/app/index';
+import LoginScreen from '@/app/(auth)/login';
 import { AUTH_SESSION_STORAGE_KEY, useAuthStore } from '@/stores/authStore';
 import { STORAGE_KEYS } from '@/utils/storage';
 
@@ -31,7 +32,7 @@ const login = jest.mocked(authService.login);
 
 const routes = {
   index: IndexScreen,
-  '(auth)/login': () => <Text>Iniciar sesión</Text>,
+  '(auth)/login': LoginScreen,
   administrador: () => <Text>Inicio administrador</Text>,
   mecanico: () => <Text>Inicio mecánico</Text>,
   cliente: () => <Text>Inicio cliente</Text>,
@@ -156,6 +157,30 @@ describe('persistencia y recuperación de sesión', () => {
       isAuthenticated: false,
       isLoading: false,
     });
+  });
+
+  it('al expirar la sesión elimina credenciales y guía al usuario a reautenticarse', async () => {
+    await act(async () => {
+      await useAuthStore.getState().expireSession();
+    });
+
+    expect(deleteItem).toHaveBeenCalledWith(AUTH_SESSION_STORAGE_KEY);
+    expect(deleteItem).toHaveBeenCalledWith(STORAGE_KEYS.AUTH_TOKEN);
+    expect(deleteItem).toHaveBeenCalledWith(STORAGE_KEYS.USER_DATA);
+    expect(useAuthStore.getState()).toMatchObject({
+      isAuthenticated: false,
+      token: null,
+      user: null,
+      sessionIssue: { kind: 'expired' },
+    });
+
+    const router = await renderRouterWithProviders(routes, { initialUrl: '/login' });
+    await router;
+    expect(await screen.findByText(
+      'Tu sesión expiró o dejó de ser válida. Inicia sesión nuevamente para continuar.'
+    )).toBeTruthy();
+    expect(screen).toHavePathname('/login');
+    expect(screen.getByTestId('login-submit')).toBeTruthy();
   });
 
   it('elimina la sesión guardada al cerrar sesión', async () => {

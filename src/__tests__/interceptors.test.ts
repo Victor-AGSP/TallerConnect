@@ -33,6 +33,7 @@ jest.mock('@/stores/authStore', () => ({
 describe('Interceptors y Manejo Centralizado de Errores', () => {
   const mockedStorage = storage as jest.Mocked<typeof storage>;
   const mockLogout = jest.fn();
+  const mockExpireSession = jest.fn();
 
   beforeEach(() => {
     jest.clearAllMocks();
@@ -42,8 +43,10 @@ describe('Interceptors y Manejo Centralizado de Errores', () => {
     mockedStorage.set.mockReset();
     mockedStorage.clearSession.mockReset();
     mockLogout.mockReset();
+    mockExpireSession.mockReset();
     (useAuthStore.getState as jest.Mock).mockReturnValue({
       logout: mockLogout,
+      expireSession: mockExpireSession,
     });
   });
 
@@ -312,7 +315,8 @@ describe('Interceptors y Manejo Centralizado de Errores', () => {
 
       await expect(errorInterceptor(error401)).rejects.toBeDefined();
 
-      expect(mockLogout).toHaveBeenCalledTimes(1);
+      expect(mockExpireSession).toHaveBeenCalledTimes(1);
+      expect(mockLogout).not.toHaveBeenCalled();
     });
 
     // Los contratos definen 403 como rol sin permiso (no como sesión inválida):
