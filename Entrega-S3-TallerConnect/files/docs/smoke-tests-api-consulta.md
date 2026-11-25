@@ -4,7 +4,7 @@
 
 El script `npm run smoke:api` ejecuta exclusivamente solicitudes HTTP `GET`. No crea, modifica ni elimina registros. No necesita credenciales reales: para la ruta protegida envía un token ficticio deliberadamente inválido. Nunca imprime el token ni el cuerpo de las respuestas.
 
-Gateway predeterminada: `https://api-tallerconnect.inf.uct.cl/api`.
+Gateway predeterminada: `https://tallerconect.vercel.app/api`.
 
 ## Comprobaciones
 

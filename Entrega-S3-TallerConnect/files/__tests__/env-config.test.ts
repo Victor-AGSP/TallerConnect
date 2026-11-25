@@ -22,8 +22,8 @@ describe('Configuración de Entornos y URL de la API Gateway', () => {
       const explicitUrl = 'http://192.168.1.100:8000/api/';
       const resolved = resolveApiUrl('development', explicitUrl, 'ios');
       expect(resolved).toBe('http://192.168.1.100:8000/api');
-      expect(normalizeGatewayBaseUrl('  https://api-tallerconnect.inf.uct.cl/api/// ')).toBe(
-        'https://api-tallerconnect.inf.uct.cl/api'
+      expect(normalizeGatewayBaseUrl('  https://tallerconect.vercel.app/api/// ')).toBe(
+        'https://tallerconect.vercel.app/api'
       );
     });
 
@@ -34,14 +34,14 @@ describe('Configuración de Entornos y URL de la API Gateway', () => {
 
     it('rechaza URLs que apuntan a OpenAPI o rutas de microservicios', () => {
       expect(() => resolveApiUrl('integration', 'https://api-tallerconnect.inf.uct.cl/ms1')).toThrow(/ruta \/api/);
-      expect(() => resolveApiUrl('integration', 'https://api-tallerconnect.inf.uct.cl/api/auth')).toThrow(/ruta \/api/);
+      expect(() => resolveApiUrl('integration', 'https://tallerconect.vercel.app/api/auth')).toThrow(/ruta \/api/);
     });
 
     it('resuelve la URL de la nube (Vercel) para entorno de integración', () => {
       const resolved = resolveApiUrl('integration', undefined, 'ios');
 
       expect(resolved).toBe(API_GATEWAY_URLS.INTEGRATION);
-      expect(resolved).toBe('https://api-tallerconnect.inf.uct.cl/api');
+      expect(resolved).toBe('https://tallerconect.vercel.app/api');
     });
 
     it('resuelve la URL de la nube para entorno de producción', () => {
@@ -70,13 +70,13 @@ describe('Configuración de Entornos y URL de la API Gateway', () => {
   describe('buildGatewayEndpointPath', () => {
     it('evita duplicar el prefijo /api cuando la URL base ya termina en /api', () => {
       expect(
-        buildGatewayEndpointPath('/api/vehiculos', 'https://api-tallerconnect.inf.uct.cl/api')
+        buildGatewayEndpointPath('/api/vehiculos', 'https://tallerconect.vercel.app/api')
       ).toBe('/vehiculos');
       expect(
-        buildGatewayEndpointPath('ordenes/15', 'https://api-tallerconnect.inf.uct.cl/api/')
+        buildGatewayEndpointPath('ordenes/15', 'https://tallerconect.vercel.app/api/')
       ).toBe('/ordenes/15');
       expect(
-        buildGatewayEndpointPath('/presupuestos', 'https://api-tallerconnect.inf.uct.cl/api')
+        buildGatewayEndpointPath('/presupuestos', 'https://tallerconect.vercel.app/api')
       ).toBe('/presupuestos');
     });
 
@@ -106,11 +106,11 @@ describe('Configuración de Entornos y URL de la API Gateway', () => {
     });
 
     it('exige HTTPS, origen oficial y ruta /api en integración y producción', () => {
-      expect(isSecureGatewayUrl('https://api-tallerconnect.inf.uct.cl/api', 'integration')).toBe(true);
+      expect(isSecureGatewayUrl('https://tallerconect.vercel.app/api', 'integration')).toBe(true);
       expect(isSecureGatewayUrl('http://api-tallerconnect.inf.uct.cl/api', 'production')).toBe(false);
       expect(isSecureGatewayUrl('https://otro-host.example/api', 'integration')).toBe(false);
       expect(isSecureGatewayUrl('https://api-tallerconnect.inf.uct.cl/ms2', 'integration')).toBe(false);
-      expect(isSecureGatewayUrl('https://api-tallerconnect.inf.uct.cl/api', 'production')).toBe(true);
+      expect(isSecureGatewayUrl('https://tallerconect.vercel.app/api', 'production')).toBe(true);
       expect(isSecureGatewayUrl('http://localhost:8000/api', 'development')).toBe(true);
     });
 

@@ -10,9 +10,9 @@ export type AppEnvironment = 'development' | 'integration' | 'production' | 'tes
  */
 export const API_GATEWAY_URLS = {
   // Entorno de integración institucional
-  INTEGRATION: 'https://api-tallerconnect.inf.uct.cl/api',
+  INTEGRATION: 'https://tallerconect.vercel.app/api',
   // Entorno de producción
-  PRODUCTION: 'https://api-tallerconnect.inf.uct.cl/api',
+  PRODUCTION: 'https://tallerconect.vercel.app/api',
   // Entorno local para Web e iOS Simulator
   LOCAL: 'http://localhost:8000/api',
   // Entorno local para emuladores Android (10.0.2.2 mapea al localhost del host)

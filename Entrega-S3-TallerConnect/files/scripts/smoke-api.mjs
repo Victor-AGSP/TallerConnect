@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 import process from 'node:process';
 
-const DEFAULT_GATEWAY = 'https://api-tallerconnect.inf.uct.cl/api';
+const DEFAULT_GATEWAY = 'https://tallerconect.vercel.app/api';
 const TIMEOUT_MS = Number(process.env.SMOKE_TIMEOUT_MS || 10000);
 const INVALID_TEST_TOKEN = 'tallerconnect-smoke-invalid-token';
 
