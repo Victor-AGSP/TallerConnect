@@ -263,12 +263,14 @@ export default function LoginScreen() {
               {sessionIssue ? (
                 <ErrorMessage
                   message={sessionIssue.message}
-                  onRetry={() =>
-                    void (
-                      sessionIssue.kind === 'restore'
-                        ? hydrateSession()
-                        : logout()
-                    )
+                  onRetry={
+                    sessionIssue.kind === 'expired'
+                      ? undefined
+                      : () => void (
+                          sessionIssue.kind === 'restore'
+                            ? hydrateSession()
+                            : logout()
+                        )
                   }
                 />
               ) : null}

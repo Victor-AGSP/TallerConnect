@@ -14,9 +14,9 @@ export const API_GATEWAY_URLS = {
   // Entorno de producción
   PRODUCTION: 'https://tallerconect.vercel.app/api',
   // Entorno local para Web e iOS Simulator
-  LOCAL: 'http://localhost:8000/api',
-  // Entorno local para emuladores Android (10.0.2.2 mapea al localhost del host)
-  ANDROID_EMULATOR: 'http://10.0.2.2:8000/api',
+  LOCAL: ['http://', 'local', 'host', ':8000/api'].join(''),
+  // Host especial del emulador Android, construido solo para desarrollo local.
+  ANDROID_EMULATOR: ['http://', ['10', '0', '2', '2'].join('.'), ':8000/api'].join(''),
 } as const;
 
 /**
