@@ -9,7 +9,7 @@ export type AppEnvironment = 'development' | 'integration' | 'production' | 'tes
  * URLs oficiales de la API Gateway según el entorno.
  */
 export const API_GATEWAY_URLS = {
-  // Entorno de integración desplegado en Vercel
+  // Entorno de integración institucional
   INTEGRATION: 'https://tallerconect.vercel.app/api',
   // Entorno de producción
   PRODUCTION: 'https://tallerconect.vercel.app/api',
@@ -145,10 +145,23 @@ export function isMockModeEnabled(
   mockAuthFlag: string | undefined = process.env.EXPO_PUBLIC_USE_MOCK_AUTH,
   mockServicesFlag: string | undefined = process.env.EXPO_PUBLIC_USE_MOCK_SERVICES
 ): boolean {
-  if (mockServicesFlag !== undefined && mockServicesFlag.trim() !== '') {
-    return mockServicesFlag.trim().toLowerCase() === 'true';
-  }
-  return (mockAuthFlag ?? '').trim().toLowerCase() === 'true';
+  // El modo demo de autenticación NO debe activar mocks de los servicios de dominio.
+  // Se conserva el primer parámetro por compatibilidad con llamadas existentes,
+  // pero solo el flag explícito EXPO_PUBLIC_USE_MOCK_SERVICES habilita adaptadores mock.
+  void mockAuthFlag;
+  return (mockServicesFlag ?? '').trim().toLowerCase() === 'true';
+}
+
+/**
+ * Los adaptadores simulados solo están permitidos en desarrollo/pruebas y con
+ * el flag EXPO_PUBLIC_USE_MOCK_SERVICES=true explícito.
+ */
+export function resolveMockServicesEnabled(
+  env: AppEnvironment,
+  mockServicesFlag: string | undefined = process.env.EXPO_PUBLIC_USE_MOCK_SERVICES
+): boolean {
+  return (env === 'development' || env === 'test') &&
+    isMockModeEnabled(undefined, mockServicesFlag);
 }
 
 /**
@@ -240,7 +253,7 @@ export const ENV = {
   /**
    * Indica si los servicios de dominio deben operar con adaptadores simulados (mocks).
    */
-  USE_MOCK_SERVICES: isMockModeEnabled(),
+  USE_MOCK_SERVICES: resolveMockServicesEnabled(currentEnv),
 
   /**
    * Indica si el contrato HTTP de avisos/notificaciones está habilitado en la Gateway.

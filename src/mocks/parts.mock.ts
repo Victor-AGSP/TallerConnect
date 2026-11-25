@@ -9,7 +9,7 @@ import type { Part } from '@/models/part.model';
 
 /**
  * Datos locales de repuestos y proveedores para el modo sin backend
- * (`EXPO_PUBLIC_USE_MOCK_AUTH=true`). No provienen del MS3.
+ * (`EXPO_PUBLIC_USE_MOCK_SERVICES=true`). No provienen del MS3.
  */
 export const mockSuppliers: Supplier[] = [
   {

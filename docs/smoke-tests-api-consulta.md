@@ -1,81 +1,49 @@
-# S3-S1 — Smoke tests HTTP de endpoints de consulta
+# S3 — Verificación de Gateway, MS2 y rechazo de token inválido
 
-## Propósito y seguridad
+## Alcance
 
-Este smoke test comprueba conectividad y lectura a través de la API Gateway autorizada. Solo envía solicitudes HTTP GET; no crea, modifica ni elimina datos. No imprime JWT, encabezados de autorización ni cuerpos de respuesta que puedan contener datos personales.
+El script `npm run smoke:api` ejecuta exclusivamente solicitudes HTTP `GET`. No crea, modifica ni elimina registros. No necesita credenciales reales: para la ruta protegida envía un token ficticio deliberadamente inválido. Nunca imprime el token ni el cuerpo de las respuestas.
 
-Gateway permitida: https://tallerconect.vercel.app/api.
+Gateway predeterminada: `https://tallerconect.vercel.app/api`.
 
-## Pruebas incluidas
+## Comprobaciones
 
-| Prueba | Método | Ruta | Autenticación |
+| Prueba | Método | Ruta | Resultado esperado |
 |---|---|---|---|
-| Salud Gateway | GET | /health (configurable) | No |
-| Vehículos | GET | /vehiculos | Bearer |
-| Órdenes | GET | /ordenes | Bearer |
-| Presupuestos | GET | /presupuestos | Bearer |
+| Salud Gateway | GET | `/health` | HTTP 2xx |
+| Salud global de servicios | GET | `/health/servicios` | HTTP 2xx |
+| Salud MS2 Taller | GET | `/health/servicios/ms2_taller` | HTTP 2xx |
+| Rechazo de token inválido | GET | `/ordenes` | HTTP 401 o 403 |
 
-Las tres rutas de consulta están implementadas en los servicios móviles y documentadas en los contratos OpenAPI del repositorio. La ruta /health se usa como valor inicial configurable: debe confirmarse con el equipo backend que esté publicada en la Gateway. Si devuelve 404, se clasifica como HEALTH_ROUTE_NOT_FOUND; eso no demuestra que los endpoints de negocio estén caídos.
+La comprobación de autorización se considera fallida si una ruta protegida responde 2xx al token inválido. El script descarta el cuerpo de respuesta incluso en ese caso, para no mostrar datos.
 
-## Preparación
+## Ejecución en PowerShell
 
-Requisitos: Node.js 22 o superior y un JWT temporal de una cuenta autorizada del entorno de integración.
+Desde la carpeta raíz del proyecto:
 
-En PowerShell, configura el token en la sesión actual sin escribirlo directamente en un comando:
-
-\`\`\`powershell
-$secureToken = Read-Host "JWT de integración" -AsSecureString
-$env:SMOKE_API_TOKEN = [System.Net.NetworkCredential]::new("", $secureToken).Password
-$env:SMOKE_API_URL = "https://tallerconect.vercel.app/api"
-$env:SMOKE_HEALTH_PATH = "/health"
-\`\`\`
-
-No guardes el token en .env.example, archivos versionados, tickets ni capturas. Usa solo cuentas de prueba de integración. Al terminar:
-
-\`\`\`powershell
-Remove-Item Env:SMOKE_API_TOKEN
-Remove-Item Env:SMOKE_API_URL
-Remove-Item Env:SMOKE_HEALTH_PATH
-\`\`\`
-
-## Ejecución
-
-\`\`\`powershell
+```powershell
 npm run smoke:api -- --help
 npm run smoke:api -- --dry-run
 npm run smoke:api
-\`\`\`
+```
 
-Cada solicitud tiene timeout configurable mediante SMOKE_TIMEOUT_MS (10 segundos por defecto). El proceso termina con código 1 si una o más comprobaciones fallan, y con código 2 si la configuración impide iniciar.
+No configures `SMOKE_API_TOKEN`: no se utiliza ningún JWT real. Si el Gateway cambia, configura `SMOKE_API_URL` con una URL HTTPS que termine en `/api`. El timeout por solicitud se controla con `SMOKE_TIMEOUT_MS` (10 segundos por defecto).
 
-## Clasificación
+## Evidencia
 
-| Clasificación | HTTP / condición | Interpretación |
-|---|---|---|
-| OK | 2xx | Solicitud atendida |
-| AUTH_REQUIRED | 401 | Token ausente, inválido o expirado |
-| FORBIDDEN | 403 | Rol autenticado sin permiso |
-| NOT_FOUND | 404 en negocio | Ruta o recurso no encontrado |
-| HEALTH_ROUTE_NOT_FOUND | 404 en salud | Ruta de salud no publicada o incorrecta |
-| REQUEST_INVALID | 400 / 422 | Solicitud/contrato rechazado |
-| RATE_LIMITED | 429 | Límite de solicitudes alcanzado |
-| UPSTREAM_UNAVAILABLE | 502 / 503 / 504 | Gateway o servicio backend no disponible |
-| SERVER_ERROR | Otros 5xx | Error interno |
-| TIMEOUT | Timeout | No hubo respuesta dentro del límite |
-| NETWORK_ERROR | DNS, TLS o conectividad | No se pudo establecer conexión |
-| INVALID_JSON | 2xx con cuerpo no JSON | Respuesta incompatible con JSON |
+Cada ejecución real imprime fecha y hora ISO-8601, ruta, código HTTP, clasificación y duración. La salida de la ejecución debe adjuntarse como evidencia de la tarea; este documento no inventa códigos HTTP ni declara saludable un servicio sin haberlo consultado.
 
-Un 403 no implica que el endpoint esté caído: puede ser correcto para un rol sin permiso. Para comprobar las tres lecturas, usa una cuenta autorizada con permisos suficientes o ejecuta el test por rol y registra los 403 como restricciones de autorización.
+## Criterios de aceptación
 
-## Alcance y limitaciones
+- Las tres rutas de salud responden HTTP 2xx.
+- La ruta protegida rechaza el token inválido con HTTP 401 o 403.
+- Nunca se imprime ni registra un JWT real, un encabezado de autorización o el contenido de respuestas protegidas.
+- Las solicitudes son GET y no se repiten automáticamente.
 
-- No se envían cuerpos JSON ni parámetros que cambien datos.
-- No se invocan POST, PUT, PATCH ni DELETE.
-- Se utiliza un token existente; el script no realiza login ni almacena credenciales.
-- Se validan códigos HTTP y que el contenido 2xx sea JSON válido; no se imprimen datos de vehículos, órdenes ni presupuestos.
-- La ruta de salud debe confirmarse con backend; el repositorio frontend no acredita que /health exista en Gateway.
-- Una ejecución exitosa confirma disponibilidad y lectura para el token/rol probado en ese momento.
+## Timeout, reintentos y mocks (S3-S2)
 
-## Evidencia para cerrar la tarea
-
-Registrar la salida de npm run smoke:api con el token oculto, fecha/hora, entorno y rol de la cuenta. No adjuntar payloads ni encabezados. Criterio de cierre: ruta de salud confirmada con backend y GET de vehículos, órdenes y presupuestos con respuesta 2xx, o restricciones 403 justificadas por rol y documentadas.
+- El cliente móvil solo reintenta `GET`, `HEAD` y `OPTIONS` ante errores transitorios; no reintenta `POST`, `PUT`, `PATCH` ni `DELETE`.
+- Las solicitudes canceladas por el usuario no se reintentan.
+- Los adaptadores de dominio usan exclusivamente `EXPO_PUBLIC_USE_MOCK_SERVICES=true` y solo en `development`/`test`.
+- `EXPO_PUBLIC_USE_MOCK_AUTH` controla únicamente el login demo; no activa mocks de órdenes, vehículos, presupuestos, repuestos, proveedores, evidencias o notificaciones.
+- En `integration` y `production`, `ENV.USE_MOCK_SERVICES` permanece desactivado.
