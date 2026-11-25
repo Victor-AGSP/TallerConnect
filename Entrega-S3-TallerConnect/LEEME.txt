@@ -1,0 +1,13 @@
+TallerConnect — tareas S3
+
+1) Descarga este ZIP en la carpeta raíz de tu clon TallerConnect.
+2) En PowerShell, desde esa carpeta, ejecuta:
+
+   Expand-Archive -Path .\Entrega-S3-TallerConnect.zip -DestinationPath . -Force
+   powershell -ExecutionPolicy Bypass -File .\Entrega-S3-TallerConnect\Apply-S3Tasks.ps1
+
+   Si el nombre de la carpeta extraída cambia, ajusta solo la ruta del .ps1.
+
+El script exige rama Javier y árbol limpio, respalda los archivos, aplica cambios,
+ejecuta typecheck y pruebas focalizadas, ejecuta el smoke HTTP y crea un único commit.
+No usa JWT real. El smoke solo usa GET.
