@@ -12,6 +12,10 @@ export interface OrderResponseDto {
   creado_por_id: number;
   creado_en: string;
   actualizado_en: string;
+  /** Fecha de devolución física de una orden cancelada; `null` si no fue devuelta. */
+  devuelto_en?: string | null;
+  /** Usuario que registró la devolución; `null` si no fue devuelta. */
+  devuelto_por_id?: number | null;
 }
 
 /**

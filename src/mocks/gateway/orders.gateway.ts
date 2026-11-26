@@ -1,8 +1,8 @@
 import type { OrderResponseDto } from '@/dto/order.dto';
 
 /**
- * Forma real de `OrdenRespuesta` en `/ms2/openapi.json`. Incluye `devuelto_en`
- * y `devuelto_por_id`, que el contrato declara obligatorios y `OrderResponseDto` no tiene.
+ * Forma real de `OrdenRespuesta` en `/ms2/openapi.json`, con `devuelto_en` y
+ * `devuelto_por_id` obligatorios como los declara el contrato.
  */
 export type OrderGatewayResponse = OrderResponseDto & {
   devuelto_en: string | null;

@@ -19,6 +19,10 @@ export interface WorkOrder {
   createdById: string;
   createdAt: string;
   updatedAt: string;
+  /** Fecha de devolución física de una orden cancelada; `null` si no fue devuelta. */
+  returnedAt?: string | null;
+  /** Usuario que registró la devolución; `null` si no fue devuelta. */
+  returnedById?: string | null;
 }
 
 /**

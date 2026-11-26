@@ -5,8 +5,8 @@ import { VehicleResponseDto } from '@/dto/vehicle.dto';
  * Mapea un vehículo devuelto por la API Gateway al modelo Vehicle de la aplicación.
  */
 type LegacyVehicleResponseDto = {
-  id?: number | string;
-  vehiculo_id?: number | string;
+  id?: number;
+  vehiculo_id?: number;
   patent?: string;
   patente?: string;
   license_plate?: string;
@@ -28,6 +28,8 @@ type LegacyVehicleResponseDto = {
 /**
  * Mantiene el contrato oficial MS2 y admite los formatos
  * anteriores de Victor como compatibilidad de lectura.
+ * En ambos formatos el identificador debe ser un entero y el año y el
+ * kilometraje deben venir informados, aunque sea con `null`.
  */
 export function mapVehicleResponse(
   dto: VehicleResponseDto | LegacyVehicleResponseDto
@@ -47,16 +49,14 @@ export function mapVehicleResponse(
   const brand = raw.marca ?? raw.brand;
   const model = raw.modelo ?? raw.model;
 
-  const year = raw.anio ?? raw.year ?? null;
-  const mileage = raw.kilometraje ?? raw.mileage ?? null;
+  const year = raw.anio !== undefined ? raw.anio : raw.year;
+  const mileage = raw.kilometraje !== undefined ? raw.kilometraje : raw.mileage;
 
   const owner =
     raw.cliente_id ?? raw.clientId ??
     raw.client_id ?? raw.owner_id ?? raw.ownerId;
 
-  const validId =
-    (typeof id === 'number' && Number.isInteger(id)) ||
-    (typeof id === 'string' && id.trim().length > 0);
+  const validId = typeof id === 'number' && Number.isInteger(id);
 
   const validOwner =
     owner === undefined ||
@@ -69,7 +69,7 @@ export function mapVehicleResponse(
     plate.trim().length === 0 ||
     typeof brand !== 'string' ||
     typeof model !== 'string' ||
-    !(year === null || Number.isInteger(year)) ||
+    !(year === null || (typeof year === 'number' && Number.isInteger(year))) ||
     !(mileage === null || (
       typeof mileage === 'number' &&
       Number.isInteger(mileage)
@@ -79,15 +79,8 @@ export function mapVehicleResponse(
     throw new Error('Respuesta de vehículo inválida.');
   }
 
-  // Si incluye cliente_id, debe respetar el contrato MS2.
-  if (
-    'cliente_id' in raw &&
-    (
-      !Number.isInteger(raw.cliente_id) ||
-      raw.anio === undefined ||
-      raw.kilometraje === undefined
-    )
-  ) {
+  // Si incluye cliente_id, debe ser el entero del contrato MS2.
+  if ('cliente_id' in raw && !Number.isInteger(raw.cliente_id)) {
     throw new Error('Respuesta de vehículo inválida.');
   }
 
@@ -96,8 +89,8 @@ export function mapVehicleResponse(
     plate,
     brand,
     model,
-    year,
-    mileage,
+    year: year as number | null,
+    mileage: mileage as number | null,
     ownerId: owner === undefined ? undefined : String(owner),
   };
 }

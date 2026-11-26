@@ -2,6 +2,7 @@ import { ordersGatewayResponse } from '@/mocks/gateway/orders.gateway';
 import { vehiclesGatewayResponse } from '@/mocks/gateway/vehicles.gateway';
 import { mapOrderResponse, mapOrdersResponseList } from '@/mappers/order.mapper';
 import { mapVehicleResponse } from '@/mappers/vehicle.mapper';
+import type { VehicleResponseDto } from '@/dto/vehicle.dto';
 import { orderResponseDtoSchema } from '@/schemas/order-dto.schema';
 import { vehicleResponseDtoSchema } from '@/schemas/vehicle-dto.schema';
 
@@ -39,22 +40,18 @@ describe('Respuesta real de GET /api/ordenes', () => {
 });
 
 describe('Casos incompatibles de órdenes', () => {
-  it('O1: el esquema descarta devuelto_en y devuelto_por_id sin informar', () => {
+  it('O1: el esquema y el mapper conservan devuelto_en y devuelto_por_id', () => {
     const parsed = orderResponseDtoSchema.safeParse(ordenDevuelta);
 
     expect(parsed.success).toBe(true);
-    expect(parsed.data).not.toHaveProperty('devuelto_en');
-    expect(parsed.data).not.toHaveProperty('devuelto_por_id');
-    expect(Object.keys(mapOrderResponse(ordenDevuelta)).sort()).toEqual([
-      'assignedMechanicId',
-      'createdAt',
-      'createdById',
-      'id',
-      'intakeId',
-      'status',
-      'updatedAt',
-      'vehicleId',
-    ]);
+    expect(parsed.data).toMatchObject({
+      devuelto_en: ordenDevuelta.devuelto_en,
+      devuelto_por_id: ordenDevuelta.devuelto_por_id,
+    });
+    expect(mapOrderResponse(ordenDevuelta)).toMatchObject({
+      returnedAt: '2026-02-02T15:30:00.444444Z',
+      returnedById: '503',
+    });
   });
 
   it('O2: una orden sin devuelto_en ni devuelto_por_id se acepta aunque el contrato los exige', () => {
@@ -65,11 +62,11 @@ describe('Casos incompatibles de órdenes', () => {
 });
 
 describe('Casos incompatibles de vehículos', () => {
-  it('V1: sin cliente_id ni anio, el mapper acepta y asigna anio null; el esquema rechaza', () => {
+  it('V1: sin cliente_id ni anio, el mapper rechaza igual que el esquema', () => {
     const { cliente_id, anio, ...incompleto } = vehiculo;
 
     expect(vehicleResponseDtoSchema.safeParse(incompleto).success).toBe(false);
-    expect(mapVehicleResponse(incompleto)).toMatchObject({ year: null, ownerId: undefined });
+    expect(() => mapVehicleResponse(incompleto)).toThrow('Respuesta de vehículo inválida.');
   });
 
   it('V2: con cliente_id y sin anio, el mapper rechaza', () => {
@@ -92,10 +89,10 @@ describe('Casos incompatibles de vehículos', () => {
     expect(mapVehicleResponse(antiguo)).toMatchObject({ id: '101', plate: 'XYZW10' });
   });
 
-  it('V4: vehiculo_id como texto se acepta; el esquema rechaza', () => {
-    const idTexto = { ...vehiculo, vehiculo_id: '101' };
+  it('V4: vehiculo_id como texto se rechaza igual que en el esquema', () => {
+    const idTexto = { ...vehiculo, vehiculo_id: '101' } as unknown as VehicleResponseDto;
 
     expect(vehicleResponseDtoSchema.safeParse(idTexto).success).toBe(false);
-    expect(mapVehicleResponse(idTexto)).toMatchObject({ id: '101' });
+    expect(() => mapVehicleResponse(idTexto)).toThrow('Respuesta de vehículo inválida.');
   });
 });
