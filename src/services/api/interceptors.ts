@@ -319,7 +319,12 @@ export function attachErrorInterceptor(client: AxiosInstance): void {
             } else {
               // eslint-disable-next-line @typescript-eslint/no-var-requires
               const { useAuthStore } = require('@/stores/authStore');
-              await useAuthStore.getState().logout();
+              const authState = useAuthStore.getState();
+              if (typeof authState.expireSession === 'function') {
+                await authState.expireSession();
+              } else {
+                await authState.logout();
+              }
             }
           } catch (logoutError) {
             console.error('Error al coordinar logout tras 401:', logoutError);

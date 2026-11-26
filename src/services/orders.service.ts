@@ -1,3 +1,4 @@
+import { ENV } from '@/config/env';
 import { apiClient } from '@/services/api/client';
 import { HTTP_STATUS } from '@/services/api/types';
 import { WorkOrder, WorkOrderStatus } from '@/models/order.model';
@@ -25,7 +26,7 @@ import {
 
 export { ServiceError, normalizeOrderServiceError };
 
-const USE_MOCKS = process.env.EXPO_PUBLIC_USE_MOCK_AUTH === 'true';
+const USE_MOCKS = ENV.USE_MOCK_SERVICES;
 
 export type UpdateOrderStatusOptions = Pick<UpdateOrderStatusRequestDto, 'observacion'>;
 export type UpdateOrderStatusArgument = UpdateOrderStatusOptions | string | null;

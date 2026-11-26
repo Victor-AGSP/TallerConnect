@@ -60,7 +60,9 @@
     "test:ci": "npm test",
     "test:regression": "jest --runInBand --config jest.regression.config.cjs",
     "typecheck": "tsc --noEmit",
-    "export:android": "expo export --platform android"
+    "export:android": "expo export --platform android",
+    "smoke:api": "node ./scripts/smoke-api.mjs",
+    "verify:integration-build": "node ./scripts/verify-integration-build.mjs"
   },
   "jest": {
     "preset": "jest-expo"

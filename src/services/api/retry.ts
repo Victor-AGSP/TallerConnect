@@ -1,4 +1,4 @@
-import { AxiosError, AxiosInstance, InternalAxiosRequestConfig } from 'axios';
+import { AxiosError, AxiosInstance, InternalAxiosRequestConfig, isCancel } from 'axios';
 import { ApiRequestConfig, RetryConfig } from './types';
 
 /**
@@ -33,6 +33,11 @@ export function isSafeAndIdempotentMethod(method?: string): boolean {
  * Errores de cliente (400, 401, 403, 404, 409, 422) NUNCA se reintentan.
  */
 export function isRetryableError(error: AxiosError): boolean {
+  // Una cancelación solicitada por el usuario nunca debe volver a disparar la petición.
+  if (error.code === 'ERR_CANCELED' || error.name === 'CanceledError' || isCancel(error)) {
+    return false;
+  }
+
   // 1. Timeout de la petición
   if (
     error.code === 'ECONNABORTED' ||

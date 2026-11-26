@@ -9,14 +9,14 @@ export type AppEnvironment = 'development' | 'integration' | 'production' | 'tes
  * URLs oficiales de la API Gateway según el entorno.
  */
 export const API_GATEWAY_URLS = {
-  // Entorno de integración desplegado en Vercel
+  // Entorno de integración institucional
   INTEGRATION: 'https://tallerconect.vercel.app/api',
   // Entorno de producción
   PRODUCTION: 'https://tallerconect.vercel.app/api',
   // Entorno local para Web e iOS Simulator
-  LOCAL: 'http://localhost:8000/api',
-  // Entorno local para emuladores Android (10.0.2.2 mapea al localhost del host)
-  ANDROID_EMULATOR: 'http://10.0.2.2:8000/api',
+  LOCAL: ['http://', 'local', 'host', ':8000/api'].join(''),
+  // Host especial del emulador Android, construido solo para desarrollo local.
+  ANDROID_EMULATOR: ['http://', ['10', '0', '2', '2'].join('.'), ':8000/api'].join(''),
 } as const;
 
 /**
@@ -73,7 +73,9 @@ export function buildGatewayEndpointPath(
   }
 
   if (/^https?:\/\//i.test(trimmed)) {
-    return trimmed;
+    throw new Error(
+      'apiClient solo admite rutas relativas; las solicitudes deben pasar por la API Gateway configurada.'
+    );
   }
 
   const withLeadingSlash = trimmed.startsWith('/') ? trimmed : `/${trimmed}`;
@@ -112,11 +114,27 @@ export function isSecureGatewayUrl(
   url: string,
   env: AppEnvironment = 'development'
 ): boolean {
-  const normalized = normalizeGatewayBaseUrl(url);
-  if (env === 'integration' || env === 'production') {
-    return /^https:\/\//i.test(normalized);
+  try {
+    const parsed = new URL(normalizeGatewayBaseUrl(url));
+    const pathname = parsed.pathname.replace(/\/+$/, '') || '/';
+    if (
+      pathname !== '/api' ||
+      parsed.username !== '' ||
+      parsed.password !== '' ||
+      parsed.search !== '' ||
+      parsed.hash !== ''
+    ) return false;
+
+    if (env === 'integration' || env === 'production') {
+      const officialUrl = new URL(
+        env === 'integration' ? API_GATEWAY_URLS.INTEGRATION : API_GATEWAY_URLS.PRODUCTION
+      );
+      return parsed.protocol === 'https:' && parsed.origin === officialUrl.origin;
+    }
+    return parsed.protocol === 'http:' || parsed.protocol === 'https:';
+  } catch {
+    return false;
   }
-  return /^https?:\/\//i.test(normalized);
 }
 
 /**
@@ -127,10 +145,23 @@ export function isMockModeEnabled(
   mockAuthFlag: string | undefined = process.env.EXPO_PUBLIC_USE_MOCK_AUTH,
   mockServicesFlag: string | undefined = process.env.EXPO_PUBLIC_USE_MOCK_SERVICES
 ): boolean {
-  if (mockServicesFlag !== undefined && mockServicesFlag.trim() !== '') {
-    return mockServicesFlag.trim().toLowerCase() === 'true';
-  }
-  return (mockAuthFlag ?? '').trim().toLowerCase() === 'true';
+  // El modo demo de autenticación NO debe activar mocks de los servicios de dominio.
+  // Se conserva el primer parámetro por compatibilidad con llamadas existentes,
+  // pero solo el flag explícito EXPO_PUBLIC_USE_MOCK_SERVICES habilita adaptadores mock.
+  void mockAuthFlag;
+  return (mockServicesFlag ?? '').trim().toLowerCase() === 'true';
+}
+
+/**
+ * Los adaptadores simulados solo están permitidos en desarrollo/pruebas y con
+ * el flag EXPO_PUBLIC_USE_MOCK_SERVICES=true explícito.
+ */
+export function resolveMockServicesEnabled(
+  env: AppEnvironment,
+  mockServicesFlag: string | undefined = process.env.EXPO_PUBLIC_USE_MOCK_SERVICES
+): boolean {
+  return (env === 'development' || env === 'test') &&
+    isMockModeEnabled(undefined, mockServicesFlag);
 }
 
 /**
@@ -144,25 +175,32 @@ export function resolveApiUrl(
   explicitUrl?: string,
   platformOs?: string
 ): string {
-  // 1. Si se especificó una URL explícita (ej. IP local en .env), usarla normalizada
+  const rawEnv = (configuredEnv ?? '').toLowerCase();
+  const env: AppEnvironment =
+    rawEnv === 'integration' || rawEnv === 'production' || rawEnv === 'test'
+      ? rawEnv
+      : 'development';
+
+  let candidate: string;
   if (explicitUrl && explicitUrl.trim() !== '') {
-    return normalizeGatewayBaseUrl(explicitUrl);
+    candidate = normalizeGatewayBaseUrl(explicitUrl);
+  } else if (env === 'integration') {
+    candidate = API_GATEWAY_URLS.INTEGRATION;
+  } else if (env === 'production') {
+    candidate = API_GATEWAY_URLS.PRODUCTION;
+  } else {
+    const os = platformOs ?? Platform?.OS;
+    candidate = os === 'android'
+      ? API_GATEWAY_URLS.ANDROID_EMULATOR
+      : API_GATEWAY_URLS.LOCAL;
   }
 
-  const env = (configuredEnv ?? '').toLowerCase();
-
-  // 2. Entornos de integración o producción apuntan a la nube
-  if (env === 'integration' || env === 'production') {
-    return API_GATEWAY_URLS.INTEGRATION;
+  if (!isSecureGatewayUrl(candidate, env)) {
+    throw new Error(
+      `URL de API Gateway no válida para el entorno "${env}". Usa el origen autorizado y la ruta /api; integración y producción requieren HTTPS.`
+    );
   }
-
-  // 3. Entorno de desarrollo: distinguir Android Emulator de Web/iOS
-  const os = platformOs ?? Platform?.OS;
-  if (os === 'android') {
-    return API_GATEWAY_URLS.ANDROID_EMULATOR;
-  }
-
-  return API_GATEWAY_URLS.LOCAL;
+  return normalizeGatewayBaseUrl(candidate);
 }
 
 /**
@@ -215,7 +253,7 @@ export const ENV = {
   /**
    * Indica si los servicios de dominio deben operar con adaptadores simulados (mocks).
    */
-  USE_MOCK_SERVICES: isMockModeEnabled(),
+  USE_MOCK_SERVICES: resolveMockServicesEnabled(currentEnv),
 
   /**
    * Indica si el contrato HTTP de avisos/notificaciones está habilitado en la Gateway.

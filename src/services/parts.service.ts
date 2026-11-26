@@ -1,3 +1,4 @@
+import { ENV } from '@/config/env';
 import { apiClient } from '@/services/api/client';
 import { HTTP_STATUS } from '@/services/api/types';
 import {
@@ -35,7 +36,7 @@ export {
   type ProviderServiceAdapter,
 } from './providers.service';
 
-const USE_MOCKS = process.env.EXPO_PUBLIC_USE_MOCK_AUTH === 'true';
+const USE_MOCKS = ENV.USE_MOCK_SERVICES;
 
 /**
  * Normaliza un texto eliminando diacríticos para búsquedas insensibles a tildes y mayúsculas (`q` en MS3).

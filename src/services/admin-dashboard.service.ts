@@ -1,3 +1,4 @@
+import { ENV } from '@/config/env';
 import { ORDER_STATUS_LABELS, WorkOrderStatus } from '@/constants/orderStatus';
 import { ROLES } from '@/constants/roles';
 import type { UserResponseDto } from '@/dto/auth.dto';
@@ -303,7 +304,7 @@ export function buildAdminDashboardFromDomain(input: {
  * incluyendo el resumen oficial `AdminSummary` mapeado desde los contratos MS1, MS2 y MS3.
  */
 export class AdminDashboardService {
-  private useMockSummary = process.env.EXPO_PUBLIC_USE_MOCK_AUTH === 'true';
+  private useMockSummary = ENV.USE_MOCK_SERVICES;
 
   useMockAdapter(): void {
     this.useMockSummary = true;
