@@ -9,7 +9,7 @@ import type { ManagedBudget as Budget } from '@/models/budget-management.model';
 
 /**
  * Presupuestos locales para el modo sin backend
- * (`EXPO_PUBLIC_USE_MOCK_AUTH=true`), indexados por orden. No provienen del
+ * (`EXPO_PUBLIC_USE_MOCK_SERVICES=true`), indexados por orden. No provienen del
  * MS3.
  */
 export const mockBudgetsByOrder: Record<string, LegacyBudget> = {

@@ -1,0 +1,20 @@
+CORRECCIONES S3 — TALLERCONNECT
+
+Este paquete corrige lo que faltaba en la rama Javier:
+- EXPO_PUBLIC_USE_MOCK_AUTH ya no activa mocks de dominio.
+- Los mocks de dominio requieren EXPO_PUBLIC_USE_MOCK_SERVICES=true y solo funcionan en development/test.
+- Los servicios de órdenes, vehículos, presupuestos, repuestos, proveedores, evidencias, notificaciones y dashboard usan la bandera central.
+- Las solicitudes canceladas no se reintentan.
+- Solo GET, HEAD y OPTIONS pueden reintentarse; POST/PUT/PATCH/DELETE nunca se repiten.
+- Smoke test GET: health Gateway, salud global, MS2 Taller y rechazo de token inválido (401/403).
+- No cambia .env ni migra el Gateway: conserva https://tallerconect.vercel.app/api.
+
+APLICAR
+1. Extrae este ZIP dentro de C:\Users\veget\Downloads\TallerConnect (raíz del repo).
+2. Abre PowerShell en la raíz del repo y ejecuta:
+   powershell -ExecutionPolicy Bypass -File .\Entrega-S3-TallerConnect\Apply-S3Tasks.ps1
+
+El instalador exige rama Javier y árbol limpio, crea respaldo, corre typecheck y dos suites focalizadas, ejecuta smoke y crea un único commit. Si typecheck o los tests fallan, restaura los archivos.
+
+IMPORTANTE
+Un smoke con timeout/red caída no demuestra que el backend esté caído; significa que no se pudo confirmar. Para cerrar las tareas de salud/seguridad deben aparecer 2xx en las tres rutas de salud y 401 o 403 para el token ficticio.

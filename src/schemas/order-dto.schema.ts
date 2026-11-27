@@ -17,6 +17,8 @@ export const orderResponseDtoSchema: z.ZodType<OrderResponseDto> = z.object({
   creado_por_id: z.number().int(),
   creado_en: z.iso.datetime({ offset: true }),
   actualizado_en: z.iso.datetime({ offset: true }),
+  devuelto_en: z.iso.datetime({ offset: true }).nullable().optional(),
+  devuelto_por_id: z.number().int().nullable().optional(),
 });
 
 /**

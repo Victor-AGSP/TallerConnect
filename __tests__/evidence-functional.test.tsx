@@ -1,6 +1,7 @@
 import * as ImagePicker from 'expo-image-picker';
 import * as SecureStore from 'expo-secure-store';
 import { router as appRouter, type Href } from 'expo-router';
+import { Alert } from 'react-native';
 import {
   AxiosError,
   AxiosHeaders,
@@ -202,6 +203,15 @@ const adapter = jest.fn<ReturnType<AxiosAdapter>, Parameters<AxiosAdapter>>(asyn
     return respond(config, 401, { detail: 'No autenticado' });
   }
 
+    // Listado de órdenes visibles para el usuario autenticado.
+  if (method === 'get' && url === '/ordenes') {
+    const orders = Array.from(server.orders.entries()).map(
+      ([id, estadoCodigo]) => orderDto(id, estadoCodigo),
+    );
+
+    return respond(config, 200, orders);
+  }
+
   let match = /^\/ordenes\/(\d+)$/.exec(url);
   if (method === 'get' && match) {
     const id = Number(match[1]);
@@ -304,9 +314,28 @@ afterAll(() => {
 });
 
 const originalAdapter = apiClient.defaults.adapter;
-
 beforeEach(() => {
   jest.clearAllMocks();
+
+  jest.spyOn(Alert, 'alert').mockImplementation((_title, _message, buttons) => {
+    const confirmButton = buttons?.find(
+      (button) =>
+        button.text === 'Confirmar' ||
+        button.text === 'Enviar evidencia',
+    );
+
+    confirmButton?.onPress?.();
+  });
+
+  jest.spyOn(Alert, 'alert').mockImplementation((_title, _message, buttons) => {
+    const confirmButton = buttons?.find(
+      (button) =>
+        button.text === 'Confirmar' ||
+        button.text === 'Enviar evidencia',
+    );
+
+    confirmButton?.onPress?.();
+  });
   resetStores();
   secureStore.clear();
   jest.mocked(SecureStore.getItemAsync).mockImplementation(async (key) => secureStore.get(key) ?? null);
@@ -339,6 +368,7 @@ beforeEach(() => {
 });
 
 afterEach(() => {
+  jest.mocked(Alert.alert).mockRestore();
   postSpy.mockRestore();
   jest.mocked(console.warn).mockRestore?.();
   jest.mocked(console.error).mockRestore?.();

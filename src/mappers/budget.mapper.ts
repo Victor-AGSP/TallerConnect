@@ -20,6 +20,7 @@ import type {
   BudgetSummary,
 } from '@/models/budget.model';
 import type { PaginatedList } from '@/models/pagination.model';
+import { DECIMAL_TEXT_PATTERN } from '@/schemas/budget-dto.schema';
 
 /** Mensaje para respuestas que no cumplen el contrato del MS3. */
 export const INVALID_BUDGET_RESPONSE =
@@ -63,6 +64,14 @@ function requireVersionStatus(value: unknown): BudgetVersionStatus {
   return value as BudgetVersionStatus;
 }
 
+/** Un monto o cantidad fuera del formato decimal del contrato se rechaza. */
+function requireDecimalText(value: unknown): string {
+  if (typeof value !== 'string' || !DECIMAL_TEXT_PATTERN.test(value)) {
+    throw new Error(INVALID_BUDGET_RESPONSE);
+  }
+  return value;
+}
+
 function toText(value: unknown): string {
   return typeof value === 'string' ? value : value != null ? String(value) : '';
 }
@@ -78,9 +87,9 @@ export function mapBudgetItemResponse(dto: BudgetItemResponseDto): BudgetItem {
     id: String(requireInteger(dto.item_id)),
     type: dto.tipo === 'repuesto' ? 'repuesto' : 'mano_de_obra',
     description: toText(dto.descripcion),
-    quantity: toText(dto.cantidad),
-    unitPrice: toText(dto.precio_unitario),
-    subtotal: toText(dto.subtotal),
+    quantity: requireDecimalText(dto.cantidad),
+    unitPrice: requireDecimalText(dto.precio_unitario),
+    subtotal: requireDecimalText(dto.subtotal),
     partId: toIdOrNull(dto.repuesto_id),
     partName: dto.repuesto_nombre ?? null,
     supplierName: dto.proveedor_nombre ?? null,
@@ -117,7 +126,7 @@ export function mapBudgetVersionResponse(
     lockedAt: dto.bloqueada_en ?? null,
     createdAt: toText(dto.creado_en),
     sentAt: dto.enviado_en ?? null,
-    total: toText(dto.total),
+    total: requireDecimalText(dto.total),
     items: requireArray(dto.items).map((item) =>
       mapBudgetItemResponse(item as BudgetItemResponseDto),
     ),
@@ -144,7 +153,7 @@ export function mapBudgetDetailResponse(dto: BudgetDetailResponseDto): Budget {
     createdAt: toText(dto.creado_en),
     latestVersion: requireInteger(dto.ultima_version),
     latestStatus: requireVersionStatus(dto.estado_ultima_version),
-    latestTotal: toText(dto.total_ultima_version),
+    latestTotal: requireDecimalText(dto.total_ultima_version),
     currentVersion:
       typeof dto.version_vigente === 'number' ? dto.version_vigente : null,
     versions,

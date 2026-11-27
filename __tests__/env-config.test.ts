@@ -6,6 +6,7 @@ import {
   resolveTimeoutMs,
   isSecureGatewayUrl,
   isMockModeEnabled,
+  resolveMockServicesEnabled,
   API_GATEWAY_URLS,
   GATEWAY_ROUTES,
   DEFAULT_TIMEOUT_MS,
@@ -17,14 +18,23 @@ import { API_BASE_URL, DEFAULT_TIMEOUT_MS as CLIENT_TIMEOUT } from '@/services/a
 
 describe('Configuración de Entornos y URL de la API Gateway', () => {
   describe('resolveApiUrl y normalizeGatewayBaseUrl', () => {
-    it('prioriza la URL explícita (EXPO_PUBLIC_API_URL) por sobre cualquier entorno y limpia barras finales', () => {
+    it('prioriza la URL explícita de Gateway en desarrollo y limpia barras finales', () => {
       const explicitUrl = 'http://192.168.1.100:8000/api/';
-      const resolved = resolveApiUrl('production', explicitUrl, 'ios');
-
+      const resolved = resolveApiUrl('development', explicitUrl, 'ios');
       expect(resolved).toBe('http://192.168.1.100:8000/api');
       expect(normalizeGatewayBaseUrl('  https://tallerconect.vercel.app/api/// ')).toBe(
         'https://tallerconect.vercel.app/api'
       );
+    });
+
+    it('rechaza HTTP y orígenes ajenos en integración/producción', () => {
+      expect(() => resolveApiUrl('integration', 'http://api-tallerconnect.inf.uct.cl/api')).toThrow(/HTTPS/);
+      expect(() => resolveApiUrl('production', 'https://otro-host.example/api')).toThrow(/origen autorizado/);
+    });
+
+    it('rechaza URLs que apuntan a OpenAPI o rutas de microservicios', () => {
+      expect(() => resolveApiUrl('integration', 'https://api-tallerconnect.inf.uct.cl/ms1')).toThrow(/ruta \/api/);
+      expect(() => resolveApiUrl('integration', 'https://tallerconect.vercel.app/api/auth')).toThrow(/ruta \/api/);
     });
 
     it('resuelve la URL de la nube (Vercel) para entorno de integración', () => {
@@ -70,13 +80,12 @@ describe('Configuración de Entornos y URL de la API Gateway', () => {
       ).toBe('/presupuestos');
     });
 
-    it('respeta URLs absolutas o bases sin sufijo /api', () => {
-      expect(
-        buildGatewayEndpointPath('https://tallerconect.vercel.app/ms3/openapi.json')
-      ).toBe('https://tallerconect.vercel.app/ms3/openapi.json');
-      expect(
-        buildGatewayEndpointPath('/api/vehiculos', 'https://tallerconect.vercel.app')
-      ).toBe('/api/vehiculos');
+    it('rechaza URLs absolutas para impedir que apiClient omita la Gateway', () => {
+      expect(() => buildGatewayEndpointPath('https://api-tallerconnect.inf.uct.cl/ms3/openapi.json')).toThrow(/rutas relativas/);
+    });
+
+    it('conserva rutas relativas cuando la base no termina en /api', () => {
+      expect(buildGatewayEndpointPath('/api/vehiculos', 'https://api-tallerconnect.inf.uct.cl')).toBe('/api/vehiculos');
     });
   });
 
@@ -96,17 +105,30 @@ describe('Configuración de Entornos y URL de la API Gateway', () => {
       expect(resolveTimeoutMs('', DEFAULT_UPLOAD_TIMEOUT_MS)).toBe(DEFAULT_UPLOAD_TIMEOUT_MS);
     });
 
-    it('exige HTTPS en entornos de integración y producción', () => {
+    it('exige HTTPS, origen oficial y ruta /api en integración y producción', () => {
       expect(isSecureGatewayUrl('https://tallerconect.vercel.app/api', 'integration')).toBe(true);
-      expect(isSecureGatewayUrl('http://tallerconect.vercel.app/api', 'production')).toBe(false);
+      expect(isSecureGatewayUrl('http://api-tallerconnect.inf.uct.cl/api', 'production')).toBe(false);
+      expect(isSecureGatewayUrl('https://otro-host.example/api', 'integration')).toBe(false);
+      expect(isSecureGatewayUrl('https://api-tallerconnect.inf.uct.cl/ms2', 'integration')).toBe(false);
+      expect(isSecureGatewayUrl('https://tallerconect.vercel.app/api', 'production')).toBe(true);
       expect(isSecureGatewayUrl('http://localhost:8000/api', 'development')).toBe(true);
     });
 
     it('evalúa flags de modo simulado (mocks) con prioridad para EXPO_PUBLIC_USE_MOCK_SERVICES', () => {
       expect(isMockModeEnabled('false', 'true')).toBe(true);
       expect(isMockModeEnabled('true', 'false')).toBe(false);
-      expect(isMockModeEnabled('true', undefined)).toBe(true);
+      // El flag de autenticación demo nunca activa mocks de servicios por sí solo.
+      expect(isMockModeEnabled('true', undefined)).toBe(false);
       expect(isMockModeEnabled('false', undefined)).toBe(false);
+      expect(isMockModeEnabled(undefined, ' TRUE ')).toBe(true);
+    });
+
+    it('desactiva mocks de servicios en integration/production incluso si el flag está activo', () => {
+      expect(resolveMockServicesEnabled('development', 'true')).toBe(true);
+      expect(resolveMockServicesEnabled('test', 'true')).toBe(true);
+      expect(resolveMockServicesEnabled('integration', 'true')).toBe(false);
+      expect(resolveMockServicesEnabled('production', 'true')).toBe(false);
+      expect(resolveMockServicesEnabled('development', 'false')).toBe(false);
     });
   });
 

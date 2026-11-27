@@ -1,5 +1,5 @@
 import { useCallback, useState } from 'react';
-import { StyleSheet } from 'react-native';
+import { Alert, StyleSheet } from 'react-native';
 
 import { Button, Card } from '@/components/common';
 import { EvidencePhotoPicker } from '@/components/evidence/EvidencePhotoPicker';
@@ -10,14 +10,9 @@ import { useEvidenceUpload } from '@/hooks/useEvidenceUpload';
 import type { EvidenceContext } from '@/models/evidence.model';
 
 export interface EvidenceCapturePanelProps {
-  /** Orden a la que se adjunta la evidencia (identificador de la ruta). */
   orderId: string;
 }
 
-/**
- * Captura o selección de una fotografía y su envío como evidencia de la orden.
- * Seleccionar no envía nada: la carga solo ocurre al pulsar "Enviar evidencia".
- */
 export function EvidenceCapturePanel({ orderId }: EvidenceCapturePanelProps) {
   const picker = useEvidencePicker(orderId);
   const uploader = useEvidenceUpload(orderId);
@@ -26,25 +21,55 @@ export function EvidenceCapturePanel({ orderId }: EvidenceCapturePanelProps) {
   const { file, clear } = picker;
   const { state, upload } = uploader;
 
-  const send = useCallback(async () => {
+  const executeSend = useCallback(async () => {
     if (!file) return;
+
     const evidence = await upload(file, context);
-    // Una evidencia confirmada no debe poder reenviarse por error.
-    if (evidence) clear();
+
+    if (evidence) {
+      clear();
+    }
   }, [clear, context, file, upload]);
 
+  const send = useCallback(() => {
+    if (!file) return;
+
+    Alert.alert(
+      'Confirmar envío',
+      `¿Quieres adjuntar "${file.name}" como evidencia de la orden ${orderId}?`,
+      [
+        {
+          text: 'Cancelar',
+          style: 'cancel',
+        },
+        {
+          text: 'Enviar evidencia',
+          onPress: () => {
+            void executeSend();
+          },
+        },
+      ],
+    );
+  }, [executeSend, file, orderId]);
+
   const retry = useCallback(async () => {
-    if (await uploader.retry()) clear();
+    if (await uploader.retry()) {
+      clear();
+    }
   }, [clear, uploader]);
 
   const inFlight =
-    state.status === 'preparing' || state.status === 'sending' || state.status === 'verifying';
+    state.status === 'preparing' ||
+    state.status === 'sending' ||
+    state.status === 'verifying';
+
   const busy = inFlight || picker.isPicking;
 
-  // Tras un fallo con resultado incierto la misma fotografía solo se reintenta
-  // (con verificación previa): "Enviar" podría duplicarla.
-  const failedWithSameFile = state.status === 'failed' && file !== null && state.file === file;
-  const mustVerifyFirst = failedWithSameFile && state.outcome === 'uncertain';
+  const failedWithSameFile =
+    state.status === 'failed' && file !== null && state.file === file;
+
+  const mustVerifyFirst =
+    failedWithSameFile && state.outcome === 'uncertain';
 
   return (
     <Card

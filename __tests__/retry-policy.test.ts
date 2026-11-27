@@ -85,6 +85,16 @@ describe('Política de Reintento para Operaciones Seguras (RFC 7231)', () => {
       expect(isRetryableError(createStatusError(422))).toBe(false); // Unprocessable Entity
       expect(isRetryableError(createStatusError(500))).toBe(false); // Internal Server Error
     });
+
+    it('no reintenta solicitudes canceladas por el usuario', () => {
+      const canceledError = {
+        name: 'CanceledError',
+        code: 'ERR_CANCELED',
+        message: 'canceled',
+        response: undefined,
+      } as AxiosError;
+      expect(isRetryableError(canceledError)).toBe(false);
+    });
   });
 
   describe('calculateBackoffDelay (Exponential Backoff)', () => {

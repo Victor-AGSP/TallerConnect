@@ -74,6 +74,10 @@ export function mapOrderResponse(raw: OrderResponseDto): WorkOrder {
     createdById: String(dto.creado_por_id),
     createdAt: dto.creado_en,
     updatedAt: dto.actualizado_en,
+    ...(dto.devuelto_en !== undefined && { returnedAt: dto.devuelto_en }),
+    ...(dto.devuelto_por_id !== undefined && {
+      returnedById: dto.devuelto_por_id !== null ? String(dto.devuelto_por_id) : null,
+    }),
   };
 }
 

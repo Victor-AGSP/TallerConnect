@@ -1,5 +1,7 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { Pressable, StyleSheet, Text, View } from 'react-native';
+import { Alert, Pressable, StyleSheet, Text, View } from 'react-native';
+import { Controller, useForm } from 'react-hook-form';
+import { zodResolver } from '@hookform/resolvers/zod';
 
 import {
   Button,
@@ -20,9 +22,12 @@ import type { Evidence, EvidenceContext } from '@/models/evidence.model';
 import type { OrderLogEntry, OrderLogType } from '@/models/order-log.model';
 import type { WorkOrder } from '@/models/order.model';
 import { orderLogService } from '@/services/order-log.service';
+import {
+  mechanicUpdateSchema,
+  type MechanicUpdateFormValues,
+} from '@/schemas/mechanic-update.schema';
 import { formatDate } from '@/utils/formatters';
 
-/** MS4 rechaza evidencias de órdenes entregadas o canceladas (409). */
 const EVIDENCE_CLOSED_STATUSES: readonly string[] = [
   ORDER_STATUS.ENTREGADO,
   ORDER_STATUS.CANCELADO,
@@ -48,33 +53,39 @@ type SubmitState =
   | { status: 'uploading'; entry: OrderLogEntry }
   | { status: 'done'; entry: OrderLogEntry; evidence: Evidence | null }
   | { status: 'error'; message: string }
-  /** El avance quedó registrado pero la fotografía no se envió. */
   | { status: 'partial'; entry: OrderLogEntry };
 
 export interface MechanicUpdatePanelProps {
   order: WorkOrder;
 }
 
-/**
- * Avances del mecánico sobre la orden: bitácora de MS2 (observación o acción)
- * con una fotografía opcional que se sube a MS4.
- *
- * MS2 y MS4 no comparten identificadores: la fotografía queda asociada a la
- * orden y a su etapa, no a la entrada de bitácora. Por eso el avance se
- * registra primero y la fotografía después; si la fotografía falla, el avance
- * no se vuelve a enviar y solo se reintenta la carga.
- */
 export function MechanicUpdatePanel({ order }: MechanicUpdatePanelProps) {
   const orderId = order.id;
   const allowsPhoto = acceptsEvidence(order.status);
 
   const picker = useEvidencePicker(orderId);
   const uploader = useEvidenceUpload(orderId);
-  const [type, setType] = useState<OrderLogType>('observacion');
-  const [description, setDescription] = useState('');
-  const [descriptionError, setDescriptionError] = useState<string | null>(null);
+
   const [context, setContext] = useState<EvidenceContext>('reparacion');
   const [submit, setSubmit] = useState<SubmitState>({ status: 'idle' });
+  const [showLog, setShowLog] = useState(false);
+
+  const {
+    control,
+    handleSubmit,
+    reset,
+    watch,
+    formState: { errors },
+  } = useForm<MechanicUpdateFormValues>({
+    resolver: zodResolver(mechanicUpdateSchema),
+    defaultValues: {
+      type: 'observacion',
+      description: '',
+    },
+    mode: 'onBlur',
+  });
+
+ 
 
   const inFlightRef = useRef(false);
   const isMountedRef = useRef(true);
@@ -86,23 +97,24 @@ export function MechanicUpdatePanel({ order }: MechanicUpdatePanelProps) {
     };
   }, []);
 
-  // La bitácora se consulta bajo demanda: abrir la orden no genera más solicitudes.
-  const [showLog, setShowLog] = useState(false);
   const loadLog = useMemo(
     () => (showLog ? () => orderLogService.getOrderLog(orderId) : null),
     [orderId, showLog],
   );
-  const log = useDataQuery(loadLog, 'No fue posible cargar los avances de la orden.');
+
+  const log = useDataQuery(
+    loadLog,
+    'No fue posible cargar los avances de la orden.',
+  );
+
   const { refresh: refreshLog } = log;
-
   const { file, clear: clearPhoto } = picker;
-
   const { upload: uploadEvidence, retry: retryEvidence } = uploader;
 
-  /** Resultado de la carga de la fotografía tras registrar el avance. */
   const settlePhoto = useCallback(
     (entry: OrderLogEntry, evidence: Evidence | null) => {
       if (!isMountedRef.current) return;
+
       if (evidence) {
         clearPhoto();
         setSubmit({ status: 'done', entry, evidence });
@@ -119,57 +131,94 @@ export function MechanicUpdatePanel({ order }: MechanicUpdatePanelProps) {
         setSubmit({ status: 'done', entry, evidence: null });
         return;
       }
+
       setSubmit({ status: 'uploading', entry });
       settlePhoto(entry, await uploadEvidence(file, context));
     },
     [context, file, settlePhoto, uploadEvidence],
   );
 
-  const register = useCallback(async () => {
-    // Bloqueo síncrono contra la doble pulsación.
-    if (inFlightRef.current) return;
+  const executeRegister = useCallback(
+    async (values: MechanicUpdateFormValues) => {
+      if (inFlightRef.current) return;
 
-    const text = description.trim();
-    if (!text) {
-      setDescriptionError('Describe el avance realizado.');
-      return;
-    }
-    setDescriptionError(null);
+      inFlightRef.current = true;
+      setSubmit({ status: 'saving' });
 
-    inFlightRef.current = true;
-    setSubmit({ status: 'saving' });
-    try {
-      let entry: OrderLogEntry;
       try {
-        entry = await orderLogService.addOrderLogEntry(orderId, { type, description: text });
-      } catch (error: unknown) {
+        let entry: OrderLogEntry;
+
+        try {
+          entry = await orderLogService.addOrderLogEntry(orderId, {
+            type: values.type,
+            description: values.description.trim(),
+          });
+        } catch (error: unknown) {
+          if (!isMountedRef.current) return;
+
+          setSubmit({
+            status: 'error',
+            message:
+              error instanceof Error
+                ? error.message
+                : 'No fue posible registrar el avance.',
+          });
+          return;
+        }
+
         if (!isMountedRef.current) return;
-        setSubmit({
-          status: 'error',
-          message: error instanceof Error ? error.message : 'No fue posible registrar el avance.',
+
+        reset({
+          type: values.type,
+          description: '',
         });
-        return;
-      }
-      if (!isMountedRef.current) return;
 
-      // El avance ya existe en el servidor: el texto no se vuelve a enviar.
-      setDescription('');
-      if (showLog) {
-        void refreshLog();
-      } else {
-        setShowLog(true);
-      }
-      await uploadPhoto(entry);
-    } finally {
-      inFlightRef.current = false;
-    }
-  }, [description, orderId, refreshLog, showLog, type, uploadPhoto]);
+        if (showLog) {
+          void refreshLog();
+        } else {
+          setShowLog(true);
+        }
 
-  // Reintenta solo la fotografía, con la verificación previa de useEvidenceUpload.
+        await uploadPhoto(entry);
+      } finally {
+        inFlightRef.current = false;
+      }
+    },
+    [orderId, reset, refreshLog, showLog, uploadPhoto],
+  );
+
+  const confirmRegister = useCallback(
+    (values: MechanicUpdateFormValues) => {
+      if (inFlightRef.current) return;
+
+      const description = values.description.trim();
+
+      Alert.alert(
+        'Confirmar registro',
+        `¿Quieres registrar esta ${values.type === 'observacion' ? 'observación' : 'acción'} en la orden ${orderId}?\n\n"${description}"`,
+        [
+          {
+            text: 'Volver',
+            style: 'cancel',
+          },
+          {
+            text: 'Confirmar',
+            onPress: () => {
+              void executeRegister(values);
+            },
+          },
+        ],
+      );
+    },
+    [executeRegister, orderId],
+  );
+
   const retryPhoto = useCallback(async () => {
     if (inFlightRef.current || submit.status !== 'partial') return;
+
     inFlightRef.current = true;
     const { entry } = submit;
+
     try {
       setSubmit({ status: 'uploading', entry });
       settlePhoto(entry, await retryEvidence());
@@ -180,15 +229,22 @@ export function MechanicUpdatePanel({ order }: MechanicUpdatePanelProps) {
 
   const finishWithoutPhoto = useCallback(() => {
     if (submit.status !== 'partial') return;
+
     clearPhoto();
     uploader.reset();
-    setSubmit({ status: 'done', entry: submit.entry, evidence: null });
+    setSubmit({
+      status: 'done',
+      entry: submit.entry,
+      evidence: null,
+    });
   }, [clearPhoto, submit, uploader]);
 
-  const photoFailure = uploader.state.status === 'failed' ? uploader.state : null;
+  const photoFailure =
+    uploader.state.status === 'failed' ? uploader.state : null;
 
   const isPartial = submit.status === 'partial';
-  const isWorking = submit.status === 'saving' || submit.status === 'uploading';
+  const isWorking =
+    submit.status === 'saving' || submit.status === 'uploading';
   const formLocked = isWorking || isPartial;
 
   return (
@@ -198,36 +254,62 @@ export function MechanicUpdatePanel({ order }: MechanicUpdatePanelProps) {
       subtitle={`Orden ${orderId} · ${getOrderStatusLabel(order.status)}`}
     >
       <Text style={styles.label}>Tipo de avance</Text>
-      <View style={styles.chips} accessibilityRole="radiogroup">
-        {LOG_TYPES.map((option) => {
-          const selected = option.value === type;
-          return (
-            <Pressable
-              key={option.value}
-              testID={`order-update-type-${option.value}`}
-              accessibilityRole="radio"
-              accessibilityState={{ checked: selected, disabled: formLocked }}
-              disabled={formLocked}
-              onPress={() => setType(option.value)}
-              style={[styles.chip, selected && styles.chipSelected]}
-            >
-              <Text style={[styles.chipText, selected && styles.chipTextSelected]}>
-                {option.label}
-              </Text>
-            </Pressable>
-          );
-        })}
-      </View>
 
-      <Input
-        testID="order-update-description"
-        label="Descripción"
-        placeholder="Qué observaste o qué hiciste en el vehículo"
-        multiline
-        value={description}
-        onChangeText={setDescription}
-        editable={!formLocked}
-        error={descriptionError ?? undefined}
+      <Controller
+        control={control}
+        name="type"
+        render={({ field: { value, onChange } }) => (
+          <View style={styles.chips} accessibilityRole="radiogroup">
+            {LOG_TYPES.map((option) => {
+              const selected = option.value === value;
+
+              return (
+                <Pressable
+                  key={option.value}
+                  testID={`order-update-type-${option.value}`}
+                  accessibilityRole="radio"
+                  accessibilityState={{
+                    checked: selected,
+                    disabled: formLocked,
+                  }}
+                  disabled={formLocked}
+                  onPress={() => onChange(option.value)}
+                  style={[
+                    styles.chip,
+                    selected && styles.chipSelected,
+                  ]}
+                >
+                  <Text
+                    style={[
+                      styles.chipText,
+                      selected && styles.chipTextSelected,
+                    ]}
+                  >
+                    {option.label}
+                  </Text>
+                </Pressable>
+              );
+            })}
+          </View>
+        )}
+      />
+
+      <Controller
+        control={control}
+        name="description"
+        render={({ field: { value, onChange, onBlur } }) => (
+          <Input
+            testID="order-update-description"
+            label="Descripción"
+            placeholder="Qué observaste o qué hiciste en el vehículo"
+            multiline
+            value={value}
+            onChangeText={onChange}
+            onBlur={onBlur}
+            editable={!formLocked}
+            error={errors.description?.message}
+          />
+        )}
       />
 
       {allowsPhoto ? (
@@ -237,12 +319,15 @@ export function MechanicUpdatePanel({ order }: MechanicUpdatePanelProps) {
             picker={picker}
             context={context}
             onContextChange={setContext}
-            disabled={isWorking || isPartial}
+            disabled={formLocked}
             testIDPrefix="order-update-photo"
           />
         </>
       ) : (
-        <Text testID="order-update-photo-closed" style={styles.notice}>
+        <Text
+          testID="order-update-photo-closed"
+          style={styles.notice}
+        >
           {`La orden está ${getOrderStatusLabel(order.status).toLowerCase()}: ya no admite fotografías.`}
         </Text>
       )}
@@ -250,10 +335,16 @@ export function MechanicUpdatePanel({ order }: MechanicUpdatePanelProps) {
       {!isPartial ? (
         <Button
           testID="order-update-submit"
-          title={submit.status === 'uploading' ? 'Enviando fotografía...' : 'Registrar avance'}
+          title={
+            submit.status === 'uploading'
+              ? 'Enviando fotografía...'
+              : 'Registrar avance'
+          }
           loading={isWorking}
-          disabled={picker.isPicking}
-          onPress={register}
+          disabled={picker.isPicking || isWorking}
+onPress={() => {
+  void handleSubmit(confirmRegister)();
+}}
           style={styles.submit}
         />
       ) : null}
@@ -278,11 +369,18 @@ export function MechanicUpdatePanel({ order }: MechanicUpdatePanelProps) {
       ) : null}
 
       {submit.status === 'partial' ? (
-        <View testID="order-update-partial" accessibilityRole="alert" style={styles.partial}>
-          <Text style={styles.partialTitle}>Avance registrado sin fotografía</Text>
+        <View
+          testID="order-update-partial"
+          accessibilityRole="alert"
+          style={styles.partial}
+        >
+          <Text style={styles.partialTitle}>
+            Avance registrado sin fotografía
+          </Text>
           <Text style={styles.partialText}>
             {`El avance quedó registrado (${formatDate(submit.entry.createdAt)}), pero la fotografía no se envió: ${photoFailure?.message ?? ''}`}
           </Text>
+
           {photoFailure?.canRetry ? (
             <Button
               testID="order-update-retry-photo"
@@ -291,6 +389,7 @@ export function MechanicUpdatePanel({ order }: MechanicUpdatePanelProps) {
               style={styles.submit}
             />
           ) : null}
+
           <Button
             testID="order-update-skip-photo"
             title="Continuar sin fotografía"
@@ -302,9 +401,15 @@ export function MechanicUpdatePanel({ order }: MechanicUpdatePanelProps) {
       ) : null}
 
       {submit.status === 'done' ? (
-        <View testID="order-update-success" accessibilityRole="alert" style={styles.success}>
+        <View
+          testID="order-update-success"
+          accessibilityRole="alert"
+          style={styles.success}
+        >
           <Text style={styles.successTitle}>
-            {submit.evidence ? 'Avance y fotografía registrados' : 'Avance registrado'}
+            {submit.evidence
+              ? 'Avance y fotografía registrados'
+              : 'Avance registrado'}
           </Text>
           <Text style={styles.successText}>
             {`${TYPE_LABELS[submit.entry.type]} · ${formatDate(submit.entry.createdAt)}`}
@@ -315,6 +420,7 @@ export function MechanicUpdatePanel({ order }: MechanicUpdatePanelProps) {
       <Text accessibilityRole="header" style={styles.historyTitle}>
         Avances registrados
       </Text>
+
       {!showLog ? (
         <Button
           testID="order-log-show"
@@ -323,7 +429,10 @@ export function MechanicUpdatePanel({ order }: MechanicUpdatePanelProps) {
           onPress={() => setShowLog(true)}
         />
       ) : log.isLoading ? (
-        <Loading testID="order-log-loading" message="Cargando avances..." />
+        <Loading
+          testID="order-log-loading"
+          message="Cargando avances..."
+        />
       ) : log.errorMessage ? (
         <ErrorMessage
           testID="order-log-error"
@@ -339,11 +448,17 @@ export function MechanicUpdatePanel({ order }: MechanicUpdatePanelProps) {
       ) : (
         <View testID="order-log-list">
           {log.data.map((entry) => (
-            <View key={entry.id} testID={`order-log-entry-${entry.id}`} style={styles.entry}>
+            <View
+              key={entry.id}
+              testID={`order-log-entry-${entry.id}`}
+              style={styles.entry}
+            >
               <Text style={styles.entryMeta}>
                 {`${TYPE_LABELS[entry.type]} · ${formatDate(entry.createdAt)} · usuario ${entry.authorUserId}`}
               </Text>
-              <Text style={styles.entryText}>{entry.description}</Text>
+              <Text style={styles.entryText}>
+                {entry.description}
+              </Text>
               {entry.parts.length > 0 ? (
                 <Text style={styles.entryParts}>
                   {`Repuestos: ${entry.parts.map((p) => `${p.name} (${p.quantity})`).join(', ')}`}
