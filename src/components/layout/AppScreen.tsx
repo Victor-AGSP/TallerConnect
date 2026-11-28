@@ -30,7 +30,10 @@ export function AppScreen({
   children,
 }: AppScreenProps) {
   return (
-    <SafeAreaView style={styles.safeArea}>
+    <SafeAreaView
+      edges={['top', 'left', 'right', 'bottom']}
+      style={styles.safeArea}
+    >
       <KeyboardAvoidingView
         style={styles.root}
         behavior={
@@ -38,6 +41,7 @@ export function AppScreen({
             ? 'padding'
             : 'height'
         }
+        keyboardVerticalOffset={Platform.OS === 'ios' ? 0 : 24}
       >
         <ScrollView
           contentContainerStyle={styles.content}
@@ -94,7 +98,7 @@ const styles = StyleSheet.create({
     flexGrow: 1,
     paddingHorizontal: spacing.lg,
     paddingTop: spacing.lg,
-    paddingBottom: spacing.xxl,
+    paddingBottom: spacing.xxl + spacing.lg,
   },
 
   header: {

@@ -40,6 +40,7 @@ export function ErrorMessage({
       {onRetry ? (
         <Button
           title={retryLabel}
+          accessibilityHint="Vuelve a intentar cargar la información"
           onPress={onRetry}
           variant="outline"
           style={styles.retryButton}

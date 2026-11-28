@@ -57,7 +57,12 @@ export function ConnectivityBanner({
       style={styles.bannerContainer}
     >
       <View style={styles.contentRow}>
-        <View style={styles.indicatorDot} />
+        <View
+          accessible={false}
+          accessibilityElementsHidden
+          importantForAccessibility="no-hide-descendants"
+          style={styles.indicatorDot}
+        />
         <Text style={styles.messageText} numberOfLines={2}>
           {errorMessage || 'Sin conexión a internet o con la API Gateway.'}
         </Text>
@@ -67,6 +72,7 @@ export function ConnectivityBanner({
         testID="connectivity-retry-button"
         accessibilityRole="button"
         accessibilityLabel="Reintentar conexión"
+        accessibilityHint="Comprueba nuevamente la conexión con el servidor"
         accessibilityState={{ disabled: isChecking, busy: isChecking }}
         onPress={handlePressRetry}
         disabled={isChecking}
@@ -84,9 +90,9 @@ export function ConnectivityBanner({
 
 const styles = StyleSheet.create({
   bannerContainer: {
-    backgroundColor: '#FFF5DF', // colors.warningSoft
+    backgroundColor: colors.warningSoft,
     borderBottomWidth: 1,
-    borderBottomColor: '#C47A17', // colors.warning
+    borderBottomColor: colors.warning,
     paddingHorizontal: spacing.lg,
     paddingVertical: spacing.sm + 2,
     flexDirection: 'row',
@@ -104,24 +110,24 @@ const styles = StyleSheet.create({
     width: 10,
     height: 10,
     borderRadius: radius.pill,
-    backgroundColor: '#C47A17',
+    backgroundColor: colors.warning,
     marginRight: spacing.sm,
   },
   messageText: {
-    color: '#17212B',
+    color: colors.text,
     fontSize: 13,
-    fontWeight: '500',
+    fontWeight: '600',
     flex: 1,
   },
   retryButton: {
-    backgroundColor: '#C47A17',
+    backgroundColor: '#92400E',
     paddingHorizontal: spacing.md,
     paddingVertical: spacing.xs + 2,
     borderRadius: radius.sm,
     alignItems: 'center',
     justifyContent: 'center',
-    minWidth: 80,
-    minHeight: 32,
+    minWidth: 88,
+    minHeight: 44,
   },
   retryButtonDisabled: {
     opacity: 0.6,

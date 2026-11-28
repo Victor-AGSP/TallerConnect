@@ -151,6 +151,7 @@ export function OrderBudgetView({
           <Button
             testID="order-budget-refresh"
             title="Actualizar"
+            accessibilityHint="Consulta nuevamente el presupuesto actualizado desde el servidor"
             variant="outline"
             loading={isRefreshing}
             disabled={isRefreshing}
@@ -389,6 +390,7 @@ function BudgetDecisionForm({
         <Button
           testID="order-budget-retry-application"
           title="Reintentar aplicación"
+          accessibilityHint="Reintenta aplicar en la orden tu decisión ya registrada"
           variant="outline"
           loading={state.retrying}
           disabled={disabled || state.retrying}
@@ -408,6 +410,7 @@ function BudgetDecisionForm({
       <Input
         testID="order-budget-reason"
         label="Motivo (obligatorio para rechazar)"
+        accessibilityHint="Escribe el motivo antes de rechazar el presupuesto"
         value={reason}
         onChangeText={(text) => {
           setReason(text);
@@ -416,10 +419,14 @@ function BudgetDecisionForm({
         editable={!controlsDisabled}
         maxLength={1000}
         multiline
+        returnKeyType="done"
+        blurOnSubmit
+        textAlignVertical="top"
+        style={styles.reasonInput}
       />
 
       {rejectionCancels ? (
-        <Text style={styles.warning}>
+        <Text accessibilityRole="text" style={styles.warning}>
           Si rechazas este presupuesto se cancelará el servicio de la orden.
         </Text>
       ) : null}
@@ -442,6 +449,11 @@ function BudgetDecisionForm({
           <Button
             testID="order-budget-confirm"
             title={pendingDecision === 'aprobado' ? 'Confirmar aprobación' : 'Confirmar rechazo'}
+            accessibilityHint={
+              pendingDecision === 'aprobado'
+                ? 'Envía tu aprobación definitiva del presupuesto'
+                : 'Envía tu rechazo definitivo del presupuesto'
+            }
             variant={pendingDecision === 'aprobado' ? 'primary' : 'danger'}
             loading={submitting}
             disabled={controlsDisabled}
@@ -449,6 +461,7 @@ function BudgetDecisionForm({
           />
           <Button
             title="Volver"
+            accessibilityHint="Cancela la confirmación y vuelve al formulario de decisión"
             variant="outline"
             disabled={controlsDisabled}
             onPress={() => setState({ kind: 'idle' })}
@@ -459,12 +472,14 @@ function BudgetDecisionForm({
           <Button
             testID="order-budget-approve"
             title="Aprobar presupuesto"
+            accessibilityHint="Solicita confirmación antes de aprobar el presupuesto"
             disabled={controlsDisabled}
             onPress={() => startConfirmation('aprobado')}
           />
           <Button
             testID="order-budget-reject"
             title="Rechazar presupuesto"
+            accessibilityHint="Requiere un motivo y solicita confirmación antes de rechazar"
             variant="danger"
             disabled={controlsDisabled}
             onPress={() => startConfirmation('rechazado')}
@@ -478,8 +493,13 @@ function BudgetDecisionForm({
 const styles = StyleSheet.create({
   refreshButton: {
     alignSelf: 'flex-end',
-    minHeight: 40,
+    minHeight: 44,
     paddingHorizontal: spacing.md,
+  },
+
+  reasonInput: {
+    minHeight: 88,
+    paddingTop: spacing.sm,
   },
 
   header: {
