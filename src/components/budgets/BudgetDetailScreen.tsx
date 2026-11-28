@@ -1,32 +1,71 @@
-
+import { useCallback } from 'react';
 import { useRouter } from 'expo-router';
-import {
-  StyleSheet,
-  Text,
-  View,
-} from 'react-native';
+import { StyleSheet, Text, View } from 'react-native';
 
+import {
+  Button,
+  Card,
+  EmptyState,
+  ErrorMessage,
+  Loading,
+} from '@/components/common';
 import { AppScreen } from '@/components/layout/AppScreen';
-import { Button, Card } from '@/components/common';
-import { colors, radius, spacing } from '@/constants/theme';
-import {
-  calculateBudgetTotal,
-  getBudgetById,
-} from '@/services';
+import { formatBudgetAmount } from '@/components/orders/OrderBudgetView';
+import { StatusPill, type StatusTone } from '@/components/ui/StatusPill';
+import { colors, spacing } from '@/constants/theme';
+import { useDataQuery } from '@/hooks/useDataQuery';
+import type { Budget, BudgetVersionStatus } from '@/models/budget.model';
+import { budgetsService } from '@/services/budgets.service';
+import { ordersService } from '@/services/orders.service';
+import { formatDate } from '@/utils/formatters';
 
-const formatCLP = (amount: number) =>
-  amount.toLocaleString('es-CL', {
-    style: 'currency',
-    currency: 'CLP',
-    maximumFractionDigits: 0,
-  });
+interface LoadedClientBudget {
+  orderId: string;
+  budget: Budget;
+}
+
+const FALLBACK_ERROR = 'No fue posible cargar el presupuesto.';
+
+const VERSION_STATUS: Record<
+  BudgetVersionStatus,
+  { label: string; tone: StatusTone }
+> = {
+  borrador: { label: 'Borrador', tone: 'info' },
+  enviada: { label: 'Esperando decisión', tone: 'warning' },
+  aprobada: { label: 'Aprobado', tone: 'success' },
+  rechazada: { label: 'Rechazado', tone: 'danger' },
+};
 
 export function BudgetDetailScreen() {
   const router = useRouter();
 
-  const budget = getBudgetById('OT-00124');
-  const budgetItems = budget?.items ?? [];
-  const total = budget ? calculateBudgetTotal(budget) : 0;
+  const loadLatestBudget = useCallback(async (): Promise<LoadedClientBudget | null> => {
+    const orders = await ordersService.getOrders();
+    const sortedOrders = [...orders].sort(
+      (a, b) =>
+        new Date(b.updatedAt).getTime() - new Date(a.updatedAt).getTime(),
+    );
+
+    for (const order of sortedOrders) {
+      const budget = await budgetsService.getBudgetForOrder(order.id);
+      if (budget && budget.versions.length > 0) {
+        return { orderId: order.id, budget };
+      }
+    }
+
+    return null;
+  }, []);
+
+  const { data, errorMessage, isLoading, isRefreshing, refresh } = useDataQuery(
+    loadLatestBudget,
+    FALLBACK_ERROR,
+  );
+
+  const budget = data?.budget ?? null;
+  const version = budget
+    ? budget.versions[budget.versions.length - 1]
+    : undefined;
+  const status = version ? VERSION_STATUS[version.status] : null;
 
   return (
     <AppScreen
@@ -34,71 +73,97 @@ export function BudgetDetailScreen() {
       title="Detalle del presupuesto"
       subtitle="Revisa los trabajos y repuestos considerados para tu vehículo."
     >
-      <Card style={styles.card}>
-        <View style={styles.headerRow}>
-          <View style={styles.headerText}>
-            <Text style={styles.label}>ORDEN DE TRABAJO</Text>
-            <Text style={styles.orderNumber}>
-              {budget?.orderNumber ?? 'Sin orden'}
-            </Text>
-          </View>
-
-          <View style={styles.status}>
-            <Text style={styles.statusText}>
-              {budget?.status ?? 'Sin estado'}
-            </Text>
-          </View>
-        </View>
-
-        <View style={styles.separator} />
-
-        <InfoRow
-          label="Fecha"
-          value={budget?.date ?? 'No disponible'}
+      {isLoading || (isRefreshing && !data) ? (
+        <Loading
+          testID="budget-detail-loading"
+          message="Cargando presupuesto..."
         />
-        <InfoRow
-          label="Versión"
-          value={String(budget?.version ?? '—')}
+      ) : errorMessage ? (
+        <ErrorMessage
+          testID="budget-detail-error"
+          title="No se pudo cargar el presupuesto"
+          message={errorMessage}
+          onRetry={refresh}
         />
-        <InfoRow
-          label="Vehículo"
-          value={budget?.vehiclePlate ?? 'No disponible'}
+      ) : !data || !budget || !version ? (
+        <EmptyState
+          testID="budget-detail-empty"
+          title="Sin presupuesto"
+          message="Todavía no tienes un presupuesto disponible en tus órdenes."
+          actionLabel="Actualizar"
+          onAction={refresh}
         />
-      </Card>
-
-      <Text style={styles.sectionTitle}>Detalle de los trabajos</Text>
-
-      {budgetItems.length > 0 ? (
-        budgetItems.map((item) => (
-          <Card key={item.id} style={styles.itemCard}>
-            <Text style={styles.itemName}>{item.name}</Text>
-
-            <View style={styles.itemRow}>
-              <Text style={styles.muted}>
-                {item.quantity} × {formatCLP(item.price)}
-              </Text>
-              <Text style={styles.itemTotal}>
-                {formatCLP(item.quantity * item.price)}
-              </Text>
-            </View>
-          </Card>
-        ))
       ) : (
-        <Card style={styles.itemCard}>
-          <Text style={styles.muted}>
-            No hay trabajos disponibles para este presupuesto.
-          </Text>
-        </Card>
-      )}
+        <>
+          <Button
+            testID="budget-detail-refresh"
+            title="Actualizar presupuesto"
+            variant="outline"
+            loading={isRefreshing}
+            disabled={isRefreshing}
+            onPress={refresh}
+            style={styles.refreshButton}
+          />
 
-      <Card style={styles.totalCard}>
-        <Text style={styles.label}>TOTAL DEL PRESUPUESTO</Text>
-        <Text style={styles.total}>{formatCLP(total)}</Text>
-        <Text style={styles.note}>
-          Información de demostración obtenida desde BudgetService.
-          Los datos todavía no se guardan ni se consultan en el backend.
-        </Text>
-      </Card>
+          <Card testID={`budget-detail-${budget.id}`} style={styles.card}>
+            <View style={styles.headerRow}>
+              <View style={styles.headerText}>
+                <Text style={styles.label}>ORDEN DE TRABAJO</Text>
+                <Text style={styles.orderNumber}>OT #{data.orderId}</Text>
+              </View>
+
+              {status ? (
+                <StatusPill
+                  label={status.label}
+                  tone={status.tone}
+                  accessibilityLabel={`Estado del presupuesto: ${status.label}`}
+                />
+              ) : null}
+            </View>
+
+            <View style={styles.separator} />
+
+            <InfoRow label="Fecha" value={formatDate(version.createdAt)} />
+            <InfoRow label="Versión" value={String(version.number)} />
+            <InfoRow
+              label="Presupuesto"
+              value={`#${budget.id}`}
+            />
+          </Card>
+
+          <Text style={styles.sectionTitle}>Detalle de los trabajos</Text>
+
+          {version.items.length > 0 ? (
+            version.items.map((item) => (
+              <Card key={item.id} style={styles.itemCard}>
+                <Text style={styles.itemName}>{item.description}</Text>
+
+                <View style={styles.itemRow}>
+                  <Text style={styles.muted}>
+                    {item.quantity} × {formatBudgetAmount(item.unitPrice)}
+                  </Text>
+                  <Text style={styles.itemTotal}>
+                    {formatBudgetAmount(item.subtotal)}
+                  </Text>
+                </View>
+              </Card>
+            ))
+          ) : (
+            <Card style={styles.itemCard}>
+              <Text style={styles.muted}>
+                No hay trabajos registrados en esta versión del presupuesto.
+              </Text>
+            </Card>
+          )}
+
+          <Card style={styles.totalCard}>
+            <Text style={styles.label}>TOTAL DEL PRESUPUESTO</Text>
+            <Text style={styles.total}>
+              {formatBudgetAmount(version.total)}
+            </Text>
+          </Card>
+        </>
+      )}
 
       <Button
         title="Volver al inicio"
@@ -110,13 +175,7 @@ export function BudgetDetailScreen() {
   );
 }
 
-function InfoRow({
-  label,
-  value,
-}: {
-  label: string;
-  value: string;
-}) {
+function InfoRow({ label, value }: { label: string; value: string }) {
   return (
     <View style={styles.infoRow}>
       <Text style={styles.muted}>{label}</Text>
@@ -126,6 +185,12 @@ function InfoRow({
 }
 
 const styles = StyleSheet.create({
+  refreshButton: {
+    alignSelf: 'flex-end',
+    minHeight: 40,
+    paddingHorizontal: spacing.md,
+    marginBottom: spacing.sm,
+  },
   card: {
     marginBottom: spacing.md,
   },
@@ -149,17 +214,6 @@ const styles = StyleSheet.create({
     color: colors.primary,
     fontSize: 22,
     fontWeight: '900',
-  },
-  status: {
-    backgroundColor: colors.successSoft,
-    paddingHorizontal: spacing.md,
-    paddingVertical: spacing.sm,
-    borderRadius: radius.pill,
-  },
-  statusText: {
-    color: colors.success,
-    fontSize: 12,
-    fontWeight: '800',
   },
   separator: {
     height: 1,
@@ -219,12 +273,6 @@ const styles = StyleSheet.create({
     fontSize: 30,
     fontWeight: '900',
     marginTop: spacing.sm,
-  },
-  note: {
-    color: colors.textSecondary,
-    fontSize: 12,
-    lineHeight: 18,
-    marginTop: spacing.md,
   },
   backButton: {
     marginTop: spacing.sm,

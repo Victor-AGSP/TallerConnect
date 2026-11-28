@@ -40,6 +40,9 @@ export interface OrderEvidenceListProps {
  * La lista se consulta bajo demanda y las fotografías se muestran con URL
  * prefirmadas de corta duración, sin caché en disco ni en memoria.
  */
+export const EVIDENCE_LIST_FALLBACK_ERROR =
+  'El servicio de evidencias no está disponible o no pudo listar los archivos. Intenta nuevamente.';
+
 export function OrderEvidenceList({ orderId, role }: OrderEvidenceListProps) {
   const [requested, setRequested] = useState(false);
   const query = useMemo(
@@ -48,7 +51,7 @@ export function OrderEvidenceList({ orderId, role }: OrderEvidenceListProps) {
   );
   const { data, errorMessage, isLoading, isRefreshing, refresh } = useDataQuery(
     query,
-    'No fue posible cargar las evidencias.',
+    EVIDENCE_LIST_FALLBACK_ERROR,
   );
 
   const isStaff = role !== 'cliente';
@@ -75,6 +78,7 @@ export function OrderEvidenceList({ orderId, role }: OrderEvidenceListProps) {
       ) : errorMessage ? (
         <ErrorMessage
           testID="order-evidence-error"
+          title="No se pudieron cargar las evidencias"
           message={errorMessage}
           onRetry={refresh}
         />
@@ -85,6 +89,7 @@ export function OrderEvidenceList({ orderId, role }: OrderEvidenceListProps) {
             title="Actualizar evidencias"
             variant="outline"
             loading={isRefreshing}
+            disabled={isRefreshing}
             onPress={refresh}
             style={styles.refresh}
           />

@@ -608,7 +608,9 @@ const UPLOAD_MESSAGES: Record<number, string> = {
 const QUERY_MESSAGES: Record<number, string> = {
   403: 'No tienes permisos para ver las evidencias de esta orden.',
   404: 'La orden no existe o no tienes acceso a sus evidencias.',
+  502: 'El servicio de evidencias no está disponible en este momento. Intenta nuevamente más tarde.',
   503: 'El servicio de evidencias no está disponible. Intenta nuevamente.',
+  504: 'El servicio de evidencias tardó demasiado en responder. Intenta nuevamente.',
 };
 
 /** Respuestas tras las que MS4 garantiza que no quedó nada guardado. */

@@ -153,6 +153,7 @@ export function OrderBudgetView({
             title="Actualizar"
             variant="outline"
             loading={isRefreshing}
+            disabled={isRefreshing}
             onPress={refresh}
             style={styles.refreshButton}
           />
@@ -189,6 +190,7 @@ export function OrderBudgetView({
                 version={version}
                 actions={decisionActions}
                 onDecided={handleDecided}
+                disabled={isRefreshing}
               />
             ) : null}
           </Card>
@@ -294,11 +296,13 @@ function BudgetDecisionForm({
   version,
   actions,
   onDecided,
+  disabled = false,
 }: {
   budget: Budget;
   version: BudgetVersion;
   actions: BudgetDecisionActions;
   onDecided: (outcome: DecisionOutcome) => void;
+  disabled?: boolean;
 }) {
   const [reason, setReason] = useState('');
   const [state, setState] = useState<FormState>({ kind: 'idle' });
@@ -387,6 +391,7 @@ function BudgetDecisionForm({
           title="Reintentar aplicación"
           variant="outline"
           loading={state.retrying}
+          disabled={disabled || state.retrying}
           onPress={() => retryApplication(state.decisionId, state.message)}
         />
       </View>
@@ -394,6 +399,7 @@ function BudgetDecisionForm({
   }
 
   const submitting = state.kind === 'submitting';
+  const controlsDisabled = submitting || disabled;
   const pendingDecision =
     state.kind === 'confirming' || state.kind === 'submitting' ? state.decision : null;
 
@@ -403,8 +409,11 @@ function BudgetDecisionForm({
         testID="order-budget-reason"
         label="Motivo (obligatorio para rechazar)"
         value={reason}
-        onChangeText={setReason}
-        editable={!submitting}
+        onChangeText={(text) => {
+          setReason(text);
+          if (error) setError(null);
+        }}
+        editable={!controlsDisabled}
         maxLength={1000}
         multiline
       />
@@ -435,12 +444,13 @@ function BudgetDecisionForm({
             title={pendingDecision === 'aprobado' ? 'Confirmar aprobación' : 'Confirmar rechazo'}
             variant={pendingDecision === 'aprobado' ? 'primary' : 'danger'}
             loading={submitting}
+            disabled={controlsDisabled}
             onPress={() => submit(pendingDecision)}
           />
           <Button
             title="Volver"
             variant="outline"
-            disabled={submitting}
+            disabled={controlsDisabled}
             onPress={() => setState({ kind: 'idle' })}
           />
         </>
@@ -449,12 +459,14 @@ function BudgetDecisionForm({
           <Button
             testID="order-budget-approve"
             title="Aprobar presupuesto"
+            disabled={controlsDisabled}
             onPress={() => startConfirmation('aprobado')}
           />
           <Button
             testID="order-budget-reject"
             title="Rechazar presupuesto"
             variant="danger"
+            disabled={controlsDisabled}
             onPress={() => startConfirmation('rechazado')}
           />
         </>
