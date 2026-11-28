@@ -12,8 +12,11 @@ function collectSourceFiles(directory: string): string[] {
   const files: string[] = [];
   for (const entry of fs.readdirSync(directory, { withFileTypes: true })) {
     const fullPath = path.join(directory, entry.name);
-    if (entry.isDirectory()) files.push(...collectSourceFiles(fullPath));
-    else if (/\.(ts|tsx|js|jsx)$/.test(entry.name)) files.push(fullPath);
+    if (entry.isDirectory()) {
+      if (entry.name !== '__tests__') files.push(...collectSourceFiles(fullPath));
+    } else if (/\.(ts|tsx|js|jsx)$/.test(entry.name)) {
+      files.push(fullPath);
+    }
   }
   return files;
 }
@@ -21,7 +24,7 @@ function collectSourceFiles(directory: string): string[] {
 describe('Auditoría de Arquitectura: API Gateway y seguridad de URLs', () => {
   const sourceFiles = collectSourceFiles(SRC_DIRECTORY);
   const sourceContents = sourceFiles.map((file) => ({
-    file: path.relative(SRC_DIRECTORY, file),
+    file: path.relative(SRC_DIRECTORY, file).replace(/\\/g, '/'),
     content: fs.readFileSync(file, 'utf-8') as string,
   }));
 

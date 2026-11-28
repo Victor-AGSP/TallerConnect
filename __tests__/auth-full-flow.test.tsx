@@ -19,7 +19,7 @@ import IndexScreen from '@/app/index';
 import MecanicoLayout from '@/app/(mecanico)/_layout';
 import MecanicoScreen from '@/app/(mecanico)/mecanico';
 import { mockAuthResponses } from '@/mocks/auth.mock';
-import { authService } from '@/services/auth.service';
+import { authService, getCurrentUser } from '@/services/auth.service';
 import { AUTH_SESSION_STORAGE_KEY, useAuthStore } from '@/stores/authStore';
 
 jest.mock('expo-secure-store', () => ({
@@ -30,12 +30,14 @@ jest.mock('expo-secure-store', () => ({
 
 jest.mock('@/services/auth.service', () => ({
   authService: { login: jest.fn() },
+  getCurrentUser: jest.fn(),
 }));
 
 const getItem = jest.mocked(SecureStore.getItemAsync);
 const setItem = jest.mocked(SecureStore.setItemAsync);
 const deleteItem = jest.mocked(SecureStore.deleteItemAsync);
 const login = jest.mocked(authService.login);
+const mockedGetCurrentUser = jest.mocked(getCurrentUser);
 
 const routes = {
   index: IndexScreen,
@@ -139,6 +141,7 @@ it.each(roleCases)('permite reintentar una limpieza fallida desde el logout de %
 
 it.each(roleCases)('recupera %s al arrancar y no recupera la sesión después de Logout y reinicio', async (role, route) => {
   resetStores();
+  mockedGetCurrentUser.mockReset().mockResolvedValue(mockAuthResponses[role].user);
   const disk = new Map([[AUTH_SESSION_STORAGE_KEY, JSON.stringify(mockAuthResponses[role])]]);
   getItem.mockReset().mockImplementation(async (key) => disk.get(key) ?? null);
   setItem.mockReset().mockImplementation(async (key, value) => { disk.set(key, value); });
