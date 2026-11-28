@@ -6,7 +6,7 @@ import { spawnSync } from 'node:child_process';
 
 const root = process.cwd();
 const outputDir = path.join(root, '.expo-integration-verification');
-const officialGateway = 'https://tallerconect.vercel.app/api';
+const officialGateway = 'https://api-tallerconnect.inf.uct.cl/api';
 
 function collectFiles(directory) {
   const files = [];

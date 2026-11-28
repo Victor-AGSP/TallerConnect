@@ -177,7 +177,7 @@ describe('Interceptors y Manejo Centralizado de Errores', () => {
     it('normaliza rutas relativas evitando duplicar /api y ajusta FormData multipart', () => {
       const fakeFormData = { append: jest.fn() };
       const config = {
-        baseURL: 'https://tallerconect.vercel.app/api',
+        baseURL: 'https://api-tallerconnect.inf.uct.cl/api',
         url: '/api/evidencias',
         data: fakeFormData,
         headers: new axios.AxiosHeaders({ 'Content-Type': 'application/json' }),
