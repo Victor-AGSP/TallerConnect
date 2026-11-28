@@ -285,11 +285,6 @@ export function InventoryScreen() {
           )}
         </View>
       )}
-
-      <Text style={styles.demoNote}>
-        Datos simulados para desarrollo. Los cambios de stock y la información
-        de proveedores todavía no se guardan en el servidor.
-      </Text>
     </AppScreen>
   );
 }

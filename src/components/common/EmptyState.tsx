@@ -33,7 +33,12 @@ export function EmptyState({
       accessibilityRole="text"
       style={[styles.container, style]}
     >
-      <View style={styles.iconContainer}>
+      <View
+        accessible={false}
+        accessibilityElementsHidden
+        importantForAccessibility="no-hide-descendants"
+        style={styles.iconContainer}
+      >
         <Text style={styles.icon}>○</Text>
       </View>
 
