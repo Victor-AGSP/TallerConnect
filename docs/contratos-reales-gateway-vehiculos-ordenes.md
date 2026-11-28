@@ -1,6 +1,8 @@
 # Contratos reales de la Gateway: vehículos y órdenes
 
-Este documento contrasta las respuestas que entrega la API Gateway (`https://tallerconect.vercel.app/api`) con el contrato OpenAPI de MS2 (`/ms2/openapi.json`) y con los tipos de la app. Las respuestas se obtuvieron con las cuentas de prueba de cada rol, usando solo consultas de lectura.
+Este documento contrasta las respuestas que entrega la API Gateway con el contrato OpenAPI de MS2 (`/ms2/openapi.json`) y con los tipos de la app. Las respuestas se obtuvieron con las cuentas de prueba de cada rol, usando solo consultas de lectura, a través de la Gateway anterior (`https://tallerconect.vercel.app/api`). Esa Gateway ya fue retirada. La URL oficial actual es la de la UCT (`https://api-tallerconnect.inf.uct.cl/api`).
+
+Las fixtures anonimizadas, sus relaciones y las pruebas de regresión de mappers se describen en `docs/fixtures-anonimizadas-y-regresion-mappers.md`.
 
 ## Campos de respuesta de vehículos
 
@@ -95,19 +97,22 @@ Las respuestas reales de `GET /api/vehiculos` y `GET /api/ordenes` se compararon
 
 ### Vehículos
 
-`mapVehicleResponse` no usa `vehicleResponseDtoSchema`: valida la respuesta por su cuenta y acepta, además del contrato, nombres de campos de un formato anterior.
+`mapVehicleResponse` no usa `vehicleResponseDtoSchema`. Valida la respuesta por su cuenta y, además del contrato, acepta nombres de campos de un formato anterior.
 
 | Campo | Contrato | `VehicleResponseDto` | `vehicleResponseDtoSchema` | `mapVehicleResponse` | `Vehicle` |
 |---|---|---|---|---|---|
-| `vehiculo_id` | Obligatorio, no nulo | `number` | Entero obligatorio | Obligatorio; acepta también `id` y valores de texto | `id: string` |
-| `cliente_id` | Obligatorio, no nulo | `number` | Entero obligatorio | Opcional; acepta también `client_id`, `clientId`, `owner_id` y `ownerId` | `ownerId?: string` |
+| `vehiculo_id` | Obligatorio, no nulo | `number` | Entero obligatorio | Entero obligatorio; acepta también `id` | `id: string` |
+| `cliente_id` | Obligatorio, no nulo | `number` | Entero obligatorio | Opcional; si viene, debe ser entero; acepta también `client_id`, `clientId`, `owner_id` y `ownerId` | `ownerId?: string` |
 | `patente` | Obligatorio, no nulo | `string` | Texto obligatorio | Texto no vacío; acepta también `patent`, `license_plate` y `plate` | `plate: string` |
 | `marca` | Obligatorio, no nulo | `string` | Texto obligatorio | Texto; acepta también `brand` | `brand: string` |
 | `modelo` | Obligatorio, no nulo | `string` | Texto obligatorio | Texto; acepta también `model` | `model: string` |
-| `anio` | Obligatorio, admite `null` | `number \| null` | Entero o `null`, obligatorio | Si falta, se asigna `null`, salvo que venga `cliente_id` | `year: number \| null` |
-| `kilometraje` | Obligatorio, admite `null` | `number \| null` | Entero o `null`, obligatorio | Si falta, se asigna `null`, salvo que venga `cliente_id` | `mileage: number \| null` |
+| `anio` | Obligatorio, admite `null` | `number \| null` | Entero o `null`, obligatorio | Entero o `null`, obligatorio; acepta también `year` | `year: number \| null` |
+| `kilometraje` | Obligatorio, admite `null` | `number \| null` | Entero o `null`, obligatorio | Entero o `null`, obligatorio; acepta también `mileage` | `mileage: number \| null` |
 
-El DTO y el esquema coinciden con el contrato. Las diferencias están en el mapper, que acepta respuestas que el esquema rechaza, y en el modelo, donde `ownerId` es opcional aunque `cliente_id` es obligatorio en el contrato.
+El DTO y el esquema coinciden con el contrato. Quedan dos diferencias:
+
+- El mapper acepta respuestas sin `cliente_id` y con nombres del formato anterior, que el esquema rechaza.
+- En el modelo, `ownerId` es opcional, aunque `cliente_id` es obligatorio en el contrato.
 
 ### Órdenes
 
@@ -123,26 +128,31 @@ El DTO y el esquema coinciden con el contrato. Las diferencias están en el mapp
 | `creado_por_id` | Obligatorio, no nulo | `number` | Entero obligatorio | Se convierte a texto | `createdById: string` |
 | `creado_en` | Obligatorio, no nulo, `date-time` | `string` | Fecha ISO con zona horaria, obligatoria | Se conserva | `createdAt: string` |
 | `actualizado_en` | Obligatorio, no nulo, `date-time` | `string` | Fecha ISO con zona horaria, obligatoria | Se conserva | `updatedAt: string` |
-| `devuelto_en` | Obligatorio, admite `null`, `date-time` | No existe | No existe; se descarta | No existe | No existe |
-| `devuelto_por_id` | Obligatorio, admite `null` | No existe | No existe; se descarta | No existe | No existe |
+| `devuelto_en` | Obligatorio, admite `null`, `date-time` | `string \| null`, opcional | Fecha ISO con zona horaria o `null`, opcional | Se conserva; si falta, se omite | `returnedAt?: string \| null` |
+| `devuelto_por_id` | Obligatorio, admite `null` | `number \| null`, opcional | Entero o `null`, opcional | Se convierte a texto; `null` se conserva; si falta, se omite | `returnedById?: string \| null` |
 | — | No existe | No existe | No existe | No se asigna | `clientId?: string` |
 
-Los ocho campos que la app conoce coinciden con el contrato en tipo y nulabilidad. `devuelto_en` y `devuelto_por_id` registran la devolución física de una orden cancelada; la app no los tiene en ninguna capa. `clientId` existe solo en el modelo y el mapper no lo asigna, porque `OrdenRespuesta` no tiene un campo equivalente. Según la documentación de `WorkOrder`, el cliente de una orden se obtiene a través de su vehículo (`vehicleId` → `Vehicle.ownerId`).
+Los diez campos del contrato coinciden en tipo y nulabilidad con la app.
+
+- **Devolución.** `devuelto_en` y `devuelto_por_id` registran la devolución física de una orden cancelada. Se incorporaron en todas las capas, pero son opcionales en la app, aunque el contrato los exige. Así no se rompen los datos de prueba existentes que no los incluyen (caso O2).
+- **Cliente.** `clientId` existe solo en el modelo, y el mapper no lo asigna porque `OrdenRespuesta` no tiene un campo equivalente. Según la documentación de `WorkOrder`, el cliente de una orden se obtiene a través de su vehículo (`vehicleId` → `Vehicle.ownerId`).
 
 ### Casos incompatibles
 
-| Caso | Respuesta | Contrato | Comportamiento actual | Efecto |
+La tabla muestra el comportamiento detectado en el contraste inicial y el estado después de las correcciones de la capa de contratos.
+
+| Caso | Respuesta | Contrato | Comportamiento detectado | Estado actual |
 |---|---|---|---|---|
-| O1 | Orden con `devuelto_en` y `devuelto_por_id` con valor | Válida | El esquema los descarta sin error | La app pierde la fecha y el responsable de la devolución |
-| O2 | Orden sin `devuelto_en` ni `devuelto_por_id` | Fuera de contrato | El esquema la acepta | Una respuesta incompleta no se detecta |
-| V1 | Vehículo sin `cliente_id` ni `anio` | Fuera de contrato | El mapper la acepta con `anio` en `null`; el esquema la rechaza | Un dato faltante se muestra como desconocido |
-| V2 | Vehículo con `cliente_id` y sin `anio` | Fuera de contrato | El mapper la rechaza | La misma ausencia se trata distinto que en V1 |
-| V3 | Vehículo solo con nombres del formato anterior (`id`, `plate`, `brand`, `model`, `year`, `mileage`) | Fuera de contrato | El mapper la acepta; el esquema la rechaza | Se aceptan respuestas que no son de MS2 |
-| V4 | Vehículo con `vehiculo_id` de texto | Fuera de contrato | El mapper la acepta; el esquema la rechaza | Un tipo incorrecto no se detecta |
+| O1 | Orden con `devuelto_en` y `devuelto_por_id` con valor | Válida | El esquema los descartaba sin error, y la app perdía la fecha y el responsable de la devolución | Corregido: el esquema y el mapper los conservan en `returnedAt` y `returnedById` |
+| O2 | Orden sin `devuelto_en` ni `devuelto_por_id` | Fuera de contrato | El esquema la acepta | Se mantiene, para no romper datos de prueba existentes que no incluyen esos campos |
+| V1 | Vehículo sin `cliente_id` ni `anio` | Fuera de contrato | El mapper la aceptaba con `anio` en `null`, y un dato faltante se mostraba como desconocido | Corregido: el mapper la rechaza, igual que el esquema |
+| V2 | Vehículo con `cliente_id` y sin `anio` | Fuera de contrato | El mapper la rechaza | Sin cambios; ahora V1 y V2 se tratan igual |
+| V3 | Vehículo solo con nombres del formato anterior (`id`, `plate`, `brand`, `model`, `year`, `mileage`) | Fuera de contrato | El mapper la acepta; el esquema la rechaza | Se mantiene, por compatibilidad con el formato anterior que aún usan datos de prueba del proyecto |
+| V4 | Vehículo con `vehiculo_id` de texto | Fuera de contrato | El mapper la aceptaba, y un tipo incorrecto no se detectaba | Corregido: el mapper la rechaza, igual que el esquema |
 
 O1 aparece en las respuestas reales: la orden cancelada y devuelta trae ambos campos con valor. Las respuestas reales de vehículos son compatibles; V1 a V4 son respuestas fuera de contrato construidas a partir del ejemplo anonimizado.
 
-La prueba `__tests__/gateway-contract-contrast.test.ts` reproduce los seis casos con las fixtures `src/mocks/gateway/vehicles.gateway.ts` y `src/mocks/gateway/orders.gateway.ts`. En las órdenes, los identificadores y las fechas se reemplazaron por valores ficticios que conservan su formato y las relaciones entre registros; los códigos de estado y los valores nulos se conservan.
+La prueba `__tests__/gateway-contract-contrast.test.ts` reproduce los seis casos con su estado actual, usando las fixtures `src/mocks/gateway/vehicles.gateway.ts` y `src/mocks/gateway/orders.gateway.ts`. `__tests__/mapper-ids-dates-nulls.test.ts` cubre además la compatibilidad que se mantiene fuera de contrato: un vehículo sin `cliente_id` y una orden con solo uno de los campos de devolución. En las órdenes, los identificadores y las fechas se reemplazaron por valores ficticios que conservan su formato y las relaciones entre registros; los códigos de estado y los valores nulos se conservan.
 
 ## Cliente en el detalle de la orden
 
